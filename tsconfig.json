@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES6",
+    "target": "ESNext",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
@@ -19,6 +19,6 @@
     "esm": true,
     "module": "commonjs"
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "server.ts", "postcss.config.cjs", "tailwind.config.cjs"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "server.ts"],
   "exclude": ["node_modules"]
 }

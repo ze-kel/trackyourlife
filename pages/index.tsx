@@ -10,7 +10,7 @@ export default function Home({ data }) {
       </Head>
 
       <main className="example">
-        <h1 className="text-3xl font-bold underline">Hello</h1>
+        <h1 className="text-3xl font-bold underline">Helasdsdlo</h1>
       </main>
 
       <footer>This is footer</footer>

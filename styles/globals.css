@@ -1,8 +1,3 @@
-@import 'tailwindcss/base';
-
-.example {
-  display: grid;
-  transition: all 0.5s;
-  user-select: none;
-  background: linear-gradient(to bottom, white, black);
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
