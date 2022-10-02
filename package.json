@@ -2,19 +2,34 @@
   "name": "trackyourlife",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
-    "dev": "next dev",
+    "dev": "nodemon --exec ts-node server.ts",
+    "ndev": "next dev",
+    "tstart": "ts-node server.ts",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
+    "@fastify/nextjs": "^9.1.1",
+    "fastify": "^4.7.0",
+    "fastify-nextjs": "^7.3.0",
+    "iron-session": "^6.2.1",
     "next": "12.3.1",
+    "next-transpile-modules": "^9.0.0",
     "react": "18.2.0",
     "react-dom": "18.2.0"
   },
   "devDependencies": {
+    "@types/react": "18.0.21",
+    "autoprefixer": "^10.4.12",
     "eslint": "8.24.0",
-    "eslint-config-next": "12.3.1"
+    "eslint-config-next": "12.3.1",
+    "nodemon": "^2.0.20",
+    "postcss": "^8.4.17",
+    "tailwindcss": "^3.1.8",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.8.4"
   }
 }
