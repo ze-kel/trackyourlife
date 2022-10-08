@@ -50,11 +50,8 @@ const updateTrackable = (id: ITrackable["id"], updates: ITrackableUpdate) => {
   const data = getData();
 
   let itemIndex = data.findIndex((i) => i.id === id);
-  console.log("index is", itemIndex);
 
   data[itemIndex] = _merge(data[itemIndex], updates);
-
-  console.log("updated", data[itemIndex]);
 
   saveData();
   return data[itemIndex];

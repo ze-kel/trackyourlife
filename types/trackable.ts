@@ -1,6 +1,6 @@
-type IMonthData<T> = Record<number, T>;
-type IYearData<T> = Record<number, IMonthData<T>>;
-type IFullData<T> = Record<number, IYearData<T>>;
+export type IMonthData<T> = Record<number, T>;
+export type IYearData<T> = Record<number, IMonthData<T>>;
+export type IFullData<T> = Record<number, IYearData<T>>;
 
 type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 

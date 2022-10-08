@@ -1,7 +1,7 @@
 {
   "data": [
     {
-      "id": "1",
+      "id": "askjdlsadkjasloqwj",
       "type": "boolean",
       "settings": {
         "name": "Meditation"
@@ -14,25 +14,41 @@
             "30": true
           },
           "10": {
+            "1": false,
+            "2": false,
             "3": true,
+            "4": true,
             "5": true,
-            "7": true
+            "6": false,
+            "7": true,
+            "8": false,
+            "9": false
           }
         }
       }
     },
     {
-      "id": "2",
+      "id": "gnjkn4kn3kjh",
       "type": "boolean",
       "settings": {
         "name": "Read"
       },
       "data": {
         "2022": {
+          "6": {
+            "7": false,
+            "8": false
+          },
           "10": {
+            "1": true,
+            "2": true,
+            "3": false,
             "4": true,
             "5": true,
-            "6": true
+            "6": true,
+            "7": true,
+            "8": true,
+            "9": true
           }
         }
       }
