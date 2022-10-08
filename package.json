@@ -2,33 +2,51 @@
   "name": "trackyourlife",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
   "scripts": {
     "dev": "nodemon --exec ts-node server.ts",
     "ndev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "jest --runInBand"
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "**/tests/**",
+      "*.test.ts"
+    ],
+    "delay": 2500
   },
   "dependencies": {
     "@fastify/nextjs": "^9.1.1",
+    "@tanstack/react-query": "^4.10.3",
+    "@types/lodash": "^4.14.186",
+    "@types/supertest": "^2.0.12",
     "fastify": "^4.7.0",
     "fastify-nextjs": "^7.3.0",
     "iron-session": "^6.2.1",
+    "lodash": "^4.17.21",
     "next": "12.3.1",
     "next-transpile-modules": "^9.0.0",
     "react": "18.2.0",
     "react-dom": "18.2.0"
   },
   "devDependencies": {
+    "@types/jest": "^29.1.2",
+    "@types/node": "^18.8.3",
     "@types/react": "18.0.21",
     "autoprefixer": "^10.4.12",
     "eslint": "8.24.0",
     "eslint-config-next": "12.3.1",
+    "jest": "^29.1.2",
     "nodemon": "^2.0.20",
     "postcss": "^8.4.17",
     "postcss-preset-env": "^7.8.2",
+    "prettier": "2.7.1",
+    "prettier-plugin-tailwindcss": "^0.1.13",
+    "supertest": "^6.3.0",
     "tailwindcss": "^3.1.8",
+    "ts-jest": "^29.0.3",
     "ts-node": "^10.9.1",
     "typescript": "^4.8.4"
   }

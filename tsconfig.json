@@ -9,11 +9,17 @@
     "noEmit": true,
     "incremental": true,
     "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "node",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve"
+    "jsx": "preserve",
+    "baseUrl": "./",
+    "paths": {
+      "@components/*": ["src/components/*"],
+      "@pages/*": ["src/pages/*"],
+      "@t/*": ["types/*"]
+    }
   },
   "ts-node": {
     "esm": true,

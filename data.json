@@ -1,0 +1,41 @@
+{
+  "data": [
+    {
+      "id": "1",
+      "type": "boolean",
+      "settings": {
+        "name": "Meditation"
+      },
+      "data": {
+        "2022": {
+          "9": {
+            "21": true,
+            "25": true,
+            "30": true
+          },
+          "10": {
+            "3": true,
+            "5": true,
+            "7": true
+          }
+        }
+      }
+    },
+    {
+      "id": "2",
+      "type": "boolean",
+      "settings": {
+        "name": "Read"
+      },
+      "data": {
+        "2022": {
+          "10": {
+            "4": true,
+            "5": true,
+            "6": true
+          }
+        }
+      }
+    }
+  ]
+}
