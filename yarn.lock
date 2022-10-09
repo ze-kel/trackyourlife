@@ -841,6 +841,23 @@
     "tslib" "^2.4.0"
     "webcrypto-core" "^1.7.4"
 
+"@prisma/client@4.4.0":
+  "integrity" "sha512-ciKOP246x1xwr04G9ajHlJ4pkmtu9Q6esVyqVBO0QJihaKQIUvbPjClp17IsRJyxqNpFm4ScbOc/s9DUzKHINQ=="
+  "resolved" "https://registry.npmjs.org/@prisma/client/-/client-4.4.0.tgz"
+  "version" "4.4.0"
+  dependencies:
+    "@prisma/engines-version" "4.4.0-66.f352a33b70356f46311da8b00d83386dd9f145d6"
+
+"@prisma/engines-version@4.4.0-66.f352a33b70356f46311da8b00d83386dd9f145d6":
+  "integrity" "sha512-P5v/PuEIJLYXZUZBvOLPqoyCW+m6StNqHdiR6te++gYVODpPdLakks5HVx3JaZIY+LwR02juJWFlwpc9Eog/ug=="
+  "resolved" "https://registry.npmjs.org/@prisma/engines-version/-/engines-version-4.4.0-66.f352a33b70356f46311da8b00d83386dd9f145d6.tgz"
+  "version" "4.4.0-66.f352a33b70356f46311da8b00d83386dd9f145d6"
+
+"@prisma/engines@4.4.0":
+  "integrity" "sha512-Fpykccxlt9MHrAs/QpPGpI2nOiRxuLA+LiApgA59ibbf24YICZIMWd3SI2YD+q0IAIso0jCGiHhirAIbxK3RyQ=="
+  "resolved" "https://registry.npmjs.org/@prisma/engines/-/engines-4.4.0.tgz"
+  "version" "4.4.0"
+
 "@rushstack/eslint-patch@^1.1.3":
   "integrity" "sha512-sXo/qW2/pAcmT43VoRKOJbDOfV3cYpq3szSVfIThQXNt+E4DfKj361vaAt3c88U5tPUxzEswam7GW48PJqtKAg=="
   "resolved" "https://registry.npmjs.org/@rushstack/eslint-patch/-/eslint-patch-1.2.0.tgz"
@@ -4175,6 +4192,13 @@
     "@jest/schemas" "^29.0.0"
     "ansi-styles" "^5.0.0"
     "react-is" "^18.0.0"
+
+"prisma@*", "prisma@^4.4.0":
+  "integrity" "sha512-l/QKLmLcKJQFuc+X02LyICo0NWTUVaNNZ00jKJBqwDyhwMAhboD1FWwYV50rkH4Wls0RviAJSFzkC2ZrfawpfA=="
+  "resolved" "https://registry.npmjs.org/prisma/-/prisma-4.4.0.tgz"
+  "version" "4.4.0"
+  dependencies:
+    "@prisma/engines" "4.4.0"
 
 "process-warning@^1.0.0":
   "integrity" "sha512-du4wfLyj4yCZq1VupnVSZmRsPJsNuxoDQFdCFHLaYiEbFBD7QE0a+I4D7hOxrVnh78QE/YipFAj9lXHiXocV+Q=="

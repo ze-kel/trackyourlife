@@ -3,8 +3,8 @@ import fs from "fs";
 import { ITrackable, ITrackableUnsaved, ITrackableUpdate } from "@t/trackable";
 
 import _merge from "lodash/merge";
+import formatDateKey from "../util/formatDateKey";
 
-// TODO: SWITCH TO REAL DB
 let data: ITrackable[];
 
 const getData = () => {
@@ -46,12 +46,19 @@ const addTrackable = (toSave: ITrackableUnsaved) => {
   return withId;
 };
 
-const updateTrackable = (id: ITrackable["id"], updates: ITrackableUpdate) => {
+const updateTrackable = (
+  id: ITrackable["id"],
+  { day, month, year, value }: ITrackableUpdate
+) => {
   const data = getData();
 
   let itemIndex = data.findIndex((i) => i.id === id);
 
-  data[itemIndex] = _merge(data[itemIndex], updates);
+  const key = formatDateKey({ day, month, year });
+
+  data[itemIndex].data[key] = value;
+
+  console.log("updateTrackable", data[itemIndex].data);
 
   saveData();
   return data[itemIndex];

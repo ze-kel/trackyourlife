@@ -1,7 +1,6 @@
 import Fastify from "fastify";
 import Fnext from "@fastify/nextjs";
 
-//const trackablesRoutes = require('./routes/trackable');
 import trackableRoutes from "./routes/trackable";
 
 const PORT = 1337;

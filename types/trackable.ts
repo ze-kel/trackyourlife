@@ -1,6 +1,4 @@
-export type IMonthData<T> = Record<number, T>;
-export type IYearData<T> = Record<number, IMonthData<T>>;
-export type IFullData<T> = Record<number, IYearData<T>>;
+export type IFullData<T> = Record<string, T>;
 
 type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 
@@ -33,7 +31,10 @@ export type ITrackableUnsaved =
 
 export type ITrackable = ITrackableUnsaved & { id: string };
 
-export type ITrackableUpdate = Optional<
-  ITrackable,
-  "settings" | "data" | "type"
->;
+// Probably should be force to provide correct type
+export type ITrackableUpdate = {
+  day: number;
+  month: number;
+  year: number;
+  value: boolean | number | string;
+};

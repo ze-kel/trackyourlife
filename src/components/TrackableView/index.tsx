@@ -1,4 +1,4 @@
-import { IMonthData, ITrackable, IYearData } from "@t/trackable";
+import { ITrackable, ITrackableBoolean, ITrackableUpdate } from "@t/trackable";
 
 import {
   getDay,
@@ -14,6 +14,8 @@ import { useContext } from "react";
 import { IdContext } from "src/helpers/idContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { update } from "src/helpers/api";
+import updateData from "src/helpers/updateData";
+import formatDateKey from "util/formatDateKey";
 
 const daysBeforeToday = (year: number, month: number) => {
   const now = new Date();
@@ -29,7 +31,7 @@ const Month = ({
   month,
   year,
 }: {
-  data: IMonthData<boolean>;
+  data: ITrackableBoolean["data"];
   month;
   year;
 }) => {
@@ -47,27 +49,25 @@ const Month = ({
   const id = useContext(IdContext);
 
   const isActive = (num: number) => {
-    return _get(data, num, false);
+    return data[formatDateKey({ day: num, month, year })];
   };
 
   const queryClient = useQueryClient();
 
+  const dateForUpdate = {
+    year,
+    month,
+  };
+
   const mutation = useMutation(
-    ({ day, value }: { day: number; value: boolean }) => {
-      return update(id, {
-        id,
-        data: {
-          [year]: {
-            [month + 1]: {
-              [day]: value,
-            },
-          },
-        },
-      });
+    ({ day, month, year, value }: ITrackableUpdate) => {
+      return update(id, { year, month, day, value });
     },
     {
-      onSuccess() {
-        queryClient.invalidateQueries(["trackable", id]);
+      onSuccess(data, variables) {
+        queryClient.setQueryData(["trackable", id], (data: ITrackable) => {
+          return updateData(data, variables);
+        });
       },
     }
   );
@@ -75,6 +75,7 @@ const Month = ({
   return (
     <div>
       <h3 className="text-lg">{format(firstDayDate, "MMMM")}</h3>
+      {month}
       <div className="grid grid-cols-7 gap-5">
         {prepend.map((_, i) => (
           <div key={i}> </div>
@@ -89,7 +90,13 @@ const Month = ({
                 : "cursor-pointer"
             )}
             key={el}
-            onClick={() => mutation.mutate({ day: el, value: !isActive(el) })}
+            onClick={() =>
+              mutation.mutate({
+                ...dateForUpdate,
+                day: el,
+                value: !isActive(el),
+              })
+            }
           >
             {el}
           </div>
@@ -109,7 +116,13 @@ const monthsBeforeToday = (year: number) => {
   return getMonth(now) + 1;
 };
 
-const Year = ({ data, year }: { data: IYearData<boolean>; year: number }) => {
+const Year = ({
+  data,
+  year,
+}: {
+  data: ITrackableBoolean["data"];
+  year: number;
+}) => {
   const toRender = monthsBeforeToday(year);
   const months = Array(toRender)
     .fill(0)
@@ -121,7 +134,7 @@ const Year = ({ data, year }: { data: IYearData<boolean>; year: number }) => {
       <h2 className="my-3 text-2xl">{year}</h2>
       <div className="space-y-10">
         {months.map((m) => (
-          <Month key={m} year={year} month={m} data={data[m + 1]} />
+          <Month key={m} year={year} month={m} data={data} />
         ))}
       </div>
     </>
@@ -133,7 +146,7 @@ const TrackableView = ({ trackable }: { trackable: ITrackable }) => {
 
   return (
     <div>
-      <Year year={2022} data={trackable.data["2022"]} />
+      <Year year={2022} data={trackable.data} />
     </div>
   );
 };
