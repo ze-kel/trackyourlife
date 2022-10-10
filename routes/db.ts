@@ -58,8 +58,6 @@ const updateTrackable = (
 
   data[itemIndex].data[key] = value;
 
-  console.log("updateTrackable", data[itemIndex].data);
-
   saveData();
   return data[itemIndex];
 };

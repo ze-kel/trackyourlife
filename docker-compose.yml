@@ -1,0 +1,21 @@
+version: "3"
+services:
+  node-next:
+    build: .
+    ports:
+      - "1337:1337"
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    env_file:
+      - ./.env
+  mongo:
+    image: mongo
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=dbadmin
+      - MONGO_INITDB_ROOT_PASSWORD=samplepass
+    volumes:
+      - mongo-db:/data/db
+
+volumes:
+  mongo-db:
