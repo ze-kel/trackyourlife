@@ -10,4 +10,13 @@ services:
       - /app/node_modules
     environment:
       - NODE_ENV=development
+      - PORT=1337
+      - MONGO_USER=dbadmin
+      - MONGO_PASSWORD=samplepass
     command: npm run dev
+  mongo:
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=dbadmin
+      - MONGO_INITDB_ROOT_PASSWORD=samplepass
+    volumes:
+      - mongo-db:/data/db

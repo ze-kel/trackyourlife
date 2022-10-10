@@ -1,7 +1,5 @@
 export type IFullData<T> = Record<string, T>;
 
-type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
-
 interface BaseSettings {
   name: string;
 }
@@ -31,7 +29,7 @@ export type ITrackableUnsaved =
 
 export type ITrackable = ITrackableUnsaved & { id: string };
 
-// Probably should be force to provide correct type
+// Probably should be forced to provide correct type
 export type ITrackableUpdate = {
   day: number;
   month: number;
