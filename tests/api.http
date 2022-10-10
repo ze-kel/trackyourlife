@@ -2,7 +2,7 @@
 GET http://localhost:1337/api/v1/trackables
 
 ### SINGLE
-GET http://localhost:1337/api/v1/trackable/1
+GET http://localhost:1337/api/v1/trackable/634480dda1a1af9f56fb4c1c
 
 ### ADD
 POST http://localhost:1337/api/v1/trackables HTTP/1.1
@@ -18,15 +18,13 @@ content-type: application/json
 DELETE http://localhost:1337/api/v1/trackable/43243ae6-abb7-4498-bedd-f420e5f5bb6a
 
 ### UPDATE
-PUT http://localhost:1337/api/v1/trackable/44f5046b-a67f-4301-be02-b49e7da6f323 HTTP/1.1
+PUT http://localhost:1337/api/v1/trackable/634480dda1a1af9f56fb4c1c HTTP/1.1
 content-type: application/json
 
 {
-  "data": {
-    "2022": {
-      "09": {
-        "08": false
-      }
-    }
-  }
+  "year": 2022,
+  "month": 1,
+  "day": 12,
+  "value": true
 }
+

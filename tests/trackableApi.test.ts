@@ -14,8 +14,8 @@ const getAll = async () => {
   return response.body as ITrackable[];
 };
 
-const getSingle = async (id: ITrackable["id"]) => {
-  const response = await request(BASE_URL).get("/trackable/" + id);
+const getSingle = async (_id: ITrackable["_id"]) => {
+  const response = await request(BASE_URL).get("/trackable/" + _id);
   return response.body;
 };
 
@@ -24,14 +24,14 @@ const add = async (data: ITrackableUnsaved) => {
   return response.body as ITrackable;
 };
 
-const remove = async (id: ITrackable["id"]) => {
-  const response = await request(BASE_URL).delete("/trackable/" + id);
+const remove = async (_id: ITrackable["_id"]) => {
+  const response = await request(BASE_URL).delete("/trackable/" + _id);
   return;
 };
 
-const update = async (id: ITrackable["id"], updates: ITrackableUpdate) => {
+const update = async (_id: ITrackable["_id"], updates: ITrackableUpdate) => {
   const response = await request(BASE_URL)
-    .put("/trackable/" + id)
+    .put("/trackable/" + _id)
     .send(updates);
   return response.body as ITrackable;
 };
@@ -40,8 +40,8 @@ describe("API TEST", () => {
   const toDelete = [];
 
   afterAll(async () => {
-    toDelete.forEach(async (id) => {
-      await remove(id);
+    toDelete.forEach(async (_id) => {
+      await remove(_id);
     });
   });
 
@@ -64,14 +64,14 @@ describe("API TEST", () => {
     expect(added.type).toEqual(mock.type);
     expect(added.settings).toEqual(mock.settings);
     expect(added.data).toEqual(mock.data);
-    expect(added.id).toBeDefined();
+    expect(added._id).toBeDefined();
 
     const allAfter = await getAll();
     const shouldBeAfter = _cloneDeep(allBefore);
     shouldBeAfter.push(added);
 
     expect(allAfter).toEqual(shouldBeAfter);
-    toDelete.push(added.id);
+    toDelete.push(added._id);
   });
 
   test("Deletion", async () => {
@@ -90,7 +90,7 @@ describe("API TEST", () => {
 
     expect(allAfterAdding.length).toBe(allBefore.length + 2);
 
-    await remove(added2.id);
+    await remove(added2._id);
 
     const allAfterDeletion = await getAll();
 
@@ -100,7 +100,7 @@ describe("API TEST", () => {
     shouldBeAfter.push(added1);
     expect(allAfterDeletion).toEqual(shouldBeAfter);
 
-    toDelete.push(added1.id);
+    toDelete.push(added1._id);
   });
 
   test("Getting individual", async () => {
@@ -112,7 +112,7 @@ describe("API TEST", () => {
 
     const added = await add(mock);
 
-    const fetched = await getSingle(added.id);
+    const fetched = await getSingle(added._id);
 
     expect(added).toEqual(fetched);
   });
@@ -121,71 +121,34 @@ describe("API TEST", () => {
     const mock: ITrackableUnsaved = {
       type: "boolean",
       settings: { name: randomUUID() },
-      data: {
-        2022: {
-          6: {
-            1: true,
-          },
-        },
-      },
+      data: {},
     };
 
     const added = await add(mock);
 
     const upd1: ITrackableUpdate = {
-      id: added.id,
-      data: {
-        2022: {
-          9: {
-            8: true,
-          },
-        },
-      },
+      year: 2022,
+      month: 8,
+      day: 8,
+      value: true,
     };
 
-    const afterUpd1 = await update(added.id, upd1);
+    const afterUpd1 = await update(added._id, upd1);
 
-    const dataShouldBe1 = {
-      2022: {
-        6: {
-          1: true,
-        },
-        9: {
-          8: true,
-        },
-      },
-    };
-
-    expect(afterUpd1.data).toEqual(dataShouldBe1);
+    expect(afterUpd1.data["2022-09-08"]).toEqual(true);
 
     const upd2: ITrackableUpdate = {
-      id: added.id,
-      data: {
-        2022: {
-          9: {
-            10: true,
-          },
-        },
-      },
+      year: 2022,
+      month: 8,
+      day: 10,
+      value: true,
     };
 
-    const afterUpd2 = await update(added.id, upd2);
+    const afterUpd2 = await update(added._id, upd2);
 
-    const dataShouldBe2 = {
-      2022: {
-        6: {
-          1: true,
-        },
-        9: {
-          8: true,
-          10: true,
-        },
-      },
-    };
+    expect(afterUpd2.data["2022-09-10"]).toEqual(true);
 
-    expect(afterUpd2.data).toEqual(dataShouldBe2);
-
-    const fullFetch = await getSingle(added.id);
+    const fullFetch = await getSingle(added._id);
     expect(fullFetch).toEqual(afterUpd2);
 
     toDelete.push(fullFetch.id);

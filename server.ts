@@ -9,6 +9,7 @@ import {
   MONGO_PORT,
   MONGO_USER,
 } from "./config/config";
+import { TrackableModel } from "./models/trackableModel";
 
 const PORT = Number(process.env.PORT) || 1337;
 

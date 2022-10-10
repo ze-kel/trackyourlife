@@ -1,73 +1,48 @@
-import { randomUUID } from "crypto";
-import fs from "fs";
-import { ITrackable, ITrackableUnsaved, ITrackableUpdate } from "@t/trackable";
+import {
+  ITrackable,
+  ITrackableDB,
+  ITrackableUnsaved,
+  ITrackableUpdate,
+} from "@t/trackable";
 
 import _merge from "lodash/merge";
-import formatDateKey from "../util/formatDateKey";
+import { transformToDBFormat, transformToUserFormat } from "../util/dbToFront";
+import { TrackableModel } from "../models/trackableModel";
 
-let data: ITrackable[];
-
-const getData = () => {
-  if (!data) {
-    const content = fs.readFileSync("data.json").toString();
-    const jsn = JSON.parse(content);
-
-    data = jsn.data;
-  }
-  return data;
+const getTrackables = async (): Promise<ITrackable[]> => {
+  const trackables = await TrackableModel.find();
+  const transformed = trackables.map(transformToUserFormat);
+  return transformed as ITrackable[];
 };
 
-const saveData = () => {
-  if (!data) return;
-
-  const jsn = JSON.stringify({ data: data }, null, 2);
-
-  fs.writeFileSync("data.json", jsn);
+const getTrackable = async (_id: ITrackable["_id"]): Promise<ITrackable> => {
+  const item = await TrackableModel.findOne({ _id });
+  return transformToUserFormat(item);
 };
 
-const getTrackables = () => {
-  const data = getData();
-
-  return data;
+const addTrackable = async (toSave: ITrackableUnsaved): Promise<ITrackable> => {
+  const toDbFormat = transformToDBFormat(toSave);
+  const newItem = await TrackableModel.create(toDbFormat);
+  return transformToUserFormat(newItem) as ITrackable;
 };
 
-const getTrackable = (id: ITrackable["id"]) => {
-  const data = getData();
-
-  const item = data.find((i) => i.id === id);
-  return item;
-};
-
-const addTrackable = (toSave: ITrackableUnsaved) => {
-  const withId: ITrackable = { ...toSave, id: randomUUID() };
-  const data = getData();
-  data.push(withId);
-  saveData();
-  return withId;
-};
-
-const updateTrackable = (
-  id: ITrackable["id"],
+const updateTrackable = async (
+  _id: ITrackable["_id"],
   { day, month, year, value }: ITrackableUpdate
 ) => {
-  const data = getData();
+  const date = new Date(year, month, day);
+  await TrackableModel.findOneAndUpdate(
+    { _id },
+    { $push: { data: { date, value } } }
+  );
 
-  let itemIndex = data.findIndex((i) => i.id === id);
+  const item = await TrackableModel.findOne({ _id });
 
-  const key = formatDateKey({ day, month, year });
-
-  data[itemIndex].data[key] = value;
-
-  saveData();
-  return data[itemIndex];
+  return transformToUserFormat(item as ITrackableDB);
 };
 
-const deleteTrackable = (id: ITrackable["id"]) => {
-  const data = getData();
-  let itemIndex = data.findIndex((i) => i.id === id);
-
-  data.splice(itemIndex);
-  saveData();
+const deleteTrackable = async (_id: ITrackable["_id"]) => {
+  await TrackableModel.deleteOne({ _id });
 };
 
 const fakeDb = {

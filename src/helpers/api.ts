@@ -12,7 +12,7 @@ const getAll = async () => {
   return json as ITrackable[];
 };
 
-const getSingle = async (id: ITrackable["id"]) => {
+const getSingle = async (id: ITrackable["_id"]) => {
   const res = await fetch(BASE_URL + "/trackable/" + id);
   if (!res.ok) {
     throw new Error("Network response was not ok");
@@ -36,7 +36,7 @@ const add = async (data: ITrackableUnsaved) => {
   return json as ITrackable[];
 };
 
-const remove = async (id: ITrackable["id"]) => {
+const remove = async (id: ITrackable["_id"]) => {
   const res = await fetch(BASE_URL + "/trackable/" + id, { method: "DELETE" });
   if (!res.ok) {
     throw new Error("Network response was not ok");
@@ -44,7 +44,7 @@ const remove = async (id: ITrackable["id"]) => {
   return;
 };
 
-const update = async (id: ITrackable["id"], updates: ITrackableUpdate) => {
+const update = async (id: ITrackable["_id"], updates: ITrackableUpdate) => {
   const res = await fetch(BASE_URL + "/trackable/" + id, {
     method: "PUT",
     headers: {

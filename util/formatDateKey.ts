@@ -1,3 +1,5 @@
+import { format } from "date-fns";
+
 const formatDateKey = ({
   day,
   month,
@@ -7,7 +9,9 @@ const formatDateKey = ({
   month: number;
   year: number;
 }) => {
-  return `${year}-${month}-${day}`;
+  const date = new Date(year, month, day);
+
+  return format(date, "yyyy-MM-dd");
 };
 
 export default formatDateKey;
