@@ -10,12 +10,13 @@ import {
 } from "date-fns";
 import _get from "lodash/get";
 import cls from "clsx";
-import { useContext } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { IdContext } from "src/helpers/idContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { update } from "src/helpers/api";
 import updateData from "src/helpers/updateData";
 import formatDateKey from "util/formatDateKey";
+import { ElObserver, ObserverContext } from "./IObserver";
 
 const daysBeforeToday = (year: number, month: number) => {
   const now = new Date();
@@ -72,8 +73,49 @@ const Month = ({
     }
   );
 
+  const monthRef = useRef<HTMLDivElement>();
+
+  const myId = `${year}-${month}`;
+  const observer = useContext(ObserverContext);
+
+  const [isVisible, setVisible] = useState<Boolean>(true);
+  const [savedHeight, setSavedHeight] = useState(0);
+
+  const recordHeightAndFlip = (newValue: boolean) => {
+    if (newValue === false) {
+      if (observer && monthRef.current) {
+        setSavedHeight(monthRef.current.clientHeight);
+      }
+    }
+    setVisible(newValue);
+  };
+
+  useEffect(() => {
+    if (!observer || !monthRef.current) return;
+    observer.watchElement(monthRef.current, recordHeightAndFlip);
+
+    return () => {
+      if (!observer || !monthRef.current) return;
+      observer.unwatchElement(monthRef.current);
+    };
+  }, [observer]);
+
+  if (observer && !isVisible) {
+    return (
+      <div
+        id={myId}
+        ref={monthRef}
+        className="flex items-center justify-center bg-slate-200"
+        style={{ height: savedHeight }}
+      >
+        This is a placeholder for month out of view. If you are seeing this
+        something went wrong, please file a bugreport.
+      </div>
+    );
+  }
+
   return (
-    <div>
+    <div id={myId} ref={monthRef}>
       <h3 className="text-lg">{format(firstDayDate, "MMMM")}</h3>
       {month}
       <div className="grid grid-cols-7 gap-5">
@@ -142,12 +184,32 @@ const Year = ({
 };
 
 const TrackableView = ({ trackable }: { trackable: ITrackable }) => {
+  const [yearsRendered, setYearsRendered] = useState([2022]);
+
+  const [observer, setObserver] = useState<ElObserver>();
+
+  const yearsRef = useRef();
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    setObserver(new ElObserver());
+  }, []);
+
   if (trackable.type !== "boolean") return <div>no support yet</div>;
 
+  const loadNextYear = () => {
+    const next = yearsRendered[yearsRendered.length - 1] - 1;
+    setYearsRendered([...yearsRendered, next]);
+  };
+
   return (
-    <div>
-      <Year year={2022} data={trackable.data} />
-    </div>
+    <ObserverContext.Provider value={observer}>
+      <div ref={yearsRef}>
+        {yearsRendered.map((year) => {
+          return <Year key={year} year={year} data={trackable.data} />;
+        })}
+      </div>
+    </ObserverContext.Provider>
   );
 };
 

@@ -13,7 +13,7 @@ const Trackable = ({ trackable }: { trackable: ITrackable }) => {
 
 const TrackablesList = ({ list }: { list: ITrackable[] }) => {
   return (
-    <div className="flex gap-6">
+    <div className="grid grid-cols-4 gap-4 ">
       {list.map((item) => (
         <Trackable trackable={item} key={item._id} />
       ))}
