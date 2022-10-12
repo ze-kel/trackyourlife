@@ -36,6 +36,16 @@ const update = async (_id: ITrackable["_id"], updates: ITrackableUpdate) => {
   return response.body as ITrackable;
 };
 
+const updateSettings = async (
+  _id: ITrackable["_id"],
+  settings: ITrackable["settings"]
+) => {
+  const response = await request(BASE_URL)
+    .put("/trackable/" + _id + "/settings")
+    .send(settings);
+  return response.body as ITrackable["settings"];
+};
+
 describe("API TEST", () => {
   const toDelete = [];
 
@@ -152,6 +162,30 @@ describe("API TEST", () => {
     expect(fullFetch).toEqual(afterUpd2);
 
     toDelete.push(fullFetch.id);
+  });
+
+  test("Settings Update", async () => {
+    const mock: ITrackableUnsaved = {
+      type: "boolean",
+      settings: { name: randomUUID() },
+      data: {},
+    };
+
+    const added = await add(mock);
+
+    const newSettings = { ...added.settings };
+
+    newSettings.name = randomUUID();
+
+    const updSetitngs = await updateSettings(added._id, newSettings);
+
+    const refetched = await getSingle(added._id);
+
+    expect(updSetitngs).toEqual(newSettings);
+
+    expect(refetched).toEqual({ ...added, settings: newSettings });
+
+    toDelete.push(added._id);
   });
 });
 

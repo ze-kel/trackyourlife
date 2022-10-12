@@ -10,10 +10,17 @@ import {
 } from "date-fns";
 import _get from "lodash/get";
 import cls from "clsx";
-import { useContext, useEffect, useRef, useState } from "react";
+import {
+  ChangeEvent,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { IdContext } from "src/helpers/idContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { update } from "src/helpers/api";
+import { update, updateSettings } from "src/helpers/api";
 import updateData from "src/helpers/updateData";
 import formatDateKey from "util/formatDateKey";
 import { ElObserver, ObserverContext } from "./IObserver";
@@ -115,9 +122,8 @@ const Month = ({
   }
 
   return (
-    <div id={myId} ref={monthRef}>
+    <div id={myId} ref={monthRef} className="">
       <h3 className="text-lg">{format(firstDayDate, "MMMM")}</h3>
-      {month}
       <div className="grid grid-cols-7 gap-5">
         {prepend.map((_, i) => (
           <div key={i}> </div>
@@ -168,8 +174,7 @@ const Year = ({
   const toRender = monthsBeforeToday(year);
   const months = Array(toRender)
     .fill(0)
-    .map((_, i) => i)
-    .reverse();
+    .map((_, i) => i);
 
   return (
     <>
@@ -183,33 +188,144 @@ const Year = ({
   );
 };
 
+const TrackableName = ({
+  name,
+  updater,
+}: {
+  name: string;
+  updater: (arg0: string) => Promise<void>;
+}) => {
+  const [editMode, setEditMode] = useState(false);
+  const [inputVal, setInputVal] = useState(name);
+  const [waiting, setWaiting] = useState(false);
+  const [focusNext, setFocusNext] = useState(false);
+
+  const goToEdit = () => {
+    setInputVal(name);
+    setEditMode(true);
+    setFocusNext(true);
+  };
+
+  const save = async () => {
+    if (waiting) return;
+    setWaiting(true);
+    await updater(inputVal);
+    setEditMode(false);
+    setWaiting(false);
+  };
+
+  const handelEdit = (e: ChangeEvent<HTMLInputElement>) => {
+    if (waiting) return;
+    setInputVal(e.target.value);
+  };
+
+  useEffect(() => {
+    if (!focusNext || !inputRef.current) return;
+
+    inputRef.current.focus();
+    setFocusNext(false);
+  }, [focusNext]);
+
+  const inputRef = useRef<HTMLInputElement>();
+
+  if (editMode) {
+    return (
+      <div>
+        <input
+          ref={inputRef}
+          value={inputVal}
+          onChange={handelEdit}
+          onBlur={save}
+          className="w-full border-b border-slate-800 text-2xl focus:border-b focus:outline-none"
+        />
+      </div>
+    );
+  }
+
+  return (
+    <h1
+      onClick={goToEdit}
+      className="cursor-text border-b border-transparent text-2xl"
+    >
+      {name}
+    </h1>
+  );
+};
+
 const TrackableView = ({ trackable }: { trackable: ITrackable }) => {
   const [yearsRendered, setYearsRendered] = useState([2022]);
 
   const [observer, setObserver] = useState<ElObserver>();
 
-  const yearsRef = useRef();
+  const yearsRef = useRef<HTMLDivElement>();
+  const loadRef = useRef<HTMLDivElement>();
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    setObserver(new ElObserver());
+    const observer = new ElObserver();
+    setObserver(observer);
   }, []);
-
-  if (trackable.type !== "boolean") return <div>no support yet</div>;
 
   const loadNextYear = () => {
     const next = yearsRendered[yearsRendered.length - 1] - 1;
     setYearsRendered([...yearsRendered, next]);
   };
 
+  const queryClient = useQueryClient();
+  const settingsMutation = useMutation(
+    (settings: ITrackable["settings"]) => {
+      return updateSettings(trackable._id, settings);
+    },
+    {
+      onSuccess(data, variables) {
+        queryClient.setQueryData(
+          ["trackable", trackable._id],
+          (data: ITrackable) => {
+            const newOne = { ...data, settings: variables };
+            return newOne;
+          }
+        );
+      },
+    }
+  );
+
+  const udpateName = async (newName: string) => {
+    const newSettings = { ...trackable.settings, name: newName };
+    await settingsMutation.mutateAsync(newSettings);
+  };
+
+  const handleScroll = (e) => {
+    const left = e.target.scrollTop + e.target.scrollHeight;
+    if (left < window.innerHeight * 2) {
+      loadNextYear();
+    }
+  };
   return (
-    <ObserverContext.Provider value={observer}>
-      <div ref={yearsRef}>
-        {yearsRendered.map((year) => {
-          return <Year key={year} year={year} data={trackable.data} />;
-        })}
-      </div>
-    </ObserverContext.Provider>
+    <div className="h-full">
+      <TrackableName name={trackable.settings.name} updater={udpateName} />
+
+      <ObserverContext.Provider value={observer}>
+        <div
+          className="flex h-full flex-col-reverse overflow-scroll"
+          ref={yearsRef}
+          onScroll={handleScroll}
+        >
+          {yearsRendered.map((year) => {
+            return (
+              <Year
+                key={year}
+                year={year}
+                data={trackable.data as ITrackableBoolean["data"]}
+              />
+            );
+          })}
+
+          <div ref={loadRef} onClick={loadNextYear}>
+            Load More
+          </div>
+        </div>
+      </ObserverContext.Provider>
+    </div>
   );
 };
 

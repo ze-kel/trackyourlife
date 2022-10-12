@@ -5,19 +5,20 @@ const Page = ({
   children,
   title,
 }: {
-  children: JSX.Element;
+  children: JSX.Element | JSX.Element[] | string;
   title?: string;
 }) => {
   return (
-    <>
+    <div className="h-screen overflow-hidden">
       <Head>
         <title>{title || "TrackYourLife"}</title>
         <meta name="description" content="TrackYourLife app" />
       </Head>
       <Header />
-      <main className="container mx-auto my-5 max-w-5xl">{children}</main>
-      <footer></footer>
-    </>
+      <main className="container mx-auto my-5 h-full max-h-full max-w-5xl">
+        {children}
+      </main>
+    </div>
   );
 };
 

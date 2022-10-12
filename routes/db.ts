@@ -41,6 +41,18 @@ const updateTrackable = async (
   return transformToUserFormat(item as ITrackableDB);
 };
 
+const updateTrackableSettings = async (
+  _id: ITrackable["_id"],
+  newSettings: ITrackable["settings"]
+) => {
+  await TrackableModel.findOneAndUpdate(
+    { _id },
+    { $set: { settings: newSettings } }
+  );
+
+  return newSettings;
+};
+
 const deleteTrackable = async (_id: ITrackable["_id"]) => {
   await TrackableModel.deleteOne({ _id });
 };
@@ -50,6 +62,7 @@ const fakeDb = {
   getTrackables,
   addTrackable,
   updateTrackable,
+  updateTrackableSettings,
   deleteTrackable,
 };
 

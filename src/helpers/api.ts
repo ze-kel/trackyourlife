@@ -59,4 +59,22 @@ const update = async (id: ITrackable["_id"], updates: ITrackableUpdate) => {
   return json as ITrackable[];
 };
 
-export { getAll, getSingle, add, remove, update };
+const updateSettings = async (
+  id: ITrackable["_id"],
+  updates: ITrackable["settings"]
+) => {
+  const res = await fetch(BASE_URL + "/trackable/" + id + "/settings", {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(updates),
+  });
+  if (!res.ok) {
+    throw new Error("Network response was not ok");
+  }
+  const json = await res.json();
+  return json as ITrackable["settings"];
+};
+
+export { getAll, getSingle, add, remove, update, updateSettings };

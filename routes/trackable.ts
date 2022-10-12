@@ -1,7 +1,7 @@
 import { FastifyPluginCallback } from "fastify";
 
 import DB from "./db";
-import { ITrackableUnsaved, ITrackableUpdate } from "@t/trackable";
+import { ITrackable, ITrackableUnsaved, ITrackableUpdate } from "@t/trackable";
 
 const trackablesRoutes: FastifyPluginCallback = (fastify, options, done) => {
   fastify.get("/trackables", async (req, reply) => {
@@ -29,6 +29,13 @@ const trackablesRoutes: FastifyPluginCallback = (fastify, options, done) => {
     const { id } = req.params as { id: string };
 
     const updated = await DB.updateTrackable(id, req.body as ITrackableUpdate);
+    reply.send(updated);
+  });
+
+  fastify.put("/trackable/:id/settings", async (req, reply) => {
+    const { id } = req.params as { id: string };
+
+    const updated = await DB.updateTrackableSettings(id, req.body as ITrackable['settings']);
     reply.send(updated);
   });
 
