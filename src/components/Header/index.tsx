@@ -1,9 +1,13 @@
+import CreateButton from "@components/CreateButton";
 import Link from "next/link";
 
 const Header = () => {
   return (
-    <div className="flex justify-center bg-black py-3 font-bold text-white">
-      <Link href={"/"}>Track Your Life</Link>
+    <div className="flex h-12 flex-shrink-0 justify-center bg-black  font-bold text-white">
+      <div className="flex h-full w-full max-w-5xl items-center justify-between">
+        <Link href={"/"}>Track Your Life</Link>
+        <CreateButton />
+      </div>
     </div>
   );
 };

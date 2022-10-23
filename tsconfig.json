@@ -25,6 +25,6 @@
     "esm": true,
     "module": "commonjs"
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "server.ts"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "server.ts", "src/components/TrackableView/trackableContext.jsx"],
   "exclude": ["node_modules"]
 }

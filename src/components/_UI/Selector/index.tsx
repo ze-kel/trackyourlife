@@ -15,15 +15,16 @@ const Selector = ({
   setter: (arg0: any) => void;
 }) => {
   return (
-    <div className="flex w-fit overflow-hidden rounded-md border">
+    <div className="flex w-fit overflow-hidden rounded-md">
       {options.map((option, index) => {
         return (
           <div
             key={index}
             className={cls(
-              "cursor-pointer bg-slate-200 px-2 py-1",
-              active === option.value &&
-                "cursor-default bg-slate-800 text-white"
+              "px-2 py-1  transition-colors",
+              active === option.value
+                ? "cursor-default bg-zinc-800 text-zinc-50"
+                : "cursor-pointer bg-zinc-200 text-zinc-800 hover:bg-zinc-300"
             )}
             onClick={() => setter(option.value)}
           >

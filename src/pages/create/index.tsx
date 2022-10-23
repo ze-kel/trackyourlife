@@ -1,17 +1,35 @@
 import Page from "@components/Page";
 import Selector, { ISelectorOption } from "@components/_UI/Selector";
-import { ITrackable } from "@t/trackable";
+import { ITrackable, ITrackableUnsaved } from "@t/trackable";
+import { useRouter } from "next/router";
 import { useState } from "react";
+import { add } from "src/helpers/api";
 
 export default function Home() {
-  const [name, setName] = useState<ITrackable["settings"]["name"]>("");
-  const [type, setType] = useState<ITrackable["type"]>("boolean");
+  const [name, setName] = useState<ITrackableUnsaved["settings"]["name"]>("");
+  const [type, setType] = useState<ITrackableUnsaved["type"]>("boolean");
 
   const types: ISelectorOption[] = [
     { label: "Boolean", value: "boolean" },
     { label: "Number", value: "number" },
     { label: "Range", value: "Range" },
   ];
+
+  const router = useRouter();
+
+  const create = async () => {
+    const newOne = {
+      type: type,
+      settings: {
+        name,
+      },
+      data: {},
+    };
+
+    const saved = await add(newOne as ITrackableUnsaved);
+
+    router.push(`/trackable/${saved._id}`);
+  };
 
   return (
     <Page>
@@ -23,7 +41,7 @@ export default function Home() {
       />
       <Selector active={type} options={types} setter={setType}></Selector>
 
-      <button>Create</button>
+      <button onClick={create}>Create</button>
     </Page>
   );
 }

@@ -9,13 +9,13 @@ const Page = ({
   title?: string;
 }) => {
   return (
-    <div className="h-screen overflow-hidden">
+    <div className="box-border flex h-full flex-col overflow-hidden">
       <Head>
         <title>{title || "TrackYourLife"}</title>
         <meta name="description" content="TrackYourLife app" />
       </Head>
       <Header />
-      <main className="container mx-auto my-5 h-full max-h-full max-w-5xl">
+      <main className="container mx-auto box-border h-full max-h-full max-w-5xl">
         {children}
       </main>
     </div>

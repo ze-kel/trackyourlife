@@ -13,6 +13,7 @@ function MyApp({ Component, pageProps }) {
     <QueryClientProvider client={queryClient}>
       <Hydrate state={pageProps.dehydratedState}>
         <Component {...pageProps} />
+        <div id="modal-portal"></div>
       </Hydrate>
     </QueryClientProvider>
   );

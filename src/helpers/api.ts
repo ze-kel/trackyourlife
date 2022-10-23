@@ -33,7 +33,7 @@ const add = async (data: ITrackableUnsaved) => {
     throw new Error("Network response was not ok");
   }
   const json = await res.json();
-  return json as ITrackable[];
+  return json as ITrackable;
 };
 
 const remove = async (id: ITrackable["_id"]) => {
@@ -56,7 +56,7 @@ const update = async (id: ITrackable["_id"], updates: ITrackableUpdate) => {
     throw new Error("Network response was not ok");
   }
   const json = await res.json();
-  return json as ITrackable[];
+  return json as ITrackable;
 };
 
 const updateSettings = async (

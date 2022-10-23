@@ -3,7 +3,7 @@ import Page from "@components/Page";
 import TrackableView from "@components/TrackableView";
 import { QueryClient, dehydrate, useQuery } from "@tanstack/react-query";
 import { getSingle } from "src/helpers/api";
-import { IdContext } from "src/helpers/idContext";
+import TrackableContext from "@components/TrackableView/trackableContext";
 
 const Trackable = () => {
   const router = useRouter();
@@ -12,9 +12,9 @@ const Trackable = () => {
 
   return (
     <Page title={data.settings.name}>
-      <IdContext.Provider value={id as string}>
-        <TrackableView trackable={data} />
-      </IdContext.Provider>
+      <TrackableContext trackable={data}>
+        <TrackableView />
+      </TrackableContext>
     </Page>
   );
 };
