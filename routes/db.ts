@@ -5,7 +5,6 @@ import {
   ITrackableUpdate,
 } from "@t/trackable";
 
-import _merge from "lodash/merge";
 import { transformToDBFormat, transformToUserFormat } from "../util/dbToFront";
 import { TrackableModel } from "../models/trackableModel";
 

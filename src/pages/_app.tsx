@@ -1,13 +1,18 @@
 import {
+  DehydratedState,
   Hydrate,
   QueryClient,
   QueryClientProvider,
 } from "@tanstack/react-query";
-import React from "react";
+import { AppProps } from "next/app";
+import { useState } from "react";
 import "../styles/globals.css";
 
-function MyApp({ Component, pageProps }) {
-  const [queryClient] = React.useState(() => new QueryClient());
+function MyApp({
+  Component,
+  pageProps,
+}: AppProps<{ dehydratedState: DehydratedState }>) {
+  const [queryClient] = useState(() => new QueryClient());
 
   return (
     <QueryClientProvider client={queryClient}>
