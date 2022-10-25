@@ -3,7 +3,7 @@ import Modal from "@components/_UI/Modal";
 import router from "next/router";
 import { useContext, useState } from "react";
 import { remove } from "src/helpers/api";
-import { TrackableContext } from "./trackableContext";
+import { TrackableContext } from "../../helpers/trackableContext";
 
 const DeleteButton = () => {
   const { trackable } = useContext(TrackableContext);

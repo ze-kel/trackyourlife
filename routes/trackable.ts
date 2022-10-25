@@ -26,10 +26,19 @@ const trackablesRoutes: FastifyPluginCallback = (fastify, options, done) => {
   });
 
   fastify.put("/trackable/:id", async (req, reply) => {
-    const { id } = req.params as { id: string };
+    try {
+      const { id } = req.params as { id: string };
 
-    const updated = await DB.updateTrackable(id, req.body as ITrackableUpdate);
-    reply.send(updated);
+      const updated = await DB.updateTrackable(
+        id,
+        req.body as ITrackableUpdate
+      );
+
+      console.log("updated", updated);
+      reply.send(updated);
+    } catch (e) {
+      console.log(e);
+    }
   });
 
   fastify.put("/trackable/:id/settings", async (req, reply) => {

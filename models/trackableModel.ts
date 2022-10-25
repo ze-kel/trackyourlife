@@ -10,22 +10,6 @@ function isNumber() {
 function isRange() {
   return this.type === "range";
 }
-
-const validators = {
-  boolean(v) {
-    return typeof v === "boolean";
-  },
-  number(v) {
-    return typeof v === "number";
-  },
-  range(v) {
-    return (
-      typeof v === "number" &&
-      Object.keys(this.settings.labels).includes(String(v))
-    );
-  },
-};
-
 const trackableSchema = new mongoose.Schema<ITrackableDB>({
   type: {
     type: String,
@@ -46,14 +30,8 @@ const trackableSchema = new mongoose.Schema<ITrackableDB>({
     type: [
       {
         value: {
-          type: Boolean,
+          type: Schema.Types.Mixed,
           required: true,
-          validate: {
-            validator(v) {
-              return validators[this.type](v);
-            },
-            message: "Value validator failed",
-          },
         },
         date: { type: Date, required: true },
       },

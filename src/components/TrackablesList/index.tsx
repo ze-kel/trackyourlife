@@ -1,25 +1,32 @@
 import { ITrackable } from "@t/trackable";
 import Link from "next/link";
+import TrackableProvider from "src/helpers/trackableContext";
+import MiniTrackable from "./miniTrackable";
 
 const Trackable = ({ trackable }: { trackable: ITrackable }) => {
   return (
-    <Link href={`/trackable/${trackable._id}`}>
-      <div className="h-24 cursor-pointer rounded-lg border-2 border-blue-200 p-2">
-        {trackable.settings.name}
-      </div>
-    </Link>
+    <TrackableProvider trackable={trackable}>
+      <article className="border-b border-zinc-200 p-2 last:border-0">
+        <Link href={`/trackable/${trackable._id}`}>
+          <h3 className="w-fit cursor-pointer text-xl ">
+            {trackable.settings.name}
+          </h3>
+        </Link>
+        <MiniTrackable className="my-4" />
+      </article>
+    </TrackableProvider>
   );
 };
 
 const TrackablesList = ({ list }: { list: ITrackable[] }) => {
   return (
-    <>
-      <div className="grid grid-cols-4 gap-8 overflow-scroll">
+    <div className="content-container overflow-scroll">
+      <div className="grid gap-5">
         {list.map((item) => (
           <Trackable trackable={item} key={item._id} />
         ))}
       </div>
-    </>
+    </div>
   );
 };
 

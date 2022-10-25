@@ -6,7 +6,7 @@ import { update, updateSettings } from "src/helpers/api";
 type IChangeSettings = (someSettings: Partial<ITrackable["settings"]>) => void;
 type IChangeDay = (update: ITrackableUpdate) => void;
 
-interface IContextData {
+export interface IContextData {
   trackable: ITrackable;
   changeSettings: IChangeSettings;
   changeDay: IChangeDay;

@@ -44,7 +44,7 @@ const Month = ({ month, year }: { month; year }) => {
 
   return (
     <div>
-      <h3 className="sticky top-0 bg-white pt-2 text-lg">
+      <h3 className="sticky top-0 z-10 bg-white pt-2 text-lg">
         <span className="font-bold">{format(firstDayDate, "MMMM")}</span>{" "}
         <span>{year}</span>
       </h3>
@@ -53,7 +53,7 @@ const Month = ({ month, year }: { month; year }) => {
         <div
           id={myId}
           ref={monthRef}
-          className="flex items-center justify-center bg-slate-200 text-slate-300"
+          className="flex items-center justify-center text-zinc-200"
           style={{ height: savedHeight }}
         >
           This is a placeholder for month out of view. If you are seeing this
@@ -95,7 +95,7 @@ const Year = ({ year }: { year: number }) => {
 
   return (
     <>
-      <div className="space-y-10">
+      <div className="content-container space-y-10">
         {months.map((m) => (
           <Month key={m} year={year} month={m} />
         ))}
@@ -130,28 +130,27 @@ const TrackableView = () => {
     }
   };
   return (
-    <>
-      <div className="flex w-full justify-between py-2">
+    <div className="grid h-full max-h-full w-full">
+      <div className="content-container flex w-full justify-between py-2">
         <TrackableName />
         <DeleteButton />
       </div>
 
       <ObserverContext.Provider value={observer}>
         <div
-          className="relative box-border flex h-full flex-col-reverse overflow-scroll pb-20"
+          className="relative box-border flex w-full flex-col-reverse overflow-scroll pb-10"
           ref={yearsRef}
           onScroll={handleScroll}
         >
           {yearsRendered.map((year) => {
             return <Year key={year} year={year} />;
           })}
-
           <div ref={loadRef} onClick={loadNextYear}>
             Load More
           </div>
         </div>
       </ObserverContext.Provider>
-    </>
+    </div>
   );
 };
 

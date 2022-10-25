@@ -15,7 +15,7 @@ const Page = ({
         <meta name="description" content="TrackYourLife app" />
       </Head>
       <Header />
-      <main className="container mx-auto box-border h-full max-h-full max-w-5xl">
+      <main className="mx-auto box-border max-h-[calc(100vh-48px)] w-full">
         {children}
       </main>
     </div>

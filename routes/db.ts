@@ -25,17 +25,38 @@ const addTrackable = async (toSave: ITrackableUnsaved): Promise<ITrackable> => {
   return transformToUserFormat(newItem) as ITrackable;
 };
 
+const updateValidators = {
+  boolean(v) {
+    return typeof v === "boolean";
+  },
+  number(v) {
+    return typeof v === "number";
+  },
+  range(v) {
+    return (
+      typeof v === "number" &&
+      Object.keys(this.settings.labels).includes(String(v))
+    );
+  },
+};
+
 const updateTrackable = async (
   _id: ITrackable["_id"],
   { day, month, year, value }: ITrackableUpdate
 ) => {
   const date = new Date(year, month, day);
-  await TrackableModel.findOneAndUpdate(
-    { _id },
-    { $push: { data: { date, value } } }
-  );
 
-  const item = await TrackableModel.findOne({ _id });
+  const before = await TrackableModel.findOne({ _id });
+
+  if (!updateValidators[before.type](value)) {
+    throw `Value ${value} is invalid for type ${before.type}`;
+  }
+
+  const item = await TrackableModel.findOneAndUpdate(
+    { _id },
+    { $push: { data: { date, value } } },
+    { returnDocument: "after" }
+  );
 
   return transformToUserFormat(item as ITrackableDB);
 };
@@ -46,7 +67,8 @@ const updateTrackableSettings = async (
 ) => {
   await TrackableModel.findOneAndUpdate(
     { _id },
-    { $set: { settings: newSettings } }
+    { $set: { settings: newSettings } },
+    { runValidators: true }
   );
 
   return newSettings;

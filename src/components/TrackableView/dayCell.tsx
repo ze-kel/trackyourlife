@@ -1,8 +1,11 @@
 import cls from "clsx";
-import { getYear, getMonth, getDaysInMonth } from "date-fns";
-import { useContext } from "react";
-import { TrackableContext } from "./trackableContext";
+import { getYear, getMonth, getDaysInMonth, isSameDay } from "date-fns";
+import { useCallback, useContext, useMemo, useState } from "react";
+import { IContextData, TrackableContext } from "../../helpers/trackableContext";
 import formatDateKey from "util/formatDateKey";
+import { ITrackableBoolean, ITrackableNumber } from "@t/trackable";
+import { debounce } from "lodash";
+import EditableText from "@components/_UI/EditableText";
 
 const daysBeforeToday = (year: number, month: number) => {
   const now = new Date();
@@ -13,39 +16,193 @@ const daysBeforeToday = (year: number, month: number) => {
   return now.getDate();
 };
 
-const DayCell = ({
-  day,
-  month,
-  year,
-}: {
+type IDayProps = {
   day: number;
   month: number;
   year: number;
-}) => {
-  const { trackable, changeDay } = useContext(TrackableContext);
+};
 
-  const beforeToday = daysBeforeToday(year, month);
+const useDayCellHelpers = ({ day, month, year }: IDayProps) => {
+  const dateKey = formatDateKey({ day, month, year });
 
-  const isActive = trackable.data[formatDateKey({ day, month, year })];
+  const inFuture = daysBeforeToday(year, month) < day;
+
+  const isToday = isSameDay(new Date(), new Date(year, month, day));
+
+  return { dateKey, inFuture, isToday };
+};
+
+const DayCellBoolean = ({ day, month, year }: IDayProps) => {
+  const { trackable, changeDay } = useContext(
+    TrackableContext
+  ) as IContextData & {
+    trackable: ITrackableBoolean;
+  };
+
+  const { dateKey, inFuture, isToday } = useMemo(
+    () => useDayCellHelpers({ day, month, year }),
+    [day, month, year]
+  );
+
+  const isActive = trackable.data[dateKey];
+  console.log("renderDayB", { day, month, year, isActive });
 
   const handleClick = async () => {
     await changeDay({ day, month, year, value: !isActive });
   };
 
-  return (
-    <div
-      className={cls(
-        "flex h-16 items-start justify-start rounded-sm border-2 border-transparent px-2 py-1 font-semibold text-zinc-700 transition-colors",
-        beforeToday < day ? "bg-slate-100 text-slate-400" : "cursor-pointer",
+  const getClasses = () => {
+    const arr = [
+      "flex h-16 items-start justify-start rounded-sm border-2 border-transparent px-2 py-1 font-semibold transition-colors",
+    ];
+
+    if (inFuture) {
+      arr.push("bg-slate-100 text-zinc-300");
+    } else {
+      if (isToday) {
+        arr.push("border-zinc-500 text-zinc-600");
+      } else {
+        arr.push("text-zinc-500");
+      }
+
+      arr.push("cursor-pointer");
+
+      arr.push(
         isActive
           ? "bg-green-500 hover:border-zinc-400"
           : "bg-zinc-300 hover:border-green-400"
-      )}
-      key={day}
-      onClick={handleClick}
-    >
+      );
+    }
+
+    return arr;
+  };
+
+  return (
+    <div className={cls(...getClasses())} key={day} onClick={handleClick}>
       {day}
     </div>
   );
 };
+
+const DayCellNumber = ({ day, month, year }: IDayProps) => {
+  const { trackable, changeDay } = useContext(
+    TrackableContext
+  ) as IContextData & {
+    trackable: ITrackableNumber;
+  };
+
+  const { dateKey, inFuture, isToday } = useMemo(
+    () => useDayCellHelpers({ day, month, year }),
+    [day, month, year]
+  );
+
+  const number = trackable.data[dateKey];
+
+  const [displayedNumber, setDisplayedNumber] = useState(number || 0);
+
+  const [inInputEdit, setInInputEdit] = useState(false);
+
+  const updateValue = async (value) => {
+    await changeDay({ day, month, year, value });
+  };
+
+  const debouncedUpdateValue = useCallback(debounce(updateValue, 400), [
+    day,
+    month,
+    year,
+  ]);
+
+  const handlePlus = () => {
+    setDisplayedNumber(displayedNumber + 1);
+    debouncedUpdateValue(displayedNumber + 1);
+  };
+  const handleMinus = () => {
+    setDisplayedNumber(displayedNumber - 1);
+    debouncedUpdateValue(displayedNumber - 1);
+  };
+
+  const handleInputUpdate = (val) => {
+    if (val !== displayedNumber) {
+      setDisplayedNumber(val);
+      debouncedUpdateValue(val);
+    }
+  };
+
+  const getClasses = () => {
+    const arr = [
+      "group relative flex h-16 items-center justify-center rounded-sm border-2 border-transparent font-semibold transition-colors",
+    ];
+
+    if (inFuture) {
+      arr.push("bg-slate-100 text-zinc-300");
+    } else {
+      if (isToday) {
+        arr.push("border-zinc-500 text-zinc-600");
+      } else {
+        arr.push("text-zinc-500 border-zinc-100");
+      }
+    }
+    return arr;
+  };
+
+  return (
+    <div className={cls(...getClasses())} key={day}>
+      <span className="absolute top-1 left-2">{day}</span>
+
+      {!inFuture && (
+        <>
+          <EditableText
+            value={displayedNumber || 0}
+            isNumber={true}
+            updater={handleInputUpdate}
+            className={cls(
+              "flex h-full w-full items-center justify-center text-center text-xl transition-colors",
+              displayedNumber === 0 && !inInputEdit
+                ? "text-zinc-200"
+                : "text-zinc-800"
+            )}
+            classNameInput="focus:outline-zinc-900"
+            editModeSetter={setInInputEdit}
+          />
+          <span
+            className={cls(
+              "text-xl transition-colors",
+              displayedNumber === 0 ? "text-zinc-200" : "text-zinc-800"
+            )}
+          ></span>
+
+          {!inInputEdit && (
+            <>
+              <button
+                onClick={handleMinus}
+                className="invisible absolute left-[50%] bottom-0 z-20 h-7 w-7 -translate-x-1/2 translate-y-1/2 rounded-sm border border-zinc-500 bg-zinc-50 group-hover:visible"
+              >
+                -
+              </button>
+              <button
+                onClick={handlePlus}
+                className="invisible absolute left-[50%] top-0 z-20 h-7 w-7 -translate-x-1/2 -translate-y-1/2 rounded-sm border border-zinc-500 bg-zinc-50 group-hover:visible"
+              >
+                +
+              </button>
+            </>
+          )}
+        </>
+      )}
+    </div>
+  );
+};
+
+const DayCell = (data: IDayProps) => {
+  const { trackable } = useContext(TrackableContext);
+
+  if (trackable.type === "boolean") {
+    return <DayCellBoolean {...data} />;
+  }
+
+  if (trackable.type === "number") {
+    return <DayCellNumber {...data} />;
+  }
+};
+
 export default DayCell;

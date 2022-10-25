@@ -13,3 +13,20 @@ html {
 #__next {
   height: 100%;
 }
+
+@layer components {
+  .content-container {
+    @apply container mx-auto max-w-4xl;
+  }
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
