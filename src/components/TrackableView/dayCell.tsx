@@ -45,7 +45,6 @@ const DayCellBoolean = ({ day, month, year }: IDayProps) => {
   );
 
   const isActive = trackable.data[dateKey];
-  console.log("renderDayB", { day, month, year, isActive });
 
   const handleClick = async () => {
     await changeDay({ day, month, year, value: !isActive });

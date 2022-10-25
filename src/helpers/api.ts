@@ -12,6 +12,16 @@ const getAll = async () => {
   return json as ITrackable[];
 };
 
+const getAllIds = async () => {
+  const res = await fetch(BASE_URL + "/trackables/id");
+  if (!res.ok) {
+    throw new Error("Network response was not ok");
+  }
+
+  const json = await res.json();
+  return json as ITrackable["_id"][];
+};
+
 const getSingle = async (id: ITrackable["_id"]) => {
   const res = await fetch(BASE_URL + "/trackable/" + id);
   if (!res.ok) {
@@ -77,4 +87,4 @@ const updateSettings = async (
   return json as ITrackable["settings"];
 };
 
-export { getAll, getSingle, add, remove, update, updateSettings };
+export { getAll, getSingle, add, remove, update, updateSettings, getAllIds };

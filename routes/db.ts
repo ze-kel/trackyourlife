@@ -14,6 +14,11 @@ const getTrackables = async (): Promise<ITrackable[]> => {
   return transformed as ITrackable[];
 };
 
+const getIdList = async (): Promise<ITrackable["_id"][]> => {
+  const trackables = await TrackableModel.find().select("_id");
+  return trackables.map((el) => el._id);
+};
+
 const getTrackable = async (_id: ITrackable["_id"]): Promise<ITrackable> => {
   const item = await TrackableModel.findOne({ _id });
   return transformToUserFormat(item);
@@ -85,6 +90,7 @@ const fakeDb = {
   updateTrackable,
   updateTrackableSettings,
   deleteTrackable,
+  getIdList,
 };
 
 export default fakeDb;

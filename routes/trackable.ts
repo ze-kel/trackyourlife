@@ -9,6 +9,11 @@ const trackablesRoutes: FastifyPluginCallback = (fastify, options, done) => {
     reply.send(data);
   });
 
+  fastify.get("/trackables/id", async (req, reply) => {
+    const data = await DB.getIdList();
+    reply.send(data);
+  });
+
   fastify.get("/trackable/:id", async (req, reply) => {
     const { id } = req.params as { id: string };
 
@@ -34,7 +39,6 @@ const trackablesRoutes: FastifyPluginCallback = (fastify, options, done) => {
         req.body as ITrackableUpdate
       );
 
-      console.log("updated", updated);
       reply.send(updated);
     } catch (e) {
       console.log(e);

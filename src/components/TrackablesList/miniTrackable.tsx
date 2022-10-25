@@ -5,6 +5,7 @@ import { useMemo } from "react";
 
 const generateDates = (days: number) => {
   const today = new Date();
+
   let year = today.getFullYear();
   let month = today.getMonth();
   let day = today.getDate();
@@ -31,8 +32,6 @@ const generateDates = (days: number) => {
 
 const MiniTrackable = ({ className }: { className?: string }) => {
   const daysToRender = useMemo(() => generateDates(6), []);
-
-  console.log("rerender mini");
 
   return (
     <div className={clsx("grid grid-cols-7 gap-2", className)}>
