@@ -10,7 +10,7 @@ const Trackable = ({ id }: { id: ITrackable["_id"] }) => {
 
   return (
     <TrackableProvider trackable={data}>
-      <article className="border-b border-zinc-200 p-2 last:border-0">
+      <article className="border-b border-zinc-200 py-2 last:border-0">
         <Link href={`/trackable/${id}`}>
           <h3 className="w-fit cursor-pointer text-xl ">
             {data.settings.name}
@@ -24,12 +24,10 @@ const Trackable = ({ id }: { id: ITrackable["_id"] }) => {
 
 const TrackablesList = ({ list }: { list: ITrackable["_id"][] }) => {
   return (
-    <div className="content-container overflow-scroll">
-      <div className="grid gap-5">
-        {list.map((id) => (
-          <Trackable id={id} key={id} />
-        ))}
-      </div>
+    <div className="grid gap-5">
+      {list.map((id) => (
+        <Trackable id={id} key={id} />
+      ))}
     </div>
   );
 };

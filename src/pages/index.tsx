@@ -8,7 +8,10 @@ export default function Home() {
 
   return (
     <Page>
-      <TrackablesList list={data} />
+      <div className="content-container overflow-scroll">
+        <h2 className="my-4 text-2xl font-semibold">Your Trackables</h2>
+        <TrackablesList list={data} />
+      </div>
     </Page>
   );
 }

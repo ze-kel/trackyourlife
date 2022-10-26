@@ -44,7 +44,7 @@ const Month = ({ month, year }: { month; year }) => {
 
   return (
     <div>
-      <h3 className="sticky top-0 z-10 bg-white pt-2 text-lg">
+      <h3 className="sticky top-0 z-10 border-b border-zinc-100 bg-white pt-2 pb-1 text-lg">
         <span className="font-bold">{format(firstDayDate, "MMMM")}</span>{" "}
         <span>{year}</span>
       </h3>
@@ -53,7 +53,7 @@ const Month = ({ month, year }: { month; year }) => {
         <div
           id={myId}
           ref={monthRef}
-          className="flex items-center justify-center text-zinc-200"
+          className="my-2 flex items-center justify-center text-zinc-200"
           style={{ height: savedHeight }}
         >
           This is a placeholder for month out of view. If you are seeing this
@@ -63,7 +63,7 @@ const Month = ({ month, year }: { month; year }) => {
         <div
           id={myId}
           ref={monthRef}
-          className="grid grid-cols-7 sm:gap-2 lg:gap-3"
+          className="my-2 grid grid-cols-7 sm:gap-2 lg:gap-3"
         >
           {prepend.map((_, i) => (
             <div key={i}> </div>
@@ -131,7 +131,7 @@ const TrackableView = () => {
   };
   return (
     <div className="grid h-full max-h-full w-full">
-      <div className="content-container flex w-full justify-between py-2">
+      <div className="content-container flex w-full justify-between border-b border-zinc-400 py-4">
         <TrackableName />
         <DeleteButton />
       </div>
