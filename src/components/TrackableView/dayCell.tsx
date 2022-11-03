@@ -120,7 +120,7 @@ const DayCellNumber = ({ day, month, year }: IDayProps) => {
     debouncedUpdateValue(displayedNumber - 1);
   };
 
-  const handleInputUpdate = (val) => {
+  const handleInputUpdate = (val: number) => {
     if (val !== displayedNumber) {
       setDisplayedNumber(val);
       debouncedUpdateValue(val);
@@ -193,7 +193,9 @@ const DayCellNumber = ({ day, month, year }: IDayProps) => {
 };
 
 const DayCell = (data: IDayProps) => {
-  const { trackable } = useContext(TrackableContext);
+  const { trackable } = useContext(TrackableContext) ?? {};
+
+  if (!trackable) return;
 
   if (trackable.type === "boolean") {
     return <DayCellBoolean {...data} />;

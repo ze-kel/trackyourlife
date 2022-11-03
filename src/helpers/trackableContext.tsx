@@ -1,7 +1,5 @@
 import { ITrackable, ITrackableUpdate } from "@t/trackable";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createContext, ReactNode } from "react";
-import { update, updateSettings } from "src/helpers/api";
 import { trpc } from "src/utils/trpc";
 
 type IChangeSettings = (someSettings: Partial<ITrackable["settings"]>) => void;
@@ -14,7 +12,7 @@ export interface IContextData {
   deleteTrackable: () => Promise<void>;
 }
 
-export const TrackableContext = createContext<IContextData>(null);
+export const TrackableContext = createContext<IContextData | null>(null);
 
 const TrackableProvider = ({
   children,
@@ -23,17 +21,20 @@ const TrackableProvider = ({
   children: ReactNode;
   trackable: ITrackable;
 }) => {
-  const queryClient = useQueryClient();
-
-  const queryReference = [["trackable", "getTrackableById"], trackable._id];
+  const qContext = trpc.useContext();
 
   const settingsMutation = trpc.trackable.updateTrackableSettings.useMutation({
-    onSuccess(returned, input) {
-      queryClient.setQueryData(queryReference, (data: unknown) => {
-        const newOne = { ...(data as ITrackable), settings: returned };
-        console.log("newOne", newOne);
-        return newOne;
-      });
+    onSuccess(returned) {
+      qContext.trackable.getTrackableById.setData(
+        (data: ITrackable | undefined) => {
+          console.log("setData", data);
+          if (!data) return;
+          const newOne = { ...data, settings: returned};
+          console.log("result", newOne);
+          return newOne as ITrackable;
+        },
+        trackable._id
+      );
     },
   });
 
@@ -51,7 +52,7 @@ const TrackableProvider = ({
 
   const dayValueMutation = trpc.trackable.updateTrackableById.useMutation({
     onSuccess(result) {
-      queryClient.setQueryData(queryReference, result);
+      qContext.trackable.getTrackableById.setData(result, trackable._id);
     },
   });
 

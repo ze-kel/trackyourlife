@@ -1,9 +1,17 @@
 import Page from "@components/Page";
 import TrackablesList from "@components/TrackablesList";
+import { useEffect } from "react";
 import { trpc } from "../utils/trpc";
 
 export default function Home() {
   const { data } = trpc.trackable.getAllIds.useQuery();
+  const qContext = trpc.useContext();
+
+  useEffect(() => {
+    data?.forEach((id) => {
+      qContext.trackable.getTrackableById.prefetch(id);
+    });
+  }, []);
 
   return (
     <Page>

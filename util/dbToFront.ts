@@ -12,7 +12,7 @@ const transformToUserFormat = ({
   _id,
   data,
 }: ITrackableDB): ITrackable => {
-  const result = {
+  const result: ITrackable = {
     type,
     settings,
     _id,
