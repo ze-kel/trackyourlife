@@ -1,4 +1,4 @@
-import mongoose, { model, Schema } from "mongoose";
+import mongoose, { Model, model, Schema } from "mongoose";
 import type { ITrackable, ITrackableDB } from "@t/trackable";
 
 function isBoolean() {
@@ -39,7 +39,8 @@ const trackableSchema = new mongoose.Schema<ITrackableDB>({
     required: true,
   },
 });
+const TrackableModel =
+  (mongoose.models.Trackable as mongoose.Model<ITrackableDB>) ||
+  model<ITrackableDB>("Trackable", trackableSchema);
 
-const TrackableModel = model<ITrackableDB>("Trackable", trackableSchema);
-
-export { TrackableModel };
+export default TrackableModel;

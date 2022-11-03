@@ -55,6 +55,7 @@ export type ITrackableDBUnsaved =
 export type ITrackableDB = ITrackableDBUnsaved & { _id: string };
 // Probably should be forced to provide correct type
 export type ITrackableUpdate = {
+  _id: ITrackable["_id"];
   day: number;
   month: number;
   year: number;

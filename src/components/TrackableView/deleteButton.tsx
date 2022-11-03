@@ -6,10 +6,10 @@ import { remove } from "src/helpers/api";
 import { TrackableContext } from "../../helpers/trackableContext";
 
 const DeleteButton = () => {
-  const { trackable } = useContext(TrackableContext);
+  const { deleteTrackable } = useContext(TrackableContext);
 
-  const deleteTrackable = async () => {
-    await remove(trackable._id);
+  const performDelete = async () => {
+    await deleteTrackable();
     router.push("/");
   };
 
@@ -31,7 +31,7 @@ const DeleteButton = () => {
           <h2 className="text-xl">Are you sure you want to delete?</h2>
           <p className="pt-2">This action is irreversible</p>
           <div className="pt-3">
-            <Button click={deleteTrackable}>Confirm</Button>
+            <Button click={performDelete}>Confirm</Button>
             <Button className="ml-4" click={closeModal}>
               Cancel
             </Button>

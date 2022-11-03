@@ -3,8 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "nodemon --exec ts-node server.ts",
-    "ndev": "next dev",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -19,21 +18,25 @@
     "delay": 2500
   },
   "dependencies": {
-    "@fastify/nextjs": "^9.1.1",
     "@prisma/client": "4.4.0",
-    "@tanstack/react-query": "^4.10.3",
+    "@tanstack/react-query": "^4.13.0",
+    "@tanstack/react-query-devtools": "^4.14.1",
+    "@trpc/client": "^10.0.0-proxy-beta.26",
+    "@trpc/next": "^10.0.0-proxy-beta.26",
+    "@trpc/react-query": "^10.0.0-proxy-beta.26",
+    "@trpc/server": "^10.0.0-proxy-beta.26",
     "@types/lodash": "^4.14.186",
     "@types/supertest": "^2.0.12",
     "clsx": "^1.2.1",
     "date-fns": "^2.29.3",
-    "fastify": "^4.7.0",
-    "fastify-nextjs": "^7.3.0",
     "iron-session": "^6.2.1",
     "lodash": "^4.17.21",
     "mongoose": "^6.6.5",
     "next": "12.3.1",
     "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react-dom": "18.2.0",
+    "superjson": "^1.11.0",
+    "zod": "^3.19.1"
   },
   "devDependencies": {
     "@types/jest": "^29.1.2",

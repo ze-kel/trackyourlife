@@ -80,7 +80,7 @@ const EditableText = ({
     setFocusNext(false);
   }, [focusNext]);
 
-  const inputRef = useRef<HTMLInputElement>();
+  const inputRef = useRef<HTMLInputElement>(null);
 
   if (editMode) {
     return (

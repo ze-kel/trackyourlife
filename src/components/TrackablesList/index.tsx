@@ -3,10 +3,13 @@ import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { getSingle } from "src/helpers/api";
 import TrackableProvider from "src/helpers/trackableContext";
+import { trpc } from "src/utils/trpc";
 import MiniTrackable from "./miniTrackable";
 
 const Trackable = ({ id }: { id: ITrackable["_id"] }) => {
-  const { data } = useQuery(["trackable", id], () => getSingle(id as string));
+  const { data } = trpc.trackable.getTrackableById.useQuery(id);
+
+  if (!data) return <div>loading</div>;
 
   return (
     <TrackableProvider trackable={data}>
@@ -23,6 +26,8 @@ const Trackable = ({ id }: { id: ITrackable["_id"] }) => {
 };
 
 const TrackablesList = ({ list }: { list: ITrackable["_id"][] }) => {
+  if (!list) return <div>no list</div>;
+
   return (
     <div className="grid gap-5">
       {list.map((id) => (

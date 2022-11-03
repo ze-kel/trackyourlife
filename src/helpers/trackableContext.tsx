@@ -2,6 +2,7 @@ import { ITrackable, ITrackableUpdate } from "@t/trackable";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createContext, ReactNode } from "react";
 import { update, updateSettings } from "src/helpers/api";
+import { trpc } from "src/utils/trpc";
 
 type IChangeSettings = (someSettings: Partial<ITrackable["settings"]>) => void;
 type IChangeDay = (update: ITrackableUpdate) => void;
@@ -10,6 +11,7 @@ export interface IContextData {
   trackable: ITrackable;
   changeSettings: IChangeSettings;
   changeDay: IChangeDay;
+  deleteTrackable: () => Promise<void>;
 }
 
 export const TrackableContext = createContext<IContextData>(null);
@@ -23,22 +25,17 @@ const TrackableProvider = ({
 }) => {
   const queryClient = useQueryClient();
 
-  const settingsMutation = useMutation(
-    (settings: ITrackable["settings"]) => {
-      return updateSettings(trackable._id, settings);
+  const queryReference = [["trackable", "getTrackableById"], trackable._id];
+
+  const settingsMutation = trpc.trackable.updateTrackableSettings.useMutation({
+    onSuccess(returned, input) {
+      queryClient.setQueryData(queryReference, (data: unknown) => {
+        const newOne = { ...(data as ITrackable), settings: returned };
+        console.log("newOne", newOne);
+        return newOne;
+      });
     },
-    {
-      onSuccess(data, variables) {
-        queryClient.setQueryData(
-          ["trackable", trackable._id],
-          (data: ITrackable) => {
-            const newOne = { ...data, settings: variables };
-            return newOne;
-          }
-        );
-      },
-    }
-  );
+  });
 
   const changeSettings: IChangeSettings = async (someSettings) => {
     const newSettings: ITrackable["settings"] = {
@@ -46,24 +43,28 @@ const TrackableProvider = ({
       ...someSettings,
     };
 
-    await settingsMutation.mutateAsync(newSettings);
+    await settingsMutation.mutateAsync({
+      settings: newSettings,
+      _id: trackable._id,
+    });
   };
 
-  const dayValueMutation = useMutation(
-    ({ day, month, year, value }: ITrackableUpdate) => {
-      return update(trackable._id, { year, month, day, value });
+  const dayValueMutation = trpc.trackable.updateTrackableById.useMutation({
+    onSuccess(result) {
+      queryClient.setQueryData(queryReference, result);
     },
-    {
-      onSuccess(data) {
-        queryClient.setQueryData(["trackable", trackable._id], data);
-      },
-    }
-  );
+  });
 
   const changeDay: IChangeDay = dayValueMutation.mutateAsync;
 
+  const deleteMutation = trpc.trackable.deleteTrackable.useMutation();
+
+  const deleteTrackable = () => deleteMutation.mutateAsync(trackable._id);
+
   return (
-    <TrackableContext.Provider value={{ trackable, changeSettings, changeDay }}>
+    <TrackableContext.Provider
+      value={{ trackable, changeSettings, changeDay, deleteTrackable }}
+    >
       {children}
     </TrackableContext.Provider>
   );

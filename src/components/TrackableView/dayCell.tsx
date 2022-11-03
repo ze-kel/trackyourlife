@@ -47,7 +47,7 @@ const DayCellBoolean = ({ day, month, year }: IDayProps) => {
   const isActive = trackable.data[dateKey];
 
   const handleClick = async () => {
-    await changeDay({ day, month, year, value: !isActive });
+    await changeDay({ _id: trackable._id, day, month, year, value: !isActive });
   };
 
   const getClasses = () => {
@@ -101,8 +101,8 @@ const DayCellNumber = ({ day, month, year }: IDayProps) => {
 
   const [inInputEdit, setInInputEdit] = useState(false);
 
-  const updateValue = async (value) => {
-    await changeDay({ day, month, year, value });
+  const updateValue = async (value: number) => {
+    await changeDay({ _id: trackable._id, day, month, year, value });
   };
 
   const debouncedUpdateValue = useCallback(debounce(updateValue, 400), [
@@ -202,6 +202,8 @@ const DayCell = (data: IDayProps) => {
   if (trackable.type === "number") {
     return <DayCellNumber {...data} />;
   }
+
+  return <></>;
 };
 
 export default DayCell;

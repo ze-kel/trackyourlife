@@ -15,7 +15,7 @@ const generateDates = (days: number) => {
   for (; days >= 0; days--) {
     dates[days] = { year, month, day };
 
-    if (day === 0) {
+    if (day === 1) {
       if (month === 0) {
         year--;
         month = 11;
