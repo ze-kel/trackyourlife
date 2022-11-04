@@ -1,63 +1,21 @@
-export type IFullData<T> = Record<string, T>;
+export type IFullData<T> = Record<string, string>;
 
 interface BaseSettings {
-  name: string;
+  name?: string;
 }
 
-export interface ITrackableBoolean {
-  type: "boolean";
+export type ITrackableUnsaved = {
+  type: "range" | "number" | "boolean";
   settings: BaseSettings;
-  data: IFullData<boolean>;
-}
+  data: Record<string, string>;
+};
 
-export interface ITrackableNumber {
-  type: "number";
-  settings: BaseSettings;
-  data: IFullData<number>;
-}
+export type ITrackable = ITrackableUnsaved & { id: string };
 
-export interface ITrackableRange {
-  type: "range";
-  settings: BaseSettings & { labels: Record<string, string> };
-  data: IFullData<string>;
-}
-
-export type ITrackableUnsaved =
-  | ITrackableBoolean
-  | ITrackableNumber
-  | ITrackableRange;
-
-export type ITrackable = ITrackableUnsaved & { _id: string };
-
-export interface ITrackableBooleanDB {
-  type: "boolean";
-  settings: BaseSettings;
-  data: { date: Date; value: boolean }[];
-}
-
-export interface ITrackableNumberDB {
-  type: "number";
-  settings: BaseSettings;
-  data: { date: Date; value: number }[];
-}
-
-export interface ITrackableRangeDB {
-  type: "range";
-  settings: BaseSettings & { labels: Record<string, string> };
-  data: { date: Date; value: string }[];
-}
-
-export type ITrackableDBUnsaved =
-  | ITrackableBooleanDB
-  | ITrackableNumberDB
-  | ITrackableRangeDB;
-
-export type ITrackableDB = ITrackableDBUnsaved & { _id: string };
-// Probably should be forced to provide correct type
 export type ITrackableUpdate = {
-  _id: ITrackable["_id"];
+  id: ITrackable["id"];
   day: number;
   month: number;
   year: number;
-  value: boolean | number | string;
+  value: string;
 };

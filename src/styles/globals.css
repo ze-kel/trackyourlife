@@ -16,7 +16,7 @@ html {
 
 @layer components {
   .content-container {
-    @apply container mx-auto max-w-4xl;
+    @apply container mx-auto max-w-4xl px-4;
   }
 }
 

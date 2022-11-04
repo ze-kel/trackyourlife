@@ -4,7 +4,7 @@ import { ITrackableUnsaved } from "@t/trackable";
 import clsx from "clsx";
 import { useRouter } from "next/router";
 import { ChangeEvent, useState } from "react";
-import { add } from "src/helpers/api";
+import { trpc } from "src/utils/trpc";
 
 const CreateDialog = ({ onSuccess }: { onSuccess?: () => void }) => {
   const [name, setName] = useState<ITrackableUnsaved["settings"]["name"]>("");
@@ -20,6 +20,8 @@ const CreateDialog = ({ onSuccess }: { onSuccess?: () => void }) => {
 
   const router = useRouter();
 
+  const mutation = trpc.trackable.createTrackable.useMutation();
+
   const create = async () => {
     if (!name) {
       setNameValidationFail(true);
@@ -34,10 +36,12 @@ const CreateDialog = ({ onSuccess }: { onSuccess?: () => void }) => {
       data: {},
     };
 
-    const saved = await add(newOne as ITrackableUnsaved);
+    const saved = await mutation.mutateAsync(newOne);
 
-    router.push(`/trackable/${saved._id}`);
-    onSuccess();
+    router.push(`/trackable/${saved.id}`);
+    if (onSuccess) {
+      onSuccess();
+    }
   };
 
   const updateName = (e: ChangeEvent<HTMLInputElement>) => {

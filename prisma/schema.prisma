@@ -1,0 +1,40 @@
+
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+    id String @id @default(uuid())
+    trackables Trackable[]
+}
+
+enum TrackableType {
+    boolean
+    number
+    range
+}
+
+model Trackable {
+    id String @id @default(uuid())
+    userId String
+    user User @relation(fields: [userId], references: [id])
+    type TrackableType
+    data TrackableRecord[]    
+    settings Json 
+}
+
+model TrackableRecord {
+    id String @id @default(uuid())
+    trackableId String
+    trackable Trackable @relation(fields: [trackableId], references: [id])
+    date DateTime
+    value String
+    
+    @@unique([trackableId, date], map: "TrackableRecord_trackableId_date_unique_constraint")
+}

@@ -11,7 +11,7 @@ const Trackable = () => {
 
   return (
     data && (
-      <Page title={data.settings.name}>
+      <Page title={data.settings.name} noContainer={true}>
         <TrackableContext trackable={data}>
           <TrackableView />
         </TrackableContext>

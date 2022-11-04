@@ -2,10 +2,10 @@ import cls from "clsx";
 import { getYear, getMonth, getDaysInMonth, isSameDay } from "date-fns";
 import { useCallback, useContext, useMemo, useState } from "react";
 import { IContextData, TrackableContext } from "../../helpers/trackableContext";
-import formatDateKey from "util/formatDateKey";
-import { ITrackableBoolean, ITrackableNumber } from "@t/trackable";
+import formatDateKey from "src/helpers/formatDateKey";
 import { debounce } from "lodash";
 import EditableText from "@components/_UI/EditableText";
+import { ITrackable } from "@t/trackable";
 
 const daysBeforeToday = (year: number, month: number) => {
   const now = new Date();
@@ -36,7 +36,7 @@ const DayCellBoolean = ({ day, month, year }: IDayProps) => {
   const { trackable, changeDay } = useContext(
     TrackableContext
   ) as IContextData & {
-    trackable: ITrackableBoolean;
+    trackable: ITrackable;
   };
 
   const { dateKey, inFuture, isToday } = useMemo(
@@ -44,10 +44,16 @@ const DayCellBoolean = ({ day, month, year }: IDayProps) => {
     [day, month, year]
   );
 
-  const isActive = trackable.data[dateKey];
+  const isActive = trackable.data[dateKey] === "true";
 
   const handleClick = async () => {
-    await changeDay({ _id: trackable._id, day, month, year, value: !isActive });
+    await changeDay({
+      id: trackable.id,
+      day,
+      month,
+      year,
+      value: isActive ? "false" : "true",
+    });
   };
 
   const getClasses = () => {
@@ -87,7 +93,7 @@ const DayCellNumber = ({ day, month, year }: IDayProps) => {
   const { trackable, changeDay } = useContext(
     TrackableContext
   ) as IContextData & {
-    trackable: ITrackableNumber;
+    trackable: ITrackable;
   };
 
   const { dateKey, inFuture, isToday } = useMemo(
@@ -97,12 +103,18 @@ const DayCellNumber = ({ day, month, year }: IDayProps) => {
 
   const number = trackable.data[dateKey];
 
-  const [displayedNumber, setDisplayedNumber] = useState(number || 0);
+  const [displayedNumber, setDisplayedNumber] = useState(Number(number) || 0);
 
   const [inInputEdit, setInInputEdit] = useState(false);
 
   const updateValue = async (value: number) => {
-    await changeDay({ _id: trackable._id, day, month, year, value });
+    await changeDay({
+      id: trackable.id,
+      day,
+      month,
+      year,
+      value: String(value),
+    });
   };
 
   const debouncedUpdateValue = useCallback(debounce(updateValue, 400), [
@@ -195,7 +207,7 @@ const DayCellNumber = ({ day, month, year }: IDayProps) => {
 const DayCell = (data: IDayProps) => {
   const { trackable } = useContext(TrackableContext) ?? {};
 
-  if (!trackable) return;
+  if (!trackable) return <></>;
 
   if (trackable.type === "boolean") {
     return <DayCellBoolean {...data} />;

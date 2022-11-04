@@ -1,6 +1,7 @@
 import { ITrackable, ITrackableUpdate } from "@t/trackable";
 import { createContext, ReactNode } from "react";
 import { trpc } from "src/utils/trpc";
+import updateData from "./updateData";
 
 type IChangeSettings = (someSettings: Partial<ITrackable["settings"]>) => void;
 type IChangeDay = (update: ITrackableUpdate) => void;
@@ -27,13 +28,11 @@ const TrackableProvider = ({
     onSuccess(returned) {
       qContext.trackable.getTrackableById.setData(
         (data: ITrackable | undefined) => {
-          console.log("setData", data);
           if (!data) return;
-          const newOne = { ...data, settings: returned};
-          console.log("result", newOne);
+          const newOne = { ...data, settings: returned };
           return newOne as ITrackable;
         },
-        trackable._id
+        trackable.id
       );
     },
   });
@@ -46,13 +45,17 @@ const TrackableProvider = ({
 
     await settingsMutation.mutateAsync({
       settings: newSettings,
-      _id: trackable._id,
+      id: trackable.id,
     });
   };
 
   const dayValueMutation = trpc.trackable.updateTrackableById.useMutation({
     onSuccess(result) {
-      qContext.trackable.getTrackableById.setData(result, trackable._id);
+      qContext.trackable.getTrackableById.setData((original) => {
+        if (!original) return;
+
+        return updateData(original, result);
+      }, trackable.id);
     },
   });
 
@@ -60,7 +63,7 @@ const TrackableProvider = ({
 
   const deleteMutation = trpc.trackable.deleteTrackable.useMutation();
 
-  const deleteTrackable = () => deleteMutation.mutateAsync(trackable._id);
+  const deleteTrackable = () => deleteMutation.mutateAsync(trackable.id);
 
   return (
     <TrackableContext.Provider

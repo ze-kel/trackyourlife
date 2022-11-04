@@ -8,14 +8,9 @@ services:
       - ./:/app
       - /app/node_modules
     depends_on:
-      - mongo
-  mongo:
-    image: mongo
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=dbadmin
-      - MONGO_INITDB_ROOT_PASSWORD=samplepass
-    volumes:
-      - mongo-db:/data/db
-
+      - postgres
+  postgres:
+    image: postgres:latest
+    restart: always
 volumes:
-  mongo-db:
+  pgdata:

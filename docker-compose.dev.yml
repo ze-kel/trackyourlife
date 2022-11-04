@@ -11,12 +11,13 @@ services:
     environment:
       - NODE_ENV=development
       - PORT=1337
-      - MONGO_USER=dbadmin
-      - MONGO_PASSWORD=samplepass
-    command: npm run dev
-  mongo:
+      - DATABASE_URL=postgresql://admin:samplepass@postgres:5432/db?connect_timeout=300
+    command: "./startup.dev.sh"
+    tty: true
+  postgres:
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=dbadmin
-      - MONGO_INITDB_ROOT_PASSWORD=samplepass
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=samplepass
+      - POSTGRES_DB=db
     volumes:
-      - mongo-db:/data/db
+      - pgdata:/var/lib/postgresql/data

@@ -1,12 +1,10 @@
 import { ITrackable } from "@t/trackable";
-import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import { getSingle } from "src/helpers/api";
 import TrackableProvider from "src/helpers/trackableContext";
 import { trpc } from "src/utils/trpc";
 import MiniTrackable from "./miniTrackable";
 
-const Trackable = ({ id }: { id: ITrackable["_id"] }) => {
+const Trackable = ({ id }: { id: ITrackable["id"] }) => {
   const { data } = trpc.trackable.getTrackableById.useQuery(id);
 
   if (!data) return <div>loading</div>;
@@ -16,7 +14,7 @@ const Trackable = ({ id }: { id: ITrackable["_id"] }) => {
       <article className="border-b border-zinc-200 py-2 last:border-0">
         <Link href={`/trackable/${id}`}>
           <h3 className="w-fit cursor-pointer text-xl ">
-            {data.settings.name}
+            {data.settings.name || "Unnamed trackable"}
           </h3>
         </Link>
         <MiniTrackable className="my-4" />
@@ -25,7 +23,7 @@ const Trackable = ({ id }: { id: ITrackable["_id"] }) => {
   );
 };
 
-const TrackablesList = ({ list }: { list: ITrackable["_id"][] }) => {
+const TrackablesList = ({ list }: { list: ITrackable["id"][] }) => {
   if (!list) return <div>no list</div>;
 
   return (
