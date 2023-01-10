@@ -2,12 +2,12 @@ import { useRouter } from "next/router";
 import Page from "@components/Page";
 import TrackableView from "@components/TrackableView";
 import TrackableContext from "src/helpers/trackableContext";
-import { trpc } from "../../utils/trpc";
+import { api } from "../../utils/api";
 
 const Trackable = () => {
   const router = useRouter();
   const { id } = router.query;
-  const { data } = trpc.trackable.getTrackableById.useQuery(id as string);
+  const { data } = api.trackable.getTrackableById.useQuery(id as string);
 
   return (
     data && (

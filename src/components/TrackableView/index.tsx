@@ -5,7 +5,7 @@ import TrackableName from "./trackableName";
 import DeleteButton from "./deleteButton";
 import DayCell from "./dayCell";
 
-const Month = ({ month, year }: { month; year }) => {
+const Month = ({ month, year }: { month: number; year: number }) => {
   const toRender = getDaysInMonth(new Date(year, month));
   const dates = Array(toRender)
     .fill(0)
@@ -15,7 +15,7 @@ const Month = ({ month, year }: { month; year }) => {
   const prefaceWith = getISODay(firstDayDate) - 1;
   const prepend = Array(prefaceWith).fill(0);
 
-  const monthRef = useRef<HTMLDivElement>();
+  const monthRef = useRef<HTMLDivElement>(null);
 
   const myId = `${year}-${month}`;
   const observer = useContext(ObserverContext);
@@ -105,17 +105,20 @@ const Year = ({ year }: { year: number }) => {
 };
 
 const TrackableView = () => {
-  const [yearsRendered, setYearsRendered] = useState([2022]);
+  const [yearsRendered, setYearsRendered] = useState([
+    new Date().getFullYear(),
+  ]);
 
   const [observer, setObserver] = useState<ElObserver>();
 
-  const yearsRef = useRef<HTMLDivElement>();
-  const loadRef = useRef<HTMLDivElement>();
+  const yearsRef = useRef<HTMLDivElement>(null);
+  const loadRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     const observer = new ElObserver();
     setObserver(observer);
+    handleScroll();
   }, []);
 
   const loadNextYear = () => {
@@ -123,8 +126,10 @@ const TrackableView = () => {
     setYearsRendered([...yearsRendered, next]);
   };
 
-  const handleScroll = (e) => {
-    const left = e.target.scrollTop + e.target.scrollHeight;
+  const handleScroll = () => {
+    if (!yearsRef.current) return;
+    const t = yearsRef.current;
+    const left = t.scrollTop + t.scrollHeight;
     if (left < window.innerHeight * 2) {
       loadNextYear();
     }
@@ -136,7 +141,7 @@ const TrackableView = () => {
         <DeleteButton />
       </div>
 
-      <ObserverContext.Provider value={observer}>
+      <ObserverContext.Provider value={observer as ElObserver}>
         <div
           className="relative box-border flex w-full flex-col-reverse overflow-scroll pb-10"
           ref={yearsRef}
@@ -145,7 +150,11 @@ const TrackableView = () => {
           {yearsRendered.map((year) => {
             return <Year key={year} year={year} />;
           })}
-          <div ref={loadRef} onClick={loadNextYear}>
+          <div
+            ref={loadRef}
+            onClick={loadNextYear}
+            className="content-container flex cursor-pointer items-center justify-center bg-zinc-100 py-2"
+          >
             Load More
           </div>
         </div>

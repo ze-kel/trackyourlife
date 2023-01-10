@@ -1,11 +1,11 @@
-import { ITrackable } from "@t/trackable";
+import { ITrackable } from "src/types/trackable";
 import Link from "next/link";
 import TrackableProvider from "src/helpers/trackableContext";
-import { trpc } from "src/utils/trpc";
+import { api } from "src/utils/api";
 import MiniTrackable from "./miniTrackable";
 
 const Trackable = ({ id }: { id: ITrackable["id"] }) => {
-  const { data } = trpc.trackable.getTrackableById.useQuery(id);
+  const { data } = api.trackable.getTrackableById.useQuery(id);
 
   if (!data) return <div>loading</div>;
 

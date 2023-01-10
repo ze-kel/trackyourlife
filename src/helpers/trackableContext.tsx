@@ -1,6 +1,7 @@
-import { ITrackable, ITrackableUpdate } from "@t/trackable";
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { ITrackable, ITrackableUpdate } from "src/types/trackable";
 import { createContext, ReactNode } from "react";
-import { trpc } from "src/utils/trpc";
+import { api } from "src/utils/api";
 import updateData from "./updateData";
 
 type IChangeSettings = (someSettings: Partial<ITrackable["settings"]>) => void;
@@ -22,9 +23,9 @@ const TrackableProvider = ({
   children: ReactNode;
   trackable: ITrackable;
 }) => {
-  const qContext = trpc.useContext();
+  const qContext = api.useContext();
 
-  const settingsMutation = trpc.trackable.updateTrackableSettings.useMutation({
+  const settingsMutation = api.trackable.updateTrackableSettings.useMutation({
     onSuccess(returned) {
       qContext.trackable.getTrackableById.setData(
         (data: ITrackable | undefined) => {
@@ -49,7 +50,7 @@ const TrackableProvider = ({
     });
   };
 
-  const dayValueMutation = trpc.trackable.updateTrackableById.useMutation({
+  const dayValueMutation = api.trackable.updateTrackableById.useMutation({
     onSuccess(result) {
       qContext.trackable.getTrackableById.setData((original) => {
         if (!original) return;
@@ -61,7 +62,7 @@ const TrackableProvider = ({
 
   const changeDay: IChangeDay = dayValueMutation.mutateAsync;
 
-  const deleteMutation = trpc.trackable.deleteTrackable.useMutation();
+  const deleteMutation = api.trackable.deleteTrackable.useMutation();
 
   const deleteTrackable = () => deleteMutation.mutateAsync(trackable.id);
 

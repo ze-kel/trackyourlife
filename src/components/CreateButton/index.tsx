@@ -16,9 +16,7 @@ const CreateButton = () => {
 
   return (
     <>
-      <Button click={openModal} theme="inverted">
-        Add New
-      </Button>
+      <Button onClick={openModal}>Add New</Button>
       {isCreating && (
         <Modal close={closeModal}>
           <CreateDialog onSuccess={closeModal}></CreateDialog>

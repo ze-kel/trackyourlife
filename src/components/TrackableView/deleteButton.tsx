@@ -25,14 +25,14 @@ const DeleteButton = () => {
 
   return (
     <>
-      <Button click={openModal}>Delete</Button>
+      <Button onClick={openModal}>Delete</Button>
       {confirmOpened && (
         <Modal close={closeModal}>
           <h2 className="text-xl">Are you sure you want to delete?</h2>
           <p className="pt-2">This action is irreversible</p>
           <div className="pt-3">
-            <Button click={performDelete}>Confirm</Button>
-            <Button className="ml-4" click={closeModal}>
+            <Button onClick={performDelete}>Confirm</Button>
+            <Button className="ml-4" onClick={closeModal}>
               Cancel
             </Button>
           </div>

@@ -1,48 +1,56 @@
 import clsx from "clsx";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 
 interface ButtonProps {
-  click: () => void;
+  onClick: () => void;
   isActive?: boolean;
   children: ReactNode;
   theme?: "default" | "inverted";
+  size?: "s" | "m";
   className?: string;
   fill?: boolean;
 }
 
+const themes = {
+  default: {
+    base: "text-zinc-50 bg-zinc-800 hover:bg-zinc-900 cursor-pointer",
+    inactive: "cursor-default text-zinc-200 bg-zinc-700 hover:bg-zinc-700",
+  },
+  inverted: {
+    base: "text-zinc-900 bg-zinc-100 hover:bg-zinc-50 cursor-pointer",
+    inactive: "",
+  },
+};
+
+const sizes = {
+  s: "text-sm py-1 px-2 rounded",
+  m: "text-md py-2 px-4 font-semibold rounded-md",
+};
 const Button = ({
-  click,
+  onClick,
   isActive = true,
   children,
   theme = "default",
+  size = "m",
   className,
   fill,
 }: ButtonProps) => {
   const handleClick = () => {
     if (isActive) {
-      click();
+      onClick();
     }
   };
 
-  const themes = {
-    default: {
-      base: "text-zinc-50 bg-zinc-800 hover:bg-zinc-900 cursor-pointer",
-      inactive: "cursor-default text-zinc-200 bg-zinc:600",
-    },
-    inverted: {
-      base: "text-zinc-900 bg-zinc-100 hover:bg-zinc-50 cursor-pointer",
-      inactive: "",
-    },
-  };
-
   const currentTheme = themes[theme];
+  const currentSize = sizes[size];
 
   return (
     <button
       onClick={handleClick}
       className={clsx(
-        "text-md max-h-full rounded-md py-2 px-4 font-semibold transition-colors",
+        "max-h-full transition-colors",
         currentTheme.base,
+        currentSize,
         !isActive && currentTheme.inactive,
         className,
         fill && "w-full"

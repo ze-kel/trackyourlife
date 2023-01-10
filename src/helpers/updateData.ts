@@ -1,4 +1,4 @@
-import { ITrackable, ITrackableUpdate } from "@t/trackable";
+import { ITrackable, ITrackableUpdate } from "src/types/trackable";
 
 import _cloneDeep from "lodash/cloneDeep";
 import formatDateKey from "src/helpers/formatDateKey";

@@ -1,10 +1,12 @@
 import Button from "@components/_UI/Button";
-import Selector, { ISelectorOption } from "@components/_UI/Selector";
-import { ITrackableUnsaved } from "@t/trackable";
+import type { ISelectorOption } from "@components/_UI/Selector";
+import Selector from "@components/_UI/Selector";
+import type { ITrackableUnsaved } from "src/types/trackable";
 import clsx from "clsx";
 import { useRouter } from "next/router";
-import { ChangeEvent, useState } from "react";
-import { trpc } from "src/utils/trpc";
+import type { ChangeEvent } from "react";
+import { useState } from "react";
+import { api } from "src/utils/api";
 
 const CreateDialog = ({ onSuccess }: { onSuccess?: () => void }) => {
   const [name, setName] = useState<ITrackableUnsaved["settings"]["name"]>("");
@@ -20,9 +22,10 @@ const CreateDialog = ({ onSuccess }: { onSuccess?: () => void }) => {
 
   const router = useRouter();
 
-  const mutation = trpc.trackable.createTrackable.useMutation();
+  const mutation = api.trackable.createTrackable.useMutation();
 
   const create = async () => {
+    console.log(name);
     if (!name) {
       setNameValidationFail(true);
       return;
@@ -38,7 +41,7 @@ const CreateDialog = ({ onSuccess }: { onSuccess?: () => void }) => {
 
     const saved = await mutation.mutateAsync(newOne);
 
-    router.push(`/trackable/${saved.id}`);
+    await router.push(`/trackable/${saved.id}`);
     if (onSuccess) {
       onSuccess();
     }
@@ -68,7 +71,7 @@ const CreateDialog = ({ onSuccess }: { onSuccess?: () => void }) => {
       <Selector active={type} options={types} setter={setType}></Selector>
 
       <Button
-        click={create}
+        onClick={create}
         className="mt-5"
         isActive={!nameValidationFail}
         fill={true}

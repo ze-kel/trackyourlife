@@ -5,7 +5,7 @@ import { IContextData, TrackableContext } from "../../helpers/trackableContext";
 import formatDateKey from "src/helpers/formatDateKey";
 import { debounce } from "lodash";
 import EditableText from "@components/_UI/EditableText";
-import { ITrackable } from "@t/trackable";
+import { ITrackable } from "src/types/trackable";
 
 const daysBeforeToday = (year: number, month: number) => {
   const now = new Date();

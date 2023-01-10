@@ -5,7 +5,7 @@ import { TrackableContext } from "../../helpers/trackableContext";
 const TrackableName = () => {
   const { trackable, changeSettings } = useContext(TrackableContext) ?? {};
 
-  if (!trackable || !changeSettings) return;
+  if (!trackable || !changeSettings) return <></>;
 
   const handleUpdate = (name: string) => {
     changeSettings({ ...trackable.settings, name });

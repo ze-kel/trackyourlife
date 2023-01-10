@@ -1,25 +1,21 @@
-import {
-  DehydratedState,
-  Hydrate,
-} from "@tanstack/react-query";
-import { AppProps } from "next/app";
-import { trpc } from "src/utils/trpc";
 import "../styles/globals.css";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
-function MyApp({
+import { type AppType } from "next/app";
+import { type Session } from "next-auth";
+import { SessionProvider } from "next-auth/react";
+
+import { api } from "../utils/api";
+
+const MyApp: AppType<{ session: Session | null }> = ({
   Component,
-  pageProps,
-}: AppProps<{ dehydratedState: DehydratedState }>) {
+  pageProps: { session, ...pageProps },
+}) => {
   return (
-    <>
-      <ReactQueryDevtools initialIsOpen={false} />
-      <Hydrate state={pageProps.dehydratedState}>
-        <Component {...pageProps} />
-        <div id="modal-portal"></div>
-      </Hydrate>
-    </>
+    <SessionProvider session={session}>
+      <Component {...pageProps} />
+      <div id="modal-portal"></div>
+    </SessionProvider>
   );
-}
+};
 
-export default trpc.withTRPC(MyApp);
+export default api.withTRPC(MyApp);

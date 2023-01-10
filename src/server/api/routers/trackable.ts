@@ -1,11 +1,13 @@
-import { router, publicProcedure } from "../trpc";
+// TODO
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { publicProcedure, createTRPCRouter } from "../trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
-import { PrismaClient } from "@prisma/client";
-const prisma = new PrismaClient();
+import { prisma } from "../../db";
 
-import { ITrackable } from "@t/trackable";
+import type { ITrackable } from "src/types/trackable";
 
 import { format } from "date-fns";
 
@@ -31,7 +33,7 @@ const getDefaultUser = async () => {
   return defUser;
 };
 
-export const trackableRouter = router({
+export const trackableRouter = createTRPCRouter({
   getAllIds: publicProcedure.query(async () => {
     const entries = await prisma.trackable.findMany();
 

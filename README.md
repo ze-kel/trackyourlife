@@ -1,6 +1,7 @@
 ### Development
+You will need to have a working postgresql DB. You can either create 
 
-Use Docker
+### Using Docker
 Start
 
 ```
