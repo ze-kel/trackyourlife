@@ -10,15 +10,8 @@
     "lint": "next lint",
     "test": "jest --runInBand"
   },
-  "nodemonConfig": {
-    "ignore": [
-      "**/tests/**",
-      "*.test.ts",
-      "/data.json"
-    ],
-    "delay": 2500
-  },
   "dependencies": {
+    "@heroicons/react": "^2.0.13",
     "@next-auth/prisma-adapter": "^1.0.5",
     "@prisma/client": "^4.8.1",
     "@tanstack/react-query": "^4.20.0",

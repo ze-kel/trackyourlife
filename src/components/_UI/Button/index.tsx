@@ -13,11 +13,12 @@ interface ButtonProps {
 
 const themes = {
   default: {
-    base: "text-zinc-50 bg-zinc-800 hover:bg-zinc-900 cursor-pointer",
-    inactive: "cursor-default text-zinc-200 bg-zinc-700 hover:bg-zinc-700",
+    base: "text-neutral-50 bg-neutral-800 hover:bg-neutral-900 cursor-pointer",
+    inactive:
+      "cursor-default text-neutral-200 bg-neutral-700 hover:bg-neutral-700",
   },
   inverted: {
-    base: "text-zinc-900 bg-zinc-100 hover:bg-zinc-50 cursor-pointer",
+    base: "text-neutral-900 bg-neutral-100 hover:bg-neutral-50 cursor-pointer",
     inactive: "",
   },
 };

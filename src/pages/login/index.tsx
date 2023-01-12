@@ -29,7 +29,7 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="m-auto my-24 flex max-w-md flex-col rounded-md border-2 border-zinc-700 py-6 px-8">
+    <div className="m-auto my-24 flex max-w-md flex-col rounded-md border-2 border-neutral-700 py-6 px-8">
       <h2 className="mb-5 text-3xl font-semibold">
         {register ? "Create new account" : "Welcome back!"}
       </h2>
@@ -78,18 +78,18 @@ const LoginForm = () => {
       </Button>
 
       <div
-        className="mt-5 cursor-pointer text-zinc-500"
+        className="mt-5 cursor-pointer text-neutral-500"
         onClick={() => setRegister(!register)}
       >
         {!register ? (
           <>
             Dont have an account yet?{" "}
-            <span className="font-bold text-zinc-700">Sign up</span>
+            <span className="font-bold text-neutral-700">Sign up</span>
           </>
         ) : (
           <>
             Aready have an accoutn?{" "}
-            <span className="font-bold text-zinc-700">Sign in</span>
+            <span className="font-bold text-neutral-700">Sign in</span>
           </>
         )}
       </div>

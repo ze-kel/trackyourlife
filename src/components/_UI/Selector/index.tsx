@@ -23,8 +23,8 @@ const Selector = ({
             className={cls(
               "px-2 py-1  transition-colors",
               active === option.value
-                ? "cursor-default bg-zinc-800 text-zinc-50"
-                : "cursor-pointer bg-zinc-200 text-zinc-800 hover:bg-zinc-300"
+                ? "cursor-default bg-neutral-800 text-neutral-50"
+                : "cursor-pointer bg-neutral-200 text-neutral-800 hover:bg-neutral-300"
             )}
             onClick={() => setter(option.value)}
           >

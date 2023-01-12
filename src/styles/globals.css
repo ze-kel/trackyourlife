@@ -2,18 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  height: 100%;
-}
-html {
-  height: 100vh;
-  height: -webkit-fill-available;
-}
-
-#__next {
-  height: 100%;
-}
-
 @layer components {
   .content-container {
     @apply container mx-auto max-w-4xl px-4;

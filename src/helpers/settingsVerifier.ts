@@ -17,7 +17,7 @@ const boolean = z.object({
 
 const number = z.object({
   ...basics,
-  incrementBy: z.number().optional(),
+  incrementBy: z.number().min(1).optional(),
   limits: z
     .object({
       min: z.number(),

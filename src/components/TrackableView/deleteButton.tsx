@@ -2,15 +2,19 @@ import Button from "@components/_UI/Button";
 import Modal from "@components/_UI/Modal";
 import router from "next/router";
 import { useContext, useState } from "react";
-import { remove } from "src/helpers/api";
 import { TrackableContext } from "../../helpers/trackableContext";
+import IconTrash from "@heroicons/react/24/outline/TrashIcon";
 
 const DeleteButton = () => {
-  const { deleteTrackable } = useContext(TrackableContext);
+  const { deleteTrackable } = useContext(TrackableContext) ?? {};
+
+  if (!deleteTrackable) {
+    throw new Error("Context error: Delete trackable");
+  }
 
   const performDelete = async () => {
     await deleteTrackable();
-    router.push("/");
+    await router.push("/");
   };
 
   const [confirmOpened, setConfirmOpened] = useState(false);
@@ -25,13 +29,16 @@ const DeleteButton = () => {
 
   return (
     <>
-      <Button onClick={openModal}>Delete</Button>
+      <IconTrash
+        className="w-6 cursor-pointer text-neutral-400 transition-colors hover:text-red-600"
+        onClick={openModal}
+      />
       {confirmOpened && (
         <Modal close={closeModal}>
           <h2 className="text-xl">Are you sure you want to delete?</h2>
           <p className="pt-2">This action is irreversible</p>
           <div className="pt-3">
-            <Button onClick={performDelete}>Confirm</Button>
+            <Button onClick={() => void performDelete()}>Confirm</Button>
             <Button className="ml-4" onClick={closeModal}>
               Cancel
             </Button>

@@ -7,6 +7,8 @@ import formatDateKey from "src/helpers/formatDateKey";
 import { debounce } from "lodash";
 import EditableText from "@components/_UI/EditableText";
 import type { ITrackable } from "src/types/trackable";
+import IconPlus from "@heroicons/react/24/outline/PlusIcon";
+import IconMinus from "@heroicons/react/24/outline/MinusIcon";
 
 const daysBeforeToday = (year: number, month: number) => {
   const now = new Date();
@@ -14,26 +16,29 @@ const daysBeforeToday = (year: number, month: number) => {
     return getDaysInMonth(new Date(year, month));
   }
 
-  return now.getDate();
+  if (year === getYear(now) && month === getMonth(now)) {
+    return now.getDate();
+  }
+
+  return 0;
 };
 
 type IDayProps = {
   day: number;
   month: number;
   year: number;
+  style?: "mini";
 };
 
 const computeDayCellHelpers = ({ day, month, year }: IDayProps) => {
   const dateKey = formatDateKey({ day, month, year });
-
   const inFuture = daysBeforeToday(year, month) < day;
-
   const isToday = isSameDay(new Date(), new Date(year, month, day));
 
   return { dateKey, inFuture, isToday };
 };
 
-const DayCellBoolean = ({ day, month, year }: IDayProps) => {
+const DayCellBoolean = ({ day, month, year, style }: IDayProps) => {
   const { trackable, changeDay } = useContext(
     TrackableContext
   ) as IContextData & {
@@ -58,25 +63,33 @@ const DayCellBoolean = ({ day, month, year }: IDayProps) => {
   };
 
   const getClasses = () => {
-    const arr = [
-      "flex h-16 items-start justify-start rounded-sm border-2 border-transparent px-2 py-1 font-semibold transition-colors",
-    ];
+    const arr = ["flex rounded-sm border-transparent transition-colors"];
+
+    if (style === "mini") {
+      arr.push("text-sm h-6 justify-center items-center font-light border");
+    }
+
+    if (style === undefined) {
+      arr.push(
+        "h-16 px-2 py-1 font-semibold items-start justify-start border-2"
+      );
+    }
 
     if (inFuture) {
-      arr.push("bg-slate-100 text-zinc-300");
+      arr.push("bg-slate-100 text-neutral-300");
     } else {
       if (isToday) {
-        arr.push("border-zinc-500 text-zinc-600");
+        arr.push("border-neutral-500 text-neutral-600");
       } else {
-        arr.push("text-zinc-500");
+        arr.push("text-neutral-500");
       }
 
       arr.push("cursor-pointer");
 
       arr.push(
         isActive
-          ? "bg-lime-500 hover:border-zinc-400"
-          : "bg-zinc-300 hover:border-lime-400"
+          ? "bg-lime-500 hover:border-neutral-400"
+          : "bg-neutral-200 hover:border-lime-400"
       );
     }
 
@@ -87,7 +100,11 @@ const DayCellBoolean = ({ day, month, year }: IDayProps) => {
     <div
       className={cls(...getClasses())}
       key={day}
-      onClick={() => void handleClick()}
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        void handleClick();
+      }}
     >
       {day}
     </div>
@@ -150,12 +167,12 @@ const DayCellNumber = ({ day, month, year }: IDayProps) => {
     ];
 
     if (inFuture) {
-      arr.push("bg-slate-100 text-zinc-300");
+      arr.push("bg-slate-100 text-neutral-300");
     } else {
       if (isToday) {
-        arr.push("border-zinc-500 text-zinc-600");
+        arr.push("border-neutral-500 text-neutral-600");
       } else {
-        arr.push("text-zinc-500 border-zinc-100");
+        arr.push("text-neutral-500 border-neutral-100");
       }
     }
     return arr;
@@ -173,33 +190,29 @@ const DayCellNumber = ({ day, month, year }: IDayProps) => {
             className={cls(
               "flex h-full w-full items-center justify-center text-center text-xl transition-colors",
               displayedNumber === 0 && !inInputEdit
-                ? "text-zinc-200"
-                : "text-zinc-800"
+                ? "text-neutral-200"
+                : "text-neutral-800"
             )}
-            classNameInput="focus:outline-zinc-900"
+            classNameInput="focus:outline-neutral-900"
             editModeSetter={setInInputEdit}
           />
           <span
             className={cls(
               "text-xl transition-colors",
-              displayedNumber === 0 ? "text-zinc-200" : "text-zinc-800"
+              displayedNumber === 0 ? "text-neutral-200" : "text-neutral-800"
             )}
           ></span>
 
           {!inInputEdit && (
             <>
-              <button
+              <IconMinus
                 onClick={handleMinus}
-                className="invisible absolute left-[50%] bottom-0 z-20 h-7 w-7 -translate-x-1/2 translate-y-1/2 rounded-sm border border-zinc-500 bg-zinc-50 group-hover:visible"
-              >
-                -
-              </button>
-              <button
+                className="invisible absolute left-[50%] bottom-0 z-20 h-7 w-7 -translate-x-1/2 translate-y-1/2 cursor-pointer rounded-sm border border-neutral-500 bg-neutral-50 p-1 group-hover:visible"
+              />
+              <IconPlus
                 onClick={handlePlus}
-                className="invisible absolute left-[50%] top-0 z-20 h-7 w-7 -translate-x-1/2 -translate-y-1/2 rounded-sm border border-zinc-500 bg-zinc-50 group-hover:visible"
-              >
-                +
-              </button>
+                className="invisible absolute left-[50%] top-0 z-20 h-7 w-7 -translate-x-1/2 -translate-y-1/2 cursor-pointer rounded-sm border border-neutral-500 bg-neutral-50 p-1 group-hover:visible"
+              />
             </>
           )}
         </>
@@ -211,7 +224,9 @@ const DayCellNumber = ({ day, month, year }: IDayProps) => {
 const DayCell = (data: IDayProps) => {
   const { trackable } = useContext(TrackableContext) ?? {};
 
-  if (!trackable) return <></>;
+  if (!trackable) {
+    throw new Error("Context error: Trackable");
+  }
 
   if (trackable.type === "boolean") {
     return <DayCellBoolean {...data} />;
