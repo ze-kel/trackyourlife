@@ -7,15 +7,17 @@ import { prisma } from "../../../server/db";
 import { env } from "src/env/server.mjs";
 
 export const authOptions: NextAuthOptions = {
+  pages: { signIn: "/login" },
   callbacks: {
     jwt: ({ token, user }) => {
       if (user) {
-        token.id = user.id;
-        token.email = user.email;
+        token.user = { id: user.id, email: user.email, name: user.name };
       }
       return token;
     },
-    session: ({ session, token }) => {
+    session: ({ token, session }) => {
+      session.user = token.user as { id: string; email: string; name: string };
+
       return session;
     },
   },
@@ -29,7 +31,6 @@ export const authOptions: NextAuthOptions = {
         email: { label: "email", type: "text", placeholder: "" },
         password: { label: "Password", type: "password" },
       },
-      // eslint-disable-next-line @typescript-eslint/require-await
       async authorize(credentials) {
         if (!credentials) return null;
         const { email, password } = credentials;

@@ -5,7 +5,6 @@ import CreateButton from "@components/CreateButton";
 
 const AllTrackables = () => {
   const { data } = api.trackable.getAllIds.useQuery();
-  const qContext = api.useContext();
 
   return (
     <div className="content-container overflow-scroll">
@@ -18,10 +17,12 @@ const AllTrackables = () => {
   );
 };
 
-export default function Home() {
+const AppHome = () => {
   return (
-    <Page>
+    <Page noContainer={true}>
       <AllTrackables />
     </Page>
   );
-}
+};
+
+export default AppHome;

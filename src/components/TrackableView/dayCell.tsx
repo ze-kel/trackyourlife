@@ -1,11 +1,12 @@
 import cls from "clsx";
 import { getYear, getMonth, getDaysInMonth, isSameDay } from "date-fns";
 import { useCallback, useContext, useMemo, useState } from "react";
-import { IContextData, TrackableContext } from "../../helpers/trackableContext";
+import type { IContextData } from "../../helpers/trackableContext";
+import { TrackableContext } from "../../helpers/trackableContext";
 import formatDateKey from "src/helpers/formatDateKey";
 import { debounce } from "lodash";
 import EditableText from "@components/_UI/EditableText";
-import { ITrackable } from "src/types/trackable";
+import type { ITrackable } from "src/types/trackable";
 
 const daysBeforeToday = (year: number, month: number) => {
   const now = new Date();
@@ -22,7 +23,7 @@ type IDayProps = {
   year: number;
 };
 
-const useDayCellHelpers = ({ day, month, year }: IDayProps) => {
+const computeDayCellHelpers = ({ day, month, year }: IDayProps) => {
   const dateKey = formatDateKey({ day, month, year });
 
   const inFuture = daysBeforeToday(year, month) < day;
@@ -40,7 +41,7 @@ const DayCellBoolean = ({ day, month, year }: IDayProps) => {
   };
 
   const { dateKey, inFuture, isToday } = useMemo(
-    () => useDayCellHelpers({ day, month, year }),
+    () => computeDayCellHelpers({ day, month, year }),
     [day, month, year]
   );
 
@@ -74,8 +75,8 @@ const DayCellBoolean = ({ day, month, year }: IDayProps) => {
 
       arr.push(
         isActive
-          ? "bg-green-500 hover:border-zinc-400"
-          : "bg-zinc-300 hover:border-green-400"
+          ? "bg-lime-500 hover:border-zinc-400"
+          : "bg-zinc-300 hover:border-lime-400"
       );
     }
 
@@ -83,7 +84,11 @@ const DayCellBoolean = ({ day, month, year }: IDayProps) => {
   };
 
   return (
-    <div className={cls(...getClasses())} key={day} onClick={handleClick}>
+    <div
+      className={cls(...getClasses())}
+      key={day}
+      onClick={() => void handleClick()}
+    >
       {day}
     </div>
   );
@@ -97,7 +102,7 @@ const DayCellNumber = ({ day, month, year }: IDayProps) => {
   };
 
   const { dateKey, inFuture, isToday } = useMemo(
-    () => useDayCellHelpers({ day, month, year }),
+    () => computeDayCellHelpers({ day, month, year }),
     [day, month, year]
   );
 
@@ -125,17 +130,17 @@ const DayCellNumber = ({ day, month, year }: IDayProps) => {
 
   const handlePlus = () => {
     setDisplayedNumber(displayedNumber + 1);
-    debouncedUpdateValue(displayedNumber + 1);
+    void debouncedUpdateValue(displayedNumber + 1);
   };
   const handleMinus = () => {
     setDisplayedNumber(displayedNumber - 1);
-    debouncedUpdateValue(displayedNumber - 1);
+    void debouncedUpdateValue(displayedNumber - 1);
   };
 
   const handleInputUpdate = (val: number) => {
     if (val !== displayedNumber) {
       setDisplayedNumber(val);
-      debouncedUpdateValue(val);
+      void debouncedUpdateValue(val);
     }
   };
 
@@ -159,7 +164,6 @@ const DayCellNumber = ({ day, month, year }: IDayProps) => {
   return (
     <div className={cls(...getClasses())} key={day}>
       <span className="absolute top-1 left-2">{day}</span>
-
       {!inFuture && (
         <>
           <EditableText

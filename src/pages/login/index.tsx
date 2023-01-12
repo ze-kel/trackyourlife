@@ -1,13 +1,10 @@
 import { useState } from "react";
-import type { ISelectorOption } from "@components/_UI/Selector";
-import Selector from "@components/_UI/Selector";
 import Button from "@components/_UI/Button";
 import { api } from "src/utils/api";
 import { z } from "zod";
-import { signIn, getSession } from "next-auth/react";
+import { signIn } from "next-auth/react";
 import GenericInput from "@components/_UI/Input";
-
-const EMAIL_REGEX = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g;
+import Page from "@components/Page";
 
 const LoginForm = () => {
   const [email, setEmail] = useState("");
@@ -18,87 +15,93 @@ const LoginForm = () => {
 
   const registerMutation = api.user.createUser.useMutation();
 
-  const selectorOptions: ISelectorOption[] = [
-    { label: "Login", value: false },
-    { label: "Register", value: true },
-  ];
-
   const buttonHandle = async () => {
     if (!password || !email) return;
 
     if (register) {
       await registerMutation.mutateAsync({ name, password, email });
-    } else {
-      const s = await signIn("credentials", {
-        email: email,
-        password: password,
-        redirect: false,
-      });
-      console.log("s", s);
-
-      const session = await getSession();
-      console.log("session", session);
     }
+    await signIn("credentials", {
+      email: email,
+      password: password,
+      callbackUrl: "/",
+    });
   };
 
   return (
-    <div className="flex flex-col ">
-      <Selector
-        options={selectorOptions}
-        active={register}
-        setter={setRegister}
-      />
-      <h2 className="text-xl"> {register ? "Register" : "Login"} </h2>
-
+    <div className="m-auto my-24 flex max-w-md flex-col rounded-md border-2 border-zinc-700 py-6 px-8">
+      <h2 className="mb-5 text-3xl font-semibold">
+        {register ? "Create new account" : "Welcome back!"}
+      </h2>
       {register && (
         <GenericInput
-          title="text"
+          title="Account Name"
           value={name}
-          placeholder="Kel"
+          placeholder="Name or nickname"
           schema={z.string().min(1, "Please set some account name")}
           onChange={setName}
+          className="mb-2"
         />
       )}
       <GenericInput
         title="Email"
         value={email}
-        placeholder="kel@gmail.com"
+        placeholder="you@gmail.com"
         schema={z
           .string()
           .min(1, "Please enter an Email")
-          .regex(EMAIL_REGEX, "Please enter a valid Email")}
+          .email("Please enter a valid Email")}
         onChange={setEmail}
+        className="mb-2"
       />
       <GenericInput
         title="Password"
         value={password}
         type="password"
-        placeholder="something very secret"
-        schema={z
-          .string()
-          .min(1, "Please enter a password")
-          .min(10, "Password must be at least 10 characters")}
+        placeholder={register ? "At least 10 characters" : ""}
+        schema={
+          register
+            ? z
+                .string()
+                .min(1, "Please enter a password")
+                .min(10, "Password must be at least 10 characters")
+            : z.string().min(1, "Please enter a password")
+        }
         onChange={setPassword}
-        className="my-2"
       />
       <Button
         onClick={() => void buttonHandle()}
         isActive={Boolean(email && password)}
+        className="mt-4"
       >
         {register ? "Register" : "Login"}
       </Button>
+
+      <div
+        className="mt-5 cursor-pointer text-zinc-500"
+        onClick={() => setRegister(!register)}
+      >
+        {!register ? (
+          <>
+            Dont have an account yet?{" "}
+            <span className="font-bold text-zinc-700">Sign up</span>
+          </>
+        ) : (
+          <>
+            Aready have an accoutn?{" "}
+            <span className="font-bold text-zinc-700">Sign in</span>
+          </>
+        )}
+      </div>
     </div>
   );
 };
 
 const LoginPage = () => {
-  const users = api.user.getUsers.useQuery();
   return (
-    <div className="content-container">
-      Users
-      <div>{JSON.stringify(users.data)}</div>
+    <Page>
       <LoginForm />
-    </div>
+    </Page>
   );
 };
 

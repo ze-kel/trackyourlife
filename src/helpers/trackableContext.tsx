@@ -1,11 +1,15 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { ITrackable, ITrackableUpdate } from "src/types/trackable";
-import { createContext, ReactNode } from "react";
+import type { ITrackable, ITrackableUpdate } from "src/types/trackable";
+import type { ReactNode } from "react";
+import { createContext } from "react";
 import { api } from "src/utils/api";
 import updateData from "./updateData";
+import getData from "./getData";
 
-type IChangeSettings = (someSettings: Partial<ITrackable["settings"]>) => void;
-type IChangeDay = (update: ITrackableUpdate) => void;
+type IChangeSettings = (
+  someSettings: Partial<ITrackable["settings"]>
+) => Promise<any>;
+type IChangeDay = (update: ITrackableUpdate) => Promise<any>;
 
 export interface IContextData {
   trackable: ITrackable;
@@ -28,12 +32,12 @@ const TrackableProvider = ({
   const settingsMutation = api.trackable.updateTrackableSettings.useMutation({
     onSuccess(returned) {
       qContext.trackable.getTrackableById.setData(
+        trackable.id,
         (data: ITrackable | undefined) => {
           if (!data) return;
           const newOne = { ...data, settings: returned };
           return newOne as ITrackable;
-        },
-        trackable.id
+        }
       );
     },
   });
@@ -51,12 +55,34 @@ const TrackableProvider = ({
   };
 
   const dayValueMutation = api.trackable.updateTrackableById.useMutation({
-    onSuccess(result) {
-      qContext.trackable.getTrackableById.setData((original) => {
+    async onMutate(change) {
+      await qContext.trackable.getTrackableById.cancel(trackable.id);
+
+      const data = qContext.trackable.getTrackableById.getData(trackable.id);
+      if (!data) {
+        throw new Error("Trying to mutate trackable that does not exist");
+      }
+
+      const rollback = getData(data, change);
+
+      qContext.trackable.getTrackableById.setData(trackable.id, (original) => {
         if (!original) return;
 
-        return updateData(original, result);
-      }, trackable.id);
+        return updateData(original, change);
+      });
+
+      return { change, rollback };
+    },
+    onError: (err, newTodo, context) => {
+      if (!context || !context.rollback) {
+        throw new Error(
+          "Error when updating, unable to retrieve rollback value"
+        );
+      }
+      qContext.trackable.getTrackableById.setData(trackable.id, (original) => {
+        if (!original) return;
+        return updateData(original, context.rollback);
+      });
     },
   });
 

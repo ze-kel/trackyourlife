@@ -10,9 +10,10 @@ const ModalPortal = ({ children }: { children: ReactNode }) => {
     return () => setMounted(false);
   }, []);
 
-  return mounted
-    ? createPortal(children, document.querySelector("#modal-portal"))
-    : null;
+  const el = document.querySelector("#modal-portal");
+  if (!el) throw new Error("No element for modal portal found");
+
+  return mounted ? createPortal(children, el) : null;
 };
 
 export default ModalPortal;

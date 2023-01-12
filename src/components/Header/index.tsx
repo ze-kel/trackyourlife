@@ -1,9 +1,20 @@
 import Button from "@components/_UI/Button";
+import Dropdown from "@components/_UI/Dropdown";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
+import { useState } from "react";
+
+const SigOutButton = () => {
+  return (
+    <div onClick={() => void signOut()} className="whitespace-nowrap">
+      Sign Out
+    </div>
+  );
+};
 
 const Header = () => {
   const { data: sessionData } = useSession();
+  const [dropdown, setDropdown] = useState(false);
 
   return (
     <div className="flex h-12 flex-shrink-0 justify-center bg-black  font-bold text-white">
@@ -11,11 +22,20 @@ const Header = () => {
         <Link href={"/"}>Track Your Life</Link>
 
         {sessionData && (
-          <div className="flex items-center gap-2">
-            <p> {sessionData?.user?.name}</p>
-            <Button onClick={() => void signOut()} size="s" theme="inverted">
-              Sign Out
-            </Button>
+          <div className="relative flex items-center gap-2">
+            <p
+              onClick={() => {
+                setDropdown(!dropdown);
+              }}
+              className="cursor-pointer"
+            >
+              {sessionData?.user?.name}
+            </p>
+            <Dropdown
+              isOpened={dropdown}
+              content={[<SigOutButton key={"so"} />]}
+              className="w-fit"
+            />
           </div>
         )}
       </div>

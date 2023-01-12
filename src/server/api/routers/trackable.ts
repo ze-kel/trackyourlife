@@ -1,7 +1,7 @@
 // TODO
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { publicProcedure, createTRPCRouter } from "../trpc";
+import { protectedProcedure, createTRPCRouter } from "../trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
@@ -24,32 +24,31 @@ const trackableToCreate = z.object({
   type: z.enum(["number", "boolean", "range"]),
 });
 
-const getDefaultUser = async () => {
-  let defUser = await prisma.user.findFirst();
-  if (!defUser) {
-    defUser = await prisma.user.create({ data: {} });
-  }
-
-  return defUser;
-};
-
 export const trackableRouter = createTRPCRouter({
-  getAllIds: publicProcedure.query(async () => {
-    const entries = await prisma.trackable.findMany();
+  getAllIds: protectedProcedure.query(async ({ ctx }) => {
+    const userId = ctx.session.user.id;
+
+    console.log("userId", userId);
+
+    const entries = await prisma.trackable.findMany({ where: { userId } });
+
+    console.log("e", entries);
 
     return entries.map((entry) => entry.id);
   }),
 
-  getTrackableById: publicProcedure
+  getTrackableById: protectedProcedure
     .input(z.string())
-    .query(async ({ input }) => {
+    .query(async ({ ctx, input }) => {
       const id = input;
 
-      console.log("\ngetTrackableById");
+      const userId = ctx.session.user.id;
+      console.log("userId", userId);
 
       const trackable = await prisma.trackable.findFirst({
         where: {
           id: id,
+          userId,
         },
       });
 
@@ -79,10 +78,21 @@ export const trackableRouter = createTRPCRouter({
       return returnedTrackable;
     }),
 
-  updateTrackableById: publicProcedure
+  updateTrackableById: protectedProcedure
     .input(trackableUpdate)
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       const date = new Date(input.year, input.month, input.day);
+
+      const userId = ctx.session.user.id;
+      const trackable = await prisma.trackable.findUnique({
+        where: { id: input.id },
+      });
+      if (!trackable || trackable.userId !== userId) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "No trackable with ID" + input.id,
+        });
+      }
 
       const record = await prisma.trackableRecord.upsert({
         create: {
@@ -104,25 +114,36 @@ export const trackableRouter = createTRPCRouter({
       return input;
     }),
 
-  createTrackable: publicProcedure
+  createTrackable: protectedProcedure
     .input(trackableToCreate)
-    .mutation(async ({ input }) => {
-      const defUser = await getDefaultUser();
+    .mutation(async ({ input, ctx }) => {
+      const userId = ctx.session.user.id;
 
       const created = await prisma.trackable.create({
         data: {
           type: input.type,
           settings: input.settings,
-          userId: defUser.id,
+          userId,
         },
       });
 
       return { ...created, data: {} };
     }),
 
-  deleteTrackable: publicProcedure
+  deleteTrackable: protectedProcedure
     .input(z.string())
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
+      const userId = ctx.session.user.id;
+      const trackable = await prisma.trackable.findUnique({
+        where: { id: input },
+      });
+      if (!trackable || trackable.userId !== userId) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "No trackable with ID" + input,
+        });
+      }
+
       await prisma.trackableRecord.deleteMany({
         where: {
           trackableId: input,
@@ -138,7 +159,7 @@ export const trackableRouter = createTRPCRouter({
       return;
     }),
 
-  updateTrackableSettings: publicProcedure
+  updateTrackableSettings: protectedProcedure
     .input(
       z.object({
         id: z.string(),

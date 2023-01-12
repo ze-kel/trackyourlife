@@ -40,11 +40,13 @@ const GenericInput = ({
 
   return (
     <div className={className}>
-      {title && <h5 className="text-lg font-bold">{title}</h5>}
+      {title && (
+        <h5 className="text-lg font-semibold text-zinc-800">{title}</h5>
+      )}
       <input
         className={clsx(
-          "mt-1 w-full rounded-sm border-2 border-zinc-400 p-1 outline-none focus:border-zinc-800",
-          isValid && "border-green-500 focus:border-green-600",
+          "mt-1 w-full rounded-sm border-2 border-zinc-300 py-1 px-2 outline-none transition-colors focus:border-zinc-800",
+          isValid && "border-lime-500 focus:border-lime-600",
           error && "border-red-500 focus:border-red-600"
         )}
         type={type}
