@@ -27,13 +27,7 @@ const trackableToCreate = z.object({
 export const trackableRouter = createTRPCRouter({
   getAllIds: protectedProcedure.query(async ({ ctx }) => {
     const userId = ctx.session.user.id;
-
-    console.log("userId", userId);
-
     const entries = await prisma.trackable.findMany({ where: { userId } });
-
-    console.log("e", entries);
-
     return entries.map((entry) => entry.id);
   }),
 
