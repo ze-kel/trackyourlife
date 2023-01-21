@@ -25,6 +25,7 @@ const CreateDialog = ({ onSuccess }: { onSuccess?: () => void }) => {
   const mutation = api.trackable.createTrackable.useMutation();
 
   const create = async () => {
+    console.log("create");
     if (!name) {
       setNameValidationFail(true);
       return;
@@ -70,7 +71,7 @@ const CreateDialog = ({ onSuccess }: { onSuccess?: () => void }) => {
       <Selector active={type} options={types} setter={setType}></Selector>
 
       <Button
-        onClick={() => void create}
+        onClick={() => void create()}
         className="mt-5"
         isActive={!nameValidationFail}
         fill={true}
