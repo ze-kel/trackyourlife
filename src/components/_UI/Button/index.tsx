@@ -1,5 +1,6 @@
 import clsx from "clsx";
 import type { ReactNode } from "react";
+import { cva } from "class-variance-authority";
 
 interface ButtonProps {
   onClick: () => void;
@@ -11,28 +12,43 @@ interface ButtonProps {
   fill?: boolean;
 }
 
-const themes = {
-  default: {
-    base: "text-neutral-50 bg-neutral-900 hover:bg-neutral-900 cursor-pointer",
-    inactive:
-      "cursor-default text-neutral-200 bg-neutral-700 hover:bg-neutral-700",
-  },
-  inverted: {
-    base: "text-neutral-900 bg-neutral-100 hover:bg-neutral-50 cursor-pointer",
-    inactive: "",
-  },
-};
+const ButtonClasses = cva(
+  ["active:cursor-pointer max-h-full transition-colors"],
+  {
+    variants: {
+      theme: {
+        default: [
+          "text-neutral-50 bg-neutral-900 dark:bg-neutral-50 dark:text-neutral-900",
+          "hover:bg-neutral-700, dark:hover:bg-neutral-300",
+          "disabled:text-neutral-200 disabled:bg-neutral-700",
+        ],
+        inverted: [
+          "text-neutral-900 bg-neutral-50 dark:bg-neutral-900 dark:text-neutral-50",
+          "hover:bg-neutral-200, dark:hover:bg-neutral-700",
+          "disabled:text-neutral-700 disabled:bg-neutral-200",
+        ],
+      },
+      size: {
+        s: "text-sm py-1 px-2 rounded",
+        m: "text-md py-2 px-4 font-semibold rounded-md",
+      },
+      fill: {
+        true: "w-full",
+      },
+    },
+    defaultVariants: {
+      theme: "default",
+      size: "m",
+    },
+  }
+);
 
-const sizes = {
-  s: "text-sm py-1 px-2 rounded",
-  m: "text-md py-2 px-4 font-semibold rounded-md",
-};
 const Button = ({
   onClick,
   isActive = true,
   children,
-  theme = "default",
-  size = "m",
+  theme,
+  size,
   className,
   fill,
 }: ButtonProps) => {
@@ -42,20 +58,10 @@ const Button = ({
     }
   };
 
-  const currentTheme = themes[theme];
-  const currentSize = sizes[size];
-
   return (
     <button
       onClick={handleClick}
-      className={clsx(
-        "max-h-full transition-colors",
-        currentTheme.base,
-        currentSize,
-        !isActive && currentTheme.inactive,
-        className,
-        fill && "w-full"
-      )}
+      className={clsx(className, ButtonClasses({ theme, size, fill }))}
     >
       {children}
     </button>

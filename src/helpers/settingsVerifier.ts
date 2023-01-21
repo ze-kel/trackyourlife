@@ -9,26 +9,34 @@ const basics = {
   startDate: z.date().optional(),
 };
 
-const boolean = z.object({
+export const ZTrackableSettingsBoolean = z.object({
   ...basics,
-  timesADay: z.number().min(1).max(5).optional(),
-  everyNDays: z.boolean().optional(),
 });
 
-const number = z.object({
+export const ZTrackableSettingsNumber = z.object({
   ...basics,
   incrementBy: z.number().min(1).optional(),
   limits: z
     .object({
-      min: z.number(),
-      max: z.number(),
+      min: z.number().optional(),
+      max: z.number().optional(),
     })
     .optional(),
 });
 
-export type IBooleanSettings = z.infer<typeof boolean>;
+export const ZTrackableSettingsRange = z.object({
+  ...basics,
+});
 
-export type INumberSettings = z.infer<typeof number>;
+export type IBooleanSettings = z.infer<typeof ZTrackableSettingsBoolean>;
+
+export type INumberSettings = z.infer<typeof ZTrackableSettingsNumber>;
+export type IRangeSettings = z.infer<typeof ZTrackableSettingsRange>;
+
+export type ITrackableSettings =
+  | IBooleanSettings
+  | INumberSettings
+  | IRangeSettings;
 
 const verifySettings = () => {
   console.log("hello");

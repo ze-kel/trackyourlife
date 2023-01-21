@@ -2,7 +2,7 @@ import { getDaysInMonth, getISODay, getMonth, getYear, format } from "date-fns";
 import { useRef, useState } from "react";
 import TrackableName from "./trackableName";
 import DeleteButton from "./deleteButton";
-import DayCell from "./dayCell";
+import DayCell from "../DayCell";
 import IconChevronLeft from "@heroicons/react/20/solid/ChevronLeftIcon";
 import IconChevronRight from "@heroicons/react/20/solid/ChevronRightIcon";
 import clsx from "clsx";
@@ -83,15 +83,15 @@ const Year = ({
         {months.map((m) => (
           <div
             key={`${year}-${m}`}
-            className="group cursor-pointer rounded-md border border-transparent px-2 py-1 transition-colors hover:border-neutral-200"
+            className="group cursor-pointer rounded-md border border-transparent px-2 py-1 transition-colors hover:border-neutral-200 dark:hover:border-neutral-700"
             onClick={() => openMonth(m)}
           >
             <h5
               className={clsx(
                 "mb-1 font-semibold transition-colors",
                 m < active
-                  ? "text-neutral-600 group-hover:text-neutral-800"
-                  : "text-neutral-400 group-hover:text-neutral-600"
+                  ? "text-neutral-600 group-hover:text-neutral-800 dark:text-neutral-400 dark:group-hover:text-neutral-200"
+                  : "text-neutral-400 group-hover:text-neutral-600 dark:text-neutral-700 dark:group-hover:text-neutral-500"
               )}
             >
               <span>{format(new Date(year, m, 1), "MMMM")}</span>
@@ -125,7 +125,7 @@ const Decade = ({
       {years.map((y) => (
         <div
           onClick={() => openYear(y)}
-          className="flex cursor-pointer items-center justify-center rounded-md border border-neutral-100 p-5 hover:border-neutral-200"
+          className="flex cursor-pointer items-center justify-center rounded-md border border-neutral-100 p-5 transition-colors hover:border-neutral-200 dark:border-neutral-800 dark:hover:border-neutral-500"
           key={y}
         >
           {y}

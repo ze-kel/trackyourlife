@@ -15,7 +15,7 @@ const TrackableName = () => {
     <EditableText
       value={trackable.settings.name}
       updater={handleUpdate}
-      className="w-full text-2xl font-semibold"
+      className="w-full bg-inherit text-2xl font-semibold"
       classNameInput="outline-none"
     />
   );

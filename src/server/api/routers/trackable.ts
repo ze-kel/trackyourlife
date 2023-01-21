@@ -1,6 +1,3 @@
-// TODO
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { protectedProcedure, createTRPCRouter } from "../trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
@@ -10,6 +7,12 @@ import { prisma } from "../../db";
 import type { ITrackable } from "src/types/trackable";
 
 import { format } from "date-fns";
+import {
+  ZTrackableSettingsBoolean,
+  ZTrackableSettingsNumber,
+  ZTrackableSettingsRange,
+} from "src/helpers/settingsVerifier";
+import type { Prisma } from "@prisma/client";
 
 const trackableUpdate = z.object({
   id: z.string(),
@@ -19,10 +22,20 @@ const trackableUpdate = z.object({
   value: z.string(),
 });
 
-const trackableToCreate = z.object({
-  settings: z.any(),
-  type: z.enum(["number", "boolean", "range"]),
-});
+const trackableToCreate = z.discriminatedUnion("type", [
+  z.object({
+    settings: ZTrackableSettingsBoolean,
+    type: z.literal("boolean"),
+  }),
+  z.object({
+    settings: ZTrackableSettingsNumber,
+    type: z.literal("number"),
+  }),
+  z.object({
+    settings: ZTrackableSettingsRange,
+    type: z.literal("range"),
+  }),
+]);
 
 export const trackableRouter = createTRPCRouter({
   getAllIds: protectedProcedure.query(async ({ ctx }) => {
@@ -88,7 +101,7 @@ export const trackableRouter = createTRPCRouter({
         });
       }
 
-      const record = await prisma.trackableRecord.upsert({
+      await prisma.trackableRecord.upsert({
         create: {
           trackableId: input.id,
           value: input.value,
@@ -116,7 +129,7 @@ export const trackableRouter = createTRPCRouter({
       const created = await prisma.trackable.create({
         data: {
           type: input.type,
-          settings: input.settings,
+          settings: input.settings as Prisma.JsonObject,
           userId,
         },
       });
@@ -157,13 +170,15 @@ export const trackableRouter = createTRPCRouter({
     .input(
       z.object({
         id: z.string(),
-        settings: z.any(),
+        settings: ZTrackableSettingsBoolean.or(ZTrackableSettingsNumber).or(
+          ZTrackableSettingsRange
+        ),
       })
     )
     .mutation(async ({ input }) => {
       await prisma.trackable.update({
         data: {
-          settings: input.settings,
+          settings: input.settings as Prisma.JsonObject,
         },
         where: {
           id: input.id,

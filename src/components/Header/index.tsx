@@ -1,4 +1,3 @@
-import Button from "@components/_UI/Button";
 import Dropdown from "@components/_UI/Dropdown";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
@@ -17,7 +16,7 @@ const Header = () => {
   const [dropdown, setDropdown] = useState(false);
 
   return (
-    <div className="flex h-12 flex-shrink-0 justify-center bg-neutral-900 font-bold text-neutral-50">
+    <div className="flex h-12 flex-shrink-0 justify-center bg-neutral-900 font-bold text-neutral-200 dark:bg-neutral-800">
       <div className="content-container flex h-full w-full items-center justify-between">
         <Link href={"/"}>Track Your Life</Link>
 

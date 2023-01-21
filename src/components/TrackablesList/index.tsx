@@ -1,4 +1,4 @@
-import { ITrackable } from "src/types/trackable";
+import type { ITrackable } from "src/types/trackable";
 import Link from "next/link";
 import TrackableProvider from "src/helpers/trackableContext";
 import { api } from "src/utils/api";
@@ -11,7 +11,7 @@ const Trackable = ({ id }: { id: ITrackable["id"] }) => {
 
   return (
     <TrackableProvider trackable={data}>
-      <article className="border-b border-neutral-200 py-2 last:border-0">
+      <article className="border-b border-neutral-200 py-2 last:border-0 dark:border-neutral-700">
         <Link href={`/trackable/${id}`}>
           <h3 className="w-fit cursor-pointer text-xl ">
             {data.settings.name || "Unnamed trackable"}
