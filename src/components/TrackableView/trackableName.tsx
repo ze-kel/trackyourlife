@@ -8,7 +8,7 @@ const TrackableName = () => {
   if (!trackable || !changeSettings) return <></>;
 
   const handleUpdate = (name: string) => {
-    changeSettings({ ...trackable.settings, name });
+    void changeSettings({ ...trackable.settings, name });
   };
 
   return (

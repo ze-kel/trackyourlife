@@ -17,7 +17,7 @@ const Header = () => {
   const [dropdown, setDropdown] = useState(false);
 
   return (
-    <div className="flex h-12 flex-shrink-0 justify-center bg-black  font-bold text-white">
+    <div className="flex h-12 flex-shrink-0 justify-center bg-neutral-900 font-bold text-neutral-50">
       <div className="content-container flex h-full w-full items-center justify-between">
         <Link href={"/"}>Track Your Life</Link>
 

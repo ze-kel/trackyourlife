@@ -13,7 +13,7 @@ interface ButtonProps {
 
 const themes = {
   default: {
-    base: "text-neutral-50 bg-neutral-800 hover:bg-neutral-900 cursor-pointer",
+    base: "text-neutral-50 bg-neutral-900 hover:bg-neutral-900 cursor-pointer",
     inactive:
       "cursor-default text-neutral-200 bg-neutral-700 hover:bg-neutral-700",
   },

@@ -70,7 +70,7 @@ const CreateDialog = ({ onSuccess }: { onSuccess?: () => void }) => {
       <Selector active={type} options={types} setter={setType}></Selector>
 
       <Button
-        onClick={create}
+        onClick={() => void create}
         className="mt-5"
         isActive={!nameValidationFail}
         fill={true}

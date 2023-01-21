@@ -64,7 +64,7 @@ const EditableText = ({
 
   const handleKeyUp = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
-      save();
+       void save();
     }
 
     if (e.key === "Escape") {
@@ -89,7 +89,7 @@ const EditableText = ({
         ref={inputRef}
         value={inputVal}
         onChange={handelEdit}
-        onBlur={save}
+        onBlur={() => void save}
         className={clsx(className, classNameInput)}
         onKeyUp={handleKeyUp}
       />

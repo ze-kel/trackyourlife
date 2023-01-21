@@ -42,6 +42,7 @@ class ElObserver {
     this.observer.disconnect();
   }
 }
-const ObserverContext = createContext<ElObserver>(null);
+
+const ObserverContext = createContext<ElObserver | null>(null);
 
 export { ObserverContext, ElObserver };

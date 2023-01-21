@@ -66,7 +66,7 @@ const DayCellBoolean = ({ day, month, year, style }: IDayProps) => {
     const arr = ["flex rounded-sm border-transparent transition-colors"];
 
     if (style === "mini") {
-      arr.push("text-sm h-6 justify-center items-center font-light border");
+      arr.push("text-xs h-6 justify-center items-center font-light border");
     }
 
     if (style === undefined) {
@@ -76,7 +76,7 @@ const DayCellBoolean = ({ day, month, year, style }: IDayProps) => {
     }
 
     if (inFuture) {
-      arr.push("bg-slate-100 text-neutral-300");
+      arr.push("bg-neutral-100 text-neutral-300");
     } else {
       if (isToday) {
         arr.push("border-neutral-500 text-neutral-600");
@@ -167,7 +167,7 @@ const DayCellNumber = ({ day, month, year }: IDayProps) => {
     ];
 
     if (inFuture) {
-      arr.push("bg-slate-100 text-neutral-300");
+      arr.push("bg-neutral-100 text-neutral-300");
     } else {
       if (isToday) {
         arr.push("border-neutral-500 text-neutral-600");
