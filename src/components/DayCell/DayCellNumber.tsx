@@ -17,8 +17,10 @@ const NumberClasses = cva(
   ],
   {
     variants: {
-      inFuture: {
-        true: "bg-neutral-100 text-neutral-300 dark:bg-neutral-800 dark:text-neutral-700",
+      inTrackRange: {
+        true: "",
+        false:
+          "bg-neutral-100 text-neutral-300 dark:bg-neutral-800 dark:text-neutral-700",
       },
       isToday: {
         true: "",
@@ -26,13 +28,13 @@ const NumberClasses = cva(
     },
     compoundVariants: [
       {
-        inFuture: false,
+        inTrackRange: true,
         isToday: true,
         className:
           "text-neutral-500 border-neutral-100 dark:border-neutral-500",
       },
       {
-        inFuture: false,
+        inTrackRange: true,
         isToday: false,
         className:
           "text-neutral-500 border-neutral-100 dark:border-neutral-800",
@@ -48,7 +50,7 @@ export const DayCellNumber = ({ day, month, year }: IDayProps) => {
     trackable: ITrackable;
   };
 
-  const { dateKey, inFuture, isToday } = useMemo(
+  const { dateKey, inTrackRange, isToday } = useMemo(
     () => computeDayCellHelpers({ day, month, year }),
     [day, month, year]
   );
@@ -77,13 +79,15 @@ export const DayCellNumber = ({ day, month, year }: IDayProps) => {
   ]);
 
   const handlePlus = (e: React.MouseEvent) => {
+    console.log(e);
     e.preventDefault();
+    e.stopPropagation();
     setDisplayedNumber(displayedNumber + 1);
     void debouncedUpdateValue(displayedNumber + 1);
   };
   const handleMinus = (e: React.MouseEvent) => {
     e.preventDefault();
-
+    e.stopPropagation();
     setDisplayedNumber(displayedNumber - 1);
     void debouncedUpdateValue(displayedNumber - 1);
   };
@@ -96,16 +100,16 @@ export const DayCellNumber = ({ day, month, year }: IDayProps) => {
   };
 
   return (
-    <div className={NumberClasses({ inFuture, isToday })} key={day}>
-      <span className="absolute top-1 left-2">{day}</span>
-      {!inFuture && (
+    <div className={NumberClasses({ inTrackRange, isToday })} key={day}>
+      <span className="absolute top-1 left-2 select-none">{day}</span>
+      {inTrackRange && (
         <>
           <EditableText
             value={displayedNumber || 0}
             isNumber={true}
             updater={handleInputUpdate}
             className={cls(
-              "flex h-full w-full items-center justify-center bg-inherit text-center text-xl transition-colors",
+              "flex h-full w-full select-none items-center justify-center bg-inherit text-center text-xl transition-colors",
               displayedNumber === 0 && !inInputEdit
                 ? "text-neutral-200 dark:text-neutral-800"
                 : "text-neutral-800 dark:text-neutral-500"

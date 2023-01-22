@@ -1,7 +1,5 @@
 import { getDaysInMonth, getISODay, getMonth, getYear, format } from "date-fns";
 import { useRef, useState } from "react";
-import TrackableName from "./trackableName";
-import DeleteButton from "./deleteButton";
 import DayCell from "../DayCell";
 import IconChevronLeft from "@heroicons/react/20/solid/ChevronLeftIcon";
 import IconChevronRight from "@heroicons/react/20/solid/ChevronRightIcon";
@@ -180,11 +178,7 @@ const TrackableView = () => {
   };
 
   return (
-    <div className="content-container flex h-full max-h-full w-full flex-col">
-      <div className=" flex w-full justify-between py-4">
-        <TrackableName />
-        <DeleteButton />
-      </div>
+    <>
       <div className="flex items-center gap-2">
         <>
           <div
@@ -223,7 +217,7 @@ const TrackableView = () => {
       {view === "years" && (
         <Decade yearOffset={yearOffset} openYear={openYear} />
       )}
-    </div>
+    </>
   );
 };
 

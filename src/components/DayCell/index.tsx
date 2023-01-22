@@ -1,4 +1,10 @@
-import { getYear, getMonth, getDaysInMonth, isSameDay } from "date-fns";
+import {
+  getYear,
+  getMonth,
+  getDaysInMonth,
+  isSameDay,
+  isBefore,
+} from "date-fns";
 import { useContext } from "react";
 import { TrackableContext } from "../../helpers/trackableContext";
 import formatDateKey from "src/helpers/formatDateKey";
@@ -26,11 +32,14 @@ export type IDayProps = {
 };
 
 export const computeDayCellHelpers = ({ day, month, year }: IDayProps) => {
-  const dateKey = formatDateKey({ day, month, year });
-  const inFuture = daysBeforeToday(year, month) < day;
-  const isToday = isSameDay(new Date(), new Date(year, month, day));
+  const dateNow = new Date();
+  const dateDay = new Date(year, month, day);
 
-  return { dateKey, inFuture, isToday };
+  const dateKey = formatDateKey({ day, month, year });
+  const inTrackRange = isBefore(dateDay, dateNow);
+  const isToday = isSameDay(dateNow, dateDay);
+
+  return { dateKey, inTrackRange, isToday };
 };
 
 const DayCell = (data: IDayProps) => {

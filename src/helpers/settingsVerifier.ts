@@ -1,8 +1,17 @@
 import { z } from "zod";
 
-// Settings only affect visual representation and are different with a lot of optional values.
-// So for ease of use we store them in DB as JSON and don't verify on api.
-// Verification runs on client and if we detect that something's wrong we ask user to fix it before showing anything.
+export const colorOptions = z.enum([
+  "neutral",
+  "green",
+  "lime",
+  "red",
+  "blue",
+  "purple",
+  "pink",
+  "orange",
+]);
+
+export type IColorOptions = z.infer<typeof colorOptions>;
 
 const basics = {
   name: z.string().optional(),
@@ -11,6 +20,8 @@ const basics = {
 
 export const ZTrackableSettingsBoolean = z.object({
   ...basics,
+  inactiveColor: colorOptions.optional(),
+  activeColor: colorOptions.optional(),
 });
 
 export const ZTrackableSettingsNumber = z.object({

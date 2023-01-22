@@ -1,14 +1,27 @@
+import type {
+  IBooleanSettings,
+  INumberSettings,
+  IRangeSettings,
+} from "src/helpers/settingsVerifier";
+
 export type IFullData<T> = Record<string, string>;
 
-interface BaseSettings {
-  name?: string;
-}
-
-export type ITrackableUnsaved = {
-  type: "range" | "number" | "boolean";
-  settings: BaseSettings;
-  data: Record<string, string>;
-};
+export type ITrackableUnsaved =
+  | {
+      type: "boolean";
+      settings: IBooleanSettings;
+      data: Record<string, string>;
+    }
+  | {
+      type: "number";
+      settings: INumberSettings;
+      data: Record<string, string>;
+    }
+  | {
+      type: "range";
+      settings: IRangeSettings;
+      data: Record<string, string>;
+    };
 
 export type ITrackable = ITrackableUnsaved & { id: string };
 

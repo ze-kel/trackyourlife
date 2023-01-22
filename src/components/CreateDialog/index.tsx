@@ -14,10 +14,10 @@ const CreateDialog = ({ onSuccess }: { onSuccess?: () => void }) => {
 
   const [nameValidationFail, setNameValidationFail] = useState(false);
 
-  const types: ISelectorOption[] = [
+  const types: ISelectorOption<ITrackableUnsaved["type"]>[] = [
     { label: "Boolean", value: "boolean" },
     { label: "Number", value: "number" },
-    { label: "Range", value: "Range" },
+    { label: "Range", value: "range" },
   ];
 
   const router = useRouter();
