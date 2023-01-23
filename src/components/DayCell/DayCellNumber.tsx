@@ -51,8 +51,14 @@ export const DayCellNumber = ({ day, month, year }: IDayProps) => {
   };
 
   const { dateKey, inTrackRange, isToday } = useMemo(
-    () => computeDayCellHelpers({ day, month, year }),
-    [day, month, year]
+    () =>
+      computeDayCellHelpers({
+        day,
+        month,
+        year,
+        startDate: trackable.settings.startDate,
+      }),
+    [day, month, year, trackable.settings.startDate]
   );
 
   const number = trackable.data[dateKey];

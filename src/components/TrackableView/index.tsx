@@ -1,5 +1,5 @@
 import { getDaysInMonth, getISODay, getMonth, getYear, format } from "date-fns";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import DayCell from "../DayCell";
 import IconChevronLeft from "@heroicons/react/20/solid/ChevronLeftIcon";
 import IconChevronRight from "@heroicons/react/20/solid/ChevronRightIcon";
@@ -23,14 +23,11 @@ const Month = ({
   const prefaceWith = getISODay(firstDayDate) - 1;
   const prepend = Array(prefaceWith).fill(0);
 
-  const monthRef = useRef<HTMLDivElement>(null);
-
   const myId = `${year}-${month}`;
 
   return (
     <div
       id={myId}
-      ref={monthRef}
       className={clsx(
         "grid grid-cols-7 grid-rows-6",
         mini ? "gap-1" : "sm:gap-2 lg:gap-3"

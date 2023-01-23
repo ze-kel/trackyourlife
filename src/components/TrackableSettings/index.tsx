@@ -1,14 +1,13 @@
 import Button from "@components/_UI/Button";
+import DatePicker from "@components/_UI/DatePicker";
 import { useRouter } from "next/router";
-import { useContext, useState } from "react";
-import { TrackableContext } from "src/helpers/trackableContext";
+import { useState } from "react";
+import { useTrackableSafe } from "src/helpers/trackableContext";
 import ColorSelector from "./colorSelector";
 
 const SettingsBoolean = () => {
-  const { trackable, changeSettings } = useContext(TrackableContext) ?? {};
-  if (!trackable || !changeSettings) {
-    throw new Error("Context error: Trackable Settings");
-  }
+  const { trackable, changeSettings } = useTrackableSafe();
+
   if (trackable.type !== "boolean") {
     throw new Error("Not boolean trackable passed to boolean settings");
   }
@@ -30,6 +29,10 @@ const SettingsBoolean = () => {
     setSettings({ ...settings, inactiveColor: color });
   };
 
+  const changeStartDate = (date: (typeof settings)["startDate"]) => {
+    setSettings({ ...settings, startDate: date });
+  };
+
   return (
     <div className="flex flex-col">
       <h3 className="text-xl">Checked color</h3>
@@ -39,11 +42,18 @@ const SettingsBoolean = () => {
         className="my-2"
       />
 
-      <h3 className="text-xl">Unchecked color</h3>
+      <h3 className="mt-4 text-xl">Unchecked color</h3>
       <ColorSelector
         active={settings.inactiveColor || "neutral"}
         onChange={chaneInactiveColor}
         className="my-2"
+      />
+      <h3 className="mt-4 text-xl">Tracking Start</h3>
+      <DatePicker
+        date={settings.startDate}
+        onChange={changeStartDate}
+        limits={{ start: new Date(1990, 0, 1), end: new Date() }}
+        className="my-1"
       />
 
       <Button className="mt-4" onClick={() => void handleSave()}>
@@ -62,11 +72,7 @@ const SettingsRange = () => {
 };
 
 const TrackableSettings = () => {
-  const { trackable } = useContext(TrackableContext) ?? {};
-
-  if (!trackable) {
-    throw new Error("Context error: Trackable Settings");
-  }
+  const { trackable } = useTrackableSafe();
 
   if (trackable.type === "boolean") {
     return <SettingsBoolean />;

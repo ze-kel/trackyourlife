@@ -4,7 +4,7 @@ import type {
 } from "@components/_UI/Selector";
 import Selector from "@components/_UI/Selector";
 import clsx from "clsx";
-import type { IColorOptions } from "src/helpers/settingsVerifier";
+import type { IColorOptions } from "src/types/trackable";
 
 const options: ISelectorOption<IColorOptions>[] = [
   {

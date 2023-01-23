@@ -20,7 +20,7 @@ interface ISectorProps<T> {
   options: ISelectorOption<T>[];
   active?: T;
   setter: (v: T) => void;
-  Component: ISelectorComponent<T>;
+  Component?: ISelectorComponent<T>;
   className?: string;
 }
 

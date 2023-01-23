@@ -1,6 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import type { ITrackable, ITrackableUpdate } from "src/types/trackable";
-import type { ReactNode } from "react";
+import type { ReactNode} from "react";
+import { useContext } from "react";
 import { createContext } from "react";
 import { api } from "src/utils/api";
 import updateData from "./updateData";
@@ -8,8 +8,9 @@ import getData from "./getData";
 
 type IChangeSettings = (
   someSettings: Partial<ITrackable["settings"]>
-) => Promise<any>;
-type IChangeDay = (update: ITrackableUpdate) => Promise<any>;
+) => Promise<void>;
+
+type IChangeDay = (update: ITrackableUpdate) => Promise<ITrackableUpdate>;
 
 export interface IContextData {
   trackable: ITrackable;
@@ -99,6 +100,17 @@ const TrackableProvider = ({
       {children}
     </TrackableContext.Provider>
   );
+};
+
+export const useTrackableSafe = () => {
+  const { trackable, changeSettings, changeDay, deleteTrackable } =
+    useContext(TrackableContext) ?? {};
+
+  if (!trackable || !changeSettings || !changeDay || !deleteTrackable) {
+    throw new Error("Context error: no trackable awailable");
+  }
+
+  return { trackable, changeSettings, changeDay, deleteTrackable };
 };
 
 export default TrackableProvider;

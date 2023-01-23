@@ -12,7 +12,7 @@ const Page = ({
   noContainer?: boolean;
 }) => {
   return (
-    <div className="box-border flex h-full flex-col overflow-hidden">
+    <div className="box-border flex h-full flex-col">
       <Head>
         <title>{title || "TrackYourLife"}</title>
         <meta name="description" content="TrackYourLife app" />

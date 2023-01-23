@@ -11,16 +11,9 @@ import {
   ZTrackableSettingsBoolean,
   ZTrackableSettingsNumber,
   ZTrackableSettingsRange,
-} from "src/helpers/settingsVerifier";
+  ZTrackableUpdate,
+} from "src/types/trackable";
 import type { Prisma } from "@prisma/client";
-
-const trackableUpdate = z.object({
-  id: z.string(),
-  year: z.number(),
-  month: z.number(),
-  day: z.number(),
-  value: z.string(),
-});
 
 const trackableToCreate = z.discriminatedUnion("type", [
   z.object({
@@ -50,7 +43,6 @@ export const trackableRouter = createTRPCRouter({
       const id = input;
 
       const userId = ctx.session.user.id;
-      console.log("userId", userId);
 
       const trackable = await prisma.trackable.findFirst({
         where: {
@@ -74,19 +66,39 @@ export const trackableRouter = createTRPCRouter({
 
       const returnedTrackable: ITrackable = {
         ...trackable,
-        settings: (trackable.settings as Record<string, any>) || {},
         data: {},
+        settings: {},
       };
 
       data.forEach((el) => {
         returnedTrackable.data[format(el.date, "yyyy-MM-dd")] = el.value;
       });
 
+      let settingsParser;
+      const type = trackable.type;
+      if (type === "boolean") {
+        settingsParser = ZTrackableSettingsBoolean;
+      }
+      if (type === "number") {
+        settingsParser = ZTrackableSettingsNumber;
+      }
+      if (type === "range") {
+        settingsParser = ZTrackableSettingsRange;
+      }
+      if (!settingsParser) throw new Error("No parser for settings");
+
+      // Note that this we store settings as JSON, therefore dates there are stored as strings.
+      // Here z.coerce.date() auto converts them to JS dates.
+      const parseRes = settingsParser.safeParse(trackable.settings);
+      if (parseRes.success) {
+        returnedTrackable.settings = parseRes.data;
+      }
+
       return returnedTrackable;
     }),
 
   updateTrackableById: protectedProcedure
-    .input(trackableUpdate)
+    .input(ZTrackableUpdate)
     .mutation(async ({ input, ctx }) => {
       const date = new Date(input.year, input.month, input.day);
 

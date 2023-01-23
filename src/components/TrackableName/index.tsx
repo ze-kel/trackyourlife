@@ -1,11 +1,8 @@
 import EditableText from "@components/_UI/EditableText";
-import { useContext } from "react";
-import { TrackableContext } from "../../helpers/trackableContext";
+import { useTrackableSafe } from "../../helpers/trackableContext";
 
 const TrackableName = () => {
-  const { trackable, changeSettings } = useContext(TrackableContext) ?? {};
-
-  if (!trackable || !changeSettings) return <></>;
+  const { trackable, changeSettings } = useTrackableSafe();
 
   const handleUpdate = (name: string) => {
     void changeSettings({ ...trackable.settings, name });

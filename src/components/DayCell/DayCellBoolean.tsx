@@ -1,9 +1,9 @@
-import { useContext, useMemo } from "react";
-import { TrackableContext } from "../../helpers/trackableContext";
+import { useMemo } from "react";
+import { useTrackableSafe } from "../../helpers/trackableContext";
 import type { IDayProps } from "./index";
 import { computeDayCellHelpers } from "./index";
 import { cva } from "class-variance-authority";
-import type { IColorOptions } from "src/helpers/settingsVerifier";
+import type { IColorOptions } from "src/types/trackable";
 
 const themeList: Record<IColorOptions, ""> = {
   neutral: "",
@@ -135,24 +135,27 @@ const BooleanClasses = cva(
 );
 
 export const DayCellBoolean = ({ day, month, year, style }: IDayProps) => {
-  const { trackable, changeDay } = useContext(TrackableContext) ?? {};
-
-  if (!trackable || !changeDay) {
-    throw new Error("Context error: Trackable");
-  }
+  const { trackable, changeDay } = useTrackableSafe();
 
   if (trackable.type !== "boolean") {
     throw new Error("Not boolena trackable passed to boolean dayCell");
   }
 
   const { dateKey, inTrackRange, isToday } = useMemo(
-    () => computeDayCellHelpers({ day, month, year }),
-    [day, month, year]
+    () =>
+      computeDayCellHelpers({
+        day,
+        month,
+        year,
+        startDate: trackable.settings.startDate,
+      }),
+    [day, month, year, trackable.settings.startDate]
   );
 
   const isActive = trackable.data[dateKey] === "true";
 
   const handleClick = async () => {
+    if (!inTrackRange) return;
     await changeDay({
       id: trackable.id,
       day,
