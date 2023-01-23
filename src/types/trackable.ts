@@ -36,6 +36,14 @@ export const ZTrackableSettingsNumber = z.object({
       max: z.number().optional(),
     })
     .optional(),
+  colorCoding: z
+    .array(
+      z.object({
+        from: z.number(),
+        to: z.number(),
+      })
+    )
+    .optional(),
 });
 
 export const ZTrackableSettingsRange = z.object({

@@ -4,6 +4,7 @@ import DayCell from "../DayCell";
 import IconChevronLeft from "@heroicons/react/20/solid/ChevronLeftIcon";
 import IconChevronRight from "@heroicons/react/20/solid/ChevronRightIcon";
 import clsx from "clsx";
+import { useTrackableSafe } from "src/helpers/trackableContext";
 
 const Month = ({
   month,
@@ -139,6 +140,7 @@ const TrackableView = () => {
 
   const [yearOffset, setyearOffset] = useState(0);
 
+
   const increment = (add: number) => {
     if (view === "years") {
       setyearOffset(yearOffset + add * YEARS_ON_YEAR_VIEW);
@@ -180,13 +182,13 @@ const TrackableView = () => {
         <>
           <div
             onClick={() => increment(-1)}
-            className="flex w-6 cursor-pointer rounded-full border border-neutral-300 p-0.5 transition-colors hover:border-neutral-900"
+            className="flex w-6 cursor-pointer rounded-full border p-0.5 transition-colors dark:border-neutral-500 dark:hover:border-neutral-50"
           >
             <IconChevronLeft className="-translate-x-[1px]" />
           </div>
           <div
             onClick={() => increment(1)}
-            className="flex w-6 cursor-pointer rounded-full border border-neutral-300 p-0.5 transition-colors hover:border-neutral-900"
+            className="flex w-6 cursor-pointer rounded-full border p-0.5 transition-colors dark:border-neutral-500 dark:hover:border-neutral-50"
           >
             <IconChevronRight className="translate-x-[1px]" />
           </div>

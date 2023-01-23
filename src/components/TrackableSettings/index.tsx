@@ -35,6 +35,14 @@ const SettingsBoolean = () => {
 
   return (
     <div className="flex flex-col">
+      <h3 className="mt-4 text-xl">Tracking Start</h3>
+      <DatePicker
+        date={settings.startDate}
+        onChange={changeStartDate}
+        limits={{ start: new Date(1990, 0, 1), end: new Date() }}
+        className="my-1"
+      />
+
       <h3 className="text-xl">Checked color</h3>
       <ColorSelector
         active={settings.activeColor || "green"}
@@ -48,14 +56,6 @@ const SettingsBoolean = () => {
         onChange={chaneInactiveColor}
         className="my-2"
       />
-      <h3 className="mt-4 text-xl">Tracking Start</h3>
-      <DatePicker
-        date={settings.startDate}
-        onChange={changeStartDate}
-        limits={{ start: new Date(1990, 0, 1), end: new Date() }}
-        className="my-1"
-      />
-
       <Button className="mt-4" onClick={() => void handleSave()}>
         Save
       </Button>
