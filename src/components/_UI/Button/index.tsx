@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { cva } from "class-variance-authority";
 
 interface ButtonProps {
-  onClick: () => void;
+  onClick?: () => void;
   isActive?: boolean;
   children: ReactNode;
   theme?: "default" | "inverted";
@@ -53,7 +53,7 @@ const Button = ({
   fill,
 }: ButtonProps) => {
   const handleClick = () => {
-    if (isActive) {
+    if (isActive && onClick) {
       onClick();
     }
   };

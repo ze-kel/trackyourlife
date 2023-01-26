@@ -18,7 +18,7 @@ const themeList: Record<IColorOptions, ""> = {
 
 const activeGen: Record<IColorOptions, Record<string, string>> = {
   neutral: {
-    bg: "bg-neutral-500",
+    bg: "bg-neutral-200 dark:bg-neutral-700",
     border: "hover:border-neutral-500",
   },
   red: {
@@ -102,8 +102,8 @@ const BooleanClasses = cva(
         false: "",
       },
       isToday: {
-        true: "border-neutral-500 text-neutral-600",
-        false: "text-neutral-500",
+        true: "border-neutral-500 text-neutral-200",
+        false: "text-neutral-100",
       },
       active: {
         true: "",
@@ -116,7 +116,7 @@ const BooleanClasses = cva(
       {
         active: false,
         inTrackRange: true,
-        className: "text-neutral-800 dark:text-neutral-600",
+        className: "text-neutral-800 dark:text-neutral-500",
       },
       {
         active: false,

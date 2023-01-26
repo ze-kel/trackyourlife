@@ -24,7 +24,7 @@ const Trackable = () => {
       <Page title={data.settings.name} noContainer={true}>
         <TrackableContext trackable={data}>
           <div className="content-container flex h-full max-h-full w-full flex-col">
-            <div className=" flex w-full items-center justify-between py-4">
+            <div className=" mb-4 flex w-full items-center justify-between">
               <TrackableName />
               <Link
                 href={`/trackable/${id as string}/settings`}

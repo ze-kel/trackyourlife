@@ -7,8 +7,9 @@ import { useRouter } from "next/router";
 import type { ChangeEvent } from "react";
 import { useState } from "react";
 import { api } from "src/utils/api";
+import Page from "@components/Page";
 
-const CreateDialog = ({ onSuccess }: { onSuccess?: () => void }) => {
+const Create = ({ onSuccess }: { onSuccess?: () => void }) => {
   const [name, setName] = useState<ITrackableUnsaved["settings"]["name"]>("");
   const [type, setType] = useState<ITrackableUnsaved["type"]>("boolean");
 
@@ -57,7 +58,7 @@ const CreateDialog = ({ onSuccess }: { onSuccess?: () => void }) => {
   };
 
   return (
-    <>
+    <Page>
       <h3 className="text-2xl font-bold">Create new Trackable</h3>
       <input
         placeholder="Name"
@@ -78,8 +79,8 @@ const CreateDialog = ({ onSuccess }: { onSuccess?: () => void }) => {
       >
         Create
       </Button>
-    </>
+    </Page>
   );
 };
 
-export default CreateDialog;
+export default Create;

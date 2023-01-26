@@ -8,7 +8,7 @@ import {
   startOfMonth,
   clamp,
 } from "date-fns";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import IconChevronLeft from "@heroicons/react/20/solid/ChevronLeftIcon";
 import IconChevronLeftDouble from "@heroicons/react/20/solid/ChevronDoubleLeftIcon";
 import IconChevronDown from "@heroicons/react/20/solid/ChevronDownIcon";
@@ -32,6 +32,7 @@ const DatePicker = ({
   };
   className?: string;
 }) => {
+  const calRef = useRef<HTMLDivElement>(null);
   const [isOpened, setIsOpened] = useState(false);
 
   const [cursor, setCursor] = useState(startOfMonth(date || new Date()));
@@ -56,15 +57,33 @@ const DatePicker = ({
     setIsOpened(false);
   };
 
+  useEffect(() => {
+    const closeChecker = (e: MouseEvent) => {
+      if (e.target && calRef.current) {
+        const t = e.target as Element;
+        if (!calRef.current.contains(t)) {
+          setIsOpened(false);
+        }
+      }
+    };
+
+    window.addEventListener("click", closeChecker);
+
+    return () => {
+      window.removeEventListener("click", closeChecker);
+    };
+  }, []);
+
+  const open = () => {
+    setIsOpened(true);
+  };
+
   const highlightSeleted =
     date && isSameMonth(date, cursor) ? date.getDay() + 1 : -1;
 
   return (
-    <div className={clsx("relative", className)}>
-      <div
-        className="flex cursor-pointer"
-        onClick={() => setIsOpened(!isOpened)}
-      >
+    <div ref={calRef} className={clsx("relative", className)}>
+      <div className="flex cursor-pointer" onClick={open}>
         {date ? format(date, "d MMMM yyyy") : "No date set"}{" "}
         <IconChevronDown
           className={clsx(
@@ -75,7 +94,10 @@ const DatePicker = ({
       </div>
 
       {isOpened && (
-        <div className="absolute top-full z-10 my-1 flex w-fit flex-col rounded-sm border-2 border-neutral-900 bg-neutral-50 p-2 dark:border-neutral-700 dark:bg-neutral-900">
+        <div
+          id="datePicker"
+          className="absolute top-full z-10 my-1 flex w-fit flex-col rounded-sm border-2 border-neutral-900 bg-neutral-50 p-2 dark:border-neutral-700 dark:bg-neutral-900"
+        >
           <div className="flex w-full items-center justify-between py-2">
             <div className="flex">
               <IconChevronLeftDouble

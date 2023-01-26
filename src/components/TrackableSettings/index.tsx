@@ -35,7 +35,7 @@ const SettingsBoolean = () => {
 
   return (
     <div className="flex flex-col">
-      <h3 className="mt-4 text-xl">Tracking Start</h3>
+      <h3 className="text-xl">Tracking Start</h3>
       <DatePicker
         date={settings.startDate}
         onChange={changeStartDate}

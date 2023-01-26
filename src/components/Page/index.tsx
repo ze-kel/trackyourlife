@@ -20,7 +20,7 @@ const Page = ({
       <Header />
       <main
         className={clsx(
-          "mx-auto box-border w-full",
+          "mx-auto box-border w-full pt-4",
           !noContainer && "content-container"
         )}
       >

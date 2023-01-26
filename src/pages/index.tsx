@@ -1,22 +1,25 @@
 import Page from "@components/Page";
 import TrackablesList from "@components/TrackablesList";
 import { api } from "../utils/api";
-import CreateButton from "@components/CreateButton";
 import type { GetServerSideProps, NextApiRequest, NextApiResponse } from "next";
 import { getServerAuthSession } from "src/server/auth";
 import { createProxySSGHelpers } from "@trpc/react-query/ssg";
 import { createTRPCContext } from "src/server/api/trpc";
 import { appRouter } from "src/server/api/root";
 import superjson from "superjson";
+import Link from "next/link";
+import Button from "@components/_UI/Button";
 
 const AppHome = () => {
   const { data } = api.trackable.getAllIds.useQuery();
 
   return (
     <Page>
-      <div className="flex items-center justify-between">
-        <h2 className="my-4 text-2xl font-semibold">Your Trackables</h2>
-        <CreateButton />
+      <div className="flex justify-between">
+        <h2 className="text-2xl font-semibold">Your Trackables</h2>
+        <Link href={"/create"}>
+          <Button>Add New</Button>
+        </Link>
       </div>
       {data ? <TrackablesList list={data} /> : <></>}
     </Page>
