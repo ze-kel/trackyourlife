@@ -1,4 +1,4 @@
-import DayCell from "@components/TrackableView/dayCell";
+import DayCell from "@components/DayCell";
 import clsx from "clsx";
 import { getDaysInMonth } from "date-fns";
 import { useMemo } from "react";

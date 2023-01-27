@@ -1,11 +1,12 @@
 import type { ITrackable, ITrackableUpdate } from "src/types/trackable";
 
 import formatDateKey from "src/helpers/formatDateKey";
+import type { Optional } from "@t/helpers";
 
 const getData = (
   trackable: ITrackable,
   { day, month, year }: Omit<ITrackableUpdate, "value">
-): ITrackableUpdate => {
+): Optional<ITrackableUpdate, "value"> => {
   const nTrackable = trackable;
 
   if (!trackable.data) {

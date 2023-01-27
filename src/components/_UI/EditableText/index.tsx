@@ -1,5 +1,6 @@
 import clsx from "clsx";
-import { useState, ChangeEvent, useEffect, useRef, KeyboardEvent } from "react";
+import type { ChangeEvent, KeyboardEvent } from "react";
+import { useState, useEffect, useRef } from "react";
 
 interface IEditableTextBase {
   classNameInput?: string;

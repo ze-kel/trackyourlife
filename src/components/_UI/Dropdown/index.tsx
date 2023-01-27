@@ -1,23 +1,62 @@
 import clsx from "clsx";
+import type { MouseEvent as ReactMouseEvent } from "react";
+import { useEffect, useRef } from "react";
 
 export interface IDropdown {
-  isOpened: boolean;
-  content: React.ReactNode[];
-  className?: string;
+  mainPart: React.ReactNode;
+  hiddenPart: React.ReactNode;
+  visible: boolean;
+  setVisible: (b: boolean) => void;
+  align?: "left" | "right";
 }
 
-const Dropdown = ({ isOpened, content, className }: IDropdown) => {
-  if (!isOpened) return <></>;
+const Dropdown = ({
+  mainPart,
+  hiddenPart,
+  visible,
+  setVisible,
+  align = "left",
+}: IDropdown) => {
+  const hiddenRef = useRef<HTMLDivElement>(null);
+
+  const open = (e: ReactMouseEvent) => {
+    e.stopPropagation();
+    setVisible(!visible);
+  };
+
+  useEffect(() => {
+    const closeChecker = (e: MouseEvent) => {
+      if (e.target && hiddenRef.current) {
+        const t = e.target as Element;
+        if (!hiddenRef.current.contains(t)) {
+          setVisible(false);
+        }
+      }
+    };
+
+    window.addEventListener("click", closeChecker);
+
+    return () => {
+      window.removeEventListener("click", closeChecker);
+    };
+  }, [setVisible]);
+
   return (
-    <div
-      className={clsx(
-        "absolute top-[110%] right-0 flex w-full flex-col rounded-md border border-neutral-400 bg-neutral-900 p-2",
-        className
+    <div className="relative">
+      <div onClick={open} className="w-fit">
+        {mainPart}
+      </div>
+      {visible && (
+        <div
+          ref={hiddenRef}
+          className={clsx(
+            "absolute top-full z-10 my-1 rounded-sm border-2 bg-neutral-900 p-2 font-bold text-neutral-200 dark:border-neutral-800 dark:bg-neutral-900",
+            align === "right" && "right-0"
+          )}
+        >
+          {hiddenPart}
+        </div>
       )}
-    >
-      {content.map((c, i) => (
-        <div key={i}>{c}</div>
-      ))}
     </div>
   );
 };

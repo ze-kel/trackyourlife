@@ -1,12 +1,12 @@
 import Button from "@components/_UI/Button";
 import Modal from "@components/_UI/Modal";
 import router from "next/router";
-import { useContext, useState } from "react";
-import { TrackableContext } from "../../helpers/trackableContext";
+import { useState } from "react";
+import { useTrackableSafe } from "../../helpers/trackableContext";
 import IconTrash from "@heroicons/react/24/outline/TrashIcon";
 
 const DeleteButton = () => {
-  const { deleteTrackable } = useContext(TrackableContext) ?? {};
+  const { deleteTrackable } = useTrackableSafe();
 
   if (!deleteTrackable) {
     throw new Error("Context error: Delete trackable");

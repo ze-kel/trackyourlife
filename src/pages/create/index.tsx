@@ -7,17 +7,18 @@ import { useRouter } from "next/router";
 import type { ChangeEvent } from "react";
 import { useState } from "react";
 import { api } from "src/utils/api";
+import Page from "@components/Page";
 
-const CreateDialog = ({ onSuccess }: { onSuccess?: () => void }) => {
+const Create = ({ onSuccess }: { onSuccess?: () => void }) => {
   const [name, setName] = useState<ITrackableUnsaved["settings"]["name"]>("");
   const [type, setType] = useState<ITrackableUnsaved["type"]>("boolean");
 
   const [nameValidationFail, setNameValidationFail] = useState(false);
 
-  const types: ISelectorOption[] = [
+  const types: ISelectorOption<ITrackableUnsaved["type"]>[] = [
     { label: "Boolean", value: "boolean" },
     { label: "Number", value: "number" },
-    { label: "Range", value: "Range" },
+    { label: "Range", value: "range" },
   ];
 
   const router = useRouter();
@@ -25,7 +26,6 @@ const CreateDialog = ({ onSuccess }: { onSuccess?: () => void }) => {
   const mutation = api.trackable.createTrackable.useMutation();
 
   const create = async () => {
-    console.log("create");
     if (!name) {
       setNameValidationFail(true);
       return;
@@ -57,7 +57,7 @@ const CreateDialog = ({ onSuccess }: { onSuccess?: () => void }) => {
   };
 
   return (
-    <>
+    <Page>
       <h3 className="text-2xl font-bold">Create new Trackable</h3>
       <input
         placeholder="Name"
@@ -78,8 +78,8 @@ const CreateDialog = ({ onSuccess }: { onSuccess?: () => void }) => {
       >
         Create
       </Button>
-    </>
+    </Page>
   );
 };
 
-export default CreateDialog;
+export default Create;

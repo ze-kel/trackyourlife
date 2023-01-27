@@ -1,8 +1,6 @@
 import { getDaysInMonth, getISODay, getMonth, getYear, format } from "date-fns";
-import { useRef, useState } from "react";
-import TrackableName from "./trackableName";
-import DeleteButton from "./deleteButton";
-import DayCell from "./dayCell";
+import { useState } from "react";
+import DayCell from "../DayCell";
 import IconChevronLeft from "@heroicons/react/20/solid/ChevronLeftIcon";
 import IconChevronRight from "@heroicons/react/20/solid/ChevronRightIcon";
 import clsx from "clsx";
@@ -25,17 +23,14 @@ const Month = ({
   const prefaceWith = getISODay(firstDayDate) - 1;
   const prepend = Array(prefaceWith).fill(0);
 
-  const monthRef = useRef<HTMLDivElement>(null);
-
   const myId = `${year}-${month}`;
 
   return (
     <div
       id={myId}
-      ref={monthRef}
       className={clsx(
         "grid grid-cols-7 grid-rows-6",
-        mini ? "gap-1" : "sm:gap-2 lg:gap-3"
+        mini ? "gap-1" : "sm:gap-2 lg:gap-2"
       )}
     >
       {prepend.map((_, i) => (
@@ -83,15 +78,15 @@ const Year = ({
         {months.map((m) => (
           <div
             key={`${year}-${m}`}
-            className="group cursor-pointer rounded-md border border-transparent px-2 py-1 transition-colors hover:border-neutral-200"
+            className="group cursor-pointer rounded-md border border-transparent px-2 py-1 transition-colors hover:border-neutral-200 dark:hover:border-neutral-700"
             onClick={() => openMonth(m)}
           >
             <h5
               className={clsx(
                 "mb-1 font-semibold transition-colors",
                 m < active
-                  ? "text-neutral-600 group-hover:text-neutral-800"
-                  : "text-neutral-400 group-hover:text-neutral-600"
+                  ? "text-neutral-600 group-hover:text-neutral-800 dark:text-neutral-400 dark:group-hover:text-neutral-200"
+                  : "text-neutral-400 group-hover:text-neutral-600 dark:text-neutral-700 dark:group-hover:text-neutral-500"
               )}
             >
               <span>{format(new Date(year, m, 1), "MMMM")}</span>
@@ -125,7 +120,7 @@ const Decade = ({
       {years.map((y) => (
         <div
           onClick={() => openYear(y)}
-          className="flex cursor-pointer items-center justify-center rounded-md border border-neutral-100 p-5 hover:border-neutral-200"
+          className="flex cursor-pointer items-center justify-center border border-neutral-100 p-5 transition-colors hover:border-neutral-200 dark:border-neutral-800 dark:hover:border-neutral-500"
           key={y}
         >
           {y}
@@ -180,22 +175,18 @@ const TrackableView = () => {
   };
 
   return (
-    <div className="content-container flex h-full max-h-full w-full flex-col">
-      <div className=" flex w-full justify-between py-4">
-        <TrackableName />
-        <DeleteButton />
-      </div>
+    <>
       <div className="flex items-center gap-2">
         <>
           <div
             onClick={() => increment(-1)}
-            className="flex w-6 cursor-pointer rounded-full border border-neutral-300 p-0.5 transition-colors hover:border-neutral-900"
+            className="flex w-6 cursor-pointer rounded-full border p-0.5 transition-colors dark:border-neutral-500 dark:hover:border-neutral-50"
           >
             <IconChevronLeft className="-translate-x-[1px]" />
           </div>
           <div
             onClick={() => increment(1)}
-            className="flex w-6 cursor-pointer rounded-full border border-neutral-300 p-0.5 transition-colors hover:border-neutral-900"
+            className="flex w-6 cursor-pointer rounded-full border p-0.5 transition-colors dark:border-neutral-500 dark:hover:border-neutral-50"
           >
             <IconChevronRight className="translate-x-[1px]" />
           </div>
@@ -223,7 +214,7 @@ const TrackableView = () => {
       {view === "years" && (
         <Decade yearOffset={yearOffset} openYear={openYear} />
       )}
-    </div>
+    </>
   );
 };
 
