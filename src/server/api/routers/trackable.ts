@@ -40,7 +40,7 @@ export const trackableRouter = createTRPCRouter({
   getTrackableById: protectedProcedure
     .input(z.string())
     .query(async ({ ctx, input }) => {
-      const id = input;
+      const id: string = input;
 
       const userId = ctx.session.user.id;
 
@@ -136,7 +136,7 @@ export const trackableRouter = createTRPCRouter({
   createTrackable: protectedProcedure
     .input(trackableToCreate)
     .mutation(async ({ input, ctx }) => {
-      const userId = ctx.session.user.id;
+      const userId: string = ctx.session.user.id;
 
       const created = await prisma.trackable.create({
         data: {
@@ -182,20 +182,51 @@ export const trackableRouter = createTRPCRouter({
     .input(
       z.object({
         id: z.string(),
-        settings: ZTrackableSettingsBoolean.or(ZTrackableSettingsNumber).or(
-          ZTrackableSettingsRange
-        ),
+        settings: z.any(),
       })
     )
     .mutation(async ({ input }) => {
+      const trackable = await prisma.trackable.findUnique({
+        where: { id: input.id },
+      });
+
+      if (!trackable) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "No trackable with ID" + input.id,
+        });
+      }
+
+      let parsed;
+
+      if (trackable.type === "boolean") {
+        parsed = ZTrackableSettingsBoolean.safeParse(input.settings);
+      }
+
+      if (trackable.type === "number") {
+        parsed = ZTrackableSettingsNumber.safeParse(input.settings);
+      }
+
+      if (trackable.type === "range") {
+        parsed = ZTrackableSettingsRange.safeParse(input.settings);
+      }
+
+      if (!parsed || !parsed?.success) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Settings do not match Trackable type schema",
+        });
+      }
+
       await prisma.trackable.update({
         data: {
-          settings: input.settings as Prisma.JsonObject,
+          settings: parsed.data as Prisma.JsonObject,
         },
         where: {
           id: input.id,
         },
       });
-      return input.settings;
+
+      return parsed.data;
     }),
 });

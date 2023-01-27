@@ -3,7 +3,7 @@ import { z } from "zod";
 //
 // Settings
 //
-export const colorOptions = z.enum([
+export const colorOption = z.enum([
   "neutral",
   "green",
   "lime",
@@ -14,7 +14,7 @@ export const colorOptions = z.enum([
   "orange",
 ]);
 
-export type IColorOptions = z.infer<typeof colorOptions>;
+export type IColorOptions = z.infer<typeof colorOption>;
 
 const basics = {
   name: z.string().optional(),
@@ -23,8 +23,8 @@ const basics = {
 
 export const ZTrackableSettingsBoolean = z.object({
   ...basics,
-  inactiveColor: colorOptions.optional(),
-  activeColor: colorOptions.optional(),
+  inactiveColor: colorOption.optional(),
+  activeColor: colorOption.optional(),
 });
 
 export const ZTrackableSettingsNumber = z.object({
@@ -40,7 +40,7 @@ export const ZTrackableSettingsNumber = z.object({
     .array(
       z.object({
         from: z.number(),
-        to: z.number(),
+        color: colorOption,
       })
     )
     .optional(),

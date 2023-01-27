@@ -70,7 +70,7 @@ const Color = ({
     <div
       onClick={() => onClick(option.value)}
       className={clsx(
-        "h-10 w-10 rounded-full border-2 border-transparent transition-colors",
+        "h-8 w-8 rounded-full border-2 border-transparent transition-colors",
         option.label,
         active ? "border-neutral-50" : "cursor-pointer"
       )}

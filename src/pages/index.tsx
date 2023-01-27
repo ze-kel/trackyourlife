@@ -16,7 +16,7 @@ const AppHome = () => {
   return (
     <Page>
       <div className="flex justify-between">
-        <h2 className="text-2xl font-semibold">Your Trackables</h2>
+        <h2 className="font-] text-2xl">Your Trackables</h2>
         <Link href={"/create"}>
           <Button>Add New</Button>
         </Link>

@@ -4,7 +4,6 @@ import DayCell from "../DayCell";
 import IconChevronLeft from "@heroicons/react/20/solid/ChevronLeftIcon";
 import IconChevronRight from "@heroicons/react/20/solid/ChevronRightIcon";
 import clsx from "clsx";
-import { useTrackableSafe } from "src/helpers/trackableContext";
 
 const Month = ({
   month,
@@ -31,7 +30,7 @@ const Month = ({
       id={myId}
       className={clsx(
         "grid grid-cols-7 grid-rows-6",
-        mini ? "gap-1" : "sm:gap-2 lg:gap-3"
+        mini ? "gap-1" : "sm:gap-2 lg:gap-2"
       )}
     >
       {prepend.map((_, i) => (
@@ -121,7 +120,7 @@ const Decade = ({
       {years.map((y) => (
         <div
           onClick={() => openYear(y)}
-          className="flex cursor-pointer items-center justify-center rounded-md border border-neutral-100 p-5 transition-colors hover:border-neutral-200 dark:border-neutral-800 dark:hover:border-neutral-500"
+          className="flex cursor-pointer items-center justify-center border border-neutral-100 p-5 transition-colors hover:border-neutral-200 dark:border-neutral-800 dark:hover:border-neutral-500"
           key={y}
         >
           {y}
@@ -139,7 +138,6 @@ const TrackableView = () => {
   const [view, setView] = useState<TView>("days");
 
   const [yearOffset, setyearOffset] = useState(0);
-
 
   const increment = (add: number) => {
     if (view === "years") {

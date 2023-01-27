@@ -67,4 +67,35 @@ function Selector<T>({
   );
 }
 
+interface IHoldSectorProps<T> {
+  options: ISelectorOption<T>[];
+  active?: T;
+  setter: (v: T) => void;
+  Component: ISelectorComponent<T>;
+  className?: string;
+}
+
+export function HoldSelector<T>({
+  options,
+  active,
+  setter,
+  Component,
+  className = "flex w-fit overflow-hidden rounded-md",
+}: IHoldSectorProps<T>) {
+  return (
+    <div className={className}>
+      {options.map((option, index) => {
+        return (
+          <Component
+            key={index}
+            active={option.value === active}
+            option={option}
+            onClick={setter}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
 export default Selector;

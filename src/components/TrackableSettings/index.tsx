@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { useTrackableSafe } from "src/helpers/trackableContext";
 import ColorSelector from "./colorSelector";
+import RangeColorSelector from "./rangeSelector";
 
 const SettingsBoolean = () => {
   const { trackable, changeSettings } = useTrackableSafe();
@@ -21,42 +22,49 @@ const SettingsBoolean = () => {
     await router.push(`/trackable/${trackable.id}`);
   };
 
-  const changeActiveColor = (color: (typeof settings)["activeColor"]) => {
-    setSettings({ ...settings, activeColor: color });
+  const changeActiveColor = (v: (typeof settings)["activeColor"]) => {
+    setSettings({ ...settings, activeColor: v });
   };
 
-  const chaneInactiveColor = (color: (typeof settings)["inactiveColor"]) => {
-    setSettings({ ...settings, inactiveColor: color });
+  const chaneInactiveColor = (v: (typeof settings)["inactiveColor"]) => {
+    setSettings({ ...settings, inactiveColor: v });
   };
 
-  const changeStartDate = (date: (typeof settings)["startDate"]) => {
-    setSettings({ ...settings, startDate: date });
+  const changeStartDate = (v: (typeof settings)["startDate"]) => {
+    setSettings({ ...settings, startDate: v });
   };
 
   return (
-    <div className="flex flex-col">
-      <h3 className="text-xl">Tracking Start</h3>
-      <DatePicker
-        date={settings.startDate}
-        onChange={changeStartDate}
-        limits={{ start: new Date(1990, 0, 1), end: new Date() }}
-        className="my-1"
-      />
+    <div className="flex flex-col gap-2">
+      <div>
+        <h3 className="text-xl">Tracking Start</h3>
+        <DatePicker
+          date={settings.startDate}
+          onChange={changeStartDate}
+          limits={{ start: new Date(1990, 0, 1), end: new Date() }}
+          className="mt-2"
+        />
+      </div>
 
-      <h3 className="text-xl">Checked color</h3>
-      <ColorSelector
-        active={settings.activeColor || "green"}
-        onChange={changeActiveColor}
-        className="my-2"
-      />
+      <div>
+        <h3 className="text-xl">Checked color</h3>
+        <ColorSelector
+          active={settings.activeColor || "green"}
+          onChange={changeActiveColor}
+          className="mt-2"
+        />
+      </div>
 
-      <h3 className="mt-4 text-xl">Unchecked color</h3>
-      <ColorSelector
-        active={settings.inactiveColor || "neutral"}
-        onChange={chaneInactiveColor}
-        className="my-2"
-      />
-      <Button className="mt-4" onClick={() => void handleSave()}>
+      <div>
+        <h3 className="mt-4 text-xl">Unchecked color</h3>
+        <ColorSelector
+          active={settings.inactiveColor || "neutral"}
+          onChange={chaneInactiveColor}
+          className="mt-2"
+        />
+      </div>
+
+      <Button className="mt-2" onClick={() => void handleSave()}>
         Save
       </Button>
     </div>
@@ -64,11 +72,59 @@ const SettingsBoolean = () => {
 };
 
 const SettingsNumber = () => {
-  return <>Number Settings</>;
+  const { trackable, changeSettings } = useTrackableSafe();
+
+  if (trackable.type !== "number") {
+    throw new Error("Not boolean trackable passed to boolean settings");
+  }
+
+  const router = useRouter();
+
+  const [settings, setSettings] = useState(trackable.settings);
+
+  const handleSave = async () => {
+    console.log("sving", settings);
+    await changeSettings(settings);
+    await router.push(`/trackable/${trackable.id}`);
+  };
+
+  const changeStartDate = (v: (typeof settings)["startDate"]) => {
+    setSettings({ ...settings, startDate: v });
+  };
+
+  const changeColorCoding = (v: (typeof settings)["colorCoding"]) => {
+    setSettings({ ...settings, colorCoding: v });
+  };
+
+  return (
+    <div className="flex flex-col gap-2">
+      <div>
+        <h3 className="text-xl">Tracking Start</h3>
+        <DatePicker
+          date={settings.startDate}
+          onChange={changeStartDate}
+          limits={{ start: new Date(1990, 0, 1), end: new Date() }}
+          className="mt-2"
+        />
+      </div>
+
+      <div>
+        <h3 className="mb-2 text-xl">Range Coloring</h3>
+        <RangeColorSelector
+          value={settings.colorCoding}
+          onChange={changeColorCoding}
+        />
+      </div>
+
+      <Button className="mt-2" onClick={() => void handleSave()}>
+        Save
+      </Button>
+    </div>
+  );
 };
 
 const SettingsRange = () => {
-  return <>Number Settings</>;
+  return <>Range Settings</>;
 };
 
 const TrackableSettings = () => {

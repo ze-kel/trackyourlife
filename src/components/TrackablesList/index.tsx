@@ -7,13 +7,13 @@ import MiniTrackable from "./miniTrackable";
 const Trackable = ({ id }: { id: ITrackable["id"] }) => {
   const { data } = api.trackable.getTrackableById.useQuery(id);
 
-  if (!data) return <div>loading</div>;
+  if (!data) return <div>Loading</div>;
 
   return (
     <TrackableProvider trackable={data}>
       <article className="border-b border-neutral-200 py-2 last:border-0 dark:border-neutral-700">
-        <Link href={`/trackable/${id}`}>
-          <h3 className="w-fit cursor-pointer text-xl ">
+        <Link href={`/trackable/${id}`} className="block w-fit">
+          <h3 className="w-fit cursor-pointer text-xl font-light">
             {data.settings.name || "Unnamed trackable"}
           </h3>
         </Link>
@@ -24,7 +24,7 @@ const Trackable = ({ id }: { id: ITrackable["id"] }) => {
 };
 
 const TrackablesList = ({ list }: { list: ITrackable["id"][] }) => {
-  if (!list) return <div>no list</div>;
+  if (!list) return <div></div>;
 
   return (
     <div className="grid gap-5">

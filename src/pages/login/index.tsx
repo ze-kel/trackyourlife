@@ -78,18 +78,22 @@ const LoginForm = () => {
       </Button>
 
       <div
-        className="mt-5 cursor-pointer text-neutral-500"
+        className="mt-5 cursor-pointer text-neutral-500 dark:text-neutral-400"
         onClick={() => setRegister(!register)}
       >
         {!register ? (
           <>
             Dont have an account yet?{" "}
-            <span className="font-bold text-neutral-700">Sign up</span>
+            <span className="font-bold text-neutral-700 dark:text-neutral-200">
+              Sign up
+            </span>
           </>
         ) : (
           <>
             Aready have an accoutn?{" "}
-            <span className="font-bold text-neutral-700">Sign in</span>
+            <span className="font-bold text-neutral-700 dark:text-neutral-200">
+              Sign in
+            </span>
           </>
         )}
       </div>

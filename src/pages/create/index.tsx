@@ -26,7 +26,6 @@ const Create = ({ onSuccess }: { onSuccess?: () => void }) => {
   const mutation = api.trackable.createTrackable.useMutation();
 
   const create = async () => {
-    console.log("create");
     if (!name) {
       setNameValidationFail(true);
       return;
