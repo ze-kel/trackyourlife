@@ -8,6 +8,7 @@ import type { ChangeEvent } from "react";
 import { useState } from "react";
 import { api } from "src/utils/api";
 import Page from "@components/Page";
+import { PureInput } from "@components/_UI/Input";
 
 const Create = ({ onSuccess }: { onSuccess?: () => void }) => {
   const [name, setName] = useState<ITrackableUnsaved["settings"]["name"]>("");
@@ -59,12 +60,9 @@ const Create = ({ onSuccess }: { onSuccess?: () => void }) => {
   return (
     <Page>
       <h3 className="text-2xl font-bold">Create new Trackable</h3>
-      <input
+      <PureInput
         placeholder="Name"
-        className={clsx(
-          "text-md my-2 border p-1",
-          nameValidationFail && "border-red-600"
-        )}
+        className={clsx("my-2 w-fit")}
         value={name}
         onChange={updateName}
       />

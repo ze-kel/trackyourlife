@@ -8,6 +8,7 @@ export interface IDropdown {
   visible: boolean;
   setVisible: (b: boolean) => void;
   align?: "left" | "right";
+  vAlign?: "top" | "center" | "bottom";
 }
 
 const Dropdown = ({
@@ -16,6 +17,7 @@ const Dropdown = ({
   visible,
   setVisible,
   align = "left",
+  vAlign = "top",
 }: IDropdown) => {
   const hiddenRef = useRef<HTMLDivElement>(null);
 
@@ -51,7 +53,8 @@ const Dropdown = ({
           ref={hiddenRef}
           className={clsx(
             "absolute top-full z-10 my-1 rounded-sm border-2 bg-neutral-900 p-2 font-bold text-neutral-200 dark:border-neutral-800 dark:bg-neutral-900",
-            align === "right" && "right-0"
+            align === "right" && "right-0",
+            vAlign === "center" && "-translate-y-1/2"
           )}
         >
           {hiddenPart}

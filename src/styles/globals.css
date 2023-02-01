@@ -18,3 +18,25 @@ input::-webkit-inner-spin-button {
 input[type="number"] {
   -moz-appearance: textfield;
 }
+
+/* Emoji picker styling */
+em-emoji-picker {
+  --background-rgb: 23, 23, 23;
+  --border-radius: 0;
+  --category-icon-size: 24px;
+
+  --color-border-over: #737373;
+  --color-border: rgb(64, 64, 64);
+
+  --em-rgb-input: #262626;
+
+  --font-size: 20px;
+  --rgb-accent: 132, 204, 22;
+  --rgb-background: 23, 23, 23;
+  --rgb-color: 250, 250, 250;
+  --rgb-input: 64, 64, 64;
+
+  height: 50vh;
+  min-height: 400px;
+  max-height: 800px;
+}

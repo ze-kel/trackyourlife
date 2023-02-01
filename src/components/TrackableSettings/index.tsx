@@ -4,7 +4,8 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { useTrackableSafe } from "src/helpers/trackableContext";
 import ColorSelector from "./colorSelector";
-import RangeColorSelector from "./rangeSelector";
+import NumberColorSelector from "./numberColorSelector";
+import RangeLabelSelector from "./rangeLabelSelector";
 
 const SettingsBoolean = () => {
   const { trackable, changeSettings } = useTrackableSafe();
@@ -75,7 +76,7 @@ const SettingsNumber = () => {
   const { trackable, changeSettings } = useTrackableSafe();
 
   if (trackable.type !== "number") {
-    throw new Error("Not boolean trackable passed to boolean settings");
+    throw new Error("Not number trackable passed to number settings");
   }
 
   const router = useRouter();
@@ -83,7 +84,6 @@ const SettingsNumber = () => {
   const [settings, setSettings] = useState(trackable.settings);
 
   const handleSave = async () => {
-    console.log("sving", settings);
     await changeSettings(settings);
     await router.push(`/trackable/${trackable.id}`);
   };
@@ -109,8 +109,8 @@ const SettingsNumber = () => {
       </div>
 
       <div>
-        <h3 className="mb-2 text-xl">Range Coloring</h3>
-        <RangeColorSelector
+        <h3 className="mb-2 text-xl">Color coding</h3>
+        <NumberColorSelector
           value={settings.colorCoding}
           onChange={changeColorCoding}
         />
@@ -124,7 +124,54 @@ const SettingsNumber = () => {
 };
 
 const SettingsRange = () => {
-  return <>Range Settings</>;
+  const { trackable, changeSettings } = useTrackableSafe();
+
+  if (trackable.type !== "range") {
+    throw new Error("Not range trackable passed to range settings");
+  }
+
+  const router = useRouter();
+
+  const [settings, setSettings] = useState(trackable.settings);
+
+  const handleSave = async () => {
+    await changeSettings(settings);
+    await router.push(`/trackable/${trackable.id}`);
+  };
+
+  const changeStartDate = (v: (typeof settings)["startDate"]) => {
+    setSettings({ ...settings, startDate: v });
+  };
+
+  const changeRangeLabels = (v: (typeof settings)["labels"]) => {
+    setSettings({ ...settings, labels: v });
+  };
+
+  return (
+    <div className="flex flex-col gap-2">
+      <div>
+        <h3 className="text-xl">Tracking Start</h3>
+        <DatePicker
+          date={settings.startDate}
+          onChange={changeStartDate}
+          limits={{ start: new Date(1990, 0, 1), end: new Date() }}
+          className="mt-2"
+        />
+      </div>
+
+      <div>
+        <h3 className="mb-2 text-xl">Range Labels</h3>
+        <RangeLabelSelector
+          initialValue={settings.labels}
+          onChange={changeRangeLabels}
+        />
+      </div>
+
+      <Button className="mt-2" onClick={() => void handleSave()}>
+        Save
+      </Button>
+    </div>
+  );
 };
 
 const TrackableSettings = () => {

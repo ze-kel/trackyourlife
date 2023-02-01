@@ -48,6 +48,11 @@ export const ZTrackableSettingsNumber = z.object({
 
 export const ZTrackableSettingsRange = z.object({
   ...basics,
+  labels: z
+    .array(
+      z.object({ internalKey: z.string().min(1), emojiShortcode: z.string() })
+    )
+    .optional(),
 });
 
 export type IBooleanSettings = z.infer<typeof ZTrackableSettingsBoolean>;

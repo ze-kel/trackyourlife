@@ -4,12 +4,12 @@ import { clamp, cloneDeep } from "lodash";
 import ColorSelector from "./colorSelector";
 import XIcon from "@heroicons/react/24/outline/XMarkIcon";
 
-export interface IRangeColorSelectorProps {
+export interface INumberColorSelector {
   value: INumberSettings["colorCoding"];
   onChange: (a: INumberSettings["colorCoding"]) => void;
 }
 
-const RangeColorSelector = ({ value, onChange }: IRangeColorSelectorProps) => {
+const NumberColorSelector = ({ value, onChange }: INumberColorSelector) => {
   const v = value || [];
   const addNew = (index = 0) => {
     const v2 = cloneDeep(v);
@@ -69,4 +69,4 @@ const RangeColorSelector = ({ value, onChange }: IRangeColorSelectorProps) => {
   );
 };
 
-export default RangeColorSelector;
+export default NumberColorSelector;
