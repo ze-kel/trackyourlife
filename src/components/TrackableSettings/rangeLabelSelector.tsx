@@ -1,22 +1,13 @@
-/* eslint-disable @typescript-eslint/no-namespace */
 import type { IRangeSettings } from "@t/trackable";
 import Picker from "@emoji-mart/react";
 import data from "@emoji-mart/data";
 import { PureInput } from "@components/_UI/Input";
 import { cloneDeep } from "lodash";
-import { ReactElement, useEffect, useState } from "react";
-import Button from "@components/_UI/Button";
+import { useState } from "react";
 import Dropdown from "@components/_UI/Dropdown";
-import { init } from "emoji-mart";
 import clsx from "clsx";
+import { Emoji } from "@components/_UI/Emoji";
 
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      ["em-emoji"]: { shortcodes: string; size: string };
-    }
-  }
-}
 export interface IRangeLabelSelector {
   initialValue: IRangeSettings["labels"];
   onChange: (a: IRangeSettings["labels"]) => void;
@@ -41,7 +32,6 @@ const Pair = ({
   const [dropdown, setDropdown] = useState(false);
 
   const updateKey = (val: string) => {
-    if (!val) return;
     update({ ...value, internalKey: val });
   };
 
@@ -51,12 +41,11 @@ const Pair = ({
   };
 
   return (
-    <div className={clsx("flex", className)}>
-      hello
-      {JSON.stringify(duplicate)}
+    <div className={clsx("flex items-center", className)}>
       <PureInput
         value={value.internalKey}
-        className={clsx("mr-2 w-64", !duplicate && "border-orange-600")}
+        className={clsx("mr-2 w-64")}
+        error={duplicate || !value.internalKey}
         onChange={(e) => updateKey(e.target.value)}
       />
       <Dropdown
@@ -66,10 +55,7 @@ const Pair = ({
         hiddenPart={<Picker data={data} onEmojiSelect={selectEmoji} />}
         mainPart={
           <div className="cursor-pointer">
-            <em-emoji
-              shortcodes={value.emojiShortcode || ":question:"}
-              size="30px"
-            />
+            <Emoji size="30px" shortcodes={value.emojiShortcode} />
           </div>
         }
       />
@@ -81,34 +67,29 @@ const RangeLabelSelector = ({
   initialValue,
   onChange,
 }: IRangeLabelSelector) => {
-  useEffect(() => {
-    void init({ data });
-  }, []);
-
   const [value, updateValue] = useState(initialValue || []);
-  const [error, updateError] = useState<boolean>(false);
+  const [error, updateError] = useState<string>();
 
   const checkDuplicates = (index: number) => {
-    console.log("dup", index);
     const tVal = value[index];
     for (let i = 0; i < value.length; i++) {
-      if (value[i]?.internalKey === tVal && i !== index) {
+      if (value[i]?.internalKey === tVal?.internalKey && i !== index) {
         return true;
       }
     }
     return false;
   };
 
-  const pushUpdates = () => {
+  const pushUpdates = (value: IRangeLabel[]) => {
     const set = new Set();
     for (const val of value) {
       if (set.has(val.internalKey) || !val.internalKey.length) {
-        updateError(true);
+        updateError("Duplicate key is present. Last valid state will be saved");
         return;
       }
       set.add(val.internalKey);
     }
-    updateError(false);
+    updateError("Empty key is present. Last valid state will be saved");
     onChange(value);
   };
 
@@ -118,7 +99,7 @@ const RangeLabelSelector = ({
     try {
       newValue[index] = v;
       updateValue(newValue);
-      pushUpdates();
+      pushUpdates(newValue);
     } catch (e) {
       throw e;
     }
@@ -132,17 +113,11 @@ const RangeLabelSelector = ({
   };
 
   return (
-    <div>
-      {error && (
-        <div>
-          There is something wrong with your data. Last valid state will be
-          saved.
-        </div>
-      )}
+    <div className="flex flex-col gap-1">
       {value.map((el, index) => {
         return (
           <Pair
-            className="my-2"
+            className=""
             key={index}
             value={el}
             duplicate={checkDuplicates(index)}
@@ -150,7 +125,7 @@ const RangeLabelSelector = ({
           />
         );
       })}
-      <Button onClick={addNewProperty}>Add</Button>
+      {error && <div className="text-red-500">{error}</div>}
     </div>
   );
 };

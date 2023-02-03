@@ -1,6 +1,6 @@
 import DayCell from "@components/DayCell";
 import clsx from "clsx";
-import { getDaysInMonth } from "date-fns";
+import { format, getDaysInMonth } from "date-fns";
 import { useMemo } from "react";
 
 const generateDates = (days: number) => {
@@ -34,10 +34,23 @@ const MiniTrackable = ({ className }: { className?: string }) => {
   const daysToRender = useMemo(() => generateDates(6), []);
 
   return (
-    <div className={clsx("grid grid-cols-7 gap-2", className)}>
-      {daysToRender.map((day, index) => (
-        <DayCell {...day} key={index} />
-      ))}
+    <div className={clsx("grid grid-cols-7 gap-x-2 gap-y-1", className)}>
+      <>
+        {daysToRender.map((day, index) => {
+          const date = new Date(day.year, day.month, day.day);
+          return (
+            <div key={index} className="px-1 text-xs ">
+              <span className="text-neutral-400 dark:text-neutral-600">
+                {format(date, "E")}
+              </span>
+            </div>
+          );
+        })}
+
+        {daysToRender.map((day, index) => (
+          <DayCell {...day} key={index} />
+        ))}
+      </>
     </div>
   );
 };

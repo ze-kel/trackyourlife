@@ -13,7 +13,7 @@ interface IBase {
 interface IPureInputProps extends IBase {
   onChange: (v: ChangeEvent<HTMLInputElement>) => void;
   isValid?: boolean;
-  error?: string;
+  error?: string | boolean;
 }
 
 interface IInputProps extends IBase {
@@ -32,7 +32,7 @@ export const PureInput = ({
   className,
 }: IPureInputProps) => {
   return (
-    <>
+    <div className="flex flex-col">
       <input
         className={clsx(
           className,
@@ -47,8 +47,10 @@ export const PureInput = ({
         placeholder={placeholder}
         onChange={onChange}
       />
-      <div className="text-red-500">{error}</div>
-    </>
+      {error && typeof error === "string" && (
+        <div className="mt2 text-red-500">{error}</div>
+      )}
+    </div>
   );
 };
 

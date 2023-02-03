@@ -8,6 +8,7 @@ export default function Document() {
       </Head>
       <body className="bg-neutral-50 text-neutral-900 dark:bg-neutral-900 dark:text-neutral-50">
         <Main />
+        <div id="modal-portal"></div>
         <NextScript />
       </body>
     </Html>
