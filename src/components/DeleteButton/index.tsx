@@ -30,7 +30,7 @@ const DeleteButton = () => {
   return (
     <>
       <IconTrash
-        className="w-6 cursor-pointer text-neutral-400 transition-colors hover:text-red-600"
+        className="w-7 cursor-pointer text-neutral-400 transition-colors hover:text-red-600"
         onClick={openModal}
       />
       {confirmOpened && (

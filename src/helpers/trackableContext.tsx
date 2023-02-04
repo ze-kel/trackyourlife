@@ -6,7 +6,7 @@ import { api } from "src/utils/api";
 import updateData from "./updateData";
 import getData from "./getData";
 
-type IChangeSettings = (
+export type IChangeSettings = (
   someSettings: Partial<ITrackable["settings"]>
 ) => Promise<void>;
 

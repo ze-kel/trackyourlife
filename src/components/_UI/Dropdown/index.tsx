@@ -7,8 +7,10 @@ export interface IDropdown {
   hiddenPart: React.ReactNode;
   visible: boolean;
   setVisible: (b: boolean) => void;
-  align?: "left" | "right";
+  align?: "left" | "center" | "right";
   vAlign?: "top" | "center" | "bottom";
+  background?: boolean;
+  classNameMain?: string;
 }
 
 const Dropdown = ({
@@ -18,6 +20,8 @@ const Dropdown = ({
   setVisible,
   align = "left",
   vAlign = "top",
+  background = true,
+  classNameMain,
 }: IDropdown) => {
   const hiddenRef = useRef<HTMLDivElement>(null);
 
@@ -45,16 +49,20 @@ const Dropdown = ({
 
   return (
     <div className="relative">
-      <div onClick={open} className="w-fit">
+      <div onClick={open} className={classNameMain}>
         {mainPart}
       </div>
       {visible && (
         <div
           ref={hiddenRef}
           className={clsx(
-            "absolute top-full z-10 my-1 rounded-sm border-2 bg-neutral-900 p-2 font-bold text-neutral-200 dark:border-neutral-800 dark:bg-neutral-900",
+            "absolute z-10",
+            background &&
+              "my-1 rounded-sm border-2 bg-neutral-900 p-2 text-neutral-200 dark:border-neutral-800 dark:bg-neutral-900",
             align === "right" && "right-0",
-            vAlign === "center" && "-translate-y-1/2"
+            align === "center" && "left-1/2 -translate-x-1/2",
+            vAlign === "top" && "top-full",
+            vAlign === "center" && "top-1/2 -translate-y-1/2"
           )}
         >
           {hiddenPart}

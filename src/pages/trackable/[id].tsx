@@ -24,11 +24,11 @@ const Trackable = () => {
       <Page title={data.settings.name} noContainer={true}>
         <TrackableContext trackable={data}>
           <div className="content-container flex h-full max-h-full w-full flex-col">
-            <div className=" mb-4 flex w-full items-center justify-between">
+            <div className="mb-4 flex w-full items-center justify-between">
               <TrackableName />
               <Link
                 href={`/trackable/${id as string}/settings`}
-                className="mr-2 flex h-full w-6 cursor-pointer items-center text-neutral-400 transition-colors hover:text-neutral-700"
+                className="mr-2 flex w-7 cursor-pointer items-center text-neutral-400 transition-colors hover:text-neutral-700"
               >
                 <IconSettings />
               </Link>

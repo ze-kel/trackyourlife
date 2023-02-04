@@ -84,7 +84,7 @@ const DatePicker = ({
   };
 
   const highlightSeleted =
-    date && isSameMonth(date, cursor) ? date.getDay() + 1 : -1;
+    date && isSameMonth(date, cursor) ? date.getDate() : -1;
 
   const calendar = (
     <div id="datePicker" className="flex w-fit flex-col">
@@ -169,6 +169,7 @@ const DatePicker = ({
         hiddenPart={calendar}
         visible={isOpened}
         setVisible={setIsOpened}
+        classNameMain={"w-fit"}
       />
     </div>
   );

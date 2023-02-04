@@ -8,17 +8,21 @@ import { createTRPCContext } from "src/server/api/trpc";
 import { appRouter } from "src/server/api/root";
 import superjson from "superjson";
 import Link from "next/link";
-import Button from "@components/_UI/Button";
+import PlusIcon from "@heroicons/react/24/outline/PlusCircleIcon";
 
 const AppHome = () => {
   const { data } = api.trackable.getAllIds.useQuery();
 
   return (
     <Page>
-      <div className="flex justify-between">
-        <h2 className="font-] text-2xl">Your Trackables</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-semibold">Your Trackables</h2>
         <Link href={"/create"}>
-          <Button>Add New</Button>
+          <PlusIcon
+            className={
+              "w-7 cursor-pointer text-neutral-400 transition-colors hover:text-neutral-700"
+            }
+          />
         </Link>
       </div>
       {data ? <TrackablesList list={data} /> : <></>}

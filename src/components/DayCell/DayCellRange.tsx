@@ -1,4 +1,4 @@
-import PopupSelector from "@components/DayCell/PopupSelector";
+import Dropdown from "@components/_UI/Dropdown";
 import { Emoji } from "@components/_UI/Emoji";
 import { cva } from "class-variance-authority";
 import { useMemo, useState } from "react";
@@ -6,6 +6,36 @@ import { useTrackableSafe } from "src/helpers/trackableContext";
 import type { IDayProps } from ".";
 import { computeDayCellHelpers } from ".";
 import { ThemeList } from "./DayCellBoolean";
+
+import type { IRangeSettings } from "@t/trackable";
+
+interface PopupSelectorProps {
+  rangeMapping: IRangeSettings["labels"];
+  onSelect: (v: string) => Promise<void>;
+}
+
+const PopupSelector = ({ rangeMapping, onSelect }: PopupSelectorProps) => {
+  if (!rangeMapping || !rangeMapping.length) return <></>;
+
+  return (
+    <div className="flex cursor-pointer flex-col rounded-full dark:bg-neutral-800">
+      {rangeMapping.map((v, index) => {
+        return (
+          <div
+            key={index}
+            onClick={(e) => {
+              e.stopPropagation();
+              void onSelect(v.internalKey);
+            }}
+            className="rounded-full px-2 transition-colors hover:bg-lime-500"
+          >
+            <Emoji size="30px" shortcodes={v.emojiShortcode} />
+          </div>
+        );
+      })}
+    </div>
+  );
+};
 
 const RangeClasses = cva(
   [
@@ -66,11 +96,6 @@ export const DayCellRange = ({ day, month, year, style }: IDayProps) => {
     ? (rangeLabelMapping[dayValue] as string)
     : ':question"';
 
-  const handleClick = () => {
-    if (!inTrackRange) return;
-    setIsSelecting(true);
-  };
-
   const handleSelect = async (v: string) => {
     setIsSelecting(false);
     await changeDay({
@@ -82,26 +107,36 @@ export const DayCellRange = ({ day, month, year, style }: IDayProps) => {
     });
   };
 
-  return (
+  const visiblePart = (
     <div
       className={RangeClasses({
         inTrackRange,
         isToday,
       })}
       key={day}
-      onClick={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        void handleClick();
-      }}
     >
-      {isSelecting && (
-        <PopupSelector
-          rangeMapping={trackable.settings.labels}
-          onSelect={handleSelect}
-        />
-      )}
+      <span className="absolute top-1 left-2 select-none">{day}</span>
+
       {dayValue && <Emoji shortcodes={code} size="30px" />}
     </div>
+  );
+
+  const selector = (
+    <PopupSelector
+      rangeMapping={trackable.settings.labels}
+      onSelect={handleSelect}
+    />
+  );
+
+  return (
+    <Dropdown
+      visible={isSelecting}
+      setVisible={setIsSelecting}
+      mainPart={visiblePart}
+      hiddenPart={selector}
+      align="center"
+      vAlign="center"
+      background={false}
+    />
   );
 };
