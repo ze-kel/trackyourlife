@@ -1,12 +1,12 @@
 import type { ITrackable, ITrackableUpdate } from "src/types/trackable";
-import type { ReactNode} from "react";
+import type { ReactNode } from "react";
 import { useContext } from "react";
 import { createContext } from "react";
 import { api } from "src/utils/api";
 import updateData from "./updateData";
 import getData from "./getData";
 
-type IChangeSettings = (
+export type IChangeSettings = (
   someSettings: Partial<ITrackable["settings"]>
 ) => Promise<void>;
 
@@ -17,6 +17,8 @@ export interface IContextData {
   changeSettings: IChangeSettings;
   changeDay: IChangeDay;
   deleteTrackable: () => Promise<void>;
+
+  rangeLabelMapping?: Record<string, string>;
 }
 
 export const TrackableContext = createContext<IContextData | null>(null);
@@ -93,9 +95,17 @@ const TrackableProvider = ({
 
   const deleteTrackable = () => deleteMutation.mutateAsync(trackable.id);
 
+  const rangeLabelMapping = getRangeLabelMapping(trackable);
+
   return (
     <TrackableContext.Provider
-      value={{ trackable, changeSettings, changeDay, deleteTrackable }}
+      value={{
+        trackable,
+        changeSettings,
+        changeDay,
+        deleteTrackable,
+        rangeLabelMapping,
+      }}
     >
       {children}
     </TrackableContext.Provider>
@@ -103,14 +113,38 @@ const TrackableProvider = ({
 };
 
 export const useTrackableSafe = () => {
-  const { trackable, changeSettings, changeDay, deleteTrackable } =
-    useContext(TrackableContext) ?? {};
+  const {
+    trackable,
+    changeSettings,
+    changeDay,
+    deleteTrackable,
+    rangeLabelMapping,
+  } = useContext(TrackableContext) ?? {};
 
   if (!trackable || !changeSettings || !changeDay || !deleteTrackable) {
     throw new Error("Context error: no trackable awailable");
   }
 
-  return { trackable, changeSettings, changeDay, deleteTrackable };
+  return {
+    trackable,
+    changeSettings,
+    changeDay,
+    deleteTrackable,
+    rangeLabelMapping,
+  };
+};
+
+const getRangeLabelMapping = (trackable: ITrackable) => {
+  if (trackable.type !== "range" || !trackable.settings.labels) return;
+
+  const labels = trackable.settings.labels;
+
+  const map: Record<string, string> = {};
+  labels.forEach((v) => {
+    map[v.internalKey] = v.emojiShortcode;
+  });
+
+  return map;
 };
 
 export default TrackableProvider;

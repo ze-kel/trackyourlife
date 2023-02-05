@@ -15,7 +15,7 @@ import {
 } from "src/types/trackable";
 import type { Prisma } from "@prisma/client";
 
-const trackableToCreate = z.discriminatedUnion("type", [
+export const trackableToCreate = z.discriminatedUnion("type", [
   z.object({
     settings: ZTrackableSettingsBoolean,
     type: z.literal("boolean"),

@@ -84,7 +84,7 @@ const DatePicker = ({
   };
 
   const highlightSeleted =
-    date && isSameMonth(date, cursor) ? date.getDay() + 1 : -1;
+    date && isSameMonth(date, cursor) ? date.getDate() : -1;
 
   const calendar = (
     <div id="datePicker" className="flex w-fit flex-col">
@@ -151,7 +151,7 @@ const DatePicker = ({
   );
 
   const opener = (
-    <div className="flex w-fit cursor-pointer border-2 border-neutral-400 px-2 py-1 dark:border-neutral-800">
+    <div className="flex w-fit cursor-pointer border-2 border-neutral-400 px-2 py-1 transition-colors hover:border-neutral-600 dark:border-neutral-800 dark:hover:border-neutral-700">
       {date ? format(date, "d MMMM yyyy") : "No date set"}{" "}
       <IconChevronDown
         className={clsx(
@@ -169,6 +169,8 @@ const DatePicker = ({
         hiddenPart={calendar}
         visible={isOpened}
         setVisible={setIsOpened}
+        classNameMain={"w-fit"}
+        placement="bottom-start"
       />
     </div>
   );

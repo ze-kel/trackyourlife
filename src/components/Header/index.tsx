@@ -7,7 +7,10 @@ import clsx from "clsx";
 
 const SigOutButton = () => {
   return (
-    <div onClick={() => void signOut()} className="whitespace-nowrap">
+    <div
+      onClick={() => void signOut()}
+      className="cursor-pointer whitespace-nowrap font-normal"
+    >
       Sign Out
     </div>
   );
@@ -19,7 +22,7 @@ const Header = () => {
 
   const dropV = (
     <div className="relative flex cursor-pointer items-center text-neutral-200 transition-colors hover:text-neutral-50">
-      <p className="font-medium  ">{sessionData?.user?.name}</p>
+      <p className="font-medium">{sessionData?.user?.name}</p>
       <IconChevronDown
         className={clsx(
           "w-6 transition-transform",
@@ -44,7 +47,7 @@ const Header = () => {
             hiddenPart={dropH}
             visible={dropdown}
             setVisible={setDropdown}
-            align="right"
+            placement="bottom-end"
           />
         )}
       </div>

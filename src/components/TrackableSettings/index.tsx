@@ -1,27 +1,30 @@
 import Button from "@components/_UI/Button";
 import DatePicker from "@components/_UI/DatePicker";
+import type {
+  IBooleanSettings,
+  INumberSettings,
+  IRangeSettings,
+  ITrackable,
+  ITrackableUnsaved,
+} from "@t/trackable";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { useTrackableSafe } from "src/helpers/trackableContext";
 import ColorSelector from "./colorSelector";
-import RangeColorSelector from "./rangeSelector";
+import NumberColorSelector from "./numberColorSelector";
+import RangeLabelSelector from "./rangeLabelSelector";
 
-const SettingsBoolean = () => {
-  const { trackable, changeSettings } = useTrackableSafe();
+interface ISubSettingsProps<T> {
+  settings: T;
+  setSettings: (v: Partial<T>) => void;
+  handleSave?: () => Promise<void>;
+}
 
-  if (trackable.type !== "boolean") {
-    throw new Error("Not boolean trackable passed to boolean settings");
-  }
-
-  const router = useRouter();
-
-  const [settings, setSettings] = useState(trackable.settings);
-
-  const handleSave = async () => {
-    await changeSettings(settings);
-    await router.push(`/trackable/${trackable.id}`);
-  };
-
+const SettingsBoolean = ({
+  settings,
+  setSettings,
+  handleSave,
+}: ISubSettingsProps<IBooleanSettings>) => {
   const changeActiveColor = (v: (typeof settings)["activeColor"]) => {
     setSettings({ ...settings, activeColor: v });
   };
@@ -64,30 +67,20 @@ const SettingsBoolean = () => {
         />
       </div>
 
-      <Button className="mt-2" onClick={() => void handleSave()}>
-        Save
-      </Button>
+      {handleSave && (
+        <Button className="mt-2" onClick={() => void handleSave()}>
+          Save
+        </Button>
+      )}
     </div>
   );
 };
 
-const SettingsNumber = () => {
-  const { trackable, changeSettings } = useTrackableSafe();
-
-  if (trackable.type !== "number") {
-    throw new Error("Not boolean trackable passed to boolean settings");
-  }
-
-  const router = useRouter();
-
-  const [settings, setSettings] = useState(trackable.settings);
-
-  const handleSave = async () => {
-    console.log("sving", settings);
-    await changeSettings(settings);
-    await router.push(`/trackable/${trackable.id}`);
-  };
-
+const SettingsNumber = ({
+  settings,
+  setSettings,
+  handleSave,
+}: ISubSettingsProps<INumberSettings>) => {
   const changeStartDate = (v: (typeof settings)["startDate"]) => {
     setSettings({ ...settings, startDate: v });
   };
@@ -109,37 +102,128 @@ const SettingsNumber = () => {
       </div>
 
       <div>
-        <h3 className="mb-2 text-xl">Range Coloring</h3>
-        <RangeColorSelector
-          value={settings.colorCoding}
+        <h3 className="mb-2 text-xl">Color coding</h3>
+        <NumberColorSelector
+          initialValue={settings.colorCoding}
           onChange={changeColorCoding}
         />
       </div>
 
-      <Button className="mt-2" onClick={() => void handleSave()}>
-        Save
-      </Button>
+      {handleSave && (
+        <Button className="mt-2" onClick={() => void handleSave()}>
+          Save
+        </Button>
+      )}
     </div>
   );
 };
 
-const SettingsRange = () => {
-  return <>Range Settings</>;
+const SettingsRange = ({
+  settings,
+  setSettings,
+  handleSave,
+}: ISubSettingsProps<IRangeSettings>) => {
+  const changeStartDate = (v: (typeof settings)["startDate"]) => {
+    setSettings({ ...settings, startDate: v });
+  };
+
+  const changeRangeLabels = (v: (typeof settings)["labels"]) => {
+    setSettings({ ...settings, labels: v });
+  };
+
+  return (
+    <div className="flex flex-col gap-2">
+      <div>
+        <h3 className="text-xl">Tracking Start</h3>
+        <DatePicker
+          date={settings.startDate}
+          onChange={changeStartDate}
+          limits={{ start: new Date(1990, 0, 1), end: new Date() }}
+          className="mt-2"
+        />
+      </div>
+
+      <div>
+        <h3 className="mb-2 text-xl">Range Labels</h3>
+        <RangeLabelSelector
+          initialValue={settings.labels}
+          onChange={changeRangeLabels}
+        />
+      </div>
+
+      {handleSave && (
+        <Button className="mt-2" onClick={() => void handleSave()}>
+          Save
+        </Button>
+      )}
+    </div>
+  );
 };
 
 const TrackableSettings = () => {
-  const { trackable } = useTrackableSafe();
+  const { trackable, changeSettings } = useTrackableSafe();
+
+  const router = useRouter();
+
+  const [settings, setSettings] = useState(trackable.settings);
+
+  const handleSave = async () => {
+    await changeSettings(settings);
+    await router.push(`/trackable/${trackable.id}`);
+  };
 
   if (trackable.type === "boolean") {
-    return <SettingsBoolean />;
+    return (
+      <SettingsBoolean
+        settings={settings}
+        setSettings={setSettings}
+        handleSave={handleSave}
+      />
+    );
   }
 
   if (trackable.type === "number") {
-    return <SettingsNumber />;
+    return (
+      <SettingsNumber
+        settings={settings}
+        setSettings={setSettings}
+        handleSave={handleSave}
+      />
+    );
   }
 
   if (trackable.type === "range") {
-    return <SettingsRange />;
+    return (
+      <SettingsRange
+        settings={settings}
+        setSettings={setSettings}
+        handleSave={handleSave}
+      />
+    );
+  }
+
+  return <></>;
+};
+
+export const TrackableSettingsManual = ({
+  trackable,
+  setSettings,
+}: {
+  trackable: ITrackable | ITrackableUnsaved;
+  setSettings: (v: ITrackable["settings"]) => void;
+}) => {
+  const settings = trackable.settings;
+
+  if (trackable.type === "boolean") {
+    return <SettingsBoolean settings={settings} setSettings={setSettings} />;
+  }
+
+  if (trackable.type === "number") {
+    return <SettingsNumber settings={settings} setSettings={setSettings} />;
+  }
+
+  if (trackable.type === "range") {
+    return <SettingsRange settings={settings} setSettings={setSettings} />;
   }
 
   return <></>;

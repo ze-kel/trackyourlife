@@ -4,6 +4,7 @@ import formatDateKey from "src/helpers/formatDateKey";
 import { DayCellBoolean } from "./DayCellBoolean";
 import { DayCellNumber } from "./DayCellNumber";
 import type { ITrackableSettings } from "src/types/trackable";
+import { DayCellRange } from "./DayCellRange";
 
 export type IDayProps = {
   day: number;
@@ -48,7 +49,11 @@ const DayCell = (data: IDayProps) => {
     return <DayCellNumber {...data} />;
   }
 
-  return <></>;
+  if (trackable.type === "range") {
+    return <DayCellRange {...data} />;
+  }
+
+  throw new Error("Unsupported trackable type");
 };
 
 export default DayCell;

@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import type { ChangeEvent, KeyboardEvent } from "react";
+import type { ChangeEvent, KeyboardEvent, MouseEvent } from "react";
 import { useState, useEffect, useRef } from "react";
 
 interface IEditableTextBase {
@@ -37,7 +37,9 @@ const EditableText = ({
   const [waiting, setWaiting] = useState(false);
   const [focusNext, setFocusNext] = useState(false);
 
-  const goToEdit = () => {
+  const goToEdit = (e: MouseEvent) => {
+    console.log("goToEdit");
+    e.stopPropagation();
     setInputVal(value);
     if (editModeSetter) editModeSetter(true);
     setEditMode(true);
