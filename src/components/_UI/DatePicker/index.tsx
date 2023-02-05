@@ -151,7 +151,7 @@ const DatePicker = ({
   );
 
   const opener = (
-    <div className="flex w-fit cursor-pointer border-2 border-neutral-400 px-2 py-1 dark:border-neutral-800">
+    <div className="flex w-fit cursor-pointer border-2 border-neutral-400 px-2 py-1 transition-colors hover:border-neutral-600 dark:border-neutral-800 dark:hover:border-neutral-700">
       {date ? format(date, "d MMMM yyyy") : "No date set"}{" "}
       <IconChevronDown
         className={clsx(
@@ -170,6 +170,7 @@ const DatePicker = ({
         visible={isOpened}
         setVisible={setIsOpened}
         classNameMain={"w-fit"}
+        placement="bottom-start"
       />
     </div>
   );

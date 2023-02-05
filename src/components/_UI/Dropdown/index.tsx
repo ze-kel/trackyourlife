@@ -1,16 +1,26 @@
+import type { Placement } from "@floating-ui/react";
+import {
+  useFloating,
+  offset as offsetMiddleware,
+  flip,
+  shift,
+  autoUpdate,
+  useClick,
+  useInteractions,
+  useDismiss,
+} from "@floating-ui/react";
 import clsx from "clsx";
-import type { MouseEvent as ReactMouseEvent } from "react";
-import { useEffect, useRef } from "react";
 
 export interface IDropdown {
   mainPart: React.ReactNode;
   hiddenPart: React.ReactNode;
   visible: boolean;
   setVisible: (b: boolean) => void;
-  align?: "left" | "center" | "right";
-  vAlign?: "top" | "center" | "bottom";
   background?: boolean;
   classNameMain?: string;
+  placement?: Placement;
+  placeCenter?: boolean;
+  offset?: number;
 }
 
 const Dropdown = ({
@@ -18,57 +28,62 @@ const Dropdown = ({
   hiddenPart,
   visible,
   setVisible,
-  align = "left",
-  vAlign = "top",
   background = true,
   classNameMain,
+  placement,
+  placeCenter,
+  offset = 5,
 }: IDropdown) => {
-  const hiddenRef = useRef<HTMLDivElement>(null);
+  const { x, y, strategy, refs, context } = useFloating({
+    open: visible,
+    onOpenChange: setVisible,
+    placement: placeCenter ? "bottom" : placement,
+    middleware: [
+      offsetMiddleware(
+        placeCenter
+          ? ({ rects }) =>
+              -rects.reference.height / 2 - rects.floating.height / 2
+          : offset
+      ),
+      flip(),
+      shift(),
+    ],
+    whileElementsMounted: autoUpdate,
+  });
 
-  const open = (e: ReactMouseEvent) => {
-    e.stopPropagation();
-    setVisible(!visible);
-  };
-
-  useEffect(() => {
-    const closeChecker = (e: MouseEvent) => {
-      if (e.target && hiddenRef.current) {
-        const t = e.target as Element;
-        if (!hiddenRef.current.contains(t)) {
-          setVisible(false);
-        }
-      }
-    };
-
-    window.addEventListener("click", closeChecker);
-
-    return () => {
-      window.removeEventListener("click", closeChecker);
-    };
-  }, [setVisible]);
+  const { getReferenceProps, getFloatingProps } = useInteractions([
+    useClick(context),
+    useDismiss(context),
+  ]);
 
   return (
-    <div className="relative">
-      <div onClick={open} className={classNameMain}>
+    <>
+      <div
+        ref={refs.setReference}
+        className={classNameMain}
+        {...getReferenceProps()}
+      >
         {mainPart}
       </div>
       {visible && (
         <div
-          ref={hiddenRef}
+          ref={refs.setFloating}
+          style={{
+            position: strategy,
+            top: y ?? 0,
+            left: x ?? 0,
+            width: "max-content",
+          }}
           className={clsx(
-            "absolute z-10",
             background &&
-              "my-1 rounded-sm border-2 bg-neutral-900 p-2 text-neutral-200 dark:border-neutral-800 dark:bg-neutral-900",
-            align === "right" && "right-0",
-            align === "center" && "left-1/2 -translate-x-1/2",
-            vAlign === "top" && "top-full",
-            vAlign === "center" && "top-1/2 -translate-y-1/2"
+              "rounded-sm border-2 bg-neutral-900 p-2 text-neutral-200 dark:border-neutral-800 dark:bg-neutral-900"
           )}
+          {...getFloatingProps()}
         >
           {hiddenPart}
         </div>
       )}
-    </div>
+    </>
   );
 };
 

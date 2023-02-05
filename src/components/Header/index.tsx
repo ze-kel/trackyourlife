@@ -44,7 +44,7 @@ const Header = () => {
             hiddenPart={dropH}
             visible={dropdown}
             setVisible={setDropdown}
-            align="right"
+            placement="bottom-end"
           />
         )}
       </div>

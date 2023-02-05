@@ -49,7 +49,7 @@ const Pair = ({
         onChange={(e) => updateKey(e.target.value)}
       />
       <Dropdown
-        vAlign="center"
+        placement="right"
         visible={dropdown}
         setVisible={setDropdown}
         hiddenPart={<Picker data={data} onEmojiSelect={selectEmoji} />}

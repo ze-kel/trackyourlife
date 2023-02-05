@@ -134,9 +134,8 @@ export const DayCellRange = ({ day, month, year, style }: IDayProps) => {
       setVisible={setIsSelecting}
       mainPart={visiblePart}
       hiddenPart={selector}
-      align="center"
-      vAlign="center"
       background={false}
+      placeCenter={true}
     />
   );
 };
