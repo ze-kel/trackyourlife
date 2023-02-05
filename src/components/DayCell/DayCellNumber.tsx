@@ -39,10 +39,14 @@ const Generated = (Object.keys(activeGen) as IColorOptions[]).reduce<
 
 const NumberClasses = cva(
   [
-    "group relative flex h-16 items-center justify-center border-2 border-transparent font-light transition-colors",
+    "group relative flex items-center justify-center border-transparent font-light transition-colors",
   ],
   {
     variants: {
+      style: {
+        default: "h-16 border-2",
+        mini: "border h-6",
+      },
       inTrackRange: {
         true: "cursor-text",
         false:
@@ -59,16 +63,24 @@ const NumberClasses = cva(
         className: "text-neutral-500  dark:text-neutral-700",
       },
       {
+        inTrackRange: false,
+        className: "dark:border-neutral-800 border-neutral-100",
+      },
+      {
         inTrackRange: true,
         isToday: false,
         className: "text-neutral-500 dark:text-neutral-700",
       },
       ...Generated,
     ],
+
+    defaultVariants: {
+      style: "default",
+    },
   }
 );
 
-export const DayCellNumber = ({ day, month, year }: IDayProps) => {
+export const DayCellNumber = ({ day, month, year, style }: IDayProps) => {
   const { trackable, changeDay } = useTrackableSafe();
 
   if (trackable.type !== "number") {
@@ -130,7 +142,6 @@ export const DayCellNumber = ({ day, month, year }: IDayProps) => {
   ]);
 
   const handlePlus = (e: React.MouseEvent) => {
-    console.log(e);
     e.preventDefault();
     e.stopPropagation();
     setDisplayedNumber(displayedNumber + 1);
@@ -156,10 +167,13 @@ export const DayCellNumber = ({ day, month, year }: IDayProps) => {
         inTrackRange,
         isToday,
         colorCode: findTheme(),
+        style,
       })}
       key={day}
     >
-      <span className="absolute top-1 left-2 select-none">{day}</span>
+      {style !== "mini" && (
+        <span className="absolute top-1 left-2 select-none">{day}</span>
+      )}
       {inTrackRange && (
         <>
           <EditableText
@@ -167,16 +181,17 @@ export const DayCellNumber = ({ day, month, year }: IDayProps) => {
             isNumber={true}
             updater={handleInputUpdate}
             className={cls(
-              "flex h-full w-full select-none items-center justify-center bg-inherit text-center text-xl font-semibold outline-none transition-colors",
+              "flex h-full w-full select-none items-center justify-center bg-inherit text-center font-semibold outline-none transition-colors",
               displayedNumber === 0 && !inInputEdit
                 ? "text-neutral-200 dark:text-neutral-800"
-                : "text-neutral-800 dark:text-neutral-300"
+                : "text-neutral-800 dark:text-neutral-300",
+              style === "mini" ? "text-xs" : "text-xl"
             )}
             classNameInput="focus:outline-neutral-900"
             editModeSetter={setInInputEdit}
           />
 
-          {!inInputEdit && (
+          {!inInputEdit && style !== "mini" && (
             <>
               <IconMinus
                 onClick={handleMinus}

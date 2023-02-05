@@ -1,14 +1,18 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 
-type EmojiProps = { shortcodes: string; size: string };
-
 declare global {
   namespace JSX {
     interface IntrinsicElements {
-      ["em-emoji"]: EmojiProps & { fallback: string };
+      ["em-emoji"]: {
+        shortcodes: string;
+        size: string;
+        fallback: string;
+      };
     }
   }
 }
+
+type EmojiProps = { shortcodes: string; size: string; class?: string };
 
 export const Emoji = (props: EmojiProps) => {
   return <em-emoji {...props} fallback=":question" />;

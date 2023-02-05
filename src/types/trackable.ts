@@ -41,6 +41,8 @@ export const ZTrackableSettingsNumber = z.object({
       z.object({
         from: z.number(),
         color: colorOption,
+        // used to key inputs when editing, can be changed voluntarily
+        id: z.string().optional(),
       })
     )
     .optional(),

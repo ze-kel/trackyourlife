@@ -99,7 +99,7 @@ const BooleanClasses = cva(
         mini: "text-xs h-6 justify-center items-center font-light border",
       },
       inTrackRange: {
-        true: "cursor-pointer hover:text-2xl",
+        true: "cursor-pointer",
         false: "",
       },
       isToday: {
@@ -125,6 +125,9 @@ const BooleanClasses = cva(
         className:
           "bg-neutral-100 text-neutral-300 dark:bg-neutral-900 dark:text-neutral-800",
       },
+      { inTrackRange: true, style: "default", className: "hover:text-2xl" },
+      { inTrackRange: true, style: "mini", className: "" },
+
       ...Generated,
     ],
     defaultVariants: {

@@ -14,6 +14,7 @@ interface IPureInputProps extends IBase {
   onChange: (v: ChangeEvent<HTMLInputElement>) => void;
   isValid?: boolean;
   error?: string | boolean;
+  onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
 }
 
 interface IInputProps extends IBase {
@@ -30,6 +31,7 @@ export const PureInput = ({
   isValid,
   error,
   className,
+  onBlur,
 }: IPureInputProps) => {
   return (
     <div className="flex flex-col">
@@ -46,6 +48,7 @@ export const PureInput = ({
         value={value}
         placeholder={placeholder}
         onChange={onChange}
+        onBlur={onBlur}
       />
       {error && typeof error === "string" && (
         <div className="mt2 text-red-500">{error}</div>

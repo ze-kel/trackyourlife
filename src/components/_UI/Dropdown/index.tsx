@@ -75,6 +75,7 @@ const Dropdown = ({
             width: "max-content",
           }}
           className={clsx(
+            "z-50",
             background &&
               "rounded-sm border-2 bg-neutral-900 p-2 text-neutral-200 dark:border-neutral-800 dark:bg-neutral-900"
           )}

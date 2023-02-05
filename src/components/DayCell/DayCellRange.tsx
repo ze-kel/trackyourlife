@@ -8,6 +8,7 @@ import { computeDayCellHelpers } from ".";
 import { ThemeList } from "./DayCellBoolean";
 
 import type { IRangeSettings } from "@t/trackable";
+import clsx from "clsx";
 
 interface PopupSelectorProps {
   rangeMapping: IRangeSettings["labels"];
@@ -39,7 +40,7 @@ const PopupSelector = ({ rangeMapping, onSelect }: PopupSelectorProps) => {
 
 const RangeClasses = cva(
   [
-    "group relative flex h-16 items-center justify-center border-2 font-light transition-colors",
+    "group relative flex items-center justify-center font-light transition-colors",
   ],
   {
     variants: {
@@ -51,6 +52,10 @@ const RangeClasses = cva(
       isToday: {
         true: "text-neutral-400",
       },
+      style: {
+        default: "h-16 border-2",
+        mini: "h-6 border text-xs",
+      },
       colorCode: ThemeList,
     },
     compoundVariants: [
@@ -61,9 +66,19 @@ const RangeClasses = cva(
       {
         inTrackRange: true,
         isToday: false,
+        style: "default",
         className: "text-neutral-500 dark:text-neutral-700",
       },
+      {
+        inTrackRange: true,
+        isToday: false,
+        style: "mini",
+        className: "text-neutral-500  dark:text-neutral-800",
+      },
     ],
+    defaultVariants: {
+      style: "default",
+    },
   }
 );
 
@@ -112,12 +127,24 @@ export const DayCellRange = ({ day, month, year, style }: IDayProps) => {
       className={RangeClasses({
         inTrackRange,
         isToday,
+        style,
       })}
       key={day}
     >
-      <span className="absolute top-1 left-2 select-none">{day}</span>
+      {(style !== "mini" || !dayValue) && (
+        <span
+          className={clsx(
+            "select-none",
+            style === "mini" ? "" : "absolute top-1 left-2 "
+          )}
+        >
+          {day}
+        </span>
+      )}
 
-      {dayValue && <Emoji shortcodes={code} size="30px" />}
+      {dayValue && (
+        <Emoji shortcodes={code} size={style === "mini" ? "14px" : "30px"} />
+      )}
     </div>
   );
 
@@ -128,7 +155,7 @@ export const DayCellRange = ({ day, month, year, style }: IDayProps) => {
     />
   );
 
-  return (
+  return inTrackRange ? (
     <Dropdown
       visible={isSelecting}
       setVisible={setIsSelecting}
@@ -137,5 +164,7 @@ export const DayCellRange = ({ day, month, year, style }: IDayProps) => {
       background={false}
       placeCenter={true}
     />
+  ) : (
+    visiblePart
   );
 };

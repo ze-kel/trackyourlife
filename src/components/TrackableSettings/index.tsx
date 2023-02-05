@@ -104,7 +104,7 @@ const SettingsNumber = ({
       <div>
         <h3 className="mb-2 text-xl">Color coding</h3>
         <NumberColorSelector
-          value={settings.colorCoding}
+          initialValue={settings.colorCoding}
           onChange={changeColorCoding}
         />
       </div>
