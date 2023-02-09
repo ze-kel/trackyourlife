@@ -9,28 +9,36 @@ import clsx from "clsx";
 import { Emoji } from "@components/_UI/Emoji";
 import XIcon from "@heroicons/react/24/outline/XMarkIcon";
 import PlusIcon from "@heroicons/react/24/outline/PlusIcon";
+import type { DragControls} from "framer-motion";
+import { AnimatePresence } from "framer-motion";
+import {
+  Reorder,
+  useDragControls,
+} from "framer-motion";
+import ElliplsisIcon from "@heroicons/react/24/outline/EllipsisVerticalIcon";
+import type { ArrayElement } from "@t/helpers";
+import { v4 as uuidv4 } from "uuid";
 
 export interface IRangeLabelSelector {
   initialValue: IRangeSettings["labels"];
   onChange: (a: IRangeSettings["labels"]) => void;
 }
 
-type IRangeLabel = {
-  internalKey: string;
-  emojiShortcode: string;
-};
+type IRangeLabel = ArrayElement<NonNullable<IRangeSettings["labels"]>>;
 
 const Pair = ({
   value,
   update,
   duplicate,
   remove,
+  controls,
 }: {
   value: IRangeLabel;
   update: (v: IRangeLabel) => void;
   className?: string;
   duplicate: boolean;
   remove: () => void;
+  controls: DragControls;
 }) => {
   const [dropdown, setDropdown] = useState(false);
 
@@ -44,10 +52,28 @@ const Pair = ({
   };
 
   return (
-    <>
+    <Reorder.Item
+      value={value}
+      itemID={value.id}
+      transition={{
+        duration: 0.25,
+        opacity: { duration: 0.2, ease: "circIn" },
+      }}
+      initial={{ opacity: 0, y: 10, height: 0 }}
+      animate={{ opacity: 1, y: 0, height: "45px" }}
+      exit={{ opacity: 0, height: 0, zIndex: -99 }}
+      className="flex items-center gap-2"
+      layout
+    >
+      <div
+        onPointerDown={(e) => controls.start(e)}
+        className="flex w-4 scale-150 cursor-move dark:text-neutral-700 dark:hover:text-neutral-100"
+      >
+        <ElliplsisIcon />
+      </div>
       <PureInput
         value={value.internalKey}
-        className={clsx("col-start-1 col-end-1 mr-2 w-64")}
+        className={clsx("col-start-1 col-end-1 w-64")}
         error={duplicate || !value.internalKey}
         onChange={(e) => updateKey(e.target.value)}
       />
@@ -59,23 +85,34 @@ const Pair = ({
           <Picker data={data} onEmojiSelect={selectEmoji} autoFocus={true} />
         }
         mainPart={<Emoji size="30px" shortcodes={value.emojiShortcode} />}
-        classNameMain={"w-fit cursor-pointer col-start-2 col-end-2"}
+        classNameMain={"w-fit cursor-pointer"}
       />
       <div
-        className="col-start-3 col-end-3 flex w-10 cursor-pointer items-center justify-center"
+        className="flex w-7 cursor-pointer items-center justify-center"
         onClick={remove}
       >
         <XIcon className="w-7 transition-colors dark:text-neutral-700 dark:hover:text-neutral-100" />
       </div>
-    </>
+    </Reorder.Item>
   );
+};
+
+const addIds = (value: IRangeLabel[] = []) => {
+  const v2 = cloneDeep(value);
+
+  v2.forEach((item) => {
+    if (!item.id) {
+      item.id = uuidv4();
+    }
+  });
+  return v2;
 };
 
 const RangeLabelSelector = ({
   initialValue,
   onChange,
 }: IRangeLabelSelector) => {
-  const [value, updateValue] = useState(initialValue || []);
+  const [value, updateValue] = useState(addIds(initialValue) || []);
   const [error, updateError] = useState<string>();
 
   const checkDuplicates = (index: number) => {
@@ -105,6 +142,11 @@ const RangeLabelSelector = ({
     onChange(value);
   };
 
+  const updateAndPush: IRangeLabelSelector["onChange"] = (value = []) => {
+    updateValue(value);
+    pushUpdates(value);
+  };
+
   const changeByIndex = (index: number, v: IRangeLabel) => {
     const upd = cloneDeep(value);
 
@@ -120,7 +162,7 @@ const RangeLabelSelector = ({
   const addNewProperty = () => {
     const upd = [
       ...value,
-      { internalKey: "newLabel", emojiShortcode: ":question:" },
+      { internalKey: "newLabel", emojiShortcode: ":question:", id: uuidv4() },
     ];
     updateValue(upd);
     pushUpdates(upd);
@@ -133,32 +175,50 @@ const RangeLabelSelector = ({
     pushUpdates(upd);
   };
 
+  const controls = useDragControls();
+
   return (
     <div className="flex flex-col gap-1">
-      <div className="grid w-fit auto-cols-min items-center gap-x-2">
+      <div className="mb-1 flex w-fit flex-col items-center">
         {value.length > 0 && (
-          <>
-            <div className="col-start-1 col-end-1 text-sm text-neutral-300 dark:text-neutral-500">
+          <div className="flex w-full gap-2">
+            <div className="w-4"></div>
+            <div className="w-64 text-sm text-neutral-300 dark:text-neutral-500">
               Value
             </div>
-            <div className="col-start-2 col-end-2 text-sm text-neutral-300 dark:text-neutral-500">
+            <div className="text-sm text-neutral-300 dark:text-neutral-500">
               Icon
             </div>
-            <div className="col-start-3 col-end-3 text-sm text-neutral-300 dark:text-neutral-500"></div>
-          </>
+            <div className="text-sm text-neutral-300 dark:text-neutral-500"></div>
+          </div>
         )}
 
-        {value.map((el, index) => {
-          return (
-            <Pair
-              key={index}
-              value={el}
-              duplicate={checkDuplicates(index)}
-              update={(v) => changeByIndex(index, v)}
-              remove={() => removeByIndex(index)}
-            />
-          );
-        })}
+        <Reorder.Group
+          as="div"
+          axis="y"
+          values={value}
+          onReorder={updateAndPush}
+          dragControls={controls}
+          dragListener={false}
+          layout
+          transition={{ duration: 0.1 }}
+        >
+          <AnimatePresence initial={false}>
+            {value.map((el, index) => {
+              return (
+                <Pair
+                  key={el.id}
+                  value={el}
+                  duplicate={checkDuplicates(index)}
+                  update={(v) => changeByIndex(index, v)}
+                  remove={() => removeByIndex(index)}
+                  controls={controls}
+                />
+              );
+            })}
+          </AnimatePresence>
+        </Reorder.Group>
+
         <div
           className="flex cursor-pointer justify-center whitespace-nowrap text-neutral-300 transition-colors dark:text-neutral-700 dark:hover:text-neutral-100 "
           onClick={addNewProperty}

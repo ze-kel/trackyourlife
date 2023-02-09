@@ -9,6 +9,7 @@ import { ThemeList } from "./DayCellBoolean";
 
 import type { IRangeSettings } from "@t/trackable";
 import clsx from "clsx";
+import { AnimatePresence, motion, transform } from "framer-motion";
 
 interface PopupSelectorProps {
   rangeMapping: IRangeSettings["labels"];
@@ -17,24 +18,64 @@ interface PopupSelectorProps {
 
 const PopupSelector = ({ rangeMapping, onSelect }: PopupSelectorProps) => {
   if (!rangeMapping || !rangeMapping.length) return <></>;
+  const center = (rangeMapping.length - 1) / 2;
+  const maxDiff = Math.abs(rangeMapping.length - center);
+
+  const transformer = transform([0, maxDiff], [0, 0.15]);
+
+  const getDelayByIndex = (i: number) => {
+    const diff = Math.abs(i - center);
+    return transformer(diff);
+  };
+
+  const isCenterElement = (i: number) => {
+    return Math.abs(i - center) <= 0.5;
+  };
+
+  const getYAnimation = (i: number) => {
+    if (isCenterElement(i)) return 0;
+    return i < center ? "200%" : "-200%";
+  };
 
   return (
-    <div className="flex cursor-pointer flex-col rounded-full dark:bg-neutral-800">
-      {rangeMapping.map((v, index) => {
-        return (
-          <div
-            key={index}
-            onClick={(e) => {
-              e.stopPropagation();
-              void onSelect(v.internalKey);
-            }}
-            className="rounded-full px-2 transition-colors hover:bg-lime-500"
-          >
-            <Emoji size="30px" shortcodes={v.emojiShortcode} />
-          </div>
-        );
-      })}
-    </div>
+    <motion.div
+      layout
+      className="flex cursor-pointer flex-col rounded-full dark:bg-neutral-800"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0 }}
+    >
+      <AnimatePresence>
+        {rangeMapping.map((v, index) => {
+          return (
+            <motion.div
+              initial={{
+                translateY: getYAnimation(index),
+                height: 0,
+              }}
+              animate={{ opacity: 1, translateY: 0, height: 45 }}
+              exit={{ opacity: 0 }}
+              transition={{
+                delay: getDelayByIndex(index),
+                duration: 0.2,
+                ease: "easeInOut",
+              }}
+              key={index}
+              onClick={(e) => {
+                e.stopPropagation();
+                void onSelect(v.internalKey);
+              }}
+              className={clsx(
+                "rounded-full px-2 transition-colors hover:bg-lime-500",
+                isCenterElement(index) && "z-[100]"
+              )}
+            >
+              <Emoji size="30px" shortcodes={v.emojiShortcode} />
+            </motion.div>
+          );
+        })}
+      </AnimatePresence>
+    </motion.div>
   );
 };
 

@@ -52,7 +52,12 @@ export const ZTrackableSettingsRange = z.object({
   ...basics,
   labels: z
     .array(
-      z.object({ internalKey: z.string().min(1), emojiShortcode: z.string() })
+      z.object({
+        internalKey: z.string().min(1),
+        emojiShortcode: z.string(),
+        // used to key inputs when editing, can be changed voluntarily
+        id: z.string().optional(),
+      })
     )
     .optional(),
 });
