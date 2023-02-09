@@ -133,11 +133,14 @@ const Decade = ({
 type TView = "days" | "months" | "years";
 
 const TrackableView = () => {
-  const [year, setYear] = useState(new Date().getFullYear());
-  const [month, setMonth] = useState(new Date().getMonth());
+  const now = new Date();
+  const [year, setYear] = useState(now.getFullYear());
+  const [month, setMonth] = useState(now.getMonth());
   const [view, setView] = useState<TView>("days");
 
   const [yearOffset, setyearOffset] = useState(0);
+
+  const isCurrentMonth = now.getMonth() === month && now.getFullYear() === year;
 
   const increment = (add: number) => {
     if (view === "years") {
@@ -174,10 +177,17 @@ const TrackableView = () => {
     setView("months");
   };
 
+  const openCurrentMonth = () => {
+    const now = new Date();
+    setYear(now.getFullYear());
+    setMonth(now.getMonth());
+    setView("days");
+  };
+
   return (
     <>
-      <div className="flex items-center gap-2">
-        <>
+      <div className="mb-2 flex items-center justify-between">
+        <div className="flex gap-2">
           <div
             onClick={() => increment(-1)}
             className="flex w-6 cursor-pointer rounded-full border p-0.5 transition-colors dark:border-neutral-500 dark:hover:border-neutral-50"
@@ -190,24 +200,40 @@ const TrackableView = () => {
           >
             <IconChevronRight className="translate-x-[1px]" />
           </div>
-        </>
-        {view !== "years" && (
-          <span
-            onClick={() => setView("years")}
-            className="cursor-pointer font-semibold"
-          >
-            {year}
-          </span>
-        )}
-
-        {view === "days" && (
-          <>
-            /
-            <span onClick={() => setView("months")} className="cursor-pointer">
-              {format(new Date(year, month, 1), "MMMM")}
+          {view !== "years" && (
+            <span
+              onClick={() => setView("years")}
+              className="cursor-pointer font-semibold"
+            >
+              {year}
             </span>
-          </>
-        )}
+          )}
+
+          {view === "days" && (
+            <>
+              /
+              <span
+                onClick={() => setView("months")}
+                className="cursor-pointer"
+              >
+                {format(new Date(year, month, 1), "MMMM")}
+              </span>
+            </>
+          )}
+        </div>
+        <div>
+          <div
+            onClick={openCurrentMonth}
+            className={clsx(
+              "transition-colors",
+              isCurrentMonth
+                ? "dark:text-neutral-800"
+                : "cursor-pointer dark:text-neutral-300"
+            )}
+          >
+            Today
+          </div>
+        </div>
       </div>
       {view === "days" && <Month year={year} month={month} />}
       {view === "months" && <Year year={year} openMonth={openMonth} />}

@@ -11,7 +11,7 @@ const Trackable = ({ id }: { id: ITrackable["id"] }) => {
 
   return (
     <TrackableProvider trackable={data}>
-      <article className="border-b border-neutral-200 py-2 last:border-0 dark:border-neutral-700">
+      <article className="border-b border-neutral-200 py-2 last:border-0 dark:border-neutral-800">
         <Link href={`/trackable/${id}`} className="block w-fit">
           <h3 className="w-fit cursor-pointer text-xl font-light">
             {data.settings.name || "Unnamed trackable"}

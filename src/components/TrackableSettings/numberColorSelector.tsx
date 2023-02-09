@@ -1,6 +1,6 @@
 import { PureInput } from "@components/_UI/Input";
-import type { IColorOptions, INumberSettings } from "@t/trackable";
-import { clamp, cloneDeep } from "lodash";
+import type { INumberSettings } from "@t/trackable";
+import { cloneDeep } from "lodash";
 import ColorSelector from "./colorSelector";
 import XIcon from "@heroicons/react/24/outline/XMarkIcon";
 import PlusIcon from "@heroicons/react/24/outline/PlusIcon";

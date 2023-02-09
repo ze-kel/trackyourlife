@@ -55,7 +55,9 @@ const Pair = ({
         placement="right"
         visible={dropdown}
         setVisible={setDropdown}
-        hiddenPart={<Picker data={data} onEmojiSelect={selectEmoji} />}
+        hiddenPart={
+          <Picker data={data} onEmojiSelect={selectEmoji} autoFocus={true} />
+        }
         mainPart={<Emoji size="30px" shortcodes={value.emojiShortcode} />}
         classNameMain={"w-fit cursor-pointer col-start-2 col-end-2"}
       />
