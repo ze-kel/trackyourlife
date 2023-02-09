@@ -227,7 +227,7 @@ const TrackableView = () => {
             className={clsx(
               "transition-colors",
               isCurrentMonth
-                ? "dark:text-neutral-800"
+                ? "text-neutral-300 dark:text-neutral-800"
                 : "cursor-pointer dark:text-neutral-300"
             )}
           >

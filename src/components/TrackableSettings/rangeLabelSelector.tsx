@@ -9,12 +9,9 @@ import clsx from "clsx";
 import { Emoji } from "@components/_UI/Emoji";
 import XIcon from "@heroicons/react/24/outline/XMarkIcon";
 import PlusIcon from "@heroicons/react/24/outline/PlusIcon";
-import type { DragControls} from "framer-motion";
+import type { DragControls } from "framer-motion";
 import { AnimatePresence } from "framer-motion";
-import {
-  Reorder,
-  useDragControls,
-} from "framer-motion";
+import { Reorder, useDragControls } from "framer-motion";
 import ElliplsisIcon from "@heroicons/react/24/outline/EllipsisVerticalIcon";
 import type { ArrayElement } from "@t/helpers";
 import { v4 as uuidv4 } from "uuid";
@@ -67,7 +64,7 @@ const Pair = ({
     >
       <div
         onPointerDown={(e) => controls.start(e)}
-        className="flex w-4 scale-150 cursor-move dark:text-neutral-700 dark:hover:text-neutral-100"
+        className="flex w-4 scale-150 cursor-grabbing dark:text-neutral-700 dark:hover:text-neutral-100"
       >
         <ElliplsisIcon />
       </div>
@@ -91,7 +88,7 @@ const Pair = ({
         className="flex w-7 cursor-pointer items-center justify-center"
         onClick={remove}
       >
-        <XIcon className="w-7 transition-colors dark:text-neutral-700 dark:hover:text-neutral-100" />
+        <XIcon className="w-7 text-neutral-300 transition-colors hover:text-neutral-800 dark:text-neutral-700 dark:hover:text-neutral-100" />
       </div>
     </Reorder.Item>
   );
@@ -181,15 +178,11 @@ const RangeLabelSelector = ({
     <div className="flex flex-col gap-1">
       <div className="mb-1 flex w-fit flex-col items-center">
         {value.length > 0 && (
-          <div className="flex w-full gap-2">
+          <div className="flex w-full gap-2 text-sm text-neutral-400 dark:text-neutral-500">
             <div className="w-4"></div>
-            <div className="w-64 text-sm text-neutral-300 dark:text-neutral-500">
-              Value
-            </div>
-            <div className="text-sm text-neutral-300 dark:text-neutral-500">
-              Icon
-            </div>
-            <div className="text-sm text-neutral-300 dark:text-neutral-500"></div>
+            <div className="w-64 ">Value</div>
+            <div>Icon</div>
+            <div></div>
           </div>
         )}
 
@@ -220,7 +213,7 @@ const RangeLabelSelector = ({
         </Reorder.Group>
 
         <div
-          className="flex cursor-pointer justify-center whitespace-nowrap text-neutral-300 transition-colors dark:text-neutral-700 dark:hover:text-neutral-100 "
+          className="flex cursor-pointer justify-center whitespace-nowrap text-neutral-300 transition-colors hover:text-neutral-800 dark:text-neutral-700 dark:hover:text-neutral-100 "
           onClick={addNewProperty}
         >
           <PlusIcon className="mr-1 w-4" />

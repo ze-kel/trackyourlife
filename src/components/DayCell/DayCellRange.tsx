@@ -40,7 +40,7 @@ const PopupSelector = ({ rangeMapping, onSelect }: PopupSelectorProps) => {
   return (
     <motion.div
       layout
-      className="flex cursor-pointer flex-col rounded-full dark:bg-neutral-800"
+      className="flex cursor-pointer flex-col rounded-full border border-neutral-200 bg-neutral-50 dark:border-transparent dark:bg-neutral-800"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0 }}
@@ -57,8 +57,7 @@ const PopupSelector = ({ rangeMapping, onSelect }: PopupSelectorProps) => {
               exit={{ opacity: 0 }}
               transition={{
                 delay: getDelayByIndex(index),
-                duration: 0.2,
-                ease: "easeInOut",
+                duration: 0.1,
               }}
               key={index}
               onClick={(e) => {
@@ -86,9 +85,9 @@ const RangeClasses = cva(
   {
     variants: {
       inTrackRange: {
-        true: "cursor-pointer border-neutral-700",
+        true: "cursor-pointer border-neutral-500 dark:border-neutral-700",
         false:
-          "bg-neutral-100 text-neutral-300 dark:bg-neutral-900 dark:text-neutral-800 border-neutral-800",
+          "bg-neutral-100 text-neutral-300 dark:bg-neutral-900 dark:text-neutral-800 border-transparent",
       },
       isToday: {
         true: "text-neutral-400",

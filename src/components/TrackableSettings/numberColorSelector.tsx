@@ -68,7 +68,7 @@ const Pair = ({ value, onChange, remove }: INumberColorSelectorPair) => {
         className="flex w-7 cursor-pointer items-center justify-center"
         onClick={remove}
       >
-        <XIcon className="w-7 transition-colors dark:text-neutral-700 dark:hover:text-neutral-100" />
+        <XIcon className="w-7 text-neutral-300 transition-colors hover:text-neutral-800  dark:text-neutral-700 dark:hover:text-neutral-100" />
       </div>
     </motion.div>
   );
@@ -129,15 +129,11 @@ const NumberColorSelector = ({
   return (
     <div className="flex flex-col gap-2">
       <div className="flex w-fit flex-col items-center gap-2">
-        <div className="flex w-full gap-2">
+        <div className="flex w-full gap-2 text-neutral-400 dark:text-neutral-500">
           {value.length > 0 && (
             <>
-              <div className="w-52 text-sm text-neutral-300 dark:text-neutral-500">
-                When value {">="} than
-              </div>
-              <div className="text-sm text-neutral-300 dark:text-neutral-500">
-                Set color to
-              </div>
+              <div className="w-52 ">When value {">="} than</div>
+              <div>Set color to</div>
               <div></div>
             </>
           )}
@@ -161,7 +157,7 @@ const NumberColorSelector = ({
           </AnimatePresence>
         </motion.div>
         <div
-          className="flex cursor-pointer justify-center whitespace-nowrap text-neutral-300 transition-colors dark:text-neutral-700 dark:hover:text-neutral-100"
+          className="flex cursor-pointer justify-center whitespace-nowrap text-neutral-300 transition-colors hover:text-neutral-800 dark:text-neutral-700 dark:hover:text-neutral-100"
           onClick={() => addNew()}
         >
           <PlusIcon className="mr-1 w-4" />

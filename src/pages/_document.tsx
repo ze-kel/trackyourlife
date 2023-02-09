@@ -2,7 +2,7 @@ import { Html, Head, Main, NextScript } from "next/document";
 
 export default function Document() {
   return (
-    <Html className="dark">
+    <Html className="bg-black">
       <Head>
         <link rel="shortcut icon" href="/favicon.ico" />
         <link
@@ -23,7 +23,7 @@ export default function Document() {
           href="/favicon-16x16.png"
         />
       </Head>
-      <body className="bg-neutral-50 text-neutral-900 dark:bg-neutral-900 dark:text-neutral-50">
+      <body>
         <Main />
         <div id="modal-portal"></div>
         <NextScript />
