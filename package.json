@@ -9,7 +9,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint --fix",
-    "test": "jest --runInBand"
+    "test": "jest --runInBand",
+    "vercel-build": "prisma generate && next build"
   },
   "dependencies": {
     "@emoji-mart/data": "^1.1.2",
