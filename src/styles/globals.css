@@ -6,6 +6,13 @@
   .content-container {
     @apply container mx-auto max-w-4xl px-4;
   }
+
+  .customScrollBar::-webkit-scrollbar {
+    @apply w-0.5 bg-transparent;
+  }
+  .customScrollBar::-webkit-scrollbar-thumb {
+    @apply bg-neutral-200 dark:bg-neutral-900;
+  }
 }
 
 /* Removes arrows from input number */

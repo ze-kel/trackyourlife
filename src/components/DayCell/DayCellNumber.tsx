@@ -186,13 +186,13 @@ export const DayCellNumber = ({ day, month, year, style }: IDayProps) => {
             isNumber={true}
             updater={handleInputUpdate}
             className={cls(
-              "flex h-full w-full select-none items-center justify-center bg-inherit text-center font-semibold outline-none transition-colors",
+              "flex h-full w-full select-none items-center justify-center bg-inherit text-center font-semibold shadow-lg shadow-transparent outline-none transition-colors",
               displayedNumber === 0 && !inInputEdit
                 ? "text-neutral-200 dark:text-neutral-800"
                 : "text-neutral-800 dark:text-neutral-300",
               style === "mini" ? "text-xs" : "text-xl"
             )}
-            classNameInput="focus:outline-neutral-900"
+            classNameInput="focus:shadow-neutral-400"
             editModeSetter={setInInputEdit}
           />
 
