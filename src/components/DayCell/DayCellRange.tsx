@@ -6,10 +6,11 @@ import { useTrackableSafe } from "src/helpers/trackableContext";
 import type { IDayProps } from ".";
 import { computeDayCellHelpers } from ".";
 import { ThemeList } from "./DayCellBoolean";
+import style from "./curstomScrollbar.module.css";
 
 import type { IRangeSettings } from "@t/trackable";
 import clsx from "clsx";
-import { AnimatePresence, motion, transform } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 
 interface PopupSelectorProps {
   rangeMapping: IRangeSettings["labels"];
@@ -18,62 +19,88 @@ interface PopupSelectorProps {
 
 const PopupSelector = ({ rangeMapping, onSelect }: PopupSelectorProps) => {
   if (!rangeMapping || !rangeMapping.length) return <></>;
-  const center = (rangeMapping.length - 1) / 2;
-  const maxDiff = Math.abs(rangeMapping.length - center);
-
-  const transformer = transform([0, maxDiff], [0, 0.15]);
 
   const getDelayByIndex = (i: number) => {
-    const diff = Math.abs(i - center);
-    return transformer(diff);
+    const center = 0;
+    const oneOff = 0.025;
+    const twoOff = 0.01;
+    const arr = [twoOff, oneOff, center, oneOff, twoOff];
+    return arr[i] || 0;
   };
 
-  const isCenterElement = (i: number) => {
-    return Math.abs(i - center) <= 0.5;
+  const getEaseByIndex = (i: number) => {
+    const center = [0.4, 0, 0.4, 1.1];
+    const oneOff = [0.2, 0.3, 0.4, 1.2];
+    const twoOff = [0, 0.4, 0.4, 1.1];
+    const arr = [twoOff, oneOff, center, oneOff, twoOff];
+    return arr[i] || "linear";
+  };
+
+  const getDurationByIndex = (i: number) => {
+    const center = 0.125;
+    const oneOff = 0.22;
+    const twoOff = 0.325;
+    const arr = [twoOff, oneOff, center, oneOff, twoOff];
+    return arr[i] || 0;
   };
 
   const getYAnimation = (i: number) => {
-    if (isCenterElement(i)) return 0;
-    return i < center ? "200%" : "-200%";
+    const arr = ["150%", "100%", "0", "-100%", "-150%"];
+    return arr[i];
+  };
+
+  const getZIndex = (i: number) => {
+    const arr = [50, 75, 100, 75, 50];
+    return arr[i];
   };
 
   return (
     <motion.div
-      layout
-      className="flex cursor-pointer flex-col rounded-full border border-neutral-200 bg-neutral-50 dark:border-transparent dark:bg-neutral-800"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1, y: 0 }}
+      className={clsx(
+        style.miniScrollbar,
+        "relative flex w-14 cursor-pointer flex-col overflow-x-hidden rounded-full border border-neutral-200 bg-neutral-50 dark:border-transparent dark:bg-neutral-800"
+      )}
+      initial={{ opacity: 0, height: 0 }}
+      animate={{ opacity: 1, height: "230px" }}
       exit={{ opacity: 0 }}
+      transition={{ duration: 0.3, ease: [0, 0, 0, 1.1] }}
     >
-      <AnimatePresence>
-        {rangeMapping.map((v, index) => {
-          return (
-            <motion.div
-              initial={{
-                translateY: getYAnimation(index),
-                height: 0,
-              }}
-              animate={{ opacity: 1, translateY: 0, height: 45 }}
-              exit={{ opacity: 0 }}
-              transition={{
-                delay: getDelayByIndex(index),
-                duration: 0.1,
-              }}
-              key={index}
-              onClick={(e) => {
-                e.stopPropagation();
-                void onSelect(v.internalKey);
-              }}
-              className={clsx(
-                "rounded-full px-2 transition-colors hover:bg-lime-500",
-                isCenterElement(index) && "z-[100]"
-              )}
-            >
-              <Emoji size="30px" shortcodes={v.emojiShortcode} />
-            </motion.div>
-          );
-        })}
-      </AnimatePresence>
+      <div className="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2">
+        <AnimatePresence>
+          {rangeMapping.map((v, index) => {
+            return (
+              <motion.div
+                initial={{
+                  translateY: true ? getYAnimation(index) : 0,
+                  scale: 0,
+                }}
+                animate={{
+                  opacity: 1,
+                  translateY: 0,
+                  scale: 1,
+                }}
+                exit={{ opacity: 0 }}
+                transition={{
+                  delay: getDelayByIndex(index),
+                  duration: getDurationByIndex(index),
+                  ease: getEaseByIndex(index),
+                }}
+                key={index}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  void onSelect(v.internalKey);
+                }}
+                className={clsx(
+                  "rounded-full px-2 text-center transition-colors hover:bg-lime-500"
+                )}
+                style={{ zIndex: getZIndex(index) }}
+              >
+                <Emoji size="30px" shortcodes={v.emojiShortcode} />
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
+      </div>
     </motion.div>
   );
 };
