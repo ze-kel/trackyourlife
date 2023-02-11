@@ -9,7 +9,6 @@ import clsx from "clsx";
 import { Emoji } from "@components/_UI/Emoji";
 import XIcon from "@heroicons/react/24/outline/XMarkIcon";
 import PlusIcon from "@heroicons/react/24/outline/PlusIcon";
-import type { DragControls } from "framer-motion";
 import { AnimatePresence } from "framer-motion";
 import { Reorder, useDragControls } from "framer-motion";
 import ElliplsisIcon from "@heroicons/react/24/outline/EllipsisVerticalIcon";
@@ -28,16 +27,15 @@ const Pair = ({
   update,
   duplicate,
   remove,
-  controls,
 }: {
   value: IRangeLabel;
   update: (v: IRangeLabel) => void;
   className?: string;
   duplicate: boolean;
   remove: () => void;
-  controls: DragControls;
 }) => {
   const [dropdown, setDropdown] = useState(false);
+  const controls = useDragControls();
 
   const updateKey = (val: string) => {
     update({ ...value, internalKey: val });
@@ -57,9 +55,9 @@ const Pair = ({
         opacity: { duration: 0.2, ease: "circIn" },
       }}
       initial={{ opacity: 0, y: 10, height: 0 }}
-      animate={{ opacity: 1, y: 0, height: "45px" }}
+      animate={{ opacity: 1, y: 0, height: "45px", zIndex: 2 }}
       exit={{ opacity: 0, height: 0, zIndex: -99 }}
-      className="flex items-center gap-2"
+      className="relative flex items-center gap-2"
       layout
     >
       <div
@@ -111,6 +109,7 @@ const RangeLabelSelector = ({
 }: IRangeLabelSelector) => {
   const [value, updateValue] = useState(addIds(initialValue) || []);
   const [error, updateError] = useState<string>();
+  const controls = useDragControls();
 
   const checkDuplicates = (index: number) => {
     const tVal = value[index];
@@ -172,8 +171,6 @@ const RangeLabelSelector = ({
     pushUpdates(upd);
   };
 
-  const controls = useDragControls();
-
   return (
     <div className="flex flex-col gap-1">
       <div className="mb-1 flex w-fit flex-col items-center">
@@ -205,7 +202,6 @@ const RangeLabelSelector = ({
                   duplicate={checkDuplicates(index)}
                   update={(v) => changeByIndex(index, v)}
                   remove={() => removeByIndex(index)}
-                  controls={controls}
                 />
               );
             })}
