@@ -7,15 +7,19 @@ import clsx from "clsx";
 import { useUserSettingsSafe } from "src/helpers/userSettingsContext";
 import type { IUserSettings } from "@t/user";
 import Selector from "@components/_UI/Selector";
+import Button from "@components/_UI/Button";
 
 const SigOutButton = () => {
   return (
-    <div
+    <Button
+      theme="transparent"
+      size="s"
       onClick={() => void signOut()}
-      className="mt-1 w-full cursor-pointer whitespace-nowrap py-1 text-center text-sm font-normal hover:bg-neutral-200 dark:hover:bg-neutral-800"
+      className="mt-1 w-full text-center"
+      fill
     >
       Sign Out
-    </div>
+    </Button>
   );
 };
 

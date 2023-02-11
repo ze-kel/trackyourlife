@@ -32,6 +32,7 @@ type MakerProps<T> = {
 };
 type IndexGetter<T> = (i: number) => T;
 
+// Might be better to use Framer Motion Variants
 function makeIndexGetter<T>({
   center,
   oneOff,
@@ -177,7 +178,7 @@ const PopupSelector = ({ rangeMapping, onSelect }: PopupSelectorProps) => {
 
 const RangeClasses = cva(
   [
-    "group relative flex items-center justify-center font-light transition-colors",
+    "group w-full relative flex items-center justify-center font-light transition-colors ioutline-none focus:outline-neutral-300 dark:focus:outline-neutral-600",
   ],
   {
     variants: {
@@ -260,7 +261,8 @@ export const DayCellRange = ({ day, month, year, style }: IDayProps) => {
   };
 
   const visiblePart = (
-    <div
+    <button
+      tabIndex={inTrackRange ? 0 : -1}
       className={RangeClasses({
         inTrackRange,
         isToday,
@@ -282,7 +284,7 @@ export const DayCellRange = ({ day, month, year, style }: IDayProps) => {
       {dayValue && (
         <Emoji shortcodes={code} size={style === "mini" ? "14px" : "30px"} />
       )}
-    </div>
+    </button>
   );
 
   const selector = (

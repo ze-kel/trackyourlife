@@ -77,7 +77,7 @@ const Dropdown = ({
           className={clsx(
             "z-50",
             background &&
-              "rounded-sm border-2 bg-neutral-50 p-2 text-neutral-800 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-200"
+              "overflow-hidden rounded-sm border-2 bg-neutral-50 p-2 text-neutral-800 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-200"
           )}
           {...getFloatingProps()}
         >

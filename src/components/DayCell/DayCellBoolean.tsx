@@ -90,7 +90,7 @@ const Generated = (Object.keys(activeGen) as IColorOptions[]).reduce<
 
 const BooleanClasses = cva(
   [
-    "flex border-transparent transition-all duration-400 ease-in-out select-none",
+    "flex border-transparent transition-all duration-400 ease-in-out select-none outline-none focus:outline-neutral-300 dark:focus:outline-neutral-600",
   ],
   {
     variants: {
@@ -103,7 +103,7 @@ const BooleanClasses = cva(
         false: "",
       },
       isToday: {
-        true: "text-neutral-200",
+        true: "text-neutral-50",
         false: "text-neutral-100",
       },
       active: {
@@ -170,7 +170,8 @@ export const DayCellBoolean = ({ day, month, year, style }: IDayProps) => {
   };
 
   return (
-    <div
+    <button
+      tabIndex={inTrackRange ? 0 : -1}
       className={BooleanClasses({
         inTrackRange,
         isToday,
@@ -180,6 +181,7 @@ export const DayCellBoolean = ({ day, month, year, style }: IDayProps) => {
         themeInactive: trackable.settings.inactiveColor,
       })}
       key={day}
+      onMouseDown={(e) => e.preventDefault()}
       onClick={(e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -187,6 +189,6 @@ export const DayCellBoolean = ({ day, month, year, style }: IDayProps) => {
       }}
     >
       {day}
-    </div>
+    </button>
   );
 };

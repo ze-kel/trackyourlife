@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import type { ChangeEvent, KeyboardEvent, MouseEvent } from "react";
+import type { ChangeEvent, FocusEvent, KeyboardEvent, MouseEvent } from "react";
 import { useState, useEffect, useRef } from "react";
 
 interface IEditableTextBase {
@@ -37,7 +37,7 @@ const EditableText = ({
   const [waiting, setWaiting] = useState(false);
   const [focusNext, setFocusNext] = useState(false);
 
-  const goToEdit = (e: MouseEvent) => {
+  const goToEdit = (e: MouseEvent | FocusEvent) => {
     console.log("goToEdit");
     e.stopPropagation();
     setInputVal(value);
@@ -100,7 +100,12 @@ const EditableText = ({
   }
 
   return (
-    <div onClick={goToEdit} className={clsx(className, classNameText)}>
+    <div
+      tabIndex={0}
+      onFocus={goToEdit}
+      onClick={goToEdit}
+      className={clsx(className, classNameText)}
+    >
       {value}
     </div>
   );

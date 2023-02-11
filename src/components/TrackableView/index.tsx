@@ -188,41 +188,42 @@ const TrackableView = () => {
     <>
       <div className="mb-2 flex items-center justify-between">
         <div className="flex gap-2">
-          <div
+          <button
             onClick={() => increment(-1)}
             className="flex w-6 cursor-pointer rounded-full border p-0.5 transition-colors dark:border-neutral-500 dark:hover:border-neutral-50"
           >
             <IconChevronLeft className="-translate-x-[1px]" />
-          </div>
-          <div
+          </button>
+          <button
             onClick={() => increment(1)}
             className="flex w-6 cursor-pointer rounded-full border p-0.5 transition-colors dark:border-neutral-500 dark:hover:border-neutral-50"
           >
             <IconChevronRight className="translate-x-[1px]" />
-          </div>
+          </button>
           {view !== "years" && (
-            <span
+            <button
               onClick={() => setView("years")}
               className="cursor-pointer font-semibold"
             >
               {year}
-            </span>
+            </button>
           )}
 
           {view === "days" && (
             <>
               /
-              <span
+              <button
                 onClick={() => setView("months")}
                 className="cursor-pointer"
               >
                 {format(new Date(year, month, 1), "MMMM")}
-              </span>
+              </button>
             </>
           )}
         </div>
         <div>
-          <div
+          <button
+            tabIndex={isCurrentMonth ? -1 : 0}
             onClick={openCurrentMonth}
             className={clsx(
               "transition-colors",
@@ -232,7 +233,7 @@ const TrackableView = () => {
             )}
           >
             Today
-          </div>
+          </button>
         </div>
       </div>
       {view === "days" && <Month year={year} month={month} />}

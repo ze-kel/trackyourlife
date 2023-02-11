@@ -17,6 +17,8 @@ import IconChevronDown from "@heroicons/react/20/solid/ChevronDownIcon";
 import IconChevronRight from "@heroicons/react/20/solid/ChevronRightIcon";
 import IconChevronRightDouble from "@heroicons/react/20/solid/ChevronDoubleRightIcon";
 import Dropdown from "../Dropdown";
+import { AnimatePresence, motion } from "framer-motion";
+import useMeasure from "react-use-measure";
 
 const DatePicker = ({
   date,
@@ -39,6 +41,7 @@ const DatePicker = ({
   const [isOpened, setIsOpened] = useState(false);
 
   const [cursor, setCursor] = useState(startOfMonth(date || new Date()));
+  const [ref, bounds] = useMeasure();
 
   const toRender = getDaysInMonth(cursor);
   const dates = Array(toRender)
@@ -49,9 +52,12 @@ const DatePicker = ({
   const prefaceWith = getISODay(firstDayDate) - 1;
   const prepend = Array(prefaceWith).fill(0);
 
+  const [moveDirection, setMoveDirection] = useState(0);
+
   const moveCursorMonths = (n: number) => {
     const newDate = clamp(addMonths(cursor, n), limits);
     setCursor(newDate);
+    setMoveDirection(n < 0 ? -1 : 1);
   };
 
   const recordDate = (day: number) => {
@@ -86,68 +92,123 @@ const DatePicker = ({
   const highlightSeleted =
     date && isSameMonth(date, cursor) ? date.getDate() : -1;
 
+  const variants = {
+    enter: (d = 0) => {
+      return { x: `${100 * d}%`, opacity: 0 };
+    },
+    middle: () => {
+      return { x: "0%", opacity: 1 };
+    },
+    exit: (d = 0) => {
+      return { x: `${-100 * d}%`, opacity: 0 };
+    },
+  };
+
   const calendar = (
-    <div id="datePicker" className="flex w-fit flex-col">
-      <div className="flex w-full items-center justify-between py-2">
-        <div className="flex">
-          <IconChevronLeftDouble
-            className={clsx(
-              "w-7",
-              isSameMonth(limits.start, cursor)
-                ? "opacity-50"
-                : "cursor-pointer"
-            )}
-            onClick={() => moveCursorMonths(-12)}
-          />
-          <IconChevronLeft
-            className={clsx(
-              "w-7",
-              isSameMonth(limits.start, cursor)
-                ? "opacity-50"
-                : "cursor-pointer"
-            )}
-            onClick={() => moveCursorMonths(-1)}
-          />
-        </div>
-        <div className="select-none">{format(cursor, "MMMM yyyy")}</div>
-        <div className="flex">
-          <IconChevronRight
-            className={clsx(
-              "w-7",
-              isSameMonth(new Date(), cursor) ? "opacity-50" : "cursor-pointer"
-            )}
-            onClick={() => moveCursorMonths(1)}
-          />
-          <IconChevronRightDouble
-            className={clsx(
-              "w-7",
-              isSameMonth(limits.end, cursor) ? "opacity-50" : "cursor-pointer"
-            )}
-            onClick={() => moveCursorMonths(12)}
-          />
-        </div>
-      </div>
-      <div className={clsx("grid w-fit grid-cols-7 grid-rows-6 gap-1")}>
-        {prepend.map((_, i) => (
-          <div key={i}></div>
-        ))}
-        {dates.map((el) => (
-          <div
-            className={clsx(
-              "flex h-9 w-9 items-center justify-center rounded-full border-2 border-transparent transition-colors ",
-              el === highlightSeleted ? "border-lime-500" : "",
-              inLimit(el)
-                ? "cursor-pointer border-transparent hover:border-lime-500"
-                : "dark:text-neutral-800"
-            )}
-            key={`${cursor.getMonth()}-${el}`}
-            onClick={() => recordDate(el)}
-          >
-            {el}
+    <motion.div
+      animate={{ height: bounds.height > 0 ? bounds.height : undefined }}
+      transition={{ duration: 0.15, ease: "easeInOut" }}
+      className="flex w-fit flex-col overflow-hidden"
+    >
+      <div ref={ref}>
+        <div className="flex w-full items-center justify-between py-2">
+          <div className="flex">
+            <IconChevronLeftDouble
+              className={clsx(
+                "w-7",
+                isSameMonth(limits.start, cursor)
+                  ? "opacity-10"
+                  : "cursor-pointer"
+              )}
+              onClick={() => moveCursorMonths(-12)}
+            />
+            <IconChevronLeft
+              className={clsx(
+                "w-7",
+                isSameMonth(limits.start, cursor)
+                  ? "opacity-10"
+                  : "cursor-pointer"
+              )}
+              onClick={() => moveCursorMonths(-1)}
+            />
           </div>
-        ))}
+          <AnimatePresence
+            mode="popLayout"
+            initial={false}
+            custom={moveDirection * 0.1}
+          >
+            <motion.div
+              initial="enter"
+              animate="middle"
+              exit="exit"
+              transition={{ duration: 0.15, ease: "easeInOut" }}
+              variants={variants}
+              custom={moveDirection * 0.1}
+              key={cursor.toString()}
+              className="pointer-events-none select-none whitespace-nowrap"
+            >
+              {format(cursor, "MMMM yyyy")}
+            </motion.div>
+          </AnimatePresence>
+          <div className="flex">
+            <IconChevronRight
+              className={clsx(
+                "w-7",
+                isSameMonth(new Date(), cursor)
+                  ? "opacity-10"
+                  : "cursor-pointer"
+              )}
+              onClick={() => moveCursorMonths(1)}
+            />
+            <IconChevronRightDouble
+              className={clsx(
+                "w-7",
+                isSameMonth(new Date(), cursor)
+                  ? "opacity-10"
+                  : "cursor-pointer"
+              )}
+              onClick={() => moveCursorMonths(12)}
+            />
+          </div>
+        </div>
+
+        <AnimatePresence
+          mode="popLayout"
+          initial={false}
+          custom={moveDirection * 0.5}
+        >
+          <motion.div
+            initial="enter"
+            animate="middle"
+            exit="exit"
+            custom={moveDirection * 0.5}
+            transition={{ duration: 0.15, ease: "easeInOut" }}
+            className={clsx("grid w-fit grid-cols-7 gap-1")}
+            variants={variants}
+            key={cursor.toString()}
+          >
+            {prepend.map((_, i) => (
+              <div key={`${cursor.getMonth()}—prep—${i}`}></div>
+            ))}
+            {dates.map((el) => (
+              <div
+                className={clsx(
+                  "flex h-9 w-9 items-center justify-center rounded-full border-2 border-transparent transition-colors ",
+                  el === highlightSeleted ? "border-lime-500" : "",
+                  inLimit(el)
+                    ? "cursor-pointer border-transparent hover:border-lime-500"
+                    : "text-neutral-200 dark:text-neutral-800"
+                )}
+                key={`${cursor.getMonth()}-${el}`}
+                onClick={() => recordDate(el)}
+              >
+                {el}
+              </div>
+            ))}
+          </motion.div>
+        </AnimatePresence>
       </div>
-    </div>
+    </motion.div>
   );
 
   const opener = (
