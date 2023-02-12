@@ -40,7 +40,7 @@ const Generated = (Object.keys(activeGen) as IColorOptions[]).reduce<
 
 const NumberClasses = cva(
   [
-    "group relative flex items-center justify-center border-transparent font-light transition-colors",
+    "group relative flex items-center justify-center font-light transition-colors",
   ],
   {
     variants: {
