@@ -6,7 +6,7 @@ interface ButtonProps {
   onClick?: () => void;
   isActive?: boolean;
   children: ReactNode;
-  theme?: "default" | "inverted" | "outline";
+  theme?: "default" | "inverted" | "outline" | "transparent";
   size?: "s" | "m";
   className?: string;
   fill?: boolean;
@@ -32,9 +32,14 @@ const ButtonClasses = cva(
           "hover:bg-neutral-900, dark:hover:bg-neutral-300 hover:text-neutral-50 dark:hover:text-neutral-900",
           "disabled:text-neutral-700 disabled:bg-neutral-200",
         ],
+        transparent: [
+          "hover:bg-neutral-200 dark:hover:bg-neutral-800",
+          "hover:bg-neutral-200 dark:hover:bg-neutral-800",
+          "disabled:text-neutral-700 disabled:bg-neutral-200",
+        ],
       },
       size: {
-        s: "text-sm py-1 px-2 rounded",
+        s: "text-sm py-1 px-2 font-normal",
         m: "text-md py-2 px-4 font-semibold rounded-md",
       },
       fill: {

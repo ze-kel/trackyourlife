@@ -55,6 +55,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     transformer: superjson,
   });
 
+  await ssg.user.getUserSettings.fetch();
   await ssg.trackable.getTrackableById.prefetch(ctx.query.id as string);
 
   return {

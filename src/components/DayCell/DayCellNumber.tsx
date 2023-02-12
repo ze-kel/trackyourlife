@@ -10,9 +10,10 @@ import type { IDayProps } from "./index";
 import { computeDayCellHelpers } from "./index";
 import { ThemeList } from "./DayCellBoolean";
 import type { IColorOptions } from "@t/trackable";
+import { AnimatePresence, motion } from "framer-motion";
 
 const activeGen: Record<IColorOptions, string> = {
-  neutral: "border-neutral-500",
+  neutral: "border-neutral-500 dark:border-neutral-700",
   red: "border-red-500",
   pink: "border-pink-500",
   green: "border-green-500",
@@ -64,7 +65,7 @@ const NumberClasses = cva(
       },
       {
         inTrackRange: false,
-        className: "dark:border-neutral-800 border-neutral-100",
+        className: "border-transparent",
       },
       {
         inTrackRange: true,
@@ -103,6 +104,8 @@ export const DayCellNumber = ({ day, month, year, style }: IDayProps) => {
   const [displayedNumber, setDisplayedNumber] = useState(Number(number) || 0);
 
   const [inInputEdit, setInInputEdit] = useState(false);
+
+  const [isHover, setHover] = useState(false);
 
   const updateValue = async (value: number) => {
     await changeDay({
@@ -170,6 +173,8 @@ export const DayCellNumber = ({ day, month, year, style }: IDayProps) => {
         style,
       })}
       key={day}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
     >
       {style !== "mini" && (
         <span className="absolute top-1 left-2 select-none">{day}</span>
@@ -181,28 +186,60 @@ export const DayCellNumber = ({ day, month, year, style }: IDayProps) => {
             isNumber={true}
             updater={handleInputUpdate}
             className={cls(
-              "flex h-full w-full select-none items-center justify-center bg-inherit text-center font-semibold outline-none transition-colors",
+              "flex h-full w-full select-none items-center justify-center bg-inherit text-center font-semibold shadow-lg shadow-transparent outline-none transition-all",
               displayedNumber === 0 && !inInputEdit
                 ? "text-neutral-200 dark:text-neutral-800"
                 : "text-neutral-800 dark:text-neutral-300",
               style === "mini" ? "text-xs" : "text-xl"
             )}
-            classNameInput="focus:outline-neutral-900"
+            classNameInput="focus:outline-neutral-300 dark:focus:outline-neutral-600"
             editModeSetter={setInInputEdit}
           />
 
-          {!inInputEdit && style !== "mini" && (
-            <>
-              <IconMinus
-                onClick={handleMinus}
-                className="invisible absolute left-[50%] bottom-0 z-20 h-7 w-7 -translate-x-1/2 translate-y-1/2 cursor-pointer border border-neutral-500 bg-neutral-50 p-1 group-hover:visible dark:bg-neutral-900"
-              />
-              <IconPlus
-                onClick={handlePlus}
-                className="invisible absolute left-[50%] top-0 z-20 h-7 w-7 -translate-x-1/2 -translate-y-1/2 cursor-pointer  border border-neutral-500 bg-neutral-50 p-1 group-hover:visible dark:bg-neutral-900"
-              />
-            </>
-          )}
+          <AnimatePresence>
+            {!inInputEdit && isHover && style !== "mini" && (
+              <>
+                <motion.div
+                  className="absolute left-[50%] top-0 z-20"
+                  initial={{
+                    opacity: 0,
+                    translateY: "-25%",
+                    translateX: "-50%",
+                  }}
+                  animate={{
+                    opacity: 1,
+                    translateY: "-50%",
+                  }}
+                  exit={{ opacity: 0, translateY: "-25%" }}
+                  transition={{ duration: 0.2, opacity: { duration: 0.1 } }}
+                >
+                  <IconPlus
+                    onClick={handlePlus}
+                    className="h-6 w-6 cursor-pointer border border-neutral-500 bg-neutral-50 p-1 dark:bg-neutral-900"
+                  />
+                </motion.div>
+                <motion.div
+                  className="absolute left-[50%] bottom-0 z-20"
+                  initial={{
+                    opacity: 0,
+                    translateY: "25%",
+                    translateX: "-50%",
+                  }}
+                  animate={{
+                    opacity: 1,
+                    translateY: "50%",
+                  }}
+                  exit={{ opacity: 0, translateY: "25%" }}
+                  transition={{ duration: 0.2, opacity: { duration: 0.1 } }}
+                >
+                  <IconMinus
+                    onClick={handleMinus}
+                    className=" h-6 w-6 cursor-pointer border border-neutral-500 bg-neutral-50 p-1 dark:bg-neutral-900"
+                  />
+                </motion.div>
+              </>
+            )}
+          </AnimatePresence>
         </>
       )}
     </div>

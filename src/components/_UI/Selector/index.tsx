@@ -32,10 +32,10 @@ function DefaultSub<T>({
   return (
     <div
       className={cls(
-        "px-2 py-1  transition-colors",
+        "px-2 py-1 text-sm font-normal transition-colors",
         active
-          ? "cursor-default bg-neutral-800 text-neutral-50"
-          : "cursor-pointer bg-neutral-200 text-neutral-800 hover:bg-neutral-300"
+          ? "cursor-default bg-neutral-800 text-neutral-50 "
+          : "cursor-pointer text-neutral-800 hover:bg-neutral-300 dark:text-neutral-300 dark:hover:bg-neutral-600"
       )}
       onClick={() => onClick(option.value)}
     >
@@ -49,39 +49,8 @@ function Selector<T>({
   active,
   setter,
   Component = DefaultSub,
-  className = "flex w-fit overflow-hidden rounded-md",
+  className = "flex w-fit overflow-hidden rounded-sm border-neutral-300 dark:border-neutral-800 border",
 }: ISectorProps<T>) {
-  return (
-    <div className={className}>
-      {options.map((option, index) => {
-        return (
-          <Component
-            key={index}
-            active={option.value === active}
-            option={option}
-            onClick={setter}
-          />
-        );
-      })}
-    </div>
-  );
-}
-
-interface IHoldSectorProps<T> {
-  options: ISelectorOption<T>[];
-  active?: T;
-  setter: (v: T) => void;
-  Component: ISelectorComponent<T>;
-  className?: string;
-}
-
-export function HoldSelector<T>({
-  options,
-  active,
-  setter,
-  Component,
-  className = "flex w-fit overflow-hidden rounded-md",
-}: IHoldSectorProps<T>) {
   return (
     <div className={className}>
       {options.map((option, index) => {

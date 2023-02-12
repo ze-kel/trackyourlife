@@ -42,6 +42,8 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     transformer: superjson,
   });
 
+  await ssg.user.getUserSettings.fetch()
+
   const ids = await ssg.trackable.getAllIds.fetch();
   const promises: Promise<void>[] = [];
   ids.forEach((id) => {

@@ -49,6 +49,7 @@ model User {
     accounts      Account[]
     sessions      Session[]
     trackables    Trackable[]
+    settings Json @default("{}")
 }
 
 model VerificationToken {
@@ -76,7 +77,7 @@ model Trackable {
     user User @relation(fields: [userId], references: [id])
     type TrackableType
     data TrackableRecord[]    
-    settings Json 
+    settings Json @default("{}")
 }
 
 model TrackableRecord {

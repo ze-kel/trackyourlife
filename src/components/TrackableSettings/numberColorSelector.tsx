@@ -1,12 +1,13 @@
 import { PureInput } from "@components/_UI/Input";
-import type { IColorOptions, INumberSettings } from "@t/trackable";
-import { clamp, cloneDeep } from "lodash";
+import type { INumberSettings } from "@t/trackable";
+import { cloneDeep } from "lodash";
 import ColorSelector from "./colorSelector";
 import XIcon from "@heroicons/react/24/outline/XMarkIcon";
 import PlusIcon from "@heroicons/react/24/outline/PlusIcon";
 import { Fragment, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import type { ArrayElement } from "@t/helpers";
+import { AnimatePresence, motion } from "framer-motion";
 
 type IColorCodingValue = INumberSettings["colorCoding"];
 
@@ -43,7 +44,17 @@ const Pair = ({ value, onChange, remove }: INumberColorSelectorPair) => {
   };
 
   return (
-    <>
+    <motion.div
+      layout
+      transition={{
+        duration: 0.25,
+        opacity: { duration: 0.2, ease: "circIn" },
+      }}
+      initial={{ opacity: 0, y: 10, height: 0 }}
+      animate={{ opacity: 1, y: 0, height: "36px" }}
+      exit={{ opacity: 0, height: 0, zIndex: -99 }}
+      className="flex items-center gap-2"
+    >
       <PureInput
         type={"number"}
         value={String(fromInternal)}
@@ -54,12 +65,12 @@ const Pair = ({ value, onChange, remove }: INumberColorSelectorPair) => {
       />
       <ColorSelector active={value.color} onChange={(v) => changeColor(v)} />
       <div
-        className="col-start-3 col-end-3 flex w-10 cursor-pointer items-center justify-center"
+        className="flex w-7 cursor-pointer items-center justify-center"
         onClick={remove}
       >
-        <XIcon className="w-7 transition-colors dark:text-neutral-700 dark:hover:text-neutral-100" />
+        <XIcon className="w-7 text-neutral-300 transition-colors hover:text-neutral-800  dark:text-neutral-700 dark:hover:text-neutral-100" />
       </div>
-    </>
+    </motion.div>
   );
 };
 
@@ -73,6 +84,7 @@ const addIds = (value: IColorCodingValue = []) => {
   });
   return v2;
 };
+
 export interface INumberColorSelector {
   initialValue: IColorCodingValue;
   onChange: (a: IColorCodingValue) => void;
@@ -94,7 +106,7 @@ const NumberColorSelector = ({
     const v2 = cloneDeep(value);
     const before = v2[v2.length - 1];
     const from = before ? before.from + 1 : 0;
-    v2.push({ from, color: "neutral" });
+    v2.push({ from, color: "neutral", id: uuidv4() });
     recordUpdate(v2);
   };
 
@@ -116,30 +128,36 @@ const NumberColorSelector = ({
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="grid w-fit auto-cols-min items-center gap-x-2 gap-y-2">
-        {value.length > 0 && (
-          <>
-            <div className="text-sm text-neutral-300 dark:text-neutral-500">
-              When value {">="} than
-            </div>
-            <div className="text-sm text-neutral-300 dark:text-neutral-500">
-              Set color to
-            </div>
-            <div></div>
-          </>
-        )}
-        {value.map((el, index) => {
-          return (
-            <Pair
-              value={el}
-              onChange={(v: IColorCodingItem) => chagneByIndex(index, v)}
-              remove={() => removeByIndex(index)}
-              key={el.id || ""}
-            />
-          );
-        })}
+      <div className="flex w-fit flex-col items-center gap-2">
+        <div className="flex w-full gap-2 text-neutral-400 dark:text-neutral-500">
+          {value.length > 0 && (
+            <>
+              <div className="w-52 ">When value {">="} than</div>
+              <div>Set color to</div>
+              <div></div>
+            </>
+          )}
+        </div>
+        <motion.div
+          layout
+          transition={{ duration: 0.1 }}
+          className="flex flex-col gap-2"
+        >
+          <AnimatePresence initial={false}>
+            {value.map((el, index) => {
+              return (
+                <Pair
+                  value={el}
+                  onChange={(v: IColorCodingItem) => chagneByIndex(index, v)}
+                  remove={() => removeByIndex(index)}
+                  key={el.id || ""}
+                />
+              );
+            })}
+          </AnimatePresence>
+        </motion.div>
         <div
-          className="flex cursor-pointer justify-center whitespace-nowrap text-neutral-300 transition-colors dark:text-neutral-700 dark:hover:text-neutral-100"
+          className="flex cursor-pointer justify-center whitespace-nowrap text-neutral-300 transition-colors hover:text-neutral-800 dark:text-neutral-700 dark:hover:text-neutral-100"
           onClick={() => addNew()}
         >
           <PlusIcon className="mr-1 w-4" />

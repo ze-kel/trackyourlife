@@ -1,0 +1,8 @@
+.miniScrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.miniScrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
