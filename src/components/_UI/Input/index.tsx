@@ -38,7 +38,7 @@ export const PureInput = ({
       <input
         className={clsx(
           className,
-          "transition-color w-full rounded-sm border-2 border-neutral-300 bg-neutral-50 py-1 px-2 outline-none focus:border-neutral-800 dark:border-neutral-800 dark:bg-neutral-900 dark:focus:border-neutral-600",
+          "transition-color rounded-sm border-2 border-neutral-300 bg-neutral-50 py-1 px-2 outline-none focus:border-neutral-800 dark:border-neutral-800 dark:bg-neutral-900 dark:focus:border-neutral-600",
           isValid &&
             "border-lime-500 focus:border-lime-600 dark:border-lime-500 dark:focus:border-lime-600",
           error &&

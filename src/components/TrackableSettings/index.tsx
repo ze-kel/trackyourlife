@@ -12,6 +12,7 @@ import { useState } from "react";
 import { useTrackableSafe } from "src/helpers/trackableContext";
 import ColorSelector from "./colorSelector";
 import NumberColorSelector from "./numberColorSelector";
+import NumberLimitsSelector from "./numberLimitsSelector";
 import RangeLabelSelector from "./rangeLabelSelector";
 
 interface ISubSettingsProps<T> {
@@ -88,6 +89,9 @@ const SettingsNumber = ({
   const changeColorCoding = (v: (typeof settings)["colorCoding"]) => {
     setSettings({ ...settings, colorCoding: v });
   };
+  const changeLimits = (v: (typeof settings)["limits"]) => {
+    setSettings({ ...settings, limits: v });
+  };
 
   return (
     <div className="flex flex-col gap-2">
@@ -97,6 +101,15 @@ const SettingsNumber = ({
           date={settings.startDate}
           onChange={changeStartDate}
           limits={{ start: new Date(1990, 0, 1), end: new Date() }}
+          className="mt-2"
+        />
+      </div>
+
+      <div>
+        <h3 className="text-xl">Limits</h3>
+        <NumberLimitsSelector
+          value={settings.limits}
+          onChange={changeLimits}
           className="mt-2"
         />
       </div>

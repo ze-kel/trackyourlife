@@ -1,7 +1,7 @@
 import cls from "clsx";
 import React, { useCallback, useMemo, useState } from "react";
 import { useTrackableSafe } from "../../helpers/trackableContext";
-import { debounce } from "lodash";
+import { clamp, debounce } from "lodash";
 import EditableText from "@components/_UI/EditableText";
 import IconPlus from "@heroicons/react/24/outline/PlusIcon";
 import IconMinus from "@heroicons/react/24/outline/MinusIcon";
@@ -9,7 +9,7 @@ import { cva } from "class-variance-authority";
 import type { IDayProps } from "./index";
 import { computeDayCellHelpers } from "./index";
 import { ThemeList } from "./DayCellBoolean";
-import type { IColorOptions } from "@t/trackable";
+import type { IColorOptions, INumberSettings } from "@t/trackable";
 import { AnimatePresence, motion } from "framer-motion";
 
 const activeGen: Record<IColorOptions, string> = {
@@ -23,16 +23,29 @@ const activeGen: Record<IColorOptions, string> = {
   lime: "border-lime-500",
 };
 
+const activeGenProgress: Record<IColorOptions, string> = {
+  neutral: "bg-neutral-500 dark:bg-neutral-700",
+  red: "bg-red-500",
+  pink: "bg-pink-500",
+  green: "bg-green-500",
+  blue: "bg-blue-500",
+  orange: "bg-orange-500",
+  purple: "bg-purple-500",
+  lime: "bg-lime-500",
+};
+
 const Generated = (Object.keys(activeGen) as IColorOptions[]).reduce<
   {
     colorCode?: IColorOptions;
     inTrackRange?: boolean;
+    progress: boolean;
     className: string;
   }[]
 >((acc, key) => {
   acc.push({
     colorCode: key,
     inTrackRange: true,
+    progress: false,
     className: activeGen[key],
   });
   return acc;
@@ -55,6 +68,9 @@ const NumberClasses = cva(
       },
       isToday: {
         true: "text-neutral-400",
+      },
+      progress: {
+        true: "border-neutral-300 dark:border-neutral-800",
       },
       colorCode: ThemeList,
     },
@@ -80,6 +96,24 @@ const NumberClasses = cva(
     },
   }
 );
+
+const getProgress = (
+  limits: INumberSettings["limits"],
+  val: number | undefined
+) => {
+  if (
+    !limits ||
+    !limits.showProgress ||
+    typeof limits.max === "undefined" ||
+    typeof limits.min === "undefined" ||
+    typeof val === "undefined"
+  ) {
+    return null;
+  }
+  return Math.round(
+    (clamp(val, limits.min, limits.max) / (limits.max - limits.min)) * 100
+  );
+};
 
 export const DayCellNumber = ({ day, month, year, style }: IDayProps) => {
   const { trackable, changeDay } = useTrackableSafe();
@@ -117,6 +151,8 @@ export const DayCellNumber = ({ day, month, year, style }: IDayProps) => {
     });
   };
 
+  const progress = getProgress(trackable.settings.limits, displayedNumber);
+
   const findTheme = (): IColorOptions | undefined => {
     const cc = trackable.settings.colorCoding;
     if (!cc || !cc.length) return;
@@ -136,6 +172,8 @@ export const DayCellNumber = ({ day, month, year, style }: IDayProps) => {
 
     return result;
   };
+
+  const theme = findTheme();
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedUpdateValue = useCallback(debounce(updateValue, 400), [
@@ -169,13 +207,24 @@ export const DayCellNumber = ({ day, month, year, style }: IDayProps) => {
       className={NumberClasses({
         inTrackRange,
         isToday,
-        colorCode: findTheme(),
+        colorCode: theme,
         style,
+        progress: progress !== null,
       })}
       key={day}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
+      {progress !== null && (
+        <div
+          className={cls(
+            "z-1 absolute bottom-0 w-full transition-colors ",
+            activeGenProgress[theme || "neutral"]
+          )}
+          style={{ height: `${progress}%` }}
+        ></div>
+      )}
+
       {style !== "mini" && (
         <span className="absolute top-1 left-2 select-none">{day}</span>
       )}
@@ -186,7 +235,7 @@ export const DayCellNumber = ({ day, month, year, style }: IDayProps) => {
             isNumber={true}
             updater={handleInputUpdate}
             className={cls(
-              "flex h-full w-full select-none items-center justify-center bg-inherit text-center font-semibold shadow-lg shadow-transparent outline-none transition-all",
+              "z-10 flex h-full w-full select-none items-center justify-center bg-inherit text-center font-semibold outline-none transition-all",
               displayedNumber === 0 && !inInputEdit
                 ? "text-neutral-200 dark:text-neutral-800"
                 : "text-neutral-800 dark:text-neutral-300",

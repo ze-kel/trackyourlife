@@ -34,6 +34,7 @@ export const ZTrackableSettingsNumber = z.object({
     .object({
       min: z.number().optional(),
       max: z.number().optional(),
+      showProgress: z.boolean().optional(),
     })
     .optional(),
   colorCoding: z
