@@ -6,7 +6,7 @@ import { SessionProvider } from "next-auth/react";
 
 import { api } from "../utils/api";
 
-import { Poppins } from "@next/font/google";
+import { Poppins } from "next/font/google";
 import { init } from "emoji-mart";
 import data from "@emoji-mart/data";
 import { useEffect } from "react";
