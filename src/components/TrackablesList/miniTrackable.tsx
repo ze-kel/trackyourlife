@@ -34,22 +34,34 @@ const MiniTrackable = ({ className }: { className?: string }) => {
   const daysToRender = useMemo(() => generateDates(6), []);
 
   return (
-    <div className={clsx("grid grid-cols-7 gap-x-2 gap-y-1", className)}>
+    <div
+      className={clsx(
+        "sm grid grid-cols-3 gap-x-1 gap-y-1 md:grid-cols-7",
+        className
+      )}
+    >
       <>
         {daysToRender.map((day, index) => {
           const date = new Date(day.year, day.month, day.day);
           return (
-            <div key={index} className="px-1 text-xs ">
-              <span className="text-neutral-400 dark:text-neutral-600">
-                {format(date, "E")}
-              </span>
+            <div
+              key={index}
+              className={clsx(
+                "gap-1",
+                index === 0 ? "hidden md:flex" : "flex",
+                index > 3 ? "flex-col-reverse md:flex-col" : "flex-col"
+              )}
+            >
+              <div className="px-1 text-xs ">
+                <span className="text-neutral-400 dark:text-neutral-700">
+                  {format(date, "EEEE")}
+                </span>
+              </div>
+
+              <DayCell {...day} key={index} />
             </div>
           );
         })}
-
-        {daysToRender.map((day, index) => (
-          <DayCell {...day} key={index} />
-        ))}
       </>
     </div>
   );

@@ -274,7 +274,9 @@ export const DayCellRange = ({ day, month, year, style }: IDayProps) => {
         <span
           className={clsx(
             "select-none",
-            style === "mini" ? "" : "absolute top-1 left-2 "
+            style === "mini"
+              ? ""
+              : "absolute top-1 left-2 select-none text-xs sm:text-base"
           )}
         >
           {day}

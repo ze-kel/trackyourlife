@@ -226,7 +226,9 @@ export const DayCellNumber = ({ day, month, year, style }: IDayProps) => {
       )}
 
       {style !== "mini" && (
-        <span className="absolute top-1 left-2 select-none">{day}</span>
+        <span className="absolute top-1 left-2 select-none text-xs sm:text-base">
+          {day}
+        </span>
       )}
       {inTrackRange && (
         <>
