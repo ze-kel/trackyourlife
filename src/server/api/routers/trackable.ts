@@ -4,7 +4,7 @@ import { z } from "zod";
 
 import { prisma } from "../../db";
 
-import type { ITrackable } from "src/types/trackable";
+import { ITrackable, ZTrackableSettingsBase } from "src/types/trackable";
 
 import { format } from "date-fns";
 import {
@@ -13,7 +13,7 @@ import {
   ZTrackableSettingsRange,
   ZTrackableUpdate,
 } from "src/types/trackable";
-import type { Prisma } from "@prisma/client";
+import type { Prisma, Trackable } from "@prisma/client";
 
 export const trackableToCreate = z.discriminatedUnion("type", [
   z.object({
@@ -31,9 +31,10 @@ export const trackableToCreate = z.discriminatedUnion("type", [
 ]);
 
 export const trackableRouter = createTRPCRouter({
-  getAllIds: protectedProcedure.query(async ({ ctx }) => {
+  getIds: protectedProcedure.query(async ({ ctx }) => {
     const userId = ctx.session.user.id;
     const entries = await prisma.trackable.findMany({ where: { userId } });
+
     return entries.map((entry) => entry.id);
   }),
 

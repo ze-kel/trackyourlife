@@ -11,7 +11,7 @@ import Link from "next/link";
 import PlusIcon from "@heroicons/react/24/outline/PlusCircleIcon";
 
 const AppHome = () => {
-  const { data } = api.trackable.getAllIds.useQuery();
+  const { data } = api.trackable.getIds.useQuery();
 
   return (
     <Page>
@@ -42,9 +42,9 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     transformer: superjson,
   });
 
-  await ssg.user.getUserSettings.fetch()
+  await ssg.user.getUserSettings.fetch();
 
-  const ids = await ssg.trackable.getAllIds.fetch();
+  const ids = await ssg.trackable.getIds.fetch();
   const promises: Promise<void>[] = [];
   ids.forEach((id) => {
     promises.push(ssg.trackable.getTrackableById.prefetch(id));

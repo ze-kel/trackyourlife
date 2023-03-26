@@ -193,10 +193,12 @@ const DatePicker = ({
             {dates.map((el) => (
               <div
                 className={clsx(
-                  "flex h-9 w-9 items-center justify-center rounded-full border-2 border-transparent transition-colors ",
-                  el === highlightSeleted ? "border-lime-500" : "",
+                  "flex h-9 w-9 items-center justify-center rounded-full border-2 transition-colors ",
+                  el === highlightSeleted
+                    ? "border-lime-500"
+                    : "border-transparent",
                   inLimit(el)
-                    ? "cursor-pointer border-transparent hover:border-lime-500"
+                    ? "cursor-pointer hover:border-lime-500"
                     : "text-neutral-200 dark:text-neutral-800"
                 )}
                 key={`${cursor.getMonth()}-${el}`}

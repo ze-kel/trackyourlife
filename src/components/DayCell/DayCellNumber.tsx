@@ -52,9 +52,7 @@ const Generated = (Object.keys(activeGen) as IColorOptions[]).reduce<
 }, []);
 
 const NumberClasses = cva(
-  [
-    "group relative flex items-center justify-center font-light transition-colors",
-  ],
+  ["group relative items-center justify-center font-light transition-colors"],
   {
     variants: {
       style: {
@@ -93,6 +91,7 @@ const NumberClasses = cva(
 
     defaultVariants: {
       style: "default",
+      colorCode: "neutral",
     },
   }
 );
@@ -119,7 +118,7 @@ export const DayCellNumber = ({ day, month, year, style }: IDayProps) => {
   const { trackable, changeDay } = useTrackableSafe();
 
   if (trackable.type !== "number") {
-    throw new Error("Not boolena trackable passed to boolean dayCell");
+    throw new Error("Not number trackable passed to number dayCell");
   }
 
   const { dateKey, inTrackRange, isToday } = useMemo(
@@ -183,14 +182,14 @@ export const DayCellNumber = ({ day, month, year, style }: IDayProps) => {
   ]);
 
   const handlePlus = (e: React.MouseEvent) => {
-    e.preventDefault();
     e.stopPropagation();
+    e.preventDefault();
     setDisplayedNumber(displayedNumber + 1);
     void debouncedUpdateValue(displayedNumber + 1);
   };
   const handleMinus = (e: React.MouseEvent) => {
-    e.preventDefault();
     e.stopPropagation();
+    e.preventDefault();
     setDisplayedNumber(displayedNumber - 1);
     void debouncedUpdateValue(displayedNumber - 1);
   };
@@ -201,7 +200,6 @@ export const DayCellNumber = ({ day, month, year, style }: IDayProps) => {
       void debouncedUpdateValue(val);
     }
   };
-
   return (
     <div
       className={NumberClasses({
@@ -218,7 +216,7 @@ export const DayCellNumber = ({ day, month, year, style }: IDayProps) => {
       {progress !== null && (
         <div
           className={cls(
-            "z-1 absolute bottom-0 w-full transition-colors ",
+            "z-1 absolute bottom-0 w-full transition-all",
             activeGenProgress[theme || "neutral"]
           )}
           style={{ height: `${progress}%` }}
@@ -236,6 +234,7 @@ export const DayCellNumber = ({ day, month, year, style }: IDayProps) => {
             value={displayedNumber || 0}
             isNumber={true}
             updater={handleInputUpdate}
+            saveOnChange={true}
             className={cls(
               "z-10 flex h-full w-full select-none items-center justify-center bg-inherit text-center font-semibold outline-none transition-all",
               displayedNumber === 0 && !inInputEdit
@@ -246,7 +245,6 @@ export const DayCellNumber = ({ day, month, year, style }: IDayProps) => {
             classNameInput="focus:outline-neutral-300 dark:focus:outline-neutral-600"
             editModeSetter={setInInputEdit}
           />
-
           <AnimatePresence>
             {!inInputEdit && isHover && style !== "mini" && (
               <>
