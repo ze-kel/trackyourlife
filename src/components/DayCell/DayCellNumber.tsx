@@ -236,7 +236,7 @@ export const DayCellNumber = ({ day, month, year, style }: IDayProps) => {
             updater={handleInputUpdate}
             saveOnChange={true}
             className={cls(
-              "z-10 flex h-full w-full select-none items-center justify-center bg-inherit text-center font-semibold outline-none transition-all",
+              "relative z-10 flex h-full w-full select-none items-center justify-center bg-inherit text-center font-semibold outline-none transition-all",
               displayedNumber === 0 && !inInputEdit
                 ? "text-neutral-200 dark:text-neutral-800"
                 : "text-neutral-800 dark:text-neutral-300",
