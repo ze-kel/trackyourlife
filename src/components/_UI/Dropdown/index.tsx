@@ -10,6 +10,7 @@ import {
   useDismiss,
 } from "@floating-ui/react";
 import clsx from "clsx";
+import { AnimatePresence, motion } from "framer-motion";
 
 export interface IDropdown {
   mainPart: React.ReactNode;
@@ -66,23 +67,33 @@ const Dropdown = ({
         {mainPart}
       </div>
       {visible && (
-        <div
-          ref={refs.setFloating}
-          style={{
-            position: strategy,
-            top: y ?? 0,
-            left: x ?? 0,
-            width: "max-content",
-          }}
-          className={clsx(
-            "z-50",
-            background &&
-              "overflow-hidden rounded-sm border-2 bg-neutral-50 p-2 text-neutral-800 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-200"
-          )}
-          {...getFloatingProps()}
-        >
-          {hiddenPart}
-        </div>
+        <AnimatePresence>
+          <motion.div
+            ref={refs.setFloating}
+            initial={{
+              opacity: 0,
+            }}
+            animate={{
+              opacity: 1,
+            }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.1 }}
+            style={{
+              position: strategy,
+              top: y ?? 0,
+              left: x ?? 0,
+              width: "max-content",
+            }}
+            className={clsx(
+              "z-50",
+              background &&
+                "overflow-hidden rounded-sm border-2 bg-neutral-50 p-2 text-neutral-800 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-200"
+            )}
+            {...getFloatingProps()}
+          >
+            {hiddenPart}
+          </motion.div>
+        </AnimatePresence>
       )}
     </>
   );
