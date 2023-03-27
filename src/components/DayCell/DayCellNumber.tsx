@@ -11,6 +11,7 @@ import { computeDayCellHelpers } from "./index";
 import { ThemeList } from "./DayCellBoolean";
 import type { IColorOptions, INumberSettings } from "@t/trackable";
 import { AnimatePresence, motion } from "framer-motion";
+import DayNumber from "@components/DayCell/dayNumber";
 
 const activeGen: Record<IColorOptions, string> = {
   neutral: "border-neutral-500 dark:border-neutral-700",
@@ -64,9 +65,6 @@ const NumberClasses = cva(
         false:
           "bg-neutral-100 text-neutral-300 dark:bg-neutral-900 dark:text-neutral-800",
       },
-      isToday: {
-        true: "text-neutral-400",
-      },
       progress: {
         true: "border-neutral-300 dark:border-neutral-800",
       },
@@ -74,17 +72,8 @@ const NumberClasses = cva(
     },
     compoundVariants: [
       {
-        inTrackRange: true,
-        className: "text-neutral-500  dark:text-neutral-700",
-      },
-      {
         inTrackRange: false,
         className: "border-transparent",
-      },
-      {
-        inTrackRange: true,
-        isToday: false,
-        className: "text-neutral-500 dark:text-neutral-700",
       },
       ...Generated,
     ],
@@ -204,7 +193,6 @@ export const DayCellNumber = ({ day, month, year, style }: IDayProps) => {
     <div
       className={NumberClasses({
         inTrackRange,
-        isToday,
         colorCode: theme,
         style,
         progress: progress !== null,
@@ -223,11 +211,7 @@ export const DayCellNumber = ({ day, month, year, style }: IDayProps) => {
         ></div>
       )}
 
-      {style !== "mini" && (
-        <span className="absolute top-1 left-2 select-none text-xs sm:text-base">
-          {day}
-        </span>
-      )}
+      <DayNumber style={style} day={day} isToday={isToday} />
       {inTrackRange && (
         <>
           <EditableText

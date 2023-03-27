@@ -11,6 +11,7 @@ import style from "./curstomScrollbar.module.css";
 import type { IRangeSettings } from "@t/trackable";
 import clsx from "clsx";
 import { AnimatePresence, motion } from "framer-motion";
+import DayNumber from "@components/DayCell/dayNumber";
 
 interface PopupSelectorProps {
   rangeMapping: IRangeSettings["labels"];
@@ -187,9 +188,6 @@ const RangeClasses = cva(
         false:
           "bg-neutral-100 text-neutral-300 dark:bg-neutral-900 dark:text-neutral-800 border-transparent",
       },
-      isToday: {
-        true: "text-neutral-400",
-      },
       style: {
         default: "h-16 border-2",
         mini: "h-6 border text-xs",
@@ -200,18 +198,6 @@ const RangeClasses = cva(
       {
         inTrackRange: true,
         className: "text-neutral-500  dark:text-neutral-700",
-      },
-      {
-        inTrackRange: true,
-        isToday: false,
-        style: "default",
-        className: "text-neutral-500 dark:text-neutral-700",
-      },
-      {
-        inTrackRange: true,
-        isToday: false,
-        style: "mini",
-        className: "text-neutral-500  dark:text-neutral-800",
       },
     ],
     defaultVariants: {
@@ -265,23 +251,11 @@ export const DayCellRange = ({ day, month, year, style }: IDayProps) => {
       tabIndex={inTrackRange ? 0 : -1}
       className={RangeClasses({
         inTrackRange,
-        isToday,
         style,
       })}
       key={day}
     >
-      {(style !== "mini" || !dayValue) && (
-        <span
-          className={clsx(
-            "select-none",
-            style === "mini"
-              ? ""
-              : "absolute top-1 left-2 select-none text-xs sm:text-base"
-          )}
-        >
-          {day}
-        </span>
-      )}
+      <DayNumber style={style} day={day} isToday={isToday} />
 
       {dayValue && (
         <Emoji shortcodes={code} size={style === "mini" ? "14px" : "30px"} />

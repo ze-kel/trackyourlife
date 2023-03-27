@@ -1,9 +1,13 @@
-import { useMemo } from "react";
+import { MouseEvent, useMemo, useState } from "react";
 import { useTrackableSafe } from "../../helpers/trackableContext";
 import type { IDayProps } from "./index";
 import { computeDayCellHelpers } from "./index";
+import cls from "clsx";
 import { cva } from "class-variance-authority";
 import type { IColorOptions } from "src/types/trackable";
+import { AnimatePresence, motion } from "framer-motion";
+import DayNumber from "@components/DayCell/dayNumber";
+import { clamp } from "lodash";
 
 export const ThemeList: Record<IColorOptions, ""> = {
   neutral: "",
@@ -18,100 +22,57 @@ export const ThemeList: Record<IColorOptions, ""> = {
 
 const activeGen: Record<IColorOptions, Record<"bg" | "hover", string>> = {
   neutral: {
-    bg: "bg-neutral-200 dark:bg-neutral-700 dark:text-neutral-900",
-    hover: "hover:text-neutral-700",
+    bg: "bg-neutral-200 dark:bg-neutral-700",
+    hover: "hover:border-neutral-700",
   },
   red: {
     bg: "bg-red-500",
-    hover: "hover:text-red-500",
+    hover: "hover:border-red-500",
   },
   pink: {
     bg: "bg-pink-500",
-    hover: "hover:text-pink-500",
+    hover: "hover:border-pink-500",
   },
   green: {
     bg: "bg-green-500",
-    hover: "hover:text-green-500",
+    hover: "hover:border-green-500",
   },
   blue: {
     bg: "bg-blue-500",
-    hover: "hover:text-blue-500",
+    hover: "hover:border-blue-500",
   },
   orange: {
     bg: "bg-orange-500",
-    hover: "hover:text-orange-500",
+    hover: "hover:border-orange-500",
   },
   purple: {
     bg: "bg-purple-500",
-    hover: "hover:text-purple-500",
+    hover: "hover:border-purple-500",
   },
   lime: {
-    bg: "bg-lime-500 text-lime-700",
-    hover: "hover:text-lime-500 dark:hover:text-lime-500",
+    bg: "bg-lime-500",
+    hover: "hover:border-lime-500",
   },
 };
 
-const Generated = (Object.keys(activeGen) as IColorOptions[]).reduce<
-  {
-    active?: boolean;
-    themeActive?: IColorOptions;
-    themeInactive?: IColorOptions;
-    inTrackRange?: boolean;
-    className: string;
-  }[]
->((acc, key) => {
-  acc.push({
-    active: true,
-    themeActive: key,
-    inTrackRange: true,
-    className: activeGen[key].bg,
-  });
-  acc.push({
-    active: false,
-    themeActive: key,
-    inTrackRange: true,
-    className: activeGen[key].hover,
-  });
-  acc.push({
-    active: true,
-    themeInactive: key,
-    inTrackRange: true,
-    className: activeGen[key].hover,
-  });
-  acc.push({
-    active: false,
-    themeInactive: key,
-    inTrackRange: true,
-    className: activeGen[key].bg,
-  });
-
-  return acc;
-}, []);
-
 const BooleanClasses = cva(
   [
-    "flex border-transparent transition-all duration-400 ease-in-out select-none outline-none focus:outline-neutral-300 dark:focus:outline-neutral-600",
+    "relative border-2 overflow-hidden border-transparent transition-all duration-400 ease-in-out select-none outline-none focus:outline-neutral-300 dark:focus:outline-neutral-600",
   ],
   {
     variants: {
       style: {
-        default: "h-16 items-center justify-center text-xl font-semibold",
-        mini: "text-xs h-6 justify-center items-center font-light border",
+        default: "h-16",
+        mini: "h-6 border",
       },
       inTrackRange: {
         true: "cursor-pointer",
-        false: "",
-      },
-      isToday: {
-        true: "text-neutral-50",
-        false: "text-neutral-100",
+        false: "cursor-default",
       },
       active: {
         true: "",
         false: "",
       },
-      themeActive: ThemeList,
-      themeInactive: ThemeList,
     },
     compoundVariants: [
       {
@@ -122,21 +83,17 @@ const BooleanClasses = cva(
       {
         active: false,
         inTrackRange: false,
-        className:
-          "bg-neutral-100 text-neutral-300 dark:bg-neutral-900 dark:text-neutral-800",
+        className: "bg-neutral-100  dark:bg-neutral-900",
       },
-      { inTrackRange: true, style: "default", className: "hover:text-2xl" },
-      { inTrackRange: true, style: "mini", className: "" },
-
-      ...Generated,
     ],
     defaultVariants: {
       style: "default",
-      themeActive: "green",
-      themeInactive: "neutral",
     },
   }
 );
+
+const ANIMATION_TIME = 0.3;
+const EASE = [0, 0.3, 0.48, 0.9];
 
 export const DayCellBoolean = ({ day, month, year, style }: IDayProps) => {
   const { trackable, changeDay } = useTrackableSafe();
@@ -158,7 +115,27 @@ export const DayCellBoolean = ({ day, month, year, style }: IDayProps) => {
 
   const isActive = trackable.data[dateKey] === "true";
 
-  const handleClick = async () => {
+  // Point where click happened in % relative to button box. Used for animation
+  const [clickPoint, setClickPoint] = useState([50, 50]);
+  // Ration between width and height of the box.
+  const [whRatio, setWhRatio] = useState(1);
+
+  const handleClick = async (e: MouseEvent) => {
+    e.preventDefault();
+
+    const t = e.target as HTMLElement;
+    const rect = t.getBoundingClientRect();
+    if (e.clientX === 0 && e.clientY === 0) {
+      // keyboard click
+      setClickPoint([50, 50]);
+    } else {
+      console.log("a", (e.clientX - rect.left) / rect.width);
+      const x = clamp((e.clientX - rect.left) / rect.width, 0, 1);
+      const y = clamp((e.clientY - rect.top) / rect.height, 0, 1);
+      setClickPoint([x * 100, y * 100]);
+    }
+    setWhRatio(rect.height / rect.width);
+
     if (!inTrackRange) return;
     await changeDay({
       id: trackable.id,
@@ -169,26 +146,106 @@ export const DayCellBoolean = ({ day, month, year, style }: IDayProps) => {
     });
   };
 
+  const themeActive = trackable.settings.activeColor
+    ? activeGen[trackable.settings.activeColor].bg
+    : "";
+
+  const themeInactive = trackable.settings.inactiveColor
+    ? activeGen[trackable.settings.inactiveColor].bg
+    : "";
+
   return (
     <button
       tabIndex={inTrackRange ? 0 : -1}
       className={BooleanClasses({
         inTrackRange,
-        isToday,
         active: isActive,
         style,
-        themeActive: trackable.settings.activeColor,
-        themeInactive: trackable.settings.inactiveColor,
       })}
       key={day}
       onMouseDown={(e) => e.preventDefault()}
-      onClick={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        void handleClick();
-      }}
+      onClick={(e) => void handleClick(e)}
     >
-      {day}
+      <AnimatePresence>
+        {isActive && (
+          <>
+            <div
+              className={cls(
+                "absolute left-0 top-0 h-full  w-full",
+                themeInactive
+              )}
+            ></div>
+            <motion.div
+              initial={{
+                scaleX: 0,
+                scaleY: 0,
+              }}
+              animate={{
+                scaleX: 1.2,
+                scaleY: 1.2,
+              }}
+              transition={{
+                duration: ANIMATION_TIME,
+                ease: EASE,
+                scaleY: {
+                  duration: ANIMATION_TIME * whRatio,
+                  ease: EASE,
+                },
+              }}
+              className={cls(
+                "absolute left-0 top-0 h-full  w-full",
+                themeActive
+              )}
+              style={{
+                transformOrigin: `
+              ${clickPoint[0] || 50}% ${clickPoint[1] || 50}%`,
+              }}
+            />
+          </>
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {!isActive && (
+          <>
+            <div
+              className={cls(
+                "absolute left-0 top-0 h-full  w-full",
+                themeActive
+              )}
+            ></div>
+            <motion.div
+              initial={{
+                scaleX: 0,
+                scaleY: 0,
+              }}
+              animate={{
+                scaleX: 1.2,
+                scaleY: 1.2,
+              }}
+              transition={{
+                duration: ANIMATION_TIME,
+                ease: EASE,
+                scaleY: {
+                  duration: ANIMATION_TIME * whRatio,
+                  ease: EASE,
+                },
+              }}
+              className={cls(
+                "absolute left-0 top-0 h-full  w-full",
+                themeInactive
+              )}
+              style={{
+                transformOrigin: `
+              ${clickPoint[0] || 50}% ${clickPoint[1] || 50}%`,
+              }}
+            />
+          </>
+        )}
+      </AnimatePresence>
+
+      <DayNumber style={style} day={day} isToday={isToday} />
     </button>
   );
 };
+
+//[0, 0.3, 0.48, 0.9]
