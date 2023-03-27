@@ -11,6 +11,7 @@ import { computeDayCellHelpers } from "./index";
 import { ThemeList } from "./DayCellBoolean";
 import type { IColorOptions, INumberSettings } from "@t/trackable";
 import { AnimatePresence, motion } from "framer-motion";
+import DayNumber from "@components/DayCell/dayNumber";
 
 const activeGen: Record<IColorOptions, string> = {
   neutral: "border-neutral-500 dark:border-neutral-700",
@@ -52,9 +53,7 @@ const Generated = (Object.keys(activeGen) as IColorOptions[]).reduce<
 }, []);
 
 const NumberClasses = cva(
-  [
-    "group relative flex items-center justify-center font-light transition-colors",
-  ],
+  ["group relative items-center justify-center font-light transition-colors"],
   {
     variants: {
       style: {
@@ -66,9 +65,6 @@ const NumberClasses = cva(
         false:
           "bg-neutral-100 text-neutral-300 dark:bg-neutral-900 dark:text-neutral-800",
       },
-      isToday: {
-        true: "text-neutral-400",
-      },
       progress: {
         true: "border-neutral-300 dark:border-neutral-800",
       },
@@ -76,23 +72,15 @@ const NumberClasses = cva(
     },
     compoundVariants: [
       {
-        inTrackRange: true,
-        className: "text-neutral-500  dark:text-neutral-700",
-      },
-      {
         inTrackRange: false,
         className: "border-transparent",
-      },
-      {
-        inTrackRange: true,
-        isToday: false,
-        className: "text-neutral-500 dark:text-neutral-700",
       },
       ...Generated,
     ],
 
     defaultVariants: {
       style: "default",
+      colorCode: "neutral",
     },
   }
 );
@@ -119,7 +107,7 @@ export const DayCellNumber = ({ day, month, year, style }: IDayProps) => {
   const { trackable, changeDay } = useTrackableSafe();
 
   if (trackable.type !== "number") {
-    throw new Error("Not boolena trackable passed to boolean dayCell");
+    throw new Error("Not number trackable passed to number dayCell");
   }
 
   const { dateKey, inTrackRange, isToday } = useMemo(
@@ -183,14 +171,14 @@ export const DayCellNumber = ({ day, month, year, style }: IDayProps) => {
   ]);
 
   const handlePlus = (e: React.MouseEvent) => {
-    e.preventDefault();
     e.stopPropagation();
+    e.preventDefault();
     setDisplayedNumber(displayedNumber + 1);
     void debouncedUpdateValue(displayedNumber + 1);
   };
   const handleMinus = (e: React.MouseEvent) => {
-    e.preventDefault();
     e.stopPropagation();
+    e.preventDefault();
     setDisplayedNumber(displayedNumber - 1);
     void debouncedUpdateValue(displayedNumber - 1);
   };
@@ -201,12 +189,10 @@ export const DayCellNumber = ({ day, month, year, style }: IDayProps) => {
       void debouncedUpdateValue(val);
     }
   };
-
   return (
     <div
       className={NumberClasses({
         inTrackRange,
-        isToday,
         colorCode: theme,
         style,
         progress: progress !== null,
@@ -218,24 +204,23 @@ export const DayCellNumber = ({ day, month, year, style }: IDayProps) => {
       {progress !== null && (
         <div
           className={cls(
-            "z-1 absolute bottom-0 w-full transition-colors ",
+            "z-1 absolute bottom-0 w-full transition-all",
             activeGenProgress[theme || "neutral"]
           )}
           style={{ height: `${progress}%` }}
         ></div>
       )}
 
-      {style !== "mini" && (
-        <span className="absolute top-1 left-2 select-none">{day}</span>
-      )}
+      <DayNumber style={style} day={day} isToday={isToday} />
       {inTrackRange && (
         <>
           <EditableText
             value={displayedNumber || 0}
             isNumber={true}
             updater={handleInputUpdate}
+            saveOnChange={true}
             className={cls(
-              "z-10 flex h-full w-full select-none items-center justify-center bg-inherit text-center font-semibold outline-none transition-all",
+              "relative z-10 flex h-full w-full select-none items-center justify-center bg-inherit text-center font-semibold outline-none transition-all",
               displayedNumber === 0 && !inInputEdit
                 ? "text-neutral-200 dark:text-neutral-800"
                 : "text-neutral-800 dark:text-neutral-300",
@@ -244,7 +229,6 @@ export const DayCellNumber = ({ day, month, year, style }: IDayProps) => {
             classNameInput="focus:outline-neutral-300 dark:focus:outline-neutral-600"
             editModeSetter={setInInputEdit}
           />
-
           <AnimatePresence>
             {!inInputEdit && isHover && style !== "mini" && (
               <>

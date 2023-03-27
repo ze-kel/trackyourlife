@@ -65,7 +65,7 @@ const NumberLimitsSelector = ({
       </div>
 
       <div className="text-xs text-neutral-400 dark:text-neutral-500">
-        Note: this will not change existing values event if they are beyond set
+        Note: this will not change existing values even if they are beyond set
         limit
       </div>
 

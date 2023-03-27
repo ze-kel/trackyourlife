@@ -21,6 +21,8 @@ const basics = {
   startDate: z.coerce.date().optional(),
 };
 
+export const ZTrackableSettingsBase = z.object(basics);
+
 export const ZTrackableSettingsBoolean = z.object({
   ...basics,
   inactiveColor: colorOption.optional(),

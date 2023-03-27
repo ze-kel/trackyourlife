@@ -6,7 +6,9 @@ interface IEditableTextBase {
   classNameInput?: string;
   classNameText?: string;
   className?: string;
+  style?: React.CSSProperties;
   editModeSetter?: (val: boolean) => void;
+  saveOnChange?: boolean;
 }
 
 interface IEditableTextDefaultProps extends IEditableTextBase {
@@ -31,6 +33,8 @@ const EditableText = ({
   classNameText,
   classNameInput,
   editModeSetter,
+  saveOnChange,
+  style,
 }: IEditableTextProps) => {
   const [editMode, setEditMode] = useState(false);
   const [inputVal, setInputVal] = useState(value);
@@ -38,7 +42,6 @@ const EditableText = ({
   const [focusNext, setFocusNext] = useState(false);
 
   const goToEdit = (e: MouseEvent | FocusEvent) => {
-    console.log("goToEdit");
     e.stopPropagation();
     setInputVal(value);
     if (editModeSetter) editModeSetter(true);
@@ -46,15 +49,19 @@ const EditableText = ({
     setFocusNext(true);
   };
 
-  const save = async () => {
-    if (waiting) return;
-    setWaiting(true);
+  const save = async (val: string | number | undefined) => {
     if (isNumber) {
-      await updater(Number(inputVal));
+      await updater(Number(val));
     } else {
       //@ts-expect-error this is correct
-      await updater(inputVal);
+      await updater(val);
     }
+  };
+
+  const commit = async () => {
+    if (waiting) return;
+    setWaiting(true);
+    await save(inputVal);
     setEditMode(false);
     if (editModeSetter) editModeSetter(false);
     setWaiting(false);
@@ -63,11 +70,14 @@ const EditableText = ({
   const handelEdit = (e: ChangeEvent<HTMLInputElement>) => {
     if (waiting) return;
     setInputVal(e.target.value);
+    if (saveOnChange) {
+      void save(e.target.value);
+    }
   };
 
   const handleKeyUp = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
-      void save();
+      void commit();
     }
 
     if (e.key === "Escape") {
@@ -92,9 +102,10 @@ const EditableText = ({
         ref={inputRef}
         value={inputVal}
         onChange={handelEdit}
-        onBlur={() => void save()}
+        onBlur={() => void commit()}
         className={clsx(className, classNameInput)}
         onKeyUp={handleKeyUp}
+        style={style}
       />
     );
   }
@@ -105,6 +116,7 @@ const EditableText = ({
       onFocus={goToEdit}
       onClick={goToEdit}
       className={clsx(className, classNameText)}
+      style={style}
     >
       {value}
     </div>
