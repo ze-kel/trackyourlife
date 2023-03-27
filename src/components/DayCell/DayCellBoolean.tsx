@@ -122,6 +122,7 @@ export const DayCellBoolean = ({ day, month, year, style }: IDayProps) => {
 
   const handleClick = async (e: MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
 
     const t = e.target as HTMLElement;
     const rect = t.getBoundingClientRect();
@@ -148,100 +149,117 @@ export const DayCellBoolean = ({ day, month, year, style }: IDayProps) => {
 
   const themeActive = trackable.settings.activeColor
     ? activeGen[trackable.settings.activeColor].bg
-    : "";
+    : activeGen.lime.bg;
 
   const themeInactive = trackable.settings.inactiveColor
     ? activeGen[trackable.settings.inactiveColor].bg
-    : "";
+    : activeGen.neutral.bg;
+
+  const hoverActive = trackable.settings.activeColor
+    ? activeGen[trackable.settings.activeColor].hover
+    : activeGen.lime.hover;
+
+  const hoverInactive = trackable.settings.inactiveColor
+    ? activeGen[trackable.settings.inactiveColor].hover
+    : activeGen.neutral.hover;
+
+  const borderClass = isActive ? hoverInactive : hoverActive;
 
   return (
     <button
       tabIndex={inTrackRange ? 0 : -1}
-      className={BooleanClasses({
-        inTrackRange,
-        active: isActive,
-        style,
-      })}
+      className={cls(
+        BooleanClasses({
+          inTrackRange,
+          active: isActive,
+          style,
+        }),
+        inTrackRange && borderClass
+      )}
       key={day}
       onMouseDown={(e) => e.preventDefault()}
       onClick={(e) => void handleClick(e)}
     >
-      <AnimatePresence>
-        {isActive && (
-          <>
-            <div
-              className={cls(
-                "absolute left-0 top-0 h-full  w-full",
-                themeInactive
-              )}
-            ></div>
-            <motion.div
-              initial={{
-                scaleX: 0,
-                scaleY: 0,
-              }}
-              animate={{
-                scaleX: 1.2,
-                scaleY: 1.2,
-              }}
-              transition={{
-                duration: ANIMATION_TIME,
-                ease: EASE,
-                scaleY: {
-                  duration: ANIMATION_TIME * whRatio,
-                  ease: EASE,
-                },
-              }}
-              className={cls(
-                "absolute left-0 top-0 h-full  w-full",
-                themeActive
-              )}
-              style={{
-                transformOrigin: `
+      {inTrackRange && (
+        <>
+          <AnimatePresence initial={false}>
+            {isActive && (
+              <>
+                <div
+                  className={cls(
+                    "absolute left-0 top-0 h-full  w-full",
+                    themeInactive
+                  )}
+                ></div>
+                <motion.div
+                  initial={{
+                    scaleX: 0,
+                    scaleY: 0,
+                  }}
+                  animate={{
+                    scaleX: 1.2,
+                    scaleY: 1.2,
+                  }}
+                  transition={{
+                    duration: ANIMATION_TIME,
+                    ease: EASE,
+                    scaleY: {
+                      duration: ANIMATION_TIME * whRatio,
+                      ease: EASE,
+                    },
+                  }}
+                  className={cls(
+                    "absolute left-0 top-0 h-full  w-full",
+                    themeActive
+                  )}
+                  style={{
+                    transformOrigin: `
               ${clickPoint[0] || 50}% ${clickPoint[1] || 50}%`,
-              }}
-            />
-          </>
-        )}
-      </AnimatePresence>
-      <AnimatePresence>
-        {!isActive && (
-          <>
-            <div
-              className={cls(
-                "absolute left-0 top-0 h-full  w-full",
-                themeActive
-              )}
-            ></div>
-            <motion.div
-              initial={{
-                scaleX: 0,
-                scaleY: 0,
-              }}
-              animate={{
-                scaleX: 1.2,
-                scaleY: 1.2,
-              }}
-              transition={{
-                duration: ANIMATION_TIME,
-                ease: EASE,
-                scaleY: {
-                  duration: ANIMATION_TIME * whRatio,
-                  ease: EASE,
-                },
-              }}
-              className={cls(
-                "absolute left-0 top-0 h-full  w-full",
-                themeInactive
-              )}
-              style={{
-                transformOrigin: `
+                  }}
+                />
+              </>
+            )}
+          </AnimatePresence>
+          <AnimatePresence initial={false}>
+            {!isActive && (
+              <>
+                <div
+                  className={cls(
+                    "absolute left-0 top-0 h-full  w-full",
+                    themeActive
+                  )}
+                ></div>
+                <motion.div
+                  initial={{
+                    scaleX: 0,
+                    scaleY: 0,
+                  }}
+                  animate={{
+                    scaleX: 1.2,
+                    scaleY: 1.2,
+                  }}
+                  transition={{
+                    duration: ANIMATION_TIME,
+                    ease: EASE,
+                    scaleY: {
+                      duration: ANIMATION_TIME * whRatio,
+                      ease: EASE,
+                    },
+                  }}
+                  className={cls(
+                    "absolute left-0 top-0 h-full  w-full",
+                    themeInactive
+                  )}
+                  style={{
+                    transformOrigin: `
               ${clickPoint[0] || 50}% ${clickPoint[1] || 50}%`,
-              }}
-            />
-          </>
-        )}
-      </AnimatePresence>
+                  }}
+                />
+              </>
+            )}
+          </AnimatePresence>
+        </>
+      )}
 
       <DayNumber style={style} day={day} isToday={isToday} />
     </button>
