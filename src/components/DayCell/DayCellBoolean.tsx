@@ -1,4 +1,5 @@
-import { MouseEvent, useMemo, useState } from "react";
+import type { MouseEvent } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useTrackableSafe } from "../../helpers/trackableContext";
 import type { IDayProps } from "./index";
 import { computeDayCellHelpers } from "./index";
@@ -93,7 +94,7 @@ const BooleanClasses = cva(
 );
 
 const ANIMATION_TIME = 0.3;
-const EASE = [0, 0.3, 0.48, 0.9];
+const EASE = [0, 0.2, 0.5, 1];
 
 export const DayCellBoolean = ({ day, month, year, style }: IDayProps) => {
   const { trackable, changeDay } = useTrackableSafe();
@@ -115,6 +116,7 @@ export const DayCellBoolean = ({ day, month, year, style }: IDayProps) => {
 
   const isActive = trackable.data[dateKey] === "true";
 
+  const mainRef = useRef<HTMLButtonElement>(null);
   // Point where click happened in % relative to button box. Used for animation
   const [clickPoint, setClickPoint] = useState([50, 50]);
   // Ration between width and height of the box.
@@ -124,18 +126,21 @@ export const DayCellBoolean = ({ day, month, year, style }: IDayProps) => {
     e.preventDefault();
     e.stopPropagation();
 
-    const t = e.target as HTMLElement;
-    const rect = t.getBoundingClientRect();
-    if (e.clientX === 0 && e.clientY === 0) {
-      // keyboard click
-      setClickPoint([50, 50]);
+    if (mainRef.current) {
+      const t = mainRef.current;
+      const rect = t.getBoundingClientRect();
+      if (e.clientX === 0 && e.clientY === 0) {
+        // keyboard click
+        setClickPoint([50, 50]);
+      } else {
+        const x = clamp((e.clientX - rect.left) / rect.width, 0, 1);
+        const y = clamp((e.clientY - rect.top) / rect.height, 0, 1);
+        setClickPoint([x * 100, y * 100]);
+      }
+      setWhRatio(rect.height / rect.width);
     } else {
-      console.log("a", (e.clientX - rect.left) / rect.width);
-      const x = clamp((e.clientX - rect.left) / rect.width, 0, 1);
-      const y = clamp((e.clientY - rect.top) / rect.height, 0, 1);
-      setClickPoint([x * 100, y * 100]);
+      console.warn("DayCellBoolean animation error");
     }
-    setWhRatio(rect.height / rect.width);
 
     if (!inTrackRange) return;
     await changeDay({
@@ -167,6 +172,7 @@ export const DayCellBoolean = ({ day, month, year, style }: IDayProps) => {
 
   return (
     <button
+      ref={mainRef}
       tabIndex={inTrackRange ? 0 : -1}
       className={cls(
         BooleanClasses({
@@ -265,5 +271,3 @@ export const DayCellBoolean = ({ day, month, year, style }: IDayProps) => {
     </button>
   );
 };
-
-//[0, 0.3, 0.48, 0.9]
