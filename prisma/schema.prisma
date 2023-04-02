@@ -84,7 +84,7 @@ model TrackableRecord {
     id String @id @default(uuid())
     trackableId String
     trackable Trackable @relation(fields: [trackableId], references: [id])
-    date DateTime
+    date DateTime @db.Date
     value String
     
     @@unique([trackableId, date], map: "TrackableRecord_trackableId_date_unique_constraint")

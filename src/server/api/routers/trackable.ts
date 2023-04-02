@@ -4,7 +4,7 @@ import { z } from "zod";
 
 import { prisma } from "../../db";
 
-import { ITrackable, ZTrackableSettingsBase } from "src/types/trackable";
+import type { ITrackable } from "src/types/trackable";
 
 import { format } from "date-fns";
 import {
@@ -13,7 +13,7 @@ import {
   ZTrackableSettingsRange,
   ZTrackableUpdate,
 } from "src/types/trackable";
-import type { Prisma, Trackable } from "@prisma/client";
+import type { Prisma, Trackable, TrackableRecord } from "@prisma/client";
 
 export const trackableToCreate = z.discriminatedUnion("type", [
   z.object({
@@ -30,6 +30,39 @@ export const trackableToCreate = z.discriminatedUnion("type", [
   }),
 ]);
 
+const makeTrackableData = (trackableData: TrackableRecord[]) => {
+  const result: ITrackable["data"] = {};
+
+  trackableData.forEach((el) => {
+    result[format(el.date, "yyyy-MM-dd")] = el.value;
+  });
+  return result;
+};
+
+const makeTrackableSettings = (trackable: Trackable) => {
+  let settingsParser;
+  const type = trackable.type;
+  if (type === "boolean") {
+    settingsParser = ZTrackableSettingsBoolean;
+  }
+  if (type === "number") {
+    settingsParser = ZTrackableSettingsNumber;
+  }
+  if (type === "range") {
+    settingsParser = ZTrackableSettingsRange;
+  }
+  if (!settingsParser) throw new Error("No parser for settings");
+
+  // Note that we store settings as JSON, therefore dates there are stored as strings.
+  // Here z.coerce.date() auto converts them to JS dates.
+  const parseRes = settingsParser.safeParse(trackable.settings);
+  if (parseRes.success) {
+    return parseRes.data;
+  }
+
+  return {};
+};
+
 export const trackableRouter = createTRPCRouter({
   getIds: protectedProcedure.query(async ({ ctx }) => {
     const userId = ctx.session.user.id;
@@ -41,67 +74,61 @@ export const trackableRouter = createTRPCRouter({
   getTrackableById: protectedProcedure
     .input(z.string())
     .query(async ({ ctx, input }) => {
-      const id: string = input;
-
+      const id = input;
       const userId = ctx.session.user.id;
 
-      const trackable = await prisma.trackable.findFirst({
+      const trackable = await prisma.trackable.findFirstOrThrow({
         where: {
           id: id,
           userId,
         },
-      });
-
-      if (!trackable) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: `No trackable id '${id}'`,
-        });
-      }
-
-      const data = await prisma.trackableRecord.findMany({
-        where: {
-          trackableId: trackable.id,
+        include: {
+          data: true,
         },
       });
 
       const returnedTrackable: ITrackable = {
         ...trackable,
-        data: {},
-        settings: {},
+        data: makeTrackableData(trackable.data),
+        settings: makeTrackableSettings(trackable),
       };
 
-      data.forEach((el) => {
-        returnedTrackable.data[format(el.date, "yyyy-MM-dd")] = el.value;
+      return returnedTrackable;
+    }),
+
+  getTrackablesByIds: protectedProcedure
+    .input(z.array(z.string()))
+    .query(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+
+      const trackables = await prisma.trackable.findMany({
+        where: {
+          OR: input.map((id) => ({ id, userId })),
+        },
+        include: {
+          data: true,
+        },
       });
 
-      let settingsParser;
-      const type = trackable.type;
-      if (type === "boolean") {
-        settingsParser = ZTrackableSettingsBoolean;
-      }
-      if (type === "number") {
-        settingsParser = ZTrackableSettingsNumber;
-      }
-      if (type === "range") {
-        settingsParser = ZTrackableSettingsRange;
-      }
-      if (!settingsParser) throw new Error("No parser for settings");
+      const result = trackables.map((trackable) => {
+        const rt: ITrackable = {
+          ...trackable,
+          data: makeTrackableData(trackable.data),
+          settings: makeTrackableSettings(trackable),
+        };
+        return rt;
+      });
 
-      // Note that this we store settings as JSON, therefore dates there are stored as strings.
-      // Here z.coerce.date() auto converts them to JS dates.
-      const parseRes = settingsParser.safeParse(trackable.settings);
-      if (parseRes.success) {
-        returnedTrackable.settings = parseRes.data;
-      }
-
-      return returnedTrackable;
+      return result;
     }),
 
   updateTrackableById: protectedProcedure
     .input(ZTrackableUpdate)
     .mutation(async ({ input, ctx }) => {
-      const date = new Date(input.year, input.month, input.day);
+      const date = `${format(
+        new Date(input.year, input.month, input.day),
+        "yyyy-MM-dd"
+      )}T00:00:00.000Z`;
 
       const userId = ctx.session.user.id;
       const trackable = await prisma.trackable.findUnique({
@@ -126,7 +153,7 @@ export const trackableRouter = createTRPCRouter({
         where: {
           trackableId_date: {
             trackableId: input.id,
-            date: date,
+            date,
           },
         },
       });

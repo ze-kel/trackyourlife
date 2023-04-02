@@ -45,11 +45,21 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   await ssg.user.getUserSettings.fetch();
 
   const ids = await ssg.trackable.getIds.fetch();
-  const promises: Promise<void>[] = [];
-  ids.forEach((id) => {
-    promises.push(ssg.trackable.getTrackableById.prefetch(id));
+
+  const data = await ssg.trackable.getTrackablesByIds.fetch(ids);
+
+  data.forEach((trackable) => {
+    ssg.queryClient.setQueryData(
+      [
+        ["trackable", "getTrackableById"],
+        {
+          input: trackable.id,
+          type: "query",
+        },
+      ],
+      trackable
+    );
   });
-  await Promise.all(promises);
 
   return {
     props: { session, trpcState: ssg.dehydrate() },

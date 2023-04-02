@@ -12,6 +12,7 @@ import data from "@emoji-mart/data";
 import { useEffect } from "react";
 import UserSettingsProvider from "src/helpers/userSettingsContext";
 import type { IUserSettings } from "@t/user";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const font = Poppins({
@@ -52,6 +53,7 @@ const MyApp: AppType<{ session: Session }> = ({
             <Component {...pageProps} />
           </div>
         </div>
+        <ReactQueryDevtools />
       </UserSettingsProvider>
     </SessionProvider>
   );
