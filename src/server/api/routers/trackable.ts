@@ -51,7 +51,10 @@ const makeTrackableSettings = (trackable: Trackable) => {
   if (type === "range") {
     settingsParser = ZTrackableSettingsRange;
   }
-  if (!settingsParser) throw new Error("No parser for settings");
+  if (!settingsParser) {
+    console.log(trackable);
+    throw new Error("No parser for settings of type " + trackable.type);
+  }
 
   // Note that we store settings as JSON, therefore dates there are stored as strings.
   // Here z.coerce.date() auto converts them to JS dates.

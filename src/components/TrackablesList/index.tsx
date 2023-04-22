@@ -5,7 +5,10 @@ import { api } from "src/utils/api";
 import MiniTrackable from "./miniTrackable";
 
 const Trackable = ({ id }: { id: ITrackable["id"] }) => {
-  const { data } = api.trackable.getTrackableById.useQuery(id);
+  const { data } = api.trackable.getTrackableById.useQuery(id, {
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+  });
 
   if (!data) return <div>Loading</div>;
 
