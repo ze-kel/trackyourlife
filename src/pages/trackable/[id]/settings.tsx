@@ -7,7 +7,7 @@ import TrackableName from "@components/TrackableName";
 import DeleteButton from "@components/DeleteButton";
 import IconEye from "@heroicons/react/24/outline/EyeIcon";
 import Link from "next/link";
-import { createProxySSGHelpers } from "@trpc/react-query/ssg";
+import { createServerSideHelpers } from "@trpc/react-query/server";
 import type { GetServerSideProps, NextApiRequest, NextApiResponse } from "next";
 import { appRouter } from "src/server/api/root";
 import { createTRPCContext } from "src/server/api/trpc";
@@ -45,7 +45,7 @@ const Trackable = () => {
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const session = await getServerAuthSession(ctx);
 
-  const ssg = createProxySSGHelpers({
+  const ssg = createServerSideHelpers({
     router: appRouter,
     ctx: await createTRPCContext({
       req: ctx.req as NextApiRequest,

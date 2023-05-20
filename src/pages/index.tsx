@@ -3,7 +3,7 @@ import TrackablesList from "@components/TrackablesList";
 import { api } from "../utils/api";
 import type { GetServerSideProps, NextApiRequest, NextApiResponse } from "next";
 import { getServerAuthSession } from "src/server/auth";
-import { createProxySSGHelpers } from "@trpc/react-query/ssg";
+import { createServerSideHelpers } from "@trpc/react-query/server";
 import { createTRPCContext } from "src/server/api/trpc";
 import { appRouter } from "src/server/api/root";
 import superjson from "superjson";
@@ -33,7 +33,7 @@ const AppHome = () => {
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const session = await getServerAuthSession(ctx);
 
-  const ssg = createProxySSGHelpers({
+  const ssg = createServerSideHelpers({
     router: appRouter,
     ctx: await createTRPCContext({
       req: ctx.req as NextApiRequest,
