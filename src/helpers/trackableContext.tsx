@@ -44,8 +44,6 @@ const changeSettingsApi = async ({
 };
 
 const changeDayApi = async (update: ITrackableUpdate) => {
-  console.log('changeDayApi', update);
-
   const res = await fetch(`${getBaseUrl()}/api/trackables/${update.id}`, {
     method: 'POST',
     body: JSON.stringify(update),

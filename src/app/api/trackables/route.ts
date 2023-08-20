@@ -35,7 +35,6 @@ export const PUT = async (request: NextRequest) => {
       status: 401,
     });
   }
-  console.log('session put', session);
 
   const userId = session.user.userId;
 
