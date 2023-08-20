@@ -1,21 +1,24 @@
-import Button from "@components/_UI/Button";
-import Modal from "@components/_UI/Modal";
-import router from "next/router";
-import { useState } from "react";
-import { useTrackableSafe } from "../../helpers/trackableContext";
-import IconTrash from "@heroicons/react/24/outline/TrashIcon";
-import Dropdown from "@components/_UI/Dropdown";
+'use client';
+import Button from '@components/_UI/Button';
+import Modal from '@components/_UI/Modal';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { useTrackableSafe } from '../../helpers/trackableContext';
+import IconTrash from '@heroicons/react/24/outline/TrashIcon';
+import Dropdown from '@components/_UI/Dropdown';
 
 const DeleteButton = () => {
+  const router = useRouter();
+
   const { deleteTrackable } = useTrackableSafe();
 
   if (!deleteTrackable) {
-    throw new Error("Context error: Delete trackable");
+    throw new Error('Context error: Delete trackable');
   }
 
   const performDelete = async () => {
     await deleteTrackable();
-    await router.push("/");
+    router.push('/');
   };
 
   const [confirmOpened, setConfirmOpened] = useState(false);

@@ -1,9 +1,10 @@
-import { getDaysInMonth, getISODay, getMonth, getYear, format } from "date-fns";
-import { useState } from "react";
-import DayCell from "../DayCell";
-import IconChevronLeft from "@heroicons/react/20/solid/ChevronLeftIcon";
-import IconChevronRight from "@heroicons/react/20/solid/ChevronRightIcon";
-import clsx from "clsx";
+'use client';
+import { getDaysInMonth, getISODay, getMonth, getYear, format } from 'date-fns';
+import { useState } from 'react';
+import DayCell from '../DayCell';
+import IconChevronLeft from '@heroicons/react/20/solid/ChevronLeftIcon';
+import IconChevronRight from '@heroicons/react/20/solid/ChevronRightIcon';
+import clsx from 'clsx';
 
 const Month = ({
   month,
@@ -29,8 +30,8 @@ const Month = ({
     <div
       id={myId}
       className={clsx(
-        "grid grid-cols-7 grid-rows-6",
-        mini ? "gap-1" : "sm:gap-2 lg:gap-2"
+        'grid grid-cols-7 grid-rows-6',
+        mini ? 'gap-1' : 'sm:gap-2 lg:gap-2'
       )}
     >
       {prepend.map((_, i) => (
@@ -42,7 +43,7 @@ const Month = ({
           year={year}
           month={month}
           day={el}
-          style={mini ? "mini" : undefined}
+          style={mini ? 'mini' : undefined}
         />
       ))}
     </div>
@@ -83,13 +84,13 @@ const Year = ({
           >
             <h5
               className={clsx(
-                "mb-1 font-semibold transition-colors",
+                'mb-1 font-semibold transition-colors',
                 m < active
-                  ? "text-neutral-600 group-hover:text-neutral-800 dark:text-neutral-400 dark:group-hover:text-neutral-200"
-                  : "text-neutral-400 group-hover:text-neutral-600 dark:text-neutral-700 dark:group-hover:text-neutral-500"
+                  ? 'text-neutral-600 group-hover:text-neutral-800 dark:text-neutral-400 dark:group-hover:text-neutral-200'
+                  : 'text-neutral-400 group-hover:text-neutral-600 dark:text-neutral-700 dark:group-hover:text-neutral-500'
               )}
             >
-              <span>{format(new Date(year, m, 1), "MMMM")}</span>
+              <span>{format(new Date(year, m, 1), 'MMMM')}</span>
             </h5>
             <Month year={year} month={m} mini={true} />
           </div>
@@ -130,25 +131,25 @@ const Decade = ({
   );
 };
 
-type TView = "days" | "months" | "years";
+type TView = 'days' | 'months' | 'years';
 
 const TrackableView = () => {
   const now = new Date();
   const [year, setYear] = useState(now.getFullYear());
   const [month, setMonth] = useState(now.getMonth());
-  const [view, setView] = useState<TView>("days");
+  const [view, setView] = useState<TView>('days');
 
   const [yearOffset, setyearOffset] = useState(0);
 
   const isCurrentMonth = now.getMonth() === month && now.getFullYear() === year;
 
   const increment = (add: number) => {
-    if (view === "years") {
+    if (view === 'years') {
       setyearOffset(yearOffset + add * YEARS_ON_YEAR_VIEW);
       return;
     }
 
-    if (view === "months") {
+    if (view === 'months') {
       setYear(year + add);
       return;
     }
@@ -169,19 +170,19 @@ const TrackableView = () => {
 
   const openMonth = (m: number) => {
     setMonth(m);
-    setView("days");
+    setView('days');
   };
 
   const openYear = (y: number) => {
     setYear(y);
-    setView("months");
+    setView('months');
   };
 
   const openCurrentMonth = () => {
     const now = new Date();
     setYear(now.getFullYear());
     setMonth(now.getMonth());
-    setView("days");
+    setView('days');
   };
 
   return (
@@ -200,23 +201,23 @@ const TrackableView = () => {
           >
             <IconChevronRight className="translate-x-[1px]" />
           </button>
-          {view !== "years" && (
+          {view !== 'years' && (
             <button
-              onClick={() => setView("years")}
+              onClick={() => setView('years')}
               className="cursor-pointer font-semibold"
             >
               {year}
             </button>
           )}
 
-          {view === "days" && (
+          {view === 'days' && (
             <>
               /
               <button
-                onClick={() => setView("months")}
+                onClick={() => setView('months')}
                 className="cursor-pointer"
               >
-                {format(new Date(year, month, 1), "MMMM")}
+                {format(new Date(year, month, 1), 'MMMM')}
               </button>
             </>
           )}
@@ -226,19 +227,19 @@ const TrackableView = () => {
             tabIndex={isCurrentMonth ? -1 : 0}
             onClick={openCurrentMonth}
             className={clsx(
-              "transition-colors",
+              'transition-colors',
               isCurrentMonth
-                ? "text-neutral-300 dark:text-neutral-800"
-                : "cursor-pointer dark:text-neutral-300"
+                ? 'text-neutral-300 dark:text-neutral-800'
+                : 'cursor-pointer dark:text-neutral-300'
             )}
           >
             Today
           </button>
         </div>
       </div>
-      {view === "days" && <Month year={year} month={month} />}
-      {view === "months" && <Year year={year} openMonth={openMonth} />}
-      {view === "years" && (
+      {view === 'days' && <Month year={year} month={month} />}
+      {view === 'months' && <Year year={year} openMonth={openMonth} />}
+      {view === 'years' && (
         <Decade yearOffset={yearOffset} openYear={openYear} />
       )}
     </>

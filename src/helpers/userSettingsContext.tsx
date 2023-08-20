@@ -1,8 +1,9 @@
 import type { ReactNode } from "react";
 import { useContext } from "react";
 import { createContext } from "react";
-import { api } from "src/utils/api";
 import type { IUserSettings } from "@t/user";
+import { getBaseUrl } from "src/helpers/getBaseUrl";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export interface IUserSettingsContextData {
   userSettings: IUserSettings;
@@ -10,8 +11,17 @@ export interface IUserSettingsContextData {
 }
 
 export const TrackableContext = createContext<IUserSettingsContextData | null>(
-  null
+  null,
 );
+
+const updateSettings = async (update: IUserSettings) => {
+  const res = await fetch(`${getBaseUrl()}/user/settings`, {
+    method: "POST",
+    body: JSON.stringify(update),
+  });
+  const data = (await res.json()) as unknown;
+  return data as IUserSettings;
+};
 
 const UserSettingsProvider = ({
   settings: userSettings,
@@ -20,26 +30,29 @@ const UserSettingsProvider = ({
   settings: IUserSettings;
   children: ReactNode;
 }) => {
-  const qContext = api.useContext();
+  const qClient = useQueryClient();
 
-  const mutation = api.user.updateUserSettings.useMutation({
+  const mutation = useMutation({
+    mutationKey: ["userSettings"],
+    mutationFn: updateSettings,
+
     async onMutate(change) {
-      await qContext.user.getUserSettings.cancel();
+      await qClient.cancelQueries(["userSettings"]);
 
-      const before = qContext.user.getUserSettings.getData() as IUserSettings;
+      const before = qClient.getQueryData(["userSettings"]) as IUserSettings;
 
-      qContext.user.getUserSettings.setData(undefined, change);
+      qClient.setQueryData(["userSettings"], change);
 
       return { change, before };
     },
     onError: (err, _, context) => {
       if (!context || !context.before) {
         throw new Error(
-          "Error when updating, unable to retrieve rollback value"
+          "Error when updating, unable to retrieve rollback value",
         );
       }
 
-      qContext.user.getUserSettings.setData(undefined, context.before);
+      qClient.setQueryData(["userSettings"], context.before);
     },
   });
 

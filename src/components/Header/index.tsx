@@ -1,15 +1,21 @@
+"use client";
 import Dropdown from "@components/_UI/Dropdown";
-import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useState } from "react";
 import IconChevronDown from "@heroicons/react/20/solid/ChevronDownIcon";
 import clsx from "clsx";
-import { useUserSettingsSafe } from "src/helpers/userSettingsContext";
-import type { IUserSettings } from "@t/user";
-import Selector from "@components/_UI/Selector";
 import Button from "@components/_UI/Button";
+import type { User } from "lucia";
+import { useRouter } from "next/navigation";
 
 const SigOutButton = () => {
+  const router = useRouter();
+
+  const signOut = async () => {
+    await fetch("/api/logout", { method: "POST", credentials: "include" });
+    router.refresh();
+  };
+
   return (
     <Button
       theme="transparent"
@@ -23,39 +29,16 @@ const SigOutButton = () => {
   );
 };
 
-const DarkModeSelector = () => {
-  const { userSettings, changeSettings } = useUserSettingsSafe();
-
-  const mode = userSettings.theme || "system";
-
-  const changeMode = (theme: IUserSettings["theme"]) => {
-    changeSettings({ ...useSession, theme });
-  };
-
-  return (
-    <Selector
-      options={[
-        { label: "Dark", value: "dark" },
-        { label: "System", value: "system" },
-        { label: "Light", value: "light" },
-      ]}
-      setter={changeMode}
-      active={mode}
-    />
-  );
-};
-
-const Header = () => {
-  const { data: sessionData } = useSession();
+const Header = ({ user }: { user?: User }) => {
   const [dropdown, setDropdown] = useState(false);
 
   const dropV = (
     <div className="relative flex cursor-pointer items-center transition-colors hover:text-neutral-600 dark:hover:text-neutral-50">
-      <p className="font-medium">{sessionData?.user?.name}</p>
+      <p className="font-medium">{user ? user.username : ""}</p>
       <IconChevronDown
         className={clsx(
           "w-6 transition-transform",
-          dropdown ? "rotate-180" : ""
+          dropdown ? "rotate-180" : "",
         )}
       />
     </div>
@@ -63,7 +46,6 @@ const Header = () => {
 
   const dropH = (
     <div className="flex flex-col items-end justify-end">
-      <DarkModeSelector />
       <SigOutButton key={"so"} />
     </div>
   );
@@ -75,7 +57,7 @@ const Header = () => {
           <h2 className="font-light">Track Your Life</h2>
         </Link>
 
-        {sessionData && (
+        {user && (
           <Dropdown
             mainPart={dropV}
             hiddenPart={dropH}

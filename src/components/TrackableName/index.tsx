@@ -1,5 +1,5 @@
-import EditableText from "@components/_UI/EditableText";
-import { useTrackableSafe } from "../../helpers/trackableContext";
+import EditableText from '@components/_UI/EditableText';
+import { useTrackableSafe } from '../../helpers/trackableContext';
 
 const TrackableName = () => {
   const { trackable, changeSettings } = useTrackableSafe();

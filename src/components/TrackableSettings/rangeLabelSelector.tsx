@@ -1,26 +1,26 @@
-import type { IRangeSettings } from "@t/trackable";
-import Picker from "@emoji-mart/react";
-import data from "@emoji-mart/data";
-import { PureInput } from "@components/_UI/Input";
-import { cloneDeep } from "lodash";
-import { useState } from "react";
-import Dropdown from "@components/_UI/Dropdown";
-import clsx from "clsx";
-import { Emoji } from "@components/_UI/Emoji";
-import XIcon from "@heroicons/react/24/outline/XMarkIcon";
-import PlusIcon from "@heroicons/react/24/outline/PlusIcon";
-import { AnimatePresence } from "framer-motion";
-import { Reorder, useDragControls } from "framer-motion";
-import ElliplsisIcon from "@heroicons/react/24/outline/EllipsisVerticalIcon";
-import type { ArrayElement } from "@t/helpers";
-import { v4 as uuidv4 } from "uuid";
+import type { IRangeSettings } from '@t/trackable';
+import Picker from '@emoji-mart/react';
+import data from '@emoji-mart/data';
+import { PureInput } from '@components/_UI/Input';
+import { cloneDeep } from 'lodash';
+import { useState } from 'react';
+import Dropdown from '@components/_UI/Dropdown';
+import clsx from 'clsx';
+import { Emoji } from '@components/_UI/Emoji';
+import XIcon from '@heroicons/react/24/outline/XMarkIcon';
+import PlusIcon from '@heroicons/react/24/outline/PlusIcon';
+import { AnimatePresence } from 'framer-motion';
+import { Reorder, useDragControls } from 'framer-motion';
+import ElliplsisIcon from '@heroicons/react/24/outline/EllipsisVerticalIcon';
+import type { ArrayElement } from '@t/helpers';
+import { v4 as uuidv4 } from 'uuid';
 
 export interface IRangeLabelSelector {
-  initialValue: IRangeSettings["labels"];
-  onChange: (a: IRangeSettings["labels"]) => void;
+  initialValue: IRangeSettings['labels'];
+  onChange: (a: IRangeSettings['labels']) => void;
 }
 
-type IRangeLabel = ArrayElement<NonNullable<IRangeSettings["labels"]>>;
+type IRangeLabel = ArrayElement<NonNullable<IRangeSettings['labels']>>;
 
 const Pair = ({
   value,
@@ -52,10 +52,10 @@ const Pair = ({
       itemID={value.id}
       transition={{
         duration: 0.25,
-        opacity: { duration: 0.2, ease: "circIn" },
+        opacity: { duration: 0.2, ease: 'circIn' },
       }}
       initial={{ opacity: 0, y: 10, height: 0 }}
-      animate={{ opacity: 1, y: 0, height: "45px", zIndex: 2 }}
+      animate={{ opacity: 1, y: 0, height: '45px', zIndex: 2 }}
       exit={{ opacity: 0, height: 0, zIndex: -99 }}
       className="relative flex items-center gap-2"
       layout
@@ -68,7 +68,7 @@ const Pair = ({
       </div>
       <PureInput
         value={value.internalKey}
-        className={clsx("col-start-1 col-end-1 w-64")}
+        className={clsx('col-start-1 col-end-1 w-64')}
         error={duplicate || !value.internalKey}
         onChange={(e) => updateKey(e.target.value)}
       />
@@ -80,7 +80,7 @@ const Pair = ({
           <Picker data={data} onEmojiSelect={selectEmoji} autoFocus={true} />
         }
         mainPart={<Emoji size="30px" shortcodes={value.emojiShortcode} />}
-        classNameMain={"w-fit cursor-pointer"}
+        classNameMain={'w-fit cursor-pointer'}
       />
       <div
         className="flex w-7 cursor-pointer items-center justify-center"
@@ -125,20 +125,20 @@ const RangeLabelSelector = ({
     const set = new Set();
     for (const val of value) {
       if (!val.internalKey.length) {
-        updateError("Empty key is present. Last valid state will be saved");
+        updateError('Empty key is present. Last valid state will be saved');
         return;
       }
       if (set.has(val.internalKey)) {
-        updateError("Duplicate key is present. Last valid state will be saved");
+        updateError('Duplicate key is present. Last valid state will be saved');
         return;
       }
       set.add(val.internalKey);
     }
-    updateError("");
+    updateError('');
     onChange(value);
   };
 
-  const updateAndPush: IRangeLabelSelector["onChange"] = (value = []) => {
+  const updateAndPush: IRangeLabelSelector['onChange'] = (value = []) => {
     updateValue(value);
     pushUpdates(value);
   };
@@ -158,7 +158,7 @@ const RangeLabelSelector = ({
   const addNewProperty = () => {
     const upd = [
       ...value,
-      { internalKey: "newLabel", emojiShortcode: ":question:", id: uuidv4() },
+      { internalKey: 'newLabel', emojiShortcode: ':question:', id: uuidv4() },
     ];
     updateValue(upd);
     pushUpdates(upd);

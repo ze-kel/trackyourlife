@@ -1,13 +1,18 @@
-import type { ITrackable, ITrackableUpdate } from "src/types/trackable";
-import type { ReactNode } from "react";
-import { useContext } from "react";
-import { createContext } from "react";
-import { api } from "src/utils/api";
-import updateData from "./updateData";
-import getData from "./getData";
+import type {
+  ITrackable,
+  ITrackableSettings,
+  ITrackableUpdate,
+} from 'src/types/trackable';
+import type { ReactNode } from 'react';
+import { useContext } from 'react';
+import { createContext } from 'react';
+import updateData from './updateData';
+import getData from './getData';
+import { getBaseUrl } from 'src/helpers/getBaseUrl';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 export type IChangeSettings = (
-  someSettings: Partial<ITrackable["settings"]>
+  someSettings: Partial<ITrackable['settings']>
 ) => Promise<void>;
 
 type IChangeDay = (update: ITrackableUpdate) => Promise<ITrackableUpdate>;
@@ -23,6 +28,36 @@ export interface IContextData {
 
 export const TrackableContext = createContext<IContextData | null>(null);
 
+const changeSettingsApi = async ({
+  id,
+  settings,
+}: {
+  id: string;
+  settings: ITrackableSettings;
+}) => {
+  const res = await fetch(`${getBaseUrl()}/api/trackables/${id}/settings`, {
+    method: 'PUT',
+    body: JSON.stringify(settings),
+  });
+  const data = (await res.json()) as unknown;
+  return data as ITrackableSettings;
+};
+
+const changeDayApi = async (update: ITrackableUpdate) => {
+  const res = await fetch(`${getBaseUrl()}/api/trackables/${update.id}`, {
+    method: 'POST',
+    body: JSON.stringify(update),
+  });
+  const data = (await res.json()) as unknown;
+  return data as ITrackableUpdate;
+};
+
+const changeDayDelete = async (id: string) => {
+  await fetch(`${getBaseUrl()}/api/trackables/${id}`, {
+    method: 'DELETE',
+  });
+};
+
 const TrackableProvider = ({
   children,
   trackable,
@@ -30,12 +65,13 @@ const TrackableProvider = ({
   children: ReactNode;
   trackable: ITrackable;
 }) => {
-  const qContext = api.useContext();
+  const qClient = useQueryClient();
 
-  const settingsMutation = api.trackable.updateTrackableSettings.useMutation({
+  const settingsMutation = useMutation({
+    mutationFn: changeSettingsApi,
     onSuccess(returned) {
-      qContext.trackable.getTrackableById.setData(
-        trackable.id,
+      qClient.setQueryData(
+        ['trackable', trackable.id],
         (data: ITrackable | undefined) => {
           if (!data) return;
           const newOne = { ...data, settings: returned };
@@ -46,7 +82,7 @@ const TrackableProvider = ({
   });
 
   const changeSettings: IChangeSettings = async (someSettings) => {
-    const newSettings: ITrackable["settings"] = {
+    const newSettings: ITrackable['settings'] = {
       ...trackable.settings,
       ...someSettings,
     };
@@ -57,41 +93,53 @@ const TrackableProvider = ({
     });
   };
 
-  const dayValueMutation = api.trackable.updateTrackableById.useMutation({
-    async onMutate(change) {
-      await qContext.trackable.getTrackableById.cancel(trackable.id);
+  const dayValueMutation = useMutation({
+    mutationFn: changeDayApi,
+    onMutate(change) {
+      const data = qClient.getQueryData(['trackable', trackable.id]) as
+        | ITrackable
+        | undefined;
 
-      const data = qContext.trackable.getTrackableById.getData(trackable.id);
       if (!data) {
-        throw new Error("Trying to mutate trackable that does not exist");
+        throw new Error('Trying to mutate trackable that does not exist');
       }
 
+      console.log('ON MUTATE', { change, data });
       const rollback = getData(data, change);
 
-      qContext.trackable.getTrackableById.setData(trackable.id, (original) => {
-        if (!original) return;
+      qClient.setQueryData(
+        ['trackable', trackable.id],
+        (original: ITrackable | undefined) => {
+          if (!original) return;
 
-        return updateData(original, change);
-      });
+          return updateData(original, change);
+        }
+      );
 
       return { change, rollback };
     },
-    onError: (err, newTodo, context) => {
+    onError: (err, _, context) => {
+      console.log('err', err);
+      console.log('context', context);
+
       if (!context || !context.rollback) {
         throw new Error(
-          "Error when updating, unable to retrieve rollback value"
+          'Error when updating, unable to retrieve rollback value'
         );
       }
-      qContext.trackable.getTrackableById.setData(trackable.id, (original) => {
-        if (!original) return;
-        return updateData(original, context.rollback);
-      });
+      qClient.setQueryData(
+        ['trackable', trackable.id],
+        (original: ITrackable | undefined) => {
+          if (!original) return;
+          return updateData(original, context.rollback);
+        }
+      );
     },
   });
 
   const changeDay: IChangeDay = dayValueMutation.mutateAsync;
 
-  const deleteMutation = api.trackable.deleteTrackable.useMutation();
+  const deleteMutation = useMutation({ mutationFn: changeDayDelete });
 
   const deleteTrackable = () => deleteMutation.mutateAsync(trackable.id);
 
@@ -122,7 +170,7 @@ export const useTrackableSafe = () => {
   } = useContext(TrackableContext) ?? {};
 
   if (!trackable || !changeSettings || !changeDay || !deleteTrackable) {
-    throw new Error("Context error: no trackable awailable");
+    throw new Error('Context error: no trackable awailable');
   }
 
   return {
@@ -135,7 +183,7 @@ export const useTrackableSafe = () => {
 };
 
 const getRangeLabelMapping = (trackable: ITrackable) => {
-  if (trackable.type !== "range" || !trackable.settings.labels) return;
+  if (trackable.type !== 'range' || !trackable.settings.labels) return;
 
   const labels = trackable.settings.labels;
 

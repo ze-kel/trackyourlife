@@ -1,15 +1,15 @@
-import { PureInput } from "@components/_UI/Input";
-import type { INumberSettings } from "@t/trackable";
-import { cloneDeep } from "lodash";
-import ColorSelector from "./colorSelector";
-import XIcon from "@heroicons/react/24/outline/XMarkIcon";
-import PlusIcon from "@heroicons/react/24/outline/PlusIcon";
-import { Fragment, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
-import type { ArrayElement } from "@t/helpers";
-import { AnimatePresence, motion } from "framer-motion";
+import { PureInput } from '@components/_UI/Input';
+import type { INumberSettings } from '@t/trackable';
+import { cloneDeep } from 'lodash';
+import ColorSelector from './colorSelector';
+import XIcon from '@heroicons/react/24/outline/XMarkIcon';
+import PlusIcon from '@heroicons/react/24/outline/PlusIcon';
+import { Fragment, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
+import type { ArrayElement } from '@t/helpers';
+import { AnimatePresence, motion } from 'framer-motion';
 
-type IColorCodingValue = INumberSettings["colorCoding"];
+type IColorCodingValue = INumberSettings['colorCoding'];
 
 type IColorCodingItem = ArrayElement<NonNullable<IColorCodingValue>>;
 
@@ -33,7 +33,7 @@ const Pair = ({ value, onChange, remove }: INumberColorSelectorPair) => {
     }
   };
 
-  const changeColor = (v: IColorCodingItem["color"]) => {
+  const changeColor = (v: IColorCodingItem['color']) => {
     onChange({ ...value, color: v });
   };
 
@@ -48,15 +48,15 @@ const Pair = ({ value, onChange, remove }: INumberColorSelectorPair) => {
       layout
       transition={{
         duration: 0.25,
-        opacity: { duration: 0.2, ease: "circIn" },
+        opacity: { duration: 0.2, ease: 'circIn' },
       }}
       initial={{ opacity: 0, y: 10, height: 0 }}
-      animate={{ opacity: 1, y: 0, height: "36px" }}
+      animate={{ opacity: 1, y: 0, height: '36px' }}
       exit={{ opacity: 0, height: 0, zIndex: -99 }}
       className="flex items-center gap-2"
     >
       <PureInput
-        type={"number"}
+        type={'number'}
         value={String(fromInternal)}
         onChange={(v) => changeVal(v.target.valueAsNumber)}
         className="w-52"
@@ -106,7 +106,7 @@ const NumberColorSelector = ({
     const v2 = cloneDeep(value);
     const before = v2[v2.length - 1];
     const from = before ? before.from + 1 : 0;
-    v2.push({ from, color: "neutral", id: uuidv4() });
+    v2.push({ from, color: 'neutral', id: uuidv4() });
     recordUpdate(v2);
   };
 
@@ -116,7 +116,7 @@ const NumberColorSelector = ({
       v2[i] = v;
       recordUpdate(v2);
     } catch (e) {
-      throw new Error("Invalid index");
+      throw new Error('Invalid index');
     }
   };
 
@@ -132,7 +132,7 @@ const NumberColorSelector = ({
         <div className="flex w-full gap-2 text-neutral-400 dark:text-neutral-500">
           {value.length > 0 && (
             <>
-              <div className="w-52 ">When value {">="} than</div>
+              <div className="w-52 ">When value {'>='} than</div>
               <div>Set color to</div>
               <div></div>
             </>
@@ -150,7 +150,7 @@ const NumberColorSelector = ({
                   value={el}
                   onChange={(v: IColorCodingItem) => chagneByIndex(index, v)}
                   remove={() => removeByIndex(index)}
-                  key={el.id || ""}
+                  key={el.id || ''}
                 />
               );
             })}
