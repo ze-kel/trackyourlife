@@ -1,6 +1,6 @@
 import type { ITrackable, ITrackableUpdate } from "src/types/trackable";
 
-import formatDateKey from "src/helpers/formatDateKey";
+import formatDateKey from "./formatDateKey";
 import type { Optional } from "@t/helpers";
 
 const updateData = (

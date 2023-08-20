@@ -1,11 +1,11 @@
-import { PureInput } from "@components/_UI/Input";
-import type { INumberSettings } from "@t/trackable";
-import clsx from "clsx";
-import { useState } from "react";
+import { PureInput } from '@components/_UI/Input';
+import type { INumberSettings } from '@t/trackable';
+import clsx from 'clsx';
+import { useState } from 'react';
 
 export interface IRangeLabelSelector {
-  value: INumberSettings["limits"];
-  onChange: (a: INumberSettings["limits"]) => void;
+  value: INumberSettings['limits'];
+  onChange: (a: INumberSettings['limits']) => void;
   className?: string;
 }
 
@@ -18,7 +18,7 @@ const NumberLimitsSelector = ({
 
   const [isError, setIsError] = useState(false);
 
-  const checkValidityAndPush = (v: INumberSettings["limits"]) => {
+  const checkValidityAndPush = (v: INumberSettings['limits']) => {
     setInnerValue(v);
 
     if (v && v.min && v.max && v.min >= v.max) {
@@ -31,7 +31,7 @@ const NumberLimitsSelector = ({
   };
 
   return (
-    <div className={clsx("flex flex-col gap-1", className)}>
+    <div className={clsx('flex flex-col gap-1', className)}>
       <div className="flex gap-2 text-neutral-400 dark:text-neutral-500">
         <div className="w-52">Min</div>
         <div className="w-52">Max</div>
@@ -71,10 +71,10 @@ const NumberLimitsSelector = ({
 
       <label className="flex">
         <input
-          type={"checkbox"}
+          type={'checkbox'}
           checked={innerValue?.showProgress}
           onChange={(e) => {
-            console.log("et", e.target.checked);
+            console.log('et', e.target.checked);
             checkValidityAndPush({
               ...innerValue,
               showProgress: e.target.checked,
