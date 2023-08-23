@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { findAndPrepareTrackable } from "src/app/api/trackables/[id]/route";
-import TrackableSub from "src/app/trackables/[id]/clientPart";
+import TrackableSub from "./clientPart";
 import getPageSession from "src/helpers/getPageSesion";
 
 const Trackable = async ({ params }: { params: { id: string } }) => {

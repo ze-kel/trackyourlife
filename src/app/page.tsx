@@ -2,8 +2,8 @@ import { redirect } from "next/navigation";
 import getPageSession from "src/helpers/getPageSesion";
 import { prisma } from "./api/db";
 import Link from "next/link";
-import PlusIcon from "@heroicons/react/24/outline/PlusCircleIcon";
 import TrackablesList from "@components/TrackablesList";
+import { Button } from "@/components/ui/button";
 
 const Page = async () => {
   const session = await getPageSession();
@@ -22,11 +22,7 @@ const Page = async () => {
       <div className="flex items-center justify-between">
         <h2 className="b text-3xl font-semibold">Your Trackables</h2>
         <Link href={"/create"}>
-          <PlusIcon
-            className={
-              "w-7 cursor-pointer text-neutral-400 transition-colors hover:text-neutral-700"
-            }
-          />
+          <Button variant="outline">Create</Button>
         </Link>
       </div>
       <div className="mt-2">

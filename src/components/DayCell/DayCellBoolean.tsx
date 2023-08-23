@@ -58,12 +58,12 @@ const activeGen: Record<IColorOptions, Record<"bg" | "hover", string>> = {
 
 const BooleanClasses = cva(
   [
-    "relative border-2 overflow-hidden border-transparent transition-all duration-400 ease-in-out select-none outline-none focus:outline-neutral-300 dark:focus:outline-neutral-600",
+    "relative overflow-hidden border-transparent transition-all duration-400 ease-in-out select-none outline-none focus:outline-neutral-300 dark:focus:outline-neutral-600",
   ],
   {
     variants: {
       style: {
-        default: "h-16",
+        default: "h-16 border-2",
         mini: "h-6 border",
       },
       inTrackRange: {

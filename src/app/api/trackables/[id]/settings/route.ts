@@ -1,20 +1,22 @@
-import { prisma } from 'src/app/api/db';
+import { prisma } from "src/app/api/db";
 
-import { cookies } from 'next/headers';
-import { NextResponse, type NextRequest } from 'next/server';
-import { auth } from 'src/auth/lucia';
+import { cookies } from "next/headers";
+import { NextResponse, type NextRequest } from "next/server";
+import { auth } from "src/auth/lucia";
 
 import {
   ZTrackableSettingsBoolean,
   ZTrackableSettingsNumber,
   ZTrackableSettingsRange,
-} from 'src/types/trackable';
-import type { Prisma } from '@prisma/client';
+} from "src/types/trackable";
+import type { Prisma } from "@prisma/client";
 
 export const POST = async (
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) => {
+  console.log("POST TO SETTINGS");
+
   // Auth check
   const authRequest = auth.handleRequest({ request, cookies });
   const session = await authRequest.validate();
@@ -34,38 +36,40 @@ export const POST = async (
   if (!trackable) {
     return NextResponse.json(
       {
-        error: 'No trackable with ID' + id,
+        error: "No trackable with ID" + id,
       },
       {
         status: 400,
-      }
+      },
     );
   }
 
   const data = (await request.json()) as unknown;
 
+  console.log(data);
+
   let parsed;
 
-  if (trackable.type === 'boolean') {
+  if (trackable.type === "boolean") {
     parsed = ZTrackableSettingsBoolean.safeParse(data);
   }
 
-  if (trackable.type === 'number') {
+  if (trackable.type === "number") {
     parsed = ZTrackableSettingsNumber.safeParse(data);
   }
 
-  if (trackable.type === 'range') {
+  if (trackable.type === "range") {
     parsed = ZTrackableSettingsRange.safeParse(data);
   }
 
   if (!parsed || !parsed?.success) {
     return NextResponse.json(
       {
-        error: 'Settings do not match Trackable type schema',
+        error: "Settings do not match Trackable type schema",
       },
       {
         status: 400,
-      }
+      },
     );
   }
 
@@ -78,5 +82,5 @@ export const POST = async (
     },
   });
 
-  return parsed.data;
+  return NextResponse.json(parsed.data);
 };

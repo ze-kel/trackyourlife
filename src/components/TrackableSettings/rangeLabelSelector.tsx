@@ -1,9 +1,10 @@
 import type { IRangeSettings } from "@t/trackable";
+import { init } from "emoji-mart";
 import Picker from "@emoji-mart/react";
 import data from "@emoji-mart/data";
 import { PureInput } from "@components/_UI/Input";
 import cloneDeep from "lodash/cloneDeep";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Dropdown from "@components/_UI/Dropdown";
 import clsx from "clsx";
 import { Emoji } from "@components/_UI/Emoji";
@@ -110,6 +111,10 @@ const RangeLabelSelector = ({
   const [value, updateValue] = useState(addIds(initialValue) || []);
   const [error, updateError] = useState<string>();
   const controls = useDragControls();
+
+  useEffect(() => {
+    void init(data);
+  }, []);
 
   const checkDuplicates = (index: number) => {
     const tVal = value[index];

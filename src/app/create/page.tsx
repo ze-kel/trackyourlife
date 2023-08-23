@@ -83,7 +83,11 @@ const Create = () => {
         </div>
         <TrackableSettingsManual trackable={newOne} setSettings={setSettings} />
 
-        <Button onClick={() => void create()} className="mt-5 w-full">
+        <Button
+          onClick={() => void create()}
+          className="mt-5 w-full"
+          variant={"outline"}
+        >
           Create
         </Button>
       </div>

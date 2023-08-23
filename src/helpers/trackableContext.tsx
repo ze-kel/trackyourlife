@@ -36,7 +36,7 @@ const changeSettingsApi = async ({
   settings: ITrackableSettings;
 }) => {
   const res = await fetch(`${getBaseUrl()}/api/trackables/${id}/settings`, {
-    method: "PUT",
+    method: "POST",
     body: JSON.stringify(settings),
   });
   const data = (await res.json()) as unknown;

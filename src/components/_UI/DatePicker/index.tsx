@@ -11,10 +11,12 @@ import {
   isAfter,
 } from "date-fns";
 import { useEffect, useRef, useState } from "react";
-import IconChevronLeft from "@heroicons/react/20/solid/ChevronLeftIcon";
-import IconChevronLeftDouble from "@heroicons/react/20/solid/ChevronDoubleLeftIcon";
-import IconChevronRight from "@heroicons/react/20/solid/ChevronRightIcon";
-import IconChevronRightDouble from "@heroicons/react/20/solid/ChevronDoubleRightIcon";
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  DoubleArrowLeftIcon,
+  DoubleArrowRightIcon,
+} from "@radix-ui/react-icons";
 import Dropdown from "../Dropdown";
 import { AnimatePresence, motion } from "framer-motion";
 import useMeasure from "react-use-measure";
@@ -114,24 +116,22 @@ const DatePicker = ({
       <div ref={ref}>
         <div className="flex w-full items-center justify-between py-2">
           <div className="flex">
-            <IconChevronLeftDouble
-              className={clsx(
-                "w-7",
-                isSameMonth(limits.start, cursor)
-                  ? "opacity-10"
-                  : "cursor-pointer",
-              )}
+            <Button
+              variant="ghost"
+              size="icon"
+              disabled={isSameMonth(limits.start, cursor)}
               onClick={() => moveCursorMonths(-12)}
-            />
-            <IconChevronLeft
-              className={clsx(
-                "w-7",
-                isSameMonth(limits.start, cursor)
-                  ? "opacity-10"
-                  : "cursor-pointer",
-              )}
+            >
+              <DoubleArrowLeftIcon className="w-7" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              disabled={isSameMonth(limits.start, cursor)}
               onClick={() => moveCursorMonths(-1)}
-            />
+            >
+              <ChevronLeftIcon className="w-7" />
+            </Button>
           </div>
           <AnimatePresence
             mode="popLayout"
@@ -152,24 +152,23 @@ const DatePicker = ({
             </motion.div>
           </AnimatePresence>
           <div className="flex">
-            <IconChevronRight
-              className={clsx(
-                "w-7",
-                isSameMonth(new Date(), cursor)
-                  ? "opacity-10"
-                  : "cursor-pointer",
-              )}
+            <Button
+              variant="ghost"
+              size="icon"
+              disabled={isSameMonth(new Date(), cursor)}
               onClick={() => moveCursorMonths(1)}
-            />
-            <IconChevronRightDouble
-              className={clsx(
-                "w-7",
-                isSameMonth(new Date(), cursor)
-                  ? "opacity-10"
-                  : "cursor-pointer",
-              )}
-              onClick={() => moveCursorMonths(12)}
-            />
+            >
+              <ChevronRightIcon className="w-7" />
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="icon"
+              disabled={isSameMonth(new Date(), cursor)}
+              onClick={() => moveCursorMonths(1)}
+            >
+              <DoubleArrowRightIcon className="w-7" />
+            </Button>
           </div>
         </div>
 

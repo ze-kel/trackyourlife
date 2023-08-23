@@ -1,28 +1,18 @@
-'use client';
+"use client";
 
-import DeleteButton from '@components/DeleteButton';
-import TrackableName from '@components/TrackableName';
-import TrackableView from '@components/TrackableView';
-import type { ITrackable } from '@t/trackable';
-import Link from 'next/link';
-import { ReactQueryProvider } from 'src/helpers/ReactQueryProvider';
-import TrackableContext from 'src/helpers/trackableContext';
-import IconSettings from '@heroicons/react/24/outline/Cog6ToothIcon';
-import { useQuery } from '@tanstack/react-query';
-import { getBaseUrl } from 'src/helpers/getBaseUrl';
-
-const getTrackable = async (id: string) => {
-  const res = await fetch(`${getBaseUrl()}/api/trackables/${id}`, {
-    method: 'GET',
-  });
-
-  const data = (await res.json()) as unknown;
-
-  return data as ITrackable;
-};
+import DeleteButton from "@components/DeleteButton";
+import TrackableName from "@components/TrackableName";
+import TrackableView from "@components/TrackableView";
+import type { ITrackable } from "@t/trackable";
+import Link from "next/link";
+import TrackableContext from "src/helpers/trackableContext";
+import { GearIcon } from "@radix-ui/react-icons";
+import { useQuery } from "@tanstack/react-query";
+import { getTrackable } from "src/app/trackables/[id]/getTrackable";
+import { Button } from "@/components/ui/button";
 
 const Trackable = ({ trackable }: { trackable: ITrackable }) => {
-  const { data } = useQuery(['trackable', trackable.id], {
+  const { data } = useQuery(["trackable", trackable.id], {
     queryFn: async () => {
       return await getTrackable(trackable.id);
     },
@@ -36,11 +26,10 @@ const Trackable = ({ trackable }: { trackable: ITrackable }) => {
           <div className="content-container flex h-full max-h-full w-full flex-col">
             <div className="mb-4 flex w-full items-center justify-between">
               <TrackableName />
-              <Link
-                href={`/trackables/${data.id}/settings`}
-                className="mr-2 flex w-7 cursor-pointer items-center text-neutral-400 transition-colors hover:text-neutral-700"
-              >
-                <IconSettings />
+              <Link href={`/trackables/${data.id}/settings`} className="mr-2">
+                <Button variant="outline" size="icon">
+                  <GearIcon className="h-4 w-4" />
+                </Button>
               </Link>
               <DeleteButton />
             </div>
@@ -53,12 +42,4 @@ const Trackable = ({ trackable }: { trackable: ITrackable }) => {
   );
 };
 
-const WrappedTrackableClient = ({ data }: { data: ITrackable }) => {
-  return (
-    <ReactQueryProvider>
-      <Trackable trackable={data}></Trackable>
-    </ReactQueryProvider>
-  );
-};
-
-export default WrappedTrackableClient;
+export default Trackable;
