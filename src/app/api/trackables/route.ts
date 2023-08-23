@@ -1,9 +1,9 @@
-import type { Prisma } from '@prisma/client';
-import { prisma } from '../db';
-import { cookies } from 'next/headers';
-import { NextResponse, type NextRequest } from 'next/server';
-import { trackableToCreate } from 'src/app/api/trackables/[id]/route';
-import { auth } from 'src/auth/lucia';
+import type { Prisma } from "@prisma/client";
+import { prisma } from "../db";
+import { cookies } from "next/headers";
+import { NextResponse, type NextRequest } from "next/server";
+import { trackableToCreate } from "src/app/api/trackables/[id]/route";
+import { auth } from "src/auth/lucia";
 
 export const GET = async (request: NextRequest) => {
   // Auth check
@@ -20,8 +20,6 @@ export const GET = async (request: NextRequest) => {
     where: { userId },
     select: { id: true },
   });
-
-  console.log(entries);
 
   return NextResponse.json({ ids: entries.map((entry) => entry.id) });
 };
@@ -47,7 +45,7 @@ export const PUT = async (request: NextRequest) => {
       },
       {
         status: 400,
-      }
+      },
     );
   }
 

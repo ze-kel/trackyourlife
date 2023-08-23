@@ -51,10 +51,10 @@ const Header = ({ user }: { user?: User }) => {
   );
 
   return (
-    <div className="flex h-12 flex-shrink-0 justify-center border-b border-neutral-300 bg-neutral-50 font-bold text-neutral-800 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-100">
+    <div className="flex h-14 flex-shrink-0 justify-center border-b-2 border-neutral-300 bg-neutral-50 font-bold text-neutral-800 dark:border-neutral-900 dark:bg-neutral-950 dark:text-neutral-100">
       <div className="content-container flex h-full w-full items-center justify-between">
         <Link href={"/"}>
-          <h2 className="font-light">Track Your Life</h2>
+          <h2 className="font-medium">Track Your Life</h2>
         </Link>
 
         {user && (

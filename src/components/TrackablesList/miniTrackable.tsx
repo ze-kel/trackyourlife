@@ -1,7 +1,7 @@
-import DayCell from '@components/DayCell';
-import clsx from 'clsx';
-import { format, getDaysInMonth } from 'date-fns';
-import { useMemo } from 'react';
+import DayCell from "@components/DayCell";
+import clsx from "clsx";
+import { format, getDaysInMonth } from "date-fns";
+import { useMemo } from "react";
 
 const generateDates = (days: number) => {
   const today = new Date();
@@ -36,8 +36,8 @@ const MiniTrackable = ({ className }: { className?: string }) => {
   return (
     <div
       className={clsx(
-        'sm grid grid-cols-3 gap-x-1 gap-y-1 md:grid-cols-7',
-        className
+        "sm grid grid-cols-3 gap-x-1 gap-y-1 md:grid-cols-7",
+        className,
       )}
     >
       <>
@@ -47,14 +47,14 @@ const MiniTrackable = ({ className }: { className?: string }) => {
             <div
               key={index}
               className={clsx(
-                'gap-1',
-                index === 0 ? 'hidden md:flex' : 'flex',
-                index > 3 ? 'flex-col-reverse md:flex-col' : 'flex-col'
+                "gap-1",
+                index === 0 ? "hidden md:flex" : "flex",
+                index > 3 ? "flex-col-reverse md:flex-col" : "flex-col",
               )}
             >
               <div className="px-1 text-xs ">
                 <span className="text-neutral-400 dark:text-neutral-700">
-                  {format(date, 'EEEE')}
+                  {format(date, "EEEE")}
                 </span>
               </div>
 

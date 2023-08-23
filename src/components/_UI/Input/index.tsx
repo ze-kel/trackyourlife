@@ -1,7 +1,8 @@
 import clsx from "clsx";
 import type { ChangeEvent } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { z } from "zod";
+import { Input } from "../../../../@/components/ui/input";
 
 interface IBase {
   value?: string;
@@ -35,14 +36,11 @@ export const PureInput = ({
 }: IPureInputProps) => {
   return (
     <div className="flex flex-col">
-      <input
+      <Input
         className={clsx(
           className,
-          "transition-color rounded-sm border-2 border-neutral-300 bg-neutral-50 py-1 px-2 outline-none focus:border-neutral-800 dark:border-neutral-800 dark:bg-neutral-900 dark:focus:border-neutral-600",
-          isValid &&
-            "border-lime-500 focus:border-lime-600 dark:border-lime-500 dark:focus:border-lime-600",
-          error &&
-            "border-red-500 focus:border-red-600 dark:border-red-500 dark:focus:border-red-600"
+          isValid && "border-lime-500 dark:border-lime-600 ",
+          error && "border-red-500 dark:border-red-600 ",
         )}
         type={type}
         value={value}
@@ -51,7 +49,9 @@ export const PureInput = ({
         onBlur={onBlur}
       />
       {error && typeof error === "string" && (
-        <div className="mt2 text-red-500">{error}</div>
+        <div className="mt-1 text-xs text-red-500 dark:text-red-600">
+          {error}
+        </div>
       )}
     </div>
   );
@@ -69,6 +69,12 @@ const GenericInput = ({
   const [val, setVal] = useState(value || "");
   const [error, setError] = useState("");
   const [isValid, setIsValid] = useState(false);
+
+  useEffect(() => {
+    if (value) {
+      handleChange(value);
+    }
+  }, []);
 
   const handleChange = (val: string) => {
     setVal(val);
@@ -88,13 +94,14 @@ const GenericInput = ({
         setError(res.error.errors[0].message);
       }
       setIsValid(false);
+      onChange("");
     }
   };
 
   return (
     <div className={className}>
       {title && (
-        <h5 className="mb-1 text-lg font-semibold text-neutral-800 dark:text-neutral-300">
+        <h5 className="mb-1 text-sm font-semibold text-neutral-800 dark:text-neutral-300">
           {title}
         </h5>
       )}
