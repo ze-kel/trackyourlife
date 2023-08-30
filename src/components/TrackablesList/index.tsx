@@ -6,6 +6,8 @@ import MiniTrackable from "./miniTrackable";
 import { useQuery } from "@tanstack/react-query";
 import { getBaseUrl } from "src/helpers/getBaseUrl";
 
+import { Skeleton } from "@/components/ui/skeleton";
+
 const getTrackable = async (id: string) => {
   const res = await fetch(`${getBaseUrl()}/api/trackables/${id}`, {
     method: "GET",
@@ -23,7 +25,20 @@ const Trackable = ({ id }: { id: ITrackable["id"] }) => {
     },
   });
 
-  if (!data) return <div>Loading</div>;
+  if (!data)
+    return (
+      <article className="border-b border-neutral-200 py-2 last:border-0 dark:border-neutral-800">
+        <Link href={`/trackables/${id}`} className="block w-fit">
+          <h3 className="w-fit cursor-pointer text-xl font-light opacity-5">
+            Loading...
+          </h3>
+        </Link>
+        <MiniTrackable
+          stub={<Skeleton className="h-[64px] rounded-none"></Skeleton>}
+          className="my-4"
+        />
+      </article>
+    );
 
   return (
     <TrackableProvider trackable={data}>

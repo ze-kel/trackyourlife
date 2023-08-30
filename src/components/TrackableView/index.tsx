@@ -29,7 +29,7 @@ const Month = ({
   return (
     <div
       id={myId}
-      className={clsx("grid grid-cols-7 grid-rows-6", mini ? "gap-1" : "")}
+      className={clsx("grid grid-cols-7 grid-rows-6", mini ? "gap-1" : "gap-1")}
     >
       {prepend.map((_, i) => (
         <div key={i}> </div>

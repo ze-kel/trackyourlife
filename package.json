@@ -33,7 +33,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "date-fns": "^2.30.0",
-    "emoji-mart": "^5.5.2",
+    "emoji-regex": "^10.2.1",
     "framer-motion": "^10.16.0",
     "lodash": "^4.17.21",
     "lucia": "^2.3.0",

@@ -4,7 +4,6 @@ import { prisma } from "./api/db";
 import Link from "next/link";
 import TrackablesList from "@components/TrackablesList";
 import { Button } from "@/components/ui/button";
-
 const Page = async () => {
   const session = await getPageSession();
 

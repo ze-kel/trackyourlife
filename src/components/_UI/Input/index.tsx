@@ -21,7 +21,9 @@ interface IPureInputProps extends IBase {
 interface IInputProps extends IBase {
   title?: string;
   schema?: z.ZodString;
-  onChange: (v: string) => void;
+  onChange: (v: string) => void | string;
+  noError?: boolean;
+  updateFromOnchage?: boolean;
 }
 
 export const PureInput = ({
@@ -65,6 +67,8 @@ const GenericInput = ({
   type,
   schema,
   className,
+  noError,
+  updateFromOnchage,
 }: IInputProps) => {
   const [val, setVal] = useState(value || "");
   const [error, setError] = useState("");
@@ -86,11 +90,15 @@ const GenericInput = ({
 
     const res = schema.safeParse(val);
     if (res.success) {
-      onChange(val);
+      if (updateFromOnchage) {
+        setVal(onChange(val) as string);
+      } else {
+        onChange(val);
+      }
       setError("");
       setIsValid(true);
     } else {
-      if (res.error.errors[0]) {
+      if (res.error.errors[0] && !noError) {
         setError(res.error.errors[0].message);
       }
       setIsValid(false);

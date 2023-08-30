@@ -46,7 +46,7 @@ export const ZTrackableSettingsNumber = z.object({
         color: colorOption,
         // used to key inputs when editing, can be changed voluntarily
         id: z.string().optional(),
-      })
+      }),
     )
     .optional(),
 });
@@ -57,10 +57,10 @@ export const ZTrackableSettingsRange = z.object({
     .array(
       z.object({
         internalKey: z.string().min(1),
-        emojiShortcode: z.string(),
+        emoji: z.string().emoji(),
         // used to key inputs when editing, can be changed voluntarily
         id: z.string().optional(),
-      })
+      }),
     )
     .optional(),
 });

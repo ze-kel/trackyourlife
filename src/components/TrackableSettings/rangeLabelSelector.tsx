@@ -1,20 +1,17 @@
+"use client";
 import type { IRangeSettings } from "@t/trackable";
-import { init } from "emoji-mart";
-import Picker from "@emoji-mart/react";
-import data from "@emoji-mart/data";
-import { PureInput } from "@components/_UI/Input";
+import GenericInput, { PureInput } from "@components/_UI/Input";
 import cloneDeep from "lodash/cloneDeep";
-import { useEffect, useState } from "react";
-import Dropdown from "@components/_UI/Dropdown";
+import { useState } from "react";
 import clsx from "clsx";
-import { Emoji } from "@components/_UI/Emoji";
-import XIcon from "@heroicons/react/24/outline/XMarkIcon";
-import PlusIcon from "@heroicons/react/24/outline/PlusIcon";
 import { AnimatePresence } from "framer-motion";
 import { Reorder, useDragControls } from "framer-motion";
-import ElliplsisIcon from "@heroicons/react/24/outline/EllipsisVerticalIcon";
+import { Cross1Icon, PlusIcon } from "@radix-ui/react-icons";
 import type { ArrayElement } from "@t/helpers";
 import { v4 as uuidv4 } from "uuid";
+import { z } from "zod";
+import emojiRegex from "emoji-regex";
+import Button from "@components/_UI/Button";
 
 export interface IRangeLabelSelector {
   initialValue: IRangeSettings["labels"];
@@ -22,6 +19,8 @@ export interface IRangeLabelSelector {
 }
 
 type IRangeLabel = ArrayElement<NonNullable<IRangeSettings["labels"]>>;
+
+const regex = emojiRegex();
 
 const Pair = ({
   value,
@@ -35,16 +34,23 @@ const Pair = ({
   duplicate: boolean;
   remove: () => void;
 }) => {
-  const [dropdown, setDropdown] = useState(false);
   const controls = useDragControls();
 
   const updateKey = (val: string) => {
     update({ ...value, internalKey: val });
   };
 
-  const selectEmoji = (input: { shortcodes: string }) => {
-    update({ ...value, emojiShortcode: input.shortcodes });
-    setDropdown(false);
+  const selectEmoji = (val: string) => {
+    const emojis = val.matchAll(regex);
+
+    let lastOne = "";
+
+    for (const match of emojis) {
+      lastOne = match[0];
+    }
+
+    update({ ...value, emoji: lastOne });
+    return lastOne;
   };
 
   return (
@@ -58,36 +64,30 @@ const Pair = ({
       initial={{ opacity: 0, y: 10, height: 0 }}
       animate={{ opacity: 1, y: 0, height: "45px", zIndex: 2 }}
       exit={{ opacity: 0, height: 0, zIndex: -99 }}
+      dragControls={controls}
       className="relative flex items-center gap-2"
       layout
     >
-      <div
-        onPointerDown={(e) => controls.start(e)}
-        className="flex w-4 scale-150 cursor-grabbing dark:text-neutral-700 dark:hover:text-neutral-100"
-      >
-        <ElliplsisIcon />
-      </div>
       <PureInput
         value={value.internalKey}
         className={clsx("col-start-1 col-end-1 w-64")}
         error={duplicate || !value.internalKey}
         onChange={(e) => updateKey(e.target.value)}
       />
-      <Dropdown
-        placement="right"
-        visible={dropdown}
-        setVisible={setDropdown}
-        hiddenPart={
-          <Picker data={data} onEmojiSelect={selectEmoji} autoFocus={true} />
-        }
-        mainPart={<Emoji size="30px" shortcodes={value.emojiShortcode} />}
-        classNameMain={"w-fit cursor-pointer"}
-      />
+      <GenericInput
+        value={value.emoji}
+        onChange={selectEmoji}
+        schema={z.string().emoji("")}
+        className="w-10"
+        noError
+        updateFromOnchage
+      ></GenericInput>
+
       <div
         className="flex w-7 cursor-pointer items-center justify-center"
         onClick={remove}
       >
-        <XIcon className="w-7 text-neutral-300 transition-colors hover:text-neutral-800 dark:text-neutral-700 dark:hover:text-neutral-100" />
+        <Cross1Icon className="text-neutral-300 transition-colors hover:text-neutral-800 dark:text-neutral-700 dark:hover:text-neutral-100" />
       </div>
     </Reorder.Item>
   );
@@ -111,10 +111,6 @@ const RangeLabelSelector = ({
   const [value, updateValue] = useState(addIds(initialValue) || []);
   const [error, updateError] = useState<string>();
   const controls = useDragControls();
-
-  useEffect(() => {
-    void init(data);
-  }, []);
 
   const checkDuplicates = (index: number) => {
     const tVal = value[index];
@@ -163,7 +159,7 @@ const RangeLabelSelector = ({
   const addNewProperty = () => {
     const upd = [
       ...value,
-      { internalKey: "newLabel", emojiShortcode: ":question:", id: uuidv4() },
+      { internalKey: "newLabel", emoji: "❓", id: uuidv4() },
     ];
     updateValue(upd);
     pushUpdates(upd);
@@ -178,10 +174,10 @@ const RangeLabelSelector = ({
 
   return (
     <div className="flex flex-col gap-1">
-      <div className="mb-1 flex w-fit flex-col items-center">
+      {error && <div className="text-xs text-red-500">{error}</div>}
+      <div className="mb-1 flex w-fit flex-col">
         {value.length > 0 && (
-          <div className="flex w-full gap-2 text-sm text-neutral-400 dark:text-neutral-500">
-            <div className="w-4"></div>
+          <div className="flex w-full gap-2 text-xs text-neutral-400 dark:text-neutral-500">
             <div className="w-64 ">Value</div>
             <div>Icon</div>
             <div></div>
@@ -213,15 +209,16 @@ const RangeLabelSelector = ({
           </AnimatePresence>
         </Reorder.Group>
 
-        <div
-          className="flex cursor-pointer justify-center whitespace-nowrap text-neutral-300 transition-colors hover:text-neutral-800 dark:text-neutral-700 dark:hover:text-neutral-100 "
+        <Button
+          theme="transparent"
+          size="s"
+          className="flex w-fit items-center gap-2 rounded-sm"
           onClick={addNewProperty}
         >
           <PlusIcon className="mr-1 w-4" />
           Add new
-        </div>
+        </Button>
       </div>
-      {error && <div className="text-red-500">{error}</div>}
     </div>
   );
 };

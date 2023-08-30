@@ -188,7 +188,7 @@ const getRangeLabelMapping = (trackable: ITrackable) => {
 
   const map: Record<string, string> = {};
   labels.forEach((v) => {
-    map[v.internalKey] = v.emojiShortcode;
+    map[v.internalKey] = v.emoji;
   });
 
   return map;

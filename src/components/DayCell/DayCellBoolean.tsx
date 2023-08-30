@@ -183,6 +183,7 @@ export const DayCellBoolean = ({ day, month, year, style }: IDayProps) => {
         }),
         inTrackRange && borderClass,
       )}
+      disabled={!inTrackRange}
       key={day}
       onMouseDown={(e) => e.preventDefault()}
       onClick={(e) => void handleClick(e)}

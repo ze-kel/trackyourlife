@@ -165,7 +165,11 @@ const SettingsRange = ({
       </div>
 
       {handleSave && (
-        <Button className="mt-2" onClick={() => void handleSave()}>
+        <Button
+          className="mt-2"
+          theme="inverted"
+          onClick={() => void handleSave()}
+        >
           Save
         </Button>
       )}
@@ -182,7 +186,7 @@ const TrackableSettings = () => {
 
   const handleSave = async () => {
     await changeSettings(settings);
-    router.push(`/trackable/${trackable.id}`);
+    router.push(`/trackables/${trackable.id}`);
   };
 
   if (trackable.type === "boolean") {
