@@ -1,7 +1,8 @@
+"use server";
 import DayCell from "@components/DayCell";
+import type { ITrackable } from "@t/trackable";
 import clsx from "clsx";
 import { format, getDaysInMonth } from "date-fns";
-import type { ReactNode} from "react";
 import { useMemo } from "react";
 
 const generateDates = (days: number) => {
@@ -35,10 +36,10 @@ const NUM_OF_DAYS = 6;
 
 const MiniTrackable = ({
   className,
-  stub,
+  trackable,
 }: {
   className?: string;
-  stub?: ReactNode;
+  trackable: ITrackable;
 }) => {
   const daysToRender = useMemo(() => generateDates(NUM_OF_DAYS), []);
 
@@ -66,8 +67,7 @@ const MiniTrackable = ({
                   {format(date, "EEEE")}
                 </span>
               </div>
-
-              {stub ? stub : <DayCell {...day} key={index} />}
+              <DayCell {...day} trackable={trackable} key={index} />
             </div>
           );
         })}

@@ -5,12 +5,15 @@ import DayCell from "../DayCell";
 import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
 import clsx from "clsx";
 import { Button } from "@/components/ui/button";
+import { ITrackable } from "@t/trackable";
 
 const Month = ({
   month,
   year,
   mini,
+  trackable,
 }: {
+  trackable: ITrackable;
   month: number;
   year: number;
   mini?: boolean;
@@ -36,6 +39,7 @@ const Month = ({
       ))}
       {dates.map((el) => (
         <DayCell
+          trackable={trackable}
           key={`${month}-${el}`}
           year={year}
           month={month}
@@ -59,7 +63,9 @@ const monthsBeforeToday = (year: number) => {
 const Year = ({
   year,
   openMonth,
+  trackable,
 }: {
+  trackable: ITrackable;
   year: number;
   openMonth: (n: number) => void;
 }) => {
@@ -89,7 +95,7 @@ const Year = ({
             >
               <span>{format(new Date(year, m, 1), "MMMM")}</span>
             </h5>
-            <Month year={year} month={m} mini={true} />
+            <Month trackable={trackable} year={year} month={m} mini={true} />
           </div>
         ))}
       </div>
@@ -130,7 +136,7 @@ const Decade = ({
 
 type TView = "days" | "months" | "years";
 
-const TrackableView = () => {
+const TrackableView = ({ trackable }: { trackable: ITrackable }) => {
   const now = new Date();
   const [year, setYear] = useState(now.getFullYear());
   const [month, setMonth] = useState(now.getMonth());
@@ -219,8 +225,12 @@ const TrackableView = () => {
           </Button>
         </div>
       </div>
-      {view === "days" && <Month year={year} month={month} />}
-      {view === "months" && <Year year={year} openMonth={openMonth} />}
+      {view === "days" && (
+        <Month trackable={trackable} year={year} month={month} />
+      )}
+      {view === "months" && (
+        <Year trackable={trackable} year={year} openMonth={openMonth} />
+      )}
       {view === "years" && (
         <Decade yearOffset={yearOffset} openYear={openYear} />
       )}

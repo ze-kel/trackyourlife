@@ -6,8 +6,6 @@ import { trackableToCreate } from "src/app/api/trackables/[id]/route";
 import { auth } from "src/auth/lucia";
 
 export const GET = async (request: NextRequest) => {
-  console.log("GET REq");
-
   // Auth check
   const authRequest = auth.handleRequest({ request, cookies });
   const session = await authRequest.validate();

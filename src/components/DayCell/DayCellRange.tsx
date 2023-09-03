@@ -1,16 +1,31 @@
+"use client";
 import Dropdown from "@components/_UI/Dropdown";
 import { cva } from "class-variance-authority";
 import { useMemo, useState } from "react";
-import { useTrackableSafe } from "src/helpers/trackableContext";
-import type { IDayProps } from ".";
+import type { IDayProps } from "./index";
 import { computeDayCellHelpers } from ".";
 import { ThemeList } from "./DayCellBoolean";
 import style from "./curstomScrollbar.module.css";
 
-import type { IRangeSettings } from "@t/trackable";
+import type { IRangeSettings, ITrackable } from "@t/trackable";
 import clsx from "clsx";
 import { AnimatePresence, motion } from "framer-motion";
 import DayNumber from "@components/DayCell/dayNumber";
+import { changeDay } from "src/helpers/actions";
+import { experimental_useOptimistic as useOptimistic } from "react";
+
+const getRangeLabelMapping = (trackable: ITrackable) => {
+  if (trackable.type !== "range" || !trackable.settings.labels) return;
+
+  const labels = trackable.settings.labels;
+
+  const map: Record<string, string> = {};
+  labels.forEach((v) => {
+    map[v.internalKey] = v.emoji;
+  });
+
+  return map;
+};
 
 interface PopupSelectorProps {
   rangeMapping: IRangeSettings["labels"];
@@ -205,8 +220,14 @@ const RangeClasses = cva(
   },
 );
 
-export const DayCellRange = ({ day, month, year, style }: IDayProps) => {
-  const { trackable, changeDay, rangeLabelMapping } = useTrackableSafe();
+export const DayCellRange = ({
+  trackable,
+  day,
+  month,
+  year,
+  style,
+}: IDayProps) => {
+  const rangeLabelMapping = getRangeLabelMapping(trackable);
 
   if (trackable.type !== "range") {
     throw new Error("Not range trackable passed to trackable dayCell");
@@ -229,11 +250,18 @@ export const DayCellRange = ({ day, month, year, style }: IDayProps) => {
     [day, month, year, trackable.settings.startDate],
   );
 
-  const dayValue = trackable.data[dateKey];
+  const [dayValue, setIsActive] = useOptimistic(
+    trackable.data[dateKey],
+    (_, value: string) => {
+      return value;
+    },
+  );
+
   const em = dayValue ? (rangeLabelMapping[dayValue] as string) : "❓";
 
   const handleSelect = async (v: string) => {
     setIsSelecting(false);
+    setIsActive(v);
     await changeDay({
       id: trackable.id,
       day,

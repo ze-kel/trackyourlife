@@ -185,9 +185,12 @@ export const POST = async (
   request: NextRequest,
   // { params }: { params: { id: string } }
 ) => {
+  console.log("UPDATE HIT", cookies().toString());
   // Auth check
-  const authRequest = auth.handleRequest({ request, cookies });
+  // Request as null allows server actions to get session correctly. Should probably go ask devs about it
+  const authRequest = auth.handleRequest({ request: null, cookies });
   const session = await authRequest.validate();
+  console.log("SESSION", session);
   if (!session) {
     return new Response(null, {
       status: 401,

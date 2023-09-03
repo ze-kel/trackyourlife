@@ -1,6 +1,6 @@
+"use client";
 import cls from "clsx";
 import React, { useCallback, useMemo, useState } from "react";
-import { useTrackableSafe } from "../../helpers/trackableContext";
 import clamp from "lodash/clamp";
 import debounce from "lodash/debounce";
 import EditableText from "@components/_UI/EditableText";
@@ -13,6 +13,8 @@ import { ThemeList } from "./DayCellBoolean";
 import type { IColorOptions, INumberSettings } from "@t/trackable";
 import { AnimatePresence, motion } from "framer-motion";
 import DayNumber from "@components/DayCell/dayNumber";
+import { changeDay } from "src/helpers/actions";
+import { experimental_useOptimistic as useOptimistic } from "react";
 
 const activeGen: Record<IColorOptions, string> = {
   neutral: "border-neutral-500 dark:border-neutral-700",
@@ -104,9 +106,13 @@ const getProgress = (
   );
 };
 
-export const DayCellNumber = ({ day, month, year, style }: IDayProps) => {
-  const { trackable, changeDay } = useTrackableSafe();
-
+export const DayCellNumber = ({
+  trackable,
+  day,
+  month,
+  year,
+  style,
+}: IDayProps) => {
   if (trackable.type !== "number") {
     throw new Error("Not number trackable passed to number dayCell");
   }
@@ -122,15 +128,19 @@ export const DayCellNumber = ({ day, month, year, style }: IDayProps) => {
     [day, month, year, trackable.settings.startDate],
   );
 
-  const number = trackable.data[dateKey];
-
-  const [displayedNumber, setDisplayedNumber] = useState(Number(number) || 0);
+  const [displayedNumber, setDisplayedNumber] = useOptimistic(
+    Number(trackable.data[dateKey] || 0),
+    (_, value: number) => {
+      return value;
+    },
+  );
 
   const [inInputEdit, setInInputEdit] = useState(false);
 
   const [isHover, setHover] = useState(false);
 
   const updateValue = async (value: number) => {
+    setDisplayedNumber(value);
     await changeDay({
       id: trackable.id,
       day,

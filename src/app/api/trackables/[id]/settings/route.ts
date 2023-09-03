@@ -18,8 +18,9 @@ export const POST = async (
   console.log("POST TO SETTINGS");
 
   // Auth check
-  const authRequest = auth.handleRequest({ request, cookies });
+  const authRequest = auth.handleRequest({ request: null, cookies });
   const session = await authRequest.validate();
+  console.log("SESSIon", session);
   if (!session) {
     return new Response(null, {
       status: 401,

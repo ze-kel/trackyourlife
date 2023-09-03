@@ -1,3 +1,4 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import DatePicker from "@components/_UI/DatePicker";
 import type {
@@ -9,11 +10,11 @@ import type {
 } from "@t/trackable";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useTrackableSafe } from "src/helpers/trackableContext";
 import ColorSelector from "./colorSelector";
 import NumberColorSelector from "./numberColorSelector";
 import NumberLimitsSelector from "./numberLimitsSelector";
 import RangeLabelSelector from "./rangeLabelSelector";
+import { updateSettings } from "src/helpers/actions";
 
 interface ISubSettingsProps<T> {
   settings: T;
@@ -185,15 +186,13 @@ const SettingsRange = ({
   );
 };
 
-const TrackableSettings = () => {
-  const { trackable, changeSettings } = useTrackableSafe();
-
+const TrackableSettings = ({ trackable }: { trackable: ITrackable }) => {
   const router = useRouter();
 
   const [settings, setSettings] = useState(trackable.settings);
 
   const handleSave = async () => {
-    await changeSettings(settings);
+    await updateSettings({ id: trackable.id, settings });
     router.push(`/trackables/${trackable.id}`);
   };
 

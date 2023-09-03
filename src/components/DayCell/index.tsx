@@ -1,17 +1,18 @@
-import { isSameDay, isBefore, isAfter } from 'date-fns';
-import { useTrackableSafe } from '../../helpers/trackableContext';
-import formatDateKey from 'src/helpers/formatDateKey';
-import { DayCellBoolean } from './DayCellBoolean';
-import { DayCellNumber } from './DayCellNumber';
-import type { ITrackableSettings } from 'src/types/trackable';
-import { DayCellRange } from './DayCellRange';
+"use client";
+import { isSameDay, isBefore, isAfter } from "date-fns";
+import formatDateKey from "src/helpers/formatDateKey";
+import { DayCellBoolean } from "./DayCellBoolean";
+import { DayCellNumber } from "./DayCellNumber";
+import type { ITrackable, ITrackableSettings } from "src/types/trackable";
+import { DayCellRange } from "./DayCellRange";
 
-export type IDayProps = {
+export interface IDayProps {
+  trackable: ITrackable;
   day: number;
   month: number;
   year: number;
-  style?: 'mini';
-};
+  style?: "mini";
+}
 
 export const computeDayCellHelpers = ({
   day,
@@ -22,7 +23,7 @@ export const computeDayCellHelpers = ({
   day: number;
   month: number;
   year: number;
-  startDate: ITrackableSettings['startDate'];
+  startDate: ITrackableSettings["startDate"];
 }) => {
   const dateNow = new Date();
   const dateDay = new Date(year, month, day);
@@ -39,21 +40,21 @@ export const computeDayCellHelpers = ({
 };
 
 const DayCell = (data: IDayProps) => {
-  const { trackable } = useTrackableSafe();
+  const trackable = data.trackable;
 
-  if (trackable.type === 'boolean') {
+  if (trackable.type === "boolean") {
     return <DayCellBoolean {...data} />;
   }
 
-  if (trackable.type === 'number') {
+  if (trackable.type === "number") {
     return <DayCellNumber {...data} />;
   }
 
-  if (trackable.type === 'range') {
+  if (trackable.type === "range") {
     return <DayCellRange {...data} />;
   }
 
-  throw new Error('Unsupported trackable type');
+  throw new Error("Unsupported trackable type");
 };
 
 export default DayCell;

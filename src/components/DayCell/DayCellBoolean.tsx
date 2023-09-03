@@ -1,6 +1,6 @@
+"use client";
 import type { MouseEvent } from "react";
 import { useMemo, useRef, useState } from "react";
-import { useTrackableSafe } from "../../helpers/trackableContext";
 import type { IDayProps } from "./index";
 import { computeDayCellHelpers } from "./index";
 import cls from "clsx";
@@ -9,6 +9,8 @@ import type { IColorOptions } from "src/types/trackable";
 import { AnimatePresence, motion } from "framer-motion";
 import DayNumber from "@components/DayCell/dayNumber";
 import clamp from "lodash/clamp";
+import { changeDay } from "src/helpers/actions";
+import { experimental_useOptimistic as useOptimistic } from "react";
 
 export const ThemeList: Record<IColorOptions, ""> = {
   neutral: "",
@@ -96,9 +98,13 @@ const BooleanClasses = cva(
 const ANIMATION_TIME = 0.3;
 const EASE = [0, 0.2, 0.5, 1];
 
-export const DayCellBoolean = ({ day, month, year, style }: IDayProps) => {
-  const { trackable, changeDay } = useTrackableSafe();
-
+export const DayCellBoolean = ({
+  trackable,
+  day,
+  month,
+  year,
+  style,
+}: IDayProps) => {
   if (trackable.type !== "boolean") {
     throw new Error("Not boolena trackable passed to boolean dayCell");
   }
@@ -114,7 +120,12 @@ export const DayCellBoolean = ({ day, month, year, style }: IDayProps) => {
     [day, month, year, trackable.settings.startDate],
   );
 
-  const isActive = trackable.data[dateKey] === "true";
+  const [isActive, setIsActive] = useOptimistic(
+    trackable.data[dateKey] === "true",
+    (_, value: boolean) => {
+      return value;
+    },
+  );
 
   const mainRef = useRef<HTMLButtonElement>(null);
   // Point where click happened in % relative to button box. Used for animation
@@ -144,12 +155,15 @@ export const DayCellBoolean = ({ day, month, year, style }: IDayProps) => {
 
     if (!inTrackRange) return;
 
+    const newVal = isActive ? "false" : "true";
+
+    setIsActive(newVal === "true");
     await changeDay({
       id: trackable.id,
       day,
       month,
       year,
-      value: isActive ? "false" : "true",
+      value: newVal,
     });
   };
 

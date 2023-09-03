@@ -1,56 +1,21 @@
-"use client";
+"use server";
 import type { ITrackable } from "src/types/trackable";
 import Link from "next/link";
-import TrackableProvider from "src/helpers/trackableContext";
 import MiniTrackable from "./miniTrackable";
-import { useQuery } from "@tanstack/react-query";
-import { getBaseUrl } from "src/helpers/getBaseUrl";
+import { getTrackable } from "src/helpers/apiHelpersRSC";
 
-import { Skeleton } from "@/components/ui/skeleton";
+const Trackable = async ({ id }: { id: ITrackable["id"] }) => {
+  const trackable = await getTrackable(id);
 
-const getTrackable = async (id: string) => {
-  const res = await fetch(`${getBaseUrl()}/api/trackables/${id}`, {
-    method: "GET",
-  });
-
-  const data = (await res.json()) as unknown;
-
-  return data as ITrackable;
-};
-
-const Trackable = ({ id }: { id: ITrackable["id"] }) => {
-  const { data } = useQuery(["trackable", id], {
-    queryFn: async () => {
-      return await getTrackable(id);
-    },
-  });
-
-  if (!data)
-    return (
-      <article className="border-b border-neutral-200 py-2 last:border-0 dark:border-neutral-800">
-        <Link href={`/trackables/${id}`} className="block w-fit">
-          <h3 className="w-fit cursor-pointer text-xl font-light opacity-5">
-            Loading...
-          </h3>
-        </Link>
-        <MiniTrackable
-          stub={<Skeleton className="h-[64px] rounded-none"></Skeleton>}
-          className="my-4"
-        />
-      </article>
-    );
+  const name = trackable.settings.name || "Unnamed trackable";
 
   return (
-    <TrackableProvider trackable={data}>
-      <article className="border-b border-neutral-200 py-2 last:border-0 dark:border-neutral-800">
-        <Link href={`/trackables/${id}`} className="block w-fit">
-          <h3 className="w-fit cursor-pointer text-xl font-light">
-            {data.settings.name || "Unnamed trackable"}
-          </h3>
-        </Link>
-        <MiniTrackable className="my-4" />
-      </article>
-    </TrackableProvider>
+    <article className="border-b border-neutral-200 py-2 last:border-0 dark:border-neutral-800">
+      <Link href={`/trackables/${id}`} className="block w-fit">
+        <h3 className="w-fit cursor-pointer text-xl font-light">{name}</h3>
+      </Link>
+      <MiniTrackable trackable={trackable} className="my-4" />
+    </article>
   );
 };
 

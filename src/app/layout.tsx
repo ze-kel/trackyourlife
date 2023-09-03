@@ -4,7 +4,6 @@ import { ThemeProvider } from "src/helpers/ThemeProvider";
 
 import getPageSession from "src/helpers/getPageSesion";
 import Header from "@components/Header";
-import { ReactQueryProvider } from "src/helpers/ReactQueryProvider";
 
 export default async function RootLayout({
   // Layouts must accept a children prop.
@@ -19,12 +18,10 @@ export default async function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <ReactQueryProvider>
-            <div className="h-full max-h-full min-h-screen bg-neutral-50 text-neutral-900 dark:bg-neutral-950 dark:text-neutral-50">
-              <Header user={session?.user}></Header>
-              <div className="mx-auto box-border w-full pt-6">{children}</div>
-            </div>
-          </ReactQueryProvider>
+          <div className="h-full max-h-full min-h-screen bg-neutral-50 text-neutral-900 dark:bg-neutral-950 dark:text-neutral-50">
+            <Header user={session?.user}></Header>
+            <div className="mx-auto box-border w-full pt-6">{children}</div>
+          </div>
         </ThemeProvider>
       </body>
     </html>
