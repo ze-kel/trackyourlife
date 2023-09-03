@@ -1,7 +1,8 @@
 import DayCell from "@components/DayCell";
 import clsx from "clsx";
 import { format, getDaysInMonth } from "date-fns";
-import { ReactNode, useMemo } from "react";
+import type { ReactNode} from "react";
+import { useMemo } from "react";
 
 const generateDates = (days: number) => {
   const today = new Date();

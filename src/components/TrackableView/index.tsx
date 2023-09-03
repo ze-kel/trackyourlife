@@ -185,16 +185,19 @@ const TrackableView = () => {
   return (
     <>
       <div className="mb-4 flex items-center justify-between">
-        <div className="flex gap-2">
+        <div className="flex items-baseline gap-2">
           {view !== "years" && (
-            <Button variant="outline" onClick={() => setView("years")}>
+            <Button variant="ghost" onClick={() => setView("years")}>
               {year}
             </Button>
           )}
 
           {view === "days" && (
             <>
-              <Button variant={"outline"} onClick={() => setView("months")}>
+              <div className="text-xl font-light text-neutral-200 dark:text-neutral-800">
+                /
+              </div>
+              <Button variant={"ghost"} onClick={() => setView("months")}>
                 {format(new Date(year, month, 1), "MMMM")}
               </Button>
             </>

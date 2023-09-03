@@ -1,4 +1,4 @@
-import Button from "@components/_UI/Button";
+import { Button } from "@/components/ui/button";
 import DatePicker from "@components/_UI/DatePicker";
 import type {
   IBooleanSettings,
@@ -69,7 +69,11 @@ const SettingsBoolean = ({
       </div>
 
       {handleSave && (
-        <Button className="mt-2" onClick={() => void handleSave()}>
+        <Button
+          variant={"outline"}
+          className="mt-2"
+          onClick={() => void handleSave()}
+        >
           Save
         </Button>
       )}
@@ -123,7 +127,11 @@ const SettingsNumber = ({
       </div>
 
       {handleSave && (
-        <Button className="mt-2" onClick={() => void handleSave()}>
+        <Button
+          variant={"outline"}
+          className="mt-2"
+          onClick={() => void handleSave()}
+        >
           Save
         </Button>
       )}
@@ -167,7 +175,7 @@ const SettingsRange = ({
       {handleSave && (
         <Button
           className="mt-2"
-          theme="inverted"
+          variant={"outline"}
           onClick={() => void handleSave()}
         >
           Save

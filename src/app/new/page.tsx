@@ -1,9 +1,9 @@
 import { redirect } from "next/navigation";
 import getPageSession from "src/helpers/getPageSesion";
-import { prisma } from "./api/db";
 import Link from "next/link";
-import TrackablesList from "@components/TrackablesList";
 import { Button } from "@/components/ui/button";
+import { getBaseUrl } from "src/helpers/getBaseUrl";
+import { cookies } from "next/headers";
 
 export const revalidate = 0;
 
@@ -12,12 +12,14 @@ const Page = async () => {
 
   if (!session) redirect("/login");
 
-  const entries = await prisma.trackable.findMany({
-    where: { userId: session.user.userId },
-    select: { id: true },
+  const res = await fetch(getBaseUrl() + "/api/trackables", {
+    method: "GET",
+    headers: {
+      Cookie: cookies().toString(),
+    },
   });
 
-  const ids = entries.map((entry) => entry.id);
+  const { ids } = (await res.json()) as { ids: string[] };
 
   return (
     <div className="content-container flex w-full flex-col">
@@ -27,9 +29,7 @@ const Page = async () => {
           <Button variant="outline">Create</Button>
         </Link>
       </div>
-      <div className="mt-2">
-        <TrackablesList list={ids}></TrackablesList>
-      </div>
+      <div className="mt-2">{JSON.stringify(ids)}</div>
     </div>
   );
 };

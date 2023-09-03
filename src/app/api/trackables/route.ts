@@ -6,10 +6,13 @@ import { trackableToCreate } from "src/app/api/trackables/[id]/route";
 import { auth } from "src/auth/lucia";
 
 export const GET = async (request: NextRequest) => {
+  console.log("GET REq");
+
   // Auth check
   const authRequest = auth.handleRequest({ request, cookies });
   const session = await authRequest.validate();
   if (!session) {
+    console.log("no session");
     return new Response(null, {
       status: 401,
     });
@@ -20,6 +23,10 @@ export const GET = async (request: NextRequest) => {
     where: { userId },
     select: { id: true },
   });
+
+  const ids = entries.map((entry) => entry.id);
+
+  console.log(ids);
 
   return NextResponse.json({ ids: entries.map((entry) => entry.id) });
 };
