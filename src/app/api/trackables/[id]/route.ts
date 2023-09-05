@@ -188,7 +188,7 @@ export const POST = async (
   console.log("UPDATE HIT", cookies().toString());
   // Auth check
   // Request as null allows server actions to get session correctly. Should probably go ask devs about it
-  const authRequest = auth.handleRequest({ request: null, cookies });
+  const authRequest = auth.handleRequest({ request, cookies });
   const session = await authRequest.validate();
   console.log("SESSION", session);
   if (!session) {

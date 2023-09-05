@@ -1,4 +1,4 @@
-import { PureInput } from "@components/_UI/Input";
+import { Input } from "@/components/ui/input";
 import type { INumberSettings } from "@t/trackable";
 import cloneDeep from "lodash/cloneDeep";
 import ColorSelector from "./colorSelector";
@@ -55,7 +55,7 @@ const Pair = ({ value, onChange, remove }: INumberColorSelectorPair) => {
       exit={{ opacity: 0, height: 0, zIndex: -99 }}
       className="flex items-center gap-2"
     >
-      <PureInput
+      <Input
         type={"number"}
         value={String(fromInternal)}
         onChange={(v) => changeVal(v.target.valueAsNumber)}

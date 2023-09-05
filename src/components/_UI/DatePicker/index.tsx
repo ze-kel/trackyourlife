@@ -214,7 +214,7 @@ const DatePicker = ({
   );
 
   const opener = (
-    <Button variant={"outline"} className="w-full max-w-[200px]">
+    <Button variant={"outline"} className="min-w-[200px]">
       <span className="">
         {date ? format(date, "d MMMM yyyy") : "No date set"}
       </span>
@@ -229,7 +229,7 @@ const DatePicker = ({
         hiddenPart={calendar}
         visible={isOpened}
         setVisible={setIsOpened}
-        classNameMain={""}
+        classNameMain={"w-fit"}
         placement="bottom-start"
       />
     </div>

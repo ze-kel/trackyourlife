@@ -1,17 +1,27 @@
 "use client";
 import type { IRangeSettings } from "@t/trackable";
-import GenericInput, { PureInput } from "@components/_UI/Input";
+import GenericInput from "@components/_UI/Input";
 import cloneDeep from "lodash/cloneDeep";
 import { useState } from "react";
 import clsx from "clsx";
 import { AnimatePresence } from "framer-motion";
 import { Reorder, useDragControls } from "framer-motion";
-import { Cross1Icon, PlusIcon } from "@radix-ui/react-icons";
+import {
+  Cross1Icon,
+  DragHandleDots2Icon,
+  PlusIcon,
+} from "@radix-ui/react-icons";
 import type { ArrayElement } from "@t/helpers";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
 import emojiRegex from "emoji-regex";
-import Button from "@components/_UI/Button";
+import { Button } from "@/components/ui/button";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
+import { Input } from "@/components/ui/input";
 
 export interface IRangeLabelSelector {
   initialValue: IRangeSettings["labels"];
@@ -64,24 +74,41 @@ const Pair = ({
       initial={{ opacity: 0, y: 10, height: 0 }}
       animate={{ opacity: 1, y: 0, height: "45px", zIndex: 2 }}
       exit={{ opacity: 0, height: 0, zIndex: -99 }}
+      dragListener={false}
       dragControls={controls}
       className="relative flex items-center gap-2"
       layout
     >
-      <PureInput
+      <Input
         value={value.internalKey}
         className={clsx("col-start-1 col-end-1 w-64")}
         error={duplicate || !value.internalKey}
         onChange={(e) => updateKey(e.target.value)}
       />
-      <GenericInput
-        value={value.emoji}
-        onChange={selectEmoji}
-        schema={z.string().emoji("")}
-        className="w-10"
-        noError
-        updateFromOnchage
-      ></GenericInput>
+
+      <HoverCard>
+        <HoverCardTrigger>
+          <GenericInput
+            value={value.emoji}
+            onChange={selectEmoji}
+            schema={z.string().emoji("")}
+            className="w-10"
+            noError
+            updateFromOnchage
+          ></GenericInput>
+        </HoverCardTrigger>
+        <HoverCardContent>
+          <div className="">
+            Type new emoji. Hotkeys:
+            <span className="block"> Windows key + .</span>{" "}
+            <span className="block">Command + Control + Space.</span>
+          </div>
+        </HoverCardContent>
+      </HoverCard>
+
+      <div className="cursor-grab" onPointerDown={(e) => controls.start(e)}>
+        <DragHandleDots2Icon className="text-neutral-300 transition-colors hover:text-neutral-800 dark:text-neutral-700 dark:hover:text-neutral-100" />
+      </div>
 
       <div
         className="flex w-7 cursor-pointer items-center justify-center"
@@ -110,7 +137,6 @@ const RangeLabelSelector = ({
 }: IRangeLabelSelector) => {
   const [value, updateValue] = useState(addIds(initialValue) || []);
   const [error, updateError] = useState<string>();
-  const controls = useDragControls();
 
   const checkDuplicates = (index: number) => {
     const tVal = value[index];
@@ -189,8 +215,6 @@ const RangeLabelSelector = ({
           axis="y"
           values={value}
           onReorder={updateAndPush}
-          dragControls={controls}
-          dragListener={false}
           layout
           transition={{ duration: 0.1 }}
         >
@@ -210,9 +234,8 @@ const RangeLabelSelector = ({
         </Reorder.Group>
 
         <Button
-          theme="transparent"
-          size="s"
-          className="flex w-fit items-center gap-2 rounded-sm"
+          variant="outline"
+          className="flex w-fit items-center gap-2"
           onClick={addNewProperty}
         >
           <PlusIcon className="mr-1 w-4" />

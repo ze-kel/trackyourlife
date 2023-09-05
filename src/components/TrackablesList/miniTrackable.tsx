@@ -14,7 +14,7 @@ const generateDates = (days: number) => {
 
   const dates: { year: number; month: number; day: number }[] = [];
 
-  for (; days >= 0; days--) {
+  for (; days > 0; days--) {
     dates[days] = { year, month, day };
 
     if (day === 1) {
@@ -32,7 +32,7 @@ const generateDates = (days: number) => {
   return dates;
 };
 
-const NUM_OF_DAYS = 6;
+const NUM_OF_DAYS = 7;
 
 const MiniTrackable = ({
   className,

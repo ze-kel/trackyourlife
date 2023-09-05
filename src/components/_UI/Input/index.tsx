@@ -1,21 +1,12 @@
-import clsx from "clsx";
-import type { ChangeEvent } from "react";
 import { useEffect, useState } from "react";
 import type { z } from "zod";
-import { Input } from "../../../../@/components/ui/input";
+import { Input } from "@/components/ui/input";
 
 interface IBase {
   value?: string;
   placeholder?: string;
   type?: "password" | "email" | "text" | "search" | "number";
   className?: string;
-}
-
-interface IPureInputProps extends IBase {
-  onChange: (v: ChangeEvent<HTMLInputElement>) => void;
-  isValid?: boolean;
-  error?: string | boolean;
-  onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
 }
 
 interface IInputProps extends IBase {
@@ -25,39 +16,6 @@ interface IInputProps extends IBase {
   noError?: boolean;
   updateFromOnchage?: boolean;
 }
-
-export const PureInput = ({
-  value,
-  placeholder,
-  type,
-  onChange,
-  isValid,
-  error,
-  className,
-  onBlur,
-}: IPureInputProps) => {
-  return (
-    <div className="flex flex-col">
-      <Input
-        className={clsx(
-          className,
-          isValid && "border-lime-500 dark:border-lime-600 ",
-          error && "border-red-500 dark:border-red-600 ",
-        )}
-        type={type}
-        value={value}
-        placeholder={placeholder}
-        onChange={onChange}
-        onBlur={onBlur}
-      />
-      {error && typeof error === "string" && (
-        <div className="mt-1 text-xs text-red-500 dark:text-red-600">
-          {error}
-        </div>
-      )}
-    </div>
-  );
-};
 
 const GenericInput = ({
   value,
@@ -113,7 +71,7 @@ const GenericInput = ({
           {title}
         </h5>
       )}
-      <PureInput
+      <Input
         isValid={isValid}
         error={error}
         type={type}

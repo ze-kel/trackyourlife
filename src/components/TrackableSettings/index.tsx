@@ -15,6 +15,7 @@ import NumberColorSelector from "./numberColorSelector";
 import NumberLimitsSelector from "./numberLimitsSelector";
 import RangeLabelSelector from "./rangeLabelSelector";
 import { updateSettings } from "src/helpers/actions";
+import { Input } from "@/components/ui/input";
 
 interface ISubSettingsProps<T> {
   settings: T;
@@ -27,6 +28,10 @@ const SettingsBoolean = ({
   setSettings,
   handleSave,
 }: ISubSettingsProps<IBooleanSettings>) => {
+  const changeName = (v: (typeof settings)["name"]) => {
+    setSettings({ ...settings, name: v });
+  };
+
   const changeActiveColor = (v: (typeof settings)["activeColor"]) => {
     setSettings({ ...settings, activeColor: v });
   };
@@ -41,6 +46,15 @@ const SettingsBoolean = ({
 
   return (
     <div className="flex flex-col gap-2">
+      <div>
+        <h3 className="text-xl">Name</h3>
+        <Input
+          className="mt-2 w-fit"
+          value={settings.name}
+          onChange={(e) => changeName(e.target.value)}
+        />
+      </div>
+
       <div>
         <h3 className="text-xl">Tracking Start</h3>
         <DatePicker
@@ -87,6 +101,10 @@ const SettingsNumber = ({
   setSettings,
   handleSave,
 }: ISubSettingsProps<INumberSettings>) => {
+  const changeName = (v: (typeof settings)["name"]) => {
+    setSettings({ ...settings, name: v });
+  };
+
   const changeStartDate = (v: (typeof settings)["startDate"]) => {
     setSettings({ ...settings, startDate: v });
   };
@@ -100,6 +118,15 @@ const SettingsNumber = ({
 
   return (
     <div className="flex flex-col gap-2">
+      <div>
+        <h3 className="text-xl">Name</h3>
+        <Input
+          className="mt-2 w-fit"
+          value={settings.name}
+          onChange={(e) => changeName(e.target.value)}
+        />
+      </div>
+
       <div>
         <h3 className="text-xl">Tracking Start</h3>
         <DatePicker
@@ -145,6 +172,10 @@ const SettingsRange = ({
   setSettings,
   handleSave,
 }: ISubSettingsProps<IRangeSettings>) => {
+  const changeName = (v: (typeof settings)["name"]) => {
+    setSettings({ ...settings, name: v });
+  };
+
   const changeStartDate = (v: (typeof settings)["startDate"]) => {
     setSettings({ ...settings, startDate: v });
   };
@@ -155,6 +186,15 @@ const SettingsRange = ({
 
   return (
     <div className="flex flex-col gap-2">
+      <div>
+        <h3 className="text-xl">Name</h3>
+        <Input
+          className="mt-2 w-fit"
+          value={settings.name}
+          onChange={(e) => changeName(e.target.value)}
+        />
+      </div>
+
       <div>
         <h3 className="text-xl">Tracking Start</h3>
         <DatePicker

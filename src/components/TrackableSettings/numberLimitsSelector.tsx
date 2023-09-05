@@ -1,4 +1,4 @@
-import { PureInput } from "@components/_UI/Input";
+import { Input } from "@/components/ui/input";
 import type { INumberSettings } from "@t/trackable";
 import clsx from "clsx";
 import { useState } from "react";
@@ -40,7 +40,7 @@ const NumberLimitsSelector = ({
       </div>
 
       <div className="flex gap-2">
-        <PureInput
+        <Input
           className="w-52"
           value={String(innerValue?.min)}
           onChange={(e) => {
@@ -52,7 +52,7 @@ const NumberLimitsSelector = ({
           error={isError}
           type="number"
         />
-        <PureInput
+        <Input
           className="w-52"
           value={String(innerValue?.max)}
           onChange={(e) => {

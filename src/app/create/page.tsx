@@ -6,7 +6,7 @@ import type {
 } from "src/types/trackable";
 import clsx from "clsx";
 import { useState } from "react";
-import { PureInput } from "@components/_UI/Input";
+import { Input } from "@/components/ui/input";
 import cloneDeep from "lodash/cloneDeep";
 import { TrackableSettingsManual } from "@components/TrackableSettings";
 import { getBaseUrl } from "src/helpers/getBaseUrl";
@@ -61,6 +61,7 @@ const Create = () => {
         <RadioTabs
           value={newOne.type}
           onValueChange={(v) => setType(v as ITrackableUnsaved["type"])}
+          className="mt-2"
         >
           <RadioTabItem value="boolean" id="boolean" className="w-full">
             Boolean
@@ -74,7 +75,7 @@ const Create = () => {
         </RadioTabs>
         <div>
           <h3 className="text-xl">Name</h3>
-          <PureInput
+          <Input
             placeholder="Name"
             className={clsx("my-2 w-fit")}
             value={newOne.settings.name}
