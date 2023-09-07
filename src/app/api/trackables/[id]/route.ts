@@ -6,7 +6,7 @@ import { auth } from "src/auth/lucia";
 import { z } from "zod";
 import { sub } from "date-fns";
 
-import type { ITrackable } from "src/types/trackable";
+import type { ITrackable, ITrackableSettings } from "src/types/trackable";
 
 import { format } from "date-fns";
 import {
@@ -41,7 +41,7 @@ const makeTrackableData = (trackableData: TrackableRecord[]) => {
   return result;
 };
 
-const makeTrackableSettings = (trackable: Trackable) => {
+const makeTrackableSettings = (trackable: Trackable): ITrackableSettings => {
   let settingsParser;
   const type = trackable.type;
   if (type === "boolean") {
@@ -65,52 +65,34 @@ const makeTrackableSettings = (trackable: Trackable) => {
     return parseRes.data;
   }
 
-  return {};
+  return { name: "Error parsing settings" };
 };
 
-export const findAndPrepareTrackable = async ({
-  id,
-  userId,
-}: {
-  id: string;
-  userId: string;
-}) => {
-  const trackable = await prisma.trackable.findFirstOrThrow({
-    where: {
-      id,
-      userId,
-    },
-    include: {
-      data: true,
-    },
-  });
-
-  const returnedTrackable: ITrackable = {
+export const prepareTrackable = (
+  trackable: Trackable & { data: TrackableRecord[] },
+): ITrackable => {
+  return {
     ...trackable,
     data: makeTrackableData(trackable.data),
     settings: makeTrackableSettings(trackable),
   };
-
-  return returnedTrackable;
 };
 
-export type TGETLimits =
-  | {
-      type: "year";
-      year: number;
-    }
-  | {
-      type: "month";
-      year: number;
-      // Zero indexed because JS
-      month: number;
-    }
-  | {
-      type: "last";
-      lastNDays: number;
-    };
+export const ZGETLimits = z
+  .union([
+    z.object({ type: z.literal("year"), year: z.number() }),
+    z.object({
+      type: z.literal("month"),
+      year: z.number(),
+      month: z.number().min(0).max(11),
+    }),
+    z.object({ type: z.literal("last"), days: z.number().min(7).max(31) }),
+  ])
+  .optional();
 
-const getDateBounds = (limits: TGETLimits | undefined) => {
+export type TGETLimits = z.infer<typeof ZGETLimits>;
+
+export const getDateBounds = (limits: TGETLimits | undefined) => {
   if (!limits) {
     return {
       gte: new Date(0),
@@ -133,7 +115,7 @@ const getDateBounds = (limits: TGETLimits | undefined) => {
 
   if (limits.type === "last") {
     return {
-      gte: sub(new Date(), { days: limits.lastNDays }),
+      gte: sub(new Date(), { days: limits.days }),
       lte: new Date(),
     };
   }
@@ -142,7 +124,7 @@ const getDateBounds = (limits: TGETLimits | undefined) => {
 // GET DATA
 export const GET = async (
   request: NextRequest,
-  { params }: { params: { id: string; limits?: TGETLimits } },
+  { params }: { params: { id: string } },
 ) => {
   // Auth check
   const authRequest = auth.handleRequest({ request, cookies });
@@ -165,17 +147,13 @@ export const GET = async (
     include: {
       data: {
         where: {
-          date: getDateBounds(params.limits),
+          date: getDateBounds(undefined),
         },
       },
     },
   });
 
-  const returnedTrackable: ITrackable = {
-    ...trackable,
-    data: makeTrackableData(trackable.data),
-    settings: makeTrackableSettings(trackable),
-  };
+  const returnedTrackable: ITrackable = prepareTrackable(trackable);
 
   return NextResponse.json(returnedTrackable);
 };
@@ -185,19 +163,15 @@ export const POST = async (
   request: NextRequest,
   // { params }: { params: { id: string } }
 ) => {
-  console.log("UPDATE HIT", cookies().toString());
   // Auth check
-  // Request as null allows server actions to get session correctly. Should probably go ask devs about it
   const authRequest = auth.handleRequest({ request, cookies });
   const session = await authRequest.validate();
-  console.log("SESSION", session);
   if (!session) {
     return new Response(null, {
       status: 401,
     });
   }
   const userId = session.user.userId;
-  //const id = params.id;
 
   const data = (await request.json()) as unknown;
 

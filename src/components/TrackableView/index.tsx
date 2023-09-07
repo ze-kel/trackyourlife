@@ -219,7 +219,7 @@ const TrackableView = ({ trackable }: { trackable: ITrackable }) => {
           <Button
             variant="outline"
             onClick={openCurrentMonth}
-            disabled={!isCurrentMonth}
+            disabled={isCurrentMonth}
           >
             Today
           </Button>

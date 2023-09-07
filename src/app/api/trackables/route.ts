@@ -2,7 +2,11 @@ import type { Prisma } from "@prisma/client";
 import { prisma } from "../db";
 import { cookies } from "next/headers";
 import { NextResponse, type NextRequest } from "next/server";
-import { trackableToCreate } from "src/app/api/trackables/[id]/route";
+import {
+  getDateBounds,
+  prepareTrackable,
+  trackableToCreate,
+} from "src/app/api/trackables/[id]/route";
 import { auth } from "src/auth/lucia";
 
 export const GET = async (request: NextRequest) => {
@@ -17,16 +21,20 @@ export const GET = async (request: NextRequest) => {
   }
 
   const userId = session.user.userId;
-  const entries = await prisma.trackable.findMany({
+  const raw = await prisma.trackable.findMany({
     where: { userId },
-    select: { id: true },
+    include: {
+      data: {
+        where: {
+          date: getDateBounds({ type: "last", days: 31 }),
+        },
+      },
+    },
   });
 
-  const ids = entries.map((entry) => entry.id);
+  const trackables = raw.map(prepareTrackable);
 
-  console.log(ids);
-
-  return NextResponse.json({ ids: entries.map((entry) => entry.id) });
+  return NextResponse.json({ trackables });
 };
 
 export const PUT = async (request: NextRequest) => {

@@ -1,23 +1,12 @@
-import { redirect } from "next/navigation";
-import getPageSession from "src/helpers/getPageSesion";
-import { prisma } from "./api/db";
 import Link from "next/link";
 import TrackablesList from "@components/TrackablesList";
 import { Button } from "@/components/ui/button";
+import { getTrackableIds } from "src/helpers/apiHelpersRSC";
 
 export const revalidate = 0;
 
 const Page = async () => {
-  const session = await getPageSession();
-
-  if (!session) redirect("/login");
-
-  const entries = await prisma.trackable.findMany({
-    where: { userId: session.user.userId },
-    select: { id: true },
-  });
-
-  const ids = entries.map((entry) => entry.id);
+  const trackables = await getTrackableIds();
 
   return (
     <div className="content-container flex w-full flex-col">
@@ -28,7 +17,7 @@ const Page = async () => {
         </Link>
       </div>
       <div className="mt-2">
-        <TrackablesList list={ids}></TrackablesList>
+        <TrackablesList list={trackables}></TrackablesList>
       </div>
     </div>
   );

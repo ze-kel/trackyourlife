@@ -32,7 +32,7 @@ const generateDates = (days: number) => {
   return dates;
 };
 
-const NUM_OF_DAYS = 7;
+const NUM_OF_DAYS = 6;
 
 const MiniTrackable = ({
   className,
@@ -46,7 +46,7 @@ const MiniTrackable = ({
   return (
     <div
       className={clsx(
-        "sm grid grid-cols-3 gap-x-1 gap-y-1 md:grid-cols-7",
+        "sm grid grid-cols-3 gap-x-1 gap-y-1 md:grid-cols-6",
         className,
       )}
     >

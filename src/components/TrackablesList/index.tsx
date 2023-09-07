@@ -2,30 +2,45 @@
 import type { ITrackable } from "src/types/trackable";
 import Link from "next/link";
 import MiniTrackable from "./miniTrackable";
-import { getTrackable } from "src/helpers/apiHelpersRSC";
+import { useMemo } from "react";
+import FavButton from "@components/FavButton";
 
-const Trackable = async ({ id }: { id: ITrackable["id"] }) => {
-  const trackable = await getTrackable(id);
+const sortList = (list: ITrackable[]): ITrackable[] => {
+  const newList = [...list];
 
-  const name = trackable.settings.name || "Unnamed trackable";
+  newList.sort((a, b) => {
+    if (a.settings.favorite && !b.settings.favorite) return -1;
+    if (!a.settings.favorite && b.settings.favorite) return 1;
 
-  return (
-    <article className="border-b border-neutral-200 py-2 last:border-0 dark:border-neutral-800">
-      <Link href={`/trackables/${id}`} className="block w-fit">
-        <h3 className="w-fit cursor-pointer text-xl font-light">{name}</h3>
-      </Link>
-      <MiniTrackable trackable={trackable} className="my-4" />
-    </article>
-  );
+    const aName = a.settings.name || "";
+    const bName = b.settings.name || "";
+
+    return aName.localeCompare(bName);
+  });
+
+  return newList;
 };
 
-const TrackablesList = ({ list }: { list: ITrackable["id"][] }) => {
-  if (!list) return <div></div>;
+const TrackablesList = ({ list }: { list: ITrackable[] }) => {
+  const sortedList = useMemo(() => sortList(list), [list]);
 
   return (
     <div className="grid gap-5">
-      {list.map((id) => (
-        <Trackable id={id} key={id} />
+      {sortedList.map((tr) => (
+        <article
+          key={tr.id}
+          className="border-b border-neutral-200 py-2 last:border-0 dark:border-neutral-800"
+        >
+          <div className="flex justify-between">
+            <Link href={`/trackables/${tr.id}`} className="block w-fit">
+              <h3 className="w-fit cursor-pointer text-xl font-light">
+                {tr.settings.name}
+              </h3>
+            </Link>
+            <FavButton trackable={tr} />
+          </div>
+          <MiniTrackable trackable={tr} className="my-4" />
+        </article>
       ))}
     </div>
   );

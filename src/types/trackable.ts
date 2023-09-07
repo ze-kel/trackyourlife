@@ -17,8 +17,9 @@ export const colorOption = z.enum([
 export type IColorOptions = z.infer<typeof colorOption>;
 
 const basics = {
-  name: z.string().optional(),
+  name: z.string().default("Unnamed Trackable").optional(),
   startDate: z.coerce.date().optional(),
+  favorite: z.boolean().optional(),
 };
 
 export const ZTrackableSettingsBase = z.object(basics);
