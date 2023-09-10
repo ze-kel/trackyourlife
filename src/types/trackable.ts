@@ -17,8 +17,9 @@ export const colorOption = z.enum([
 export type IColorOptions = z.infer<typeof colorOption>;
 
 const basics = {
-  name: z.string().optional(),
+  name: z.string().default("Unnamed Trackable").optional(),
   startDate: z.coerce.date().optional(),
+  favorite: z.boolean().optional(),
 };
 
 export const ZTrackableSettingsBase = z.object(basics);
@@ -46,7 +47,7 @@ export const ZTrackableSettingsNumber = z.object({
         color: colorOption,
         // used to key inputs when editing, can be changed voluntarily
         id: z.string().optional(),
-      })
+      }),
     )
     .optional(),
 });
@@ -57,10 +58,10 @@ export const ZTrackableSettingsRange = z.object({
     .array(
       z.object({
         internalKey: z.string().min(1),
-        emojiShortcode: z.string(),
+        emoji: z.string().emoji(),
         // used to key inputs when editing, can be changed voluntarily
         id: z.string().optional(),
-      })
+      }),
     )
     .optional(),
 });

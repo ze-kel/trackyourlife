@@ -2,11 +2,13 @@
 import Dropdown from "@components/_UI/Dropdown";
 import Link from "next/link";
 import { useState } from "react";
-import IconChevronDown from "@heroicons/react/20/solid/ChevronDownIcon";
+import { ChevronDownIcon } from "@radix-ui/react-icons";
 import clsx from "clsx";
-import Button from "@components/_UI/Button";
+import { Button } from "@/components/ui/button";
 import type { User } from "lucia";
 import { useRouter } from "next/navigation";
+import { RadioTabs, RadioTabItem } from "@/components/ui/radio-tabs";
+import { useTheme } from "next-themes";
 
 const SigOutButton = () => {
   const router = useRouter();
@@ -18,11 +20,9 @@ const SigOutButton = () => {
 
   return (
     <Button
-      theme="transparent"
-      size="s"
+      variant="outline"
       onClick={() => void signOut()}
-      className="mt-1 w-full text-center"
-      fill
+      className="w-full text-center"
     >
       Sign Out
     </Button>
@@ -31,11 +31,12 @@ const SigOutButton = () => {
 
 const Header = ({ user }: { user?: User }) => {
   const [dropdown, setDropdown] = useState(false);
+  const { theme, setTheme } = useTheme();
 
   const dropV = (
     <div className="relative flex cursor-pointer items-center transition-colors hover:text-neutral-600 dark:hover:text-neutral-50">
       <p className="font-medium">{user ? user.username : ""}</p>
-      <IconChevronDown
+      <ChevronDownIcon
         className={clsx(
           "w-6 transition-transform",
           dropdown ? "rotate-180" : "",
@@ -45,16 +46,27 @@ const Header = ({ user }: { user?: User }) => {
   );
 
   const dropH = (
-    <div className="flex flex-col items-end justify-end">
+    <div className="flex flex-col items-end justify-end gap-2">
+      <RadioTabs value={theme} onValueChange={setTheme}>
+        <RadioTabItem value="light" id="light">
+          Light
+        </RadioTabItem>
+        <RadioTabItem value="system" id="system">
+          System
+        </RadioTabItem>
+        <RadioTabItem value="dark" id="dark">
+          Dark
+        </RadioTabItem>
+      </RadioTabs>
       <SigOutButton key={"so"} />
     </div>
   );
 
   return (
-    <div className="flex h-12 flex-shrink-0 justify-center border-b border-neutral-300 bg-neutral-50 font-bold text-neutral-800 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-100">
+    <div className="flex h-14 flex-shrink-0 justify-center border-b-2 border-neutral-300 bg-neutral-50 font-bold text-neutral-800 dark:border-neutral-900 dark:bg-neutral-950 dark:text-neutral-100">
       <div className="content-container flex h-full w-full items-center justify-between">
         <Link href={"/"}>
-          <h2 className="font-light">Track Your Life</h2>
+          <h2 className="font-medium">Track Your Life</h2>
         </Link>
 
         {user && (

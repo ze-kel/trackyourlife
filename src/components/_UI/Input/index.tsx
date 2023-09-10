@@ -1,7 +1,6 @@
-import clsx from "clsx";
-import type { ChangeEvent } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { z } from "zod";
+import { Input } from "@/components/ui/input";
 
 interface IBase {
   value?: string;
@@ -10,52 +9,13 @@ interface IBase {
   className?: string;
 }
 
-interface IPureInputProps extends IBase {
-  onChange: (v: ChangeEvent<HTMLInputElement>) => void;
-  isValid?: boolean;
-  error?: string | boolean;
-  onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
-}
-
 interface IInputProps extends IBase {
   title?: string;
   schema?: z.ZodString;
-  onChange: (v: string) => void;
+  onChange: (v: string) => void | string;
+  noError?: boolean;
+  updateFromOnchage?: boolean;
 }
-
-export const PureInput = ({
-  value,
-  placeholder,
-  type,
-  onChange,
-  isValid,
-  error,
-  className,
-  onBlur,
-}: IPureInputProps) => {
-  return (
-    <div className="flex flex-col">
-      <input
-        className={clsx(
-          className,
-          "transition-color rounded-sm border-2 border-neutral-300 bg-neutral-50 py-1 px-2 outline-none focus:border-neutral-800 dark:border-neutral-800 dark:bg-neutral-900 dark:focus:border-neutral-600",
-          isValid &&
-            "border-lime-500 focus:border-lime-600 dark:border-lime-500 dark:focus:border-lime-600",
-          error &&
-            "border-red-500 focus:border-red-600 dark:border-red-500 dark:focus:border-red-600"
-        )}
-        type={type}
-        value={value}
-        placeholder={placeholder}
-        onChange={onChange}
-        onBlur={onBlur}
-      />
-      {error && typeof error === "string" && (
-        <div className="mt2 text-red-500">{error}</div>
-      )}
-    </div>
-  );
-};
 
 const GenericInput = ({
   value,
@@ -65,10 +25,18 @@ const GenericInput = ({
   type,
   schema,
   className,
+  noError,
+  updateFromOnchage,
 }: IInputProps) => {
   const [val, setVal] = useState(value || "");
   const [error, setError] = useState("");
   const [isValid, setIsValid] = useState(false);
+
+  useEffect(() => {
+    if (value) {
+      handleChange(value);
+    }
+  }, []);
 
   const handleChange = (val: string) => {
     setVal(val);
@@ -80,25 +48,30 @@ const GenericInput = ({
 
     const res = schema.safeParse(val);
     if (res.success) {
-      onChange(val);
+      if (updateFromOnchage) {
+        setVal(onChange(val) as string);
+      } else {
+        onChange(val);
+      }
       setError("");
       setIsValid(true);
     } else {
-      if (res.error.errors[0]) {
+      if (res.error.errors[0] && !noError) {
         setError(res.error.errors[0].message);
       }
       setIsValid(false);
+      onChange("");
     }
   };
 
   return (
     <div className={className}>
       {title && (
-        <h5 className="mb-1 text-lg font-semibold text-neutral-800 dark:text-neutral-300">
+        <h5 className="mb-1 text-sm font-semibold text-neutral-800 dark:text-neutral-300">
           {title}
         </h5>
       )}
-      <PureInput
+      <Input
         isValid={isValid}
         error={error}
         type={type}

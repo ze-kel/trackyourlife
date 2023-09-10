@@ -1,60 +1,61 @@
-import { prisma } from 'src/app/api/db';
+import { prisma } from "src/app/api/db";
 
-import { cookies } from 'next/headers';
-import { NextResponse, type NextRequest } from 'next/server';
-import { auth } from 'src/auth/lucia';
-import { z } from 'zod';
+import { cookies } from "next/headers";
+import { NextResponse, type NextRequest } from "next/server";
+import { auth } from "src/auth/lucia";
+import { z } from "zod";
+import { sub } from "date-fns";
 
-import type { ITrackable } from 'src/types/trackable';
+import type { ITrackable, ITrackableSettings } from "src/types/trackable";
 
-import { format } from 'date-fns';
+import { format } from "date-fns";
 import {
   ZTrackableSettingsBoolean,
   ZTrackableSettingsNumber,
   ZTrackableSettingsRange,
   ZTrackableUpdate,
-} from 'src/types/trackable';
-import type { Trackable, TrackableRecord } from '@prisma/client';
+} from "src/types/trackable";
+import type { Trackable, TrackableRecord } from "@prisma/client";
 
-export const trackableToCreate = z.discriminatedUnion('type', [
+export const trackableToCreate = z.discriminatedUnion("type", [
   z.object({
     settings: ZTrackableSettingsBoolean,
-    type: z.literal('boolean'),
+    type: z.literal("boolean"),
   }),
   z.object({
     settings: ZTrackableSettingsNumber,
-    type: z.literal('number'),
+    type: z.literal("number"),
   }),
   z.object({
     settings: ZTrackableSettingsRange,
-    type: z.literal('range'),
+    type: z.literal("range"),
   }),
 ]);
 
 const makeTrackableData = (trackableData: TrackableRecord[]) => {
-  const result: ITrackable['data'] = {};
+  const result: ITrackable["data"] = {};
 
   trackableData.forEach((el) => {
-    result[format(el.date, 'yyyy-MM-dd')] = el.value;
+    result[format(el.date, "yyyy-MM-dd")] = el.value;
   });
   return result;
 };
 
-const makeTrackableSettings = (trackable: Trackable) => {
+const makeTrackableSettings = (trackable: Trackable): ITrackableSettings => {
   let settingsParser;
   const type = trackable.type;
-  if (type === 'boolean') {
+  if (type === "boolean") {
     settingsParser = ZTrackableSettingsBoolean;
   }
-  if (type === 'number') {
+  if (type === "number") {
     settingsParser = ZTrackableSettingsNumber;
   }
-  if (type === 'range') {
+  if (type === "range") {
     settingsParser = ZTrackableSettingsRange;
   }
   if (!settingsParser) {
     console.log(trackable);
-    throw new Error('No parser for settings of type ' + trackable.type);
+    throw new Error("No parser for settings of type " + trackable.type);
   }
 
   // Note that we store settings as JSON, therefore dates there are stored as strings.
@@ -64,39 +65,66 @@ const makeTrackableSettings = (trackable: Trackable) => {
     return parseRes.data;
   }
 
-  return {};
+  return { name: "Error parsing settings" };
 };
 
-export const findAndPrepareTrackable = async ({
-  id,
-  userId,
-}: {
-  id: string;
-  userId: string;
-}) => {
-  const trackable = await prisma.trackable.findFirstOrThrow({
-    where: {
-      id,
-      userId,
-    },
-    include: {
-      data: true,
-    },
-  });
-
-  const returnedTrackable: ITrackable = {
+export const prepareTrackable = (
+  trackable: Trackable & { data: TrackableRecord[] },
+): ITrackable => {
+  return {
     ...trackable,
     data: makeTrackableData(trackable.data),
     settings: makeTrackableSettings(trackable),
   };
+};
 
-  return returnedTrackable;
+export const ZGETLimits = z
+  .union([
+    z.object({ type: z.literal("year"), year: z.number() }),
+    z.object({
+      type: z.literal("month"),
+      year: z.number(),
+      month: z.number().min(0).max(11),
+    }),
+    z.object({ type: z.literal("last"), days: z.number().min(7).max(31) }),
+  ])
+  .optional();
+
+export type TGETLimits = z.infer<typeof ZGETLimits>;
+
+export const getDateBounds = (limits: TGETLimits | undefined) => {
+  if (!limits) {
+    return {
+      gte: new Date(0),
+    };
+  }
+
+  if (limits.type === "year") {
+    return {
+      gte: new Date(limits.year, 0, 1),
+      lt: new Date(limits.year + 1, 0, 1),
+    };
+  }
+
+  if (limits.type === "month") {
+    return {
+      gte: new Date(limits.year, limits.month, 1),
+      lt: new Date(limits.year, limits.month + 1, 1),
+    };
+  }
+
+  if (limits.type === "last") {
+    return {
+      gte: sub(new Date(), { days: limits.days }),
+      lte: new Date(),
+    };
+  }
 };
 
 // GET DATA
 export const GET = async (
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) => {
   // Auth check
   const authRequest = auth.handleRequest({ request, cookies });
@@ -111,14 +139,28 @@ export const GET = async (
 
   const id = params.id;
 
-  const trackable = await findAndPrepareTrackable({ id, userId });
+  const trackable = await prisma.trackable.findFirstOrThrow({
+    where: {
+      id,
+      userId,
+    },
+    include: {
+      data: {
+        where: {
+          date: getDateBounds(undefined),
+        },
+      },
+    },
+  });
 
-  return NextResponse.json(trackable);
+  const returnedTrackable: ITrackable = prepareTrackable(trackable);
+
+  return NextResponse.json(returnedTrackable);
 };
 
 // UPDATE
 export const POST = async (
-  request: NextRequest
+  request: NextRequest,
   // { params }: { params: { id: string } }
 ) => {
   // Auth check
@@ -130,7 +172,6 @@ export const POST = async (
     });
   }
   const userId = session.user.userId;
-  //const id = params.id;
 
   const data = (await request.json()) as unknown;
 
@@ -142,13 +183,13 @@ export const POST = async (
       },
       {
         status: 400,
-      }
+      },
     );
   }
 
   const date = `${format(
     new Date(input.data.year, input.data.month, input.data.day),
-    'yyyy-MM-dd'
+    "yyyy-MM-dd",
   )}T00:00:00.000Z`;
 
   const trackable = await prisma.trackable.findUnique({
@@ -157,11 +198,11 @@ export const POST = async (
   if (!trackable || trackable.userId !== userId) {
     return NextResponse.json(
       {
-        error: 'No trackable with ID' + input.data.id,
+        error: "No trackable with ID" + input.data.id,
       },
       {
         status: 400,
-      }
+      },
     );
   }
 
@@ -188,7 +229,7 @@ export const POST = async (
 // DELETE TRACKABLE
 export const DELETE = async (
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) => {
   // Auth check
   const authRequest = auth.handleRequest({ request, cookies });
@@ -210,11 +251,11 @@ export const DELETE = async (
   if (!trackable || trackable.userId !== userId) {
     return NextResponse.json(
       {
-        error: 'No trackable with ID' + id,
+        error: "No trackable with ID" + id,
       },
       {
         status: 400,
-      }
+      },
     );
   }
 

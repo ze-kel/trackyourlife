@@ -1,20 +1,34 @@
-import Dropdown from '@components/_UI/Dropdown';
-import { Emoji } from '@components/_UI/Emoji';
-import { cva } from 'class-variance-authority';
-import { useMemo, useState } from 'react';
-import { useTrackableSafe } from 'src/helpers/trackableContext';
-import type { IDayProps } from '.';
-import { computeDayCellHelpers } from '.';
-import { ThemeList } from './DayCellBoolean';
-import style from './curstomScrollbar.module.css';
+"use client";
+import Dropdown from "@components/_UI/Dropdown";
+import { cva } from "class-variance-authority";
+import { useMemo, useState } from "react";
+import type { IDayProps } from "./index";
+import { computeDayCellHelpers } from ".";
+import { ThemeList } from "./DayCellBoolean";
+import style from "./curstomScrollbar.module.css";
 
-import type { IRangeSettings } from '@t/trackable';
-import clsx from 'clsx';
-import { AnimatePresence, motion } from 'framer-motion';
-import DayNumber from '@components/DayCell/dayNumber';
+import type { IRangeSettings, ITrackable } from "@t/trackable";
+import clsx from "clsx";
+import { AnimatePresence, motion } from "framer-motion";
+import DayNumber from "@components/DayCell/dayNumber";
+import { changeDay } from "src/helpers/actions";
+import { experimental_useOptimistic as useOptimistic } from "react";
+
+const getRangeLabelMapping = (trackable: ITrackable) => {
+  if (trackable.type !== "range" || !trackable.settings.labels) return;
+
+  const labels = trackable.settings.labels;
+
+  const map: Record<string, string> = {};
+  labels.forEach((v) => {
+    map[v.internalKey] = v.emoji;
+  });
+
+  return map;
+};
 
 interface PopupSelectorProps {
-  rangeMapping: IRangeSettings['labels'];
+  rangeMapping: IRangeSettings["labels"];
   onSelect: (v: string) => Promise<void>;
 }
 
@@ -97,11 +111,11 @@ const PopupSelector = ({ rangeMapping, onSelect }: PopupSelectorProps) => {
   });
 
   const getYAnimation = makeIndexGetter({
-    center: '0',
-    oneOff: '100%',
-    twoOff: '150%',
-    oneOffR: '-100%',
-    twoOffR: '-150%',
+    center: "0",
+    oneOff: "100%",
+    twoOff: "150%",
+    oneOffR: "-100%",
+    twoOffR: "-150%",
     len: rangeMapping.length,
   });
 
@@ -119,7 +133,7 @@ const PopupSelector = ({ rangeMapping, onSelect }: PopupSelectorProps) => {
     <motion.div
       className={clsx(
         style.miniScrollbar,
-        'relative flex cursor-pointer flex-col overflow-hidden rounded-full border border-neutral-200 bg-neutral-50 dark:border-transparent dark:bg-neutral-800'
+        "relative flex cursor-pointer flex-col overflow-hidden rounded-full border border-neutral-200 bg-neutral-50 dark:border-transparent dark:bg-neutral-800",
       )}
       initial={{ height: 0 }}
       animate={{ height: `${panelH}px` }}
@@ -129,11 +143,11 @@ const PopupSelector = ({ rangeMapping, onSelect }: PopupSelectorProps) => {
         initial={{
           marginTop: `${panelH * -0.5}px`,
         }}
-        animate={{ marginTop: '0' }}
+        animate={{ marginTop: "0" }}
         transition={{ duration: 0.3 * AF, ease: [0, 0, 0, 1.1] }}
         style={{ height: `${panelH}px` }}
         className={clsx(
-          scrollBar && 'customScrollBar overflow-x-hidden pl-0.5'
+          scrollBar && "customScrollBar overflow-x-hidden pl-0.5",
         )}
       >
         <AnimatePresence>
@@ -159,7 +173,7 @@ const PopupSelector = ({ rangeMapping, onSelect }: PopupSelectorProps) => {
                   void onSelect(v.internalKey);
                 }}
                 className={clsx(
-                  'rounded-full px-2 text-center transition-colors hover:bg-lime-500'
+                  "w-11  rounded-full px-2 text-center transition-colors hover:bg-lime-500",
                 )}
                 style={{
                   zIndex: getZIndex(index),
@@ -167,7 +181,7 @@ const PopupSelector = ({ rangeMapping, onSelect }: PopupSelectorProps) => {
                   lineHeight: `${EMOJI_H}px`,
                 }}
               >
-                <Emoji size="30px" shortcodes={v.emojiShortcode} />
+                <div className="">{v.emoji}</div>
               </motion.div>
             );
           })}
@@ -179,42 +193,48 @@ const PopupSelector = ({ rangeMapping, onSelect }: PopupSelectorProps) => {
 
 const RangeClasses = cva(
   [
-    'group w-full relative flex items-center justify-center font-light transition-colors ioutline-none focus:outline-neutral-300 dark:focus:outline-neutral-600',
+    "group w-full relative box-border flex items-center justify-center font-light transition-colors outline-none focus:outline-neutral-300 dark:focus:outline-neutral-600",
   ],
   {
     variants: {
       inTrackRange: {
-        true: 'cursor-pointer border-neutral-500 dark:border-neutral-700',
+        true: "cursor-pointer border-neutral-200 dark:border-neutral-900",
         false:
-          'bg-neutral-100 text-neutral-300 dark:bg-neutral-900 dark:text-neutral-800 border-transparent',
+          "bg-neutral-100 text-neutral-300 dark:bg-neutral-900 dark:text-neutral-800 border-transparent",
       },
       style: {
-        default: 'h-16 border-2',
-        mini: 'h-6 border text-xs',
+        default: "h-16 border-2",
+        mini: "h-6 border text-xs",
       },
       colorCode: ThemeList,
     },
     compoundVariants: [
       {
         inTrackRange: true,
-        className: 'text-neutral-500  dark:text-neutral-700',
+        className: "text-neutral-500  dark:text-neutral-700",
       },
     ],
     defaultVariants: {
-      style: 'default',
+      style: "default",
     },
-  }
+  },
 );
 
-export const DayCellRange = ({ day, month, year, style }: IDayProps) => {
-  const { trackable, changeDay, rangeLabelMapping } = useTrackableSafe();
+export const DayCellRange = ({
+  trackable,
+  day,
+  month,
+  year,
+  style,
+}: IDayProps) => {
+  const rangeLabelMapping = getRangeLabelMapping(trackable);
 
-  if (trackable.type !== 'range') {
-    throw new Error('Not range trackable passed to trackable dayCell');
+  if (trackable.type !== "range") {
+    throw new Error("Not range trackable passed to trackable dayCell");
   }
 
   if (!rangeLabelMapping) {
-    throw new Error('Range label mapping error');
+    throw new Error("Range label mapping error");
   }
 
   const [isSelecting, setIsSelecting] = useState(false);
@@ -227,16 +247,21 @@ export const DayCellRange = ({ day, month, year, style }: IDayProps) => {
         year,
         startDate: trackable.settings.startDate,
       }),
-    [day, month, year, trackable.settings.startDate]
+    [day, month, year, trackable.settings.startDate],
   );
 
-  const dayValue = trackable.data[dateKey];
-  const code = dayValue
-    ? (rangeLabelMapping[dayValue] as string)
-    : ':question"';
+  const [dayValue, setIsActive] = useOptimistic(
+    trackable.data[dateKey],
+    (_, value: string) => {
+      return value;
+    },
+  );
+
+  const em = dayValue ? (rangeLabelMapping[dayValue] as string) : "❓";
 
   const handleSelect = async (v: string) => {
     setIsSelecting(false);
+    setIsActive(v);
     await changeDay({
       id: trackable.id,
       day,
@@ -253,13 +278,12 @@ export const DayCellRange = ({ day, month, year, style }: IDayProps) => {
         inTrackRange,
         style,
       })}
+      disabled={!inTrackRange}
       key={day}
     >
       <DayNumber style={style} day={day} isToday={isToday} />
 
-      {dayValue && (
-        <Emoji shortcodes={code} size={style === 'mini' ? '14px' : '30px'} />
-      )}
+      {dayValue && <div className="text-xl">{em}</div>}
     </button>
   );
 

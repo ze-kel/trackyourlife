@@ -11,14 +11,17 @@ import {
   isAfter,
 } from "date-fns";
 import { useEffect, useRef, useState } from "react";
-import IconChevronLeft from "@heroicons/react/20/solid/ChevronLeftIcon";
-import IconChevronLeftDouble from "@heroicons/react/20/solid/ChevronDoubleLeftIcon";
-import IconChevronDown from "@heroicons/react/20/solid/ChevronDownIcon";
-import IconChevronRight from "@heroicons/react/20/solid/ChevronRightIcon";
-import IconChevronRightDouble from "@heroicons/react/20/solid/ChevronDoubleRightIcon";
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  DoubleArrowLeftIcon,
+  DoubleArrowRightIcon,
+} from "@radix-ui/react-icons";
 import Dropdown from "../Dropdown";
 import { AnimatePresence, motion } from "framer-motion";
 import useMeasure from "react-use-measure";
+import { Button } from "@/components/ui/button";
+import { CalendarIcon } from "@radix-ui/react-icons";
 
 const DatePicker = ({
   date,
@@ -113,24 +116,22 @@ const DatePicker = ({
       <div ref={ref}>
         <div className="flex w-full items-center justify-between py-2">
           <div className="flex">
-            <IconChevronLeftDouble
-              className={clsx(
-                "w-7",
-                isSameMonth(limits.start, cursor)
-                  ? "opacity-10"
-                  : "cursor-pointer"
-              )}
+            <Button
+              variant="ghost"
+              size="icon"
+              disabled={isSameMonth(limits.start, cursor)}
               onClick={() => moveCursorMonths(-12)}
-            />
-            <IconChevronLeft
-              className={clsx(
-                "w-7",
-                isSameMonth(limits.start, cursor)
-                  ? "opacity-10"
-                  : "cursor-pointer"
-              )}
+            >
+              <DoubleArrowLeftIcon className="w-7" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              disabled={isSameMonth(limits.start, cursor)}
               onClick={() => moveCursorMonths(-1)}
-            />
+            >
+              <ChevronLeftIcon className="w-7" />
+            </Button>
           </div>
           <AnimatePresence
             mode="popLayout"
@@ -151,24 +152,23 @@ const DatePicker = ({
             </motion.div>
           </AnimatePresence>
           <div className="flex">
-            <IconChevronRight
-              className={clsx(
-                "w-7",
-                isSameMonth(new Date(), cursor)
-                  ? "opacity-10"
-                  : "cursor-pointer"
-              )}
+            <Button
+              variant="ghost"
+              size="icon"
+              disabled={isSameMonth(new Date(), cursor)}
               onClick={() => moveCursorMonths(1)}
-            />
-            <IconChevronRightDouble
-              className={clsx(
-                "w-7",
-                isSameMonth(new Date(), cursor)
-                  ? "opacity-10"
-                  : "cursor-pointer"
-              )}
-              onClick={() => moveCursorMonths(12)}
-            />
+            >
+              <ChevronRightIcon className="w-7" />
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="icon"
+              disabled={isSameMonth(new Date(), cursor)}
+              onClick={() => moveCursorMonths(1)}
+            >
+              <DoubleArrowRightIcon className="w-7" />
+            </Button>
           </div>
         </div>
 
@@ -199,7 +199,7 @@ const DatePicker = ({
                     : "border-transparent",
                   inLimit(el)
                     ? "cursor-pointer hover:border-lime-500"
-                    : "text-neutral-200 dark:text-neutral-800"
+                    : "text-neutral-200 dark:text-neutral-800",
                 )}
                 key={`${cursor.getMonth()}-${el}`}
                 onClick={() => recordDate(el)}
@@ -214,15 +214,12 @@ const DatePicker = ({
   );
 
   const opener = (
-    <div className="flex w-fit cursor-pointer border-2 border-neutral-400 px-2 py-1 transition-colors hover:border-neutral-600 dark:border-neutral-800 dark:hover:border-neutral-700">
-      {date ? format(date, "d MMMM yyyy") : "No date set"}{" "}
-      <IconChevronDown
-        className={clsx(
-          "ml-1 w-6",
-          isOpened && "rotate-180 transition-transform"
-        )}
-      />
-    </div>
+    <Button variant={"outline"} className="min-w-[200px]">
+      <span className="">
+        {date ? format(date, "d MMMM yyyy") : "No date set"}
+      </span>
+      <CalendarIcon className="ml-auto h-4 w-4 " />
+    </Button>
   );
 
   return (

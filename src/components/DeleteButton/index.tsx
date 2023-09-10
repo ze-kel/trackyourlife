@@ -1,94 +1,56 @@
-'use client';
-import Button from '@components/_UI/Button';
-import Modal from '@components/_UI/Modal';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { useTrackableSafe } from '../../helpers/trackableContext';
-import IconTrash from '@heroicons/react/24/outline/TrashIcon';
-import Dropdown from '@components/_UI/Dropdown';
+"use client";
+import { useRouter } from "next/navigation";
+import { TrashIcon } from "@radix-ui/react-icons";
 
-const DeleteButton = () => {
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { buttonVariants } from "@/components/ui/button";
+import { deleteTrackable } from "src/helpers/apiHelpersClient";
+
+const DeleteButton = ({ id }: { id: string }) => {
   const router = useRouter();
 
-  const { deleteTrackable } = useTrackableSafe();
-
   if (!deleteTrackable) {
-    throw new Error('Context error: Delete trackable');
+    throw new Error("Context error: Delete trackable");
   }
 
   const performDelete = async () => {
-    await deleteTrackable();
-    router.push('/');
+    await deleteTrackable(id);
+    router.push("/");
   };
 
-  const [confirmOpened, setConfirmOpened] = useState(false);
-
-  const openModal = () => {
-    setConfirmOpened(true);
-  };
-
-  const closeModal = () => {
-    setConfirmOpened(false);
-  };
-
-  const visible = (
-    <button className="flex items-center">
-      <IconTrash
-        className="w-6 cursor-pointer text-neutral-400 transition-colors hover:text-red-600"
-        onClick={openModal}
-      />
-    </button>
-  );
-
-  const hidden = (
-    <>
-      <h2 className="text-md text-center">Are you sure?</h2>
-      <p className="mt-1 text-xs">This action is irreversible</p>
-
-      <Button
-        theme="transparent"
-        fill
-        size="s"
-        className="mt-1"
-        onClick={() => void performDelete()}
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger
+        className={buttonVariants({ variant: "outline", size: "icon" })}
       >
-        Delete
-      </Button>
-    </>
-  );
-
-  return (
-    <Dropdown
-      placement="bottom-end"
-      visible={confirmOpened}
-      setVisible={setConfirmOpened}
-      mainPart={visible}
-      hiddenPart={hidden}
-    />
-  );
-
-  return (
-    <>
-      <button>
-        <IconTrash
-          className="w-7 cursor-pointer text-neutral-400 transition-colors hover:text-red-600"
-          onClick={openModal}
-        />
-      </button>
-
-      {confirmOpened && (
-        <Modal close={closeModal}>
-          <h2 className="text-xl">Are you sure you want to delete?</h2>
-          <p className="pt-2">This action is irreversible</p>
-          <div className="pt-3">
-            <Button onClick={() => void performDelete()}>Confirm</Button>
-            <Button className="ml-4" onClick={closeModal}>
-              Cancel
-            </Button>
-          </div>
-        </Modal>
-      )}
-    </>
+        <TrashIcon className="h-4 w-4" />
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+          <AlertDialogDescription>
+            This action cannot be undone. This will permanently delete this
+            trackale.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction onClick={() => void performDelete()}>
+            Delete
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 };
 

@@ -44,7 +44,7 @@ const Dropdown = ({
         placeCenter
           ? ({ rects }) =>
               -rects.reference.height / 2 - rects.floating.height / 2
-          : offset
+          : offset,
       ),
       flip(),
       shift(),
@@ -87,7 +87,7 @@ const Dropdown = ({
             className={clsx(
               "z-50",
               background &&
-                "overflow-hidden rounded-sm border-2 bg-neutral-50 p-2 text-neutral-800 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-200"
+                "overflow-hidden rounded-md border border-neutral-200 bg-white p-2  text-neutral-950 shadow dark:border-neutral-800 dark:bg-neutral-950 dark:text-neutral-50",
             )}
             {...getFloatingProps()}
           >
