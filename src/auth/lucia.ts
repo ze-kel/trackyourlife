@@ -1,10 +1,15 @@
-// auth/lucia.ts
 import { lucia } from "lucia";
 import { nextjs } from "lucia/middleware";
 import { env } from "src/env/server.mjs";
-import { prisma as prismaAdapter } from "@lucia-auth/adapter-prisma";
 import "lucia/polyfill/node";
-import { prisma } from "../app/api/db";
+import { postgres as postgresAdapter } from "@lucia-auth/adapter-postgresql";
+import { queryClient } from "src/app/api/db";
+
+const tableNames = {
+  user: "user",
+  key: "key",
+  session: "session",
+};
 
 // expect error
 export const auth = lucia({
@@ -13,7 +18,7 @@ export const auth = lucia({
   sessionCookie: {
     expires: false, // only for projects deployed to the edge
   },
-  adapter: prismaAdapter(prisma),
+  adapter: postgresAdapter(queryClient, tableNames),
   getUserAttributes: (data) => {
     return {
       username: data.username,

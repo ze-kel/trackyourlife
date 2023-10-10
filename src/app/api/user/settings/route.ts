@@ -1,8 +1,11 @@
-import { prisma } from "../../db";
+import { db } from "../../db";
 import { cookies } from "next/headers";
-import { NextResponse, type NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import { auth } from "src/auth/lucia";
 import { ZUserSettings } from "@t/user";
+import { auth_user } from "src/schema";
+import { eq } from "drizzle-orm";
 
 export const GET = async (request: NextRequest) => {
   // Auth check
@@ -16,13 +19,11 @@ export const GET = async (request: NextRequest) => {
 
   const userId = session.user.userId;
 
-  const user = await prisma.user.findFirst({
-    where: {
-      id: userId,
-    },
+  const user = await db.query.auth_user.findFirst({
+    where: eq(auth_user.id, userId),
   });
 
-  if (!user) return {};
+  if (!user) return NextResponse.json({});
 
   return NextResponse.json(ZUserSettings.parse(user.settings));
 };
@@ -52,24 +53,18 @@ export const POST = async (request: NextRequest) => {
     );
   }
 
-  const user = await prisma.user.findFirst({
-    where: {
-      id: userId,
-    },
+  const user = await db.query.auth_user.findFirst({
+    where: eq(auth_user.id, userId),
   });
 
   if (!user) {
     throw new Error("Cant find user with provided ID to access settings");
   }
 
-  await prisma.user.update({
-    where: {
-      id: userId,
-    },
-    data: {
-      settings: input.data,
-    },
-  });
+  await db
+    .update(auth_user)
+    .set({ settings: input.data })
+    .where(eq(auth_user.id, userId));
 
   return NextResponse.json(input.data);
 };

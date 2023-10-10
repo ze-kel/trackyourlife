@@ -1,4 +1,4 @@
-"use server";
+"use client";
 import type { ITrackable } from "src/types/trackable";
 import Link from "next/link";
 import MiniTrackable from "./miniTrackable";

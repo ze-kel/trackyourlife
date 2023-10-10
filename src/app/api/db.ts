@@ -1,19 +1,14 @@
-import { PrismaClient } from "@prisma/client";
+import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
 
-import { env } from "src/env/server.mjs";
+import type * as schema from "../../schema";
 
-declare global {
-  // eslint-disable-next-line no-var
-  var prisma: PrismaClient | undefined;
+const connectionString = process.env.DATABASE_URL || "";
+
+if (!connectionString) {
+  throw new Error("Unable to read process.env.DATABASE_URL");
 }
 
-export const prisma =
-  global.prisma ||
-  new PrismaClient({
-    log:
-      env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
-  });
-
-if (env.NODE_ENV !== "production") {
-  global.prisma = prisma;
-}
+export const queryClient = postgres(connectionString);
+export const db: PostgresJsDatabase<typeof schema> = drizzle(queryClient);

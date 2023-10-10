@@ -1,13 +1,13 @@
-import type { Prisma } from "@prisma/client";
-import { prisma } from "../db";
+import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { NextResponse, type NextRequest } from "next/server";
+import { db } from "src/app/api/db";
 import {
-  getDateBounds,
   prepareTrackable,
   trackableToCreate,
 } from "src/app/api/trackables/[id]/route";
 import { auth } from "src/auth/lucia";
+import { trackable } from "src/schema";
 
 export const GET = async (request: NextRequest) => {
   // Auth check
@@ -21,14 +21,12 @@ export const GET = async (request: NextRequest) => {
   }
 
   const userId = session.user.userId;
-  const raw = await prisma.trackable.findMany({
-    where: { userId },
-    include: {
-      data: {
-        where: {
-          date: getDateBounds({ type: "last", days: 31 }),
-        },
-      },
+
+  // TODO: getDateBounds({ type: "last", days: 31 }),
+  const raw = await db.query.trackable.findMany({
+    where: eq(trackable.userId, userId),
+    with: {
+      data: true,
     },
   });
 
@@ -62,17 +60,22 @@ export const PUT = async (request: NextRequest) => {
     );
   }
 
-  const created = await prisma.trackable.create({
-    data: {
+  const cr = await db
+    .insert(trackable)
+    .values({
       type: input.data.type,
-      settings: input.data.settings as Prisma.JsonObject,
+      settings: input.data.settings,
       userId,
-    },
-  });
+    })
+    .returning();
+
+  if (!cr[0]) {
+    throw new Error("Failed to insert");
+  }
 
   const url = request.nextUrl.clone();
 
-  url.pathname = `trackables/${created.id}`;
+  url.pathname = `trackables/${cr[0].id}`;
 
   return NextResponse.redirect(url);
 };

@@ -1,5 +1,3 @@
-import { prisma } from "src/app/api/db";
-
 import { cookies } from "next/headers";
 import { NextResponse, type NextRequest } from "next/server";
 import { auth } from "src/auth/lucia";
@@ -15,7 +13,7 @@ import {
   ZTrackableSettingsRange,
   ZTrackableUpdate,
 } from "src/types/trackable";
-import type { Trackable, TrackableRecord } from "@prisma/client";
+import type { DbTrackableRecordSelect, DbTrackableSelect } from "src/schema";
 
 export const trackableToCreate = z.discriminatedUnion("type", [
   z.object({
@@ -32,16 +30,18 @@ export const trackableToCreate = z.discriminatedUnion("type", [
   }),
 ]);
 
-const makeTrackableData = (trackableData: TrackableRecord[]) => {
+const makeTrackableData = (trackableData: DbTrackableRecordSelect[]) => {
   const result: ITrackable["data"] = {};
 
   trackableData.forEach((el) => {
-    result[format(el.date, "yyyy-MM-dd")] = el.value;
+    result[format(new Date(el.date), "yyyy-MM-dd")] = el.value;
   });
   return result;
 };
 
-const makeTrackableSettings = (trackable: Trackable): ITrackableSettings => {
+const makeTrackableSettings = (
+  trackable: DbTrackableSelect,
+): ITrackableSettings => {
   let settingsParser;
   const type = trackable.type;
   if (type === "boolean") {
@@ -69,7 +69,7 @@ const makeTrackableSettings = (trackable: Trackable): ITrackableSettings => {
 };
 
 export const prepareTrackable = (
-  trackable: Trackable & { data: TrackableRecord[] },
+  trackable: DbTrackableSelect & { data: DbTrackableRecordSelect[] },
 ): ITrackable => {
   return {
     ...trackable,
