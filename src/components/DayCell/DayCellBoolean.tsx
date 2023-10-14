@@ -10,7 +10,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import DayNumber from "@components/DayCell/dayNumber";
 import clamp from "lodash/clamp";
 import { changeDay } from "src/helpers/actions";
-import { experimental_useOptimistic as useOptimistic } from "react";
+import { useOptimistic } from "react";
 
 export const ThemeList: Record<IColorOptions, ""> = {
   neutral: "",

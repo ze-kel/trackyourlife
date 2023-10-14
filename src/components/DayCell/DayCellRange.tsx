@@ -12,7 +12,7 @@ import clsx from "clsx";
 import { AnimatePresence, motion } from "framer-motion";
 import DayNumber from "@components/DayCell/dayNumber";
 import { changeDay } from "src/helpers/actions";
-import { experimental_useOptimistic as useOptimistic } from "react";
+import { useOptimistic } from "react";
 
 const getRangeLabelMapping = (trackable: ITrackable) => {
   if (trackable.type !== "range" || !trackable.settings.labels) return;
