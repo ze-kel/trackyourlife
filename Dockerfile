@@ -2,7 +2,6 @@ FROM node:16
 WORKDIR /app
 COPY package.json .
 COPY package-lock.json .
-COPY /prisma .
 COPY startup.dev.sh .
 ARG NODE_ENV
 RUN if [ "$NODE_ENV" = "development" ]; \

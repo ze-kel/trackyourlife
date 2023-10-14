@@ -1,8 +1,8 @@
-import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import { drizzle } from "drizzle-orm/postgres-js";
-import postgres from "postgres";
+import type { NodePgDatabase } from "drizzle-orm/node-postgres";
+import { drizzle } from "drizzle-orm/node-postgres";
+import { Pool } from "pg";
 
-import type * as schema from "../../schema";
+import * as schema from "../../schema";
 
 const connectionString = process.env.DATABASE_URL || "";
 
@@ -10,5 +10,8 @@ if (!connectionString) {
   throw new Error("Unable to read process.env.DATABASE_URL");
 }
 
-export const queryClient = postgres(connectionString);
-export const db: PostgresJsDatabase<typeof schema> = drizzle(queryClient);
+export const pool = new Pool({
+  connectionString: connectionString,
+});
+
+export const db: NodePgDatabase<typeof schema> = drizzle(pool, { schema });

@@ -30,8 +30,11 @@ export const computeDayCellHelpers = ({
 
   const dateKey = formatDateKey({ day, month, year });
   const beforeToday = isBefore(dateDay, dateNow);
-  const afterLimit = startDate
-    ? isSameDay(dateDay, startDate) || isAfter(dateDay, startDate)
+
+  const startCovented = startDate ? new Date(startDate) : undefined;
+
+  const afterLimit = startCovented
+    ? isSameDay(dateDay, startCovented) || isAfter(dateDay, startCovented)
     : true;
   const inTrackRange = beforeToday && afterLimit;
   const isToday = isSameDay(dateNow, dateDay);

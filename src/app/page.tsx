@@ -17,6 +17,7 @@ const Page = async () => {
         </Link>
       </div>
       <div className="mt-2">
+        {JSON.stringify(trackables)}
         <TrackablesList list={trackables}></TrackablesList>
       </div>
     </div>

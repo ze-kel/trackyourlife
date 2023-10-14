@@ -19,7 +19,7 @@ const Trackable = async ({ params }: { params: { id: string } }) => {
       <div className="content-container flex h-full max-h-full w-full flex-col">
         <div className="mb-4 flex w-full items-center justify-between">
           <h2 className="w-full bg-inherit text-2xl font-semibold">
-            {trackable.settings.name}
+            {trackable.settings.name || "unnamed"}
           </h2>
           <Link href={`/trackables/${params.id}/settings`} className="mr-2">
             <Button variant="outline" size="icon">

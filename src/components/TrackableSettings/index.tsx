@@ -58,8 +58,8 @@ const SettingsBoolean = ({
       <div>
         <h3 className="text-xl">Tracking Start</h3>
         <DatePicker
-          date={settings.startDate}
-          onChange={changeStartDate}
+          date={settings.startDate ? new Date(settings.startDate) : undefined}
+          onChange={(v) => changeStartDate(String(v))}
           limits={{ start: new Date(1990, 0, 1), end: new Date() }}
           className="mt-2"
         />
@@ -130,8 +130,8 @@ const SettingsNumber = ({
       <div>
         <h3 className="text-xl">Tracking Start</h3>
         <DatePicker
-          date={settings.startDate}
-          onChange={changeStartDate}
+          date={settings.startDate ? new Date(settings.startDate) : undefined}
+          onChange={(v) => changeStartDate(String(v))}
           limits={{ start: new Date(1990, 0, 1), end: new Date() }}
           className="mt-2"
         />
@@ -198,8 +198,8 @@ const SettingsRange = ({
       <div>
         <h3 className="text-xl">Tracking Start</h3>
         <DatePicker
-          date={settings.startDate}
-          onChange={changeStartDate}
+          date={settings.startDate ? new Date(settings.startDate) : undefined}
+          onChange={(v) => changeStartDate(String(v))}
           limits={{ start: new Date(1990, 0, 1), end: new Date() }}
           className="mt-2"
         />

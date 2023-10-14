@@ -13,7 +13,15 @@ import {
   ZTrackableSettingsRange,
   ZTrackableUpdate,
 } from "src/types/trackable";
-import type { DbTrackableRecordSelect, DbTrackableSelect } from "src/schema";
+import {
+  type DbTrackableRecordSelect,
+  type DbTrackableRecordInsert,
+  type DbTrackableSelect,
+  trackable,
+  trackableRecord,
+} from "src/schema";
+import { db } from "src/app/api/db";
+import { and, eq } from "drizzle-orm";
 
 export const trackableToCreate = z.discriminatedUnion("type", [
   z.object({
@@ -54,7 +62,6 @@ const makeTrackableSettings = (
     settingsParser = ZTrackableSettingsRange;
   }
   if (!settingsParser) {
-    console.log(trackable);
     throw new Error("No parser for settings of type " + trackable.type);
   }
 
@@ -62,6 +69,7 @@ const makeTrackableSettings = (
   // Here z.coerce.date() auto converts them to JS dates.
   const parseRes = settingsParser.safeParse(trackable.settings);
   if (parseRes.success) {
+    console.log("parsed", parseRes.data);
     return parseRes.data;
   }
 
@@ -139,21 +147,18 @@ export const GET = async (
 
   const id = params.id;
 
-  const trackable = await prisma.trackable.findFirstOrThrow({
-    where: {
-      id,
-      userId,
-    },
-    include: {
-      data: {
-        where: {
-          date: getDateBounds(undefined),
-        },
-      },
+  const tr = await db.query.trackable.findFirst({
+    where: and(eq(trackable.id, id), eq(trackable.userId, userId)),
+    with: {
+      data: true,
     },
   });
 
-  const returnedTrackable: ITrackable = prepareTrackable(trackable);
+  if (!tr) {
+    throw new Error("unable to find trackable");
+  }
+
+  const returnedTrackable: ITrackable = prepareTrackable(tr);
 
   return NextResponse.json(returnedTrackable);
 };
@@ -171,6 +176,7 @@ export const POST = async (
       status: 401,
     });
   }
+
   const userId = session.user.userId;
 
   const data = (await request.json()) as unknown;
@@ -187,41 +193,25 @@ export const POST = async (
     );
   }
 
-  const date = `${format(
+  const date = format(
     new Date(input.data.year, input.data.month, input.data.day),
     "yyyy-MM-dd",
-  )}T00:00:00.000Z`;
+  );
 
-  const trackable = await prisma.trackable.findUnique({
-    where: { id: input.data.id },
-  });
-  if (!trackable || trackable.userId !== userId) {
-    return NextResponse.json(
-      {
-        error: "No trackable with ID" + input.data.id,
-      },
-      {
-        status: 400,
-      },
-    );
-  }
+  const toInsert: DbTrackableRecordInsert = {
+    trackableId: input.data.id,
+    value: input.data.value,
+    date: date,
+    userId,
+  };
 
-  await prisma.trackableRecord.upsert({
-    create: {
-      trackableId: input.data.id,
-      value: input.data.value,
-      date,
-    },
-    update: {
-      value: input.data.value,
-    },
-    where: {
-      trackableId_date: {
-        trackableId: input.data.id,
-        date,
-      },
-    },
-  });
+  await db
+    .insert(trackableRecord)
+    .values(toInsert)
+    .onConflictDoUpdate({
+      target: trackableRecord.date,
+      set: { value: input.data.value },
+    });
 
   return NextResponse.json(input.data);
 };
@@ -244,32 +234,10 @@ export const DELETE = async (
 
   const id = params.id;
 
-  const trackable = await prisma.trackable.findUnique({
-    where: { id },
-  });
-
-  if (!trackable || trackable.userId !== userId) {
-    return NextResponse.json(
-      {
-        error: "No trackable with ID" + id,
-      },
-      {
-        status: 400,
-      },
-    );
-  }
-
-  await prisma.trackableRecord.deleteMany({
-    where: {
-      trackableId: id,
-    },
-  });
-
-  await prisma.trackable.delete({
-    where: {
-      id: id,
-    },
-  });
+  // TODO Check if it cascades
+  await db
+    .delete(trackable)
+    .where(and(eq(trackable.userId, userId), eq(trackable, id)));
 
   return;
 };

@@ -14,7 +14,6 @@ export const GET = async (request: NextRequest) => {
   const authRequest = auth.handleRequest({ request, cookies });
   const session = await authRequest.validate();
   if (!session) {
-    console.log("no session");
     return new Response(null, {
       status: 401,
     });
@@ -23,6 +22,7 @@ export const GET = async (request: NextRequest) => {
   const userId = session.user.userId;
 
   // TODO: getDateBounds({ type: "last", days: 31 }),
+
   const raw = await db.query.trackable.findMany({
     where: eq(trackable.userId, userId),
     with: {

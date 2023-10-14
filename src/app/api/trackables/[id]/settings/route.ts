@@ -1,26 +1,24 @@
-import { prisma } from "src/app/api/db";
-
 import { cookies } from "next/headers";
 import { NextResponse, type NextRequest } from "next/server";
 import { auth } from "src/auth/lucia";
+
+import { db } from "src/app/api/db";
+import { and, eq } from "drizzle-orm";
 
 import {
   ZTrackableSettingsBoolean,
   ZTrackableSettingsNumber,
   ZTrackableSettingsRange,
 } from "src/types/trackable";
-import type { Prisma } from "@prisma/client";
+import { trackable } from "src/schema";
 
 export const POST = async (
   request: NextRequest,
   { params }: { params: { id: string } },
 ) => {
-  console.log("POST TO SETTINGS");
-
   // Auth check
   const authRequest = auth.handleRequest({ request: null, cookies });
   const session = await authRequest.validate();
-  console.log("SESSIon", session);
   if (!session) {
     return new Response(null, {
       status: 401,
@@ -30,11 +28,11 @@ export const POST = async (
   const userId = session.user.userId;
   const id = params.id;
 
-  const trackable = await prisma.trackable.findUnique({
-    where: { id, userId },
+  const tr = await db.query.trackable.findFirst({
+    where: and(eq(trackable.id, id), eq(trackable.userId, userId)),
   });
 
-  if (!trackable) {
+  if (!tr) {
     return NextResponse.json(
       {
         error: "No trackable with ID" + id,
@@ -47,19 +45,17 @@ export const POST = async (
 
   const data = (await request.json()) as unknown;
 
-  console.log(data);
-
   let parsed;
 
-  if (trackable.type === "boolean") {
+  if (tr.type === "boolean") {
     parsed = ZTrackableSettingsBoolean.safeParse(data);
   }
 
-  if (trackable.type === "number") {
+  if (tr.type === "number") {
     parsed = ZTrackableSettingsNumber.safeParse(data);
   }
 
-  if (trackable.type === "range") {
+  if (tr.type === "range") {
     parsed = ZTrackableSettingsRange.safeParse(data);
   }
 
@@ -74,14 +70,10 @@ export const POST = async (
     );
   }
 
-  await prisma.trackable.update({
-    data: {
-      settings: parsed.data as Prisma.JsonObject,
-    },
-    where: {
-      id: id,
-    },
-  });
+  await db
+    .update(trackable)
+    .set({ settings: parsed.data })
+    .where(and(eq(trackable.id, id), eq(trackable.userId, userId)));
 
   return NextResponse.json(parsed.data);
 };

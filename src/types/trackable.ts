@@ -18,7 +18,7 @@ export type IColorOptions = z.infer<typeof colorOption>;
 
 const basics = {
   name: z.string().default("Unnamed Trackable").optional(),
-  startDate: z.coerce.date().optional(),
+  startDate: z.string().datetime().optional(),
   favorite: z.boolean().optional(),
 };
 

@@ -1,6 +1,7 @@
 import { getBaseUrl } from "src/helpers/getBaseUrl";
 import { type ITrackable } from "src/types/trackable";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 export type ITrackableBasic = Omit<ITrackable, "data">;
 
@@ -12,9 +13,15 @@ export const getTrackableIds = async () => {
     },
   });
 
+  if (res.status === 401) {
+    redirect("/login");
+  }
+
   const data = (await res.json()) as unknown;
 
   const result = data as { trackables: ITrackable[] };
+
+  console.log(result.trackables[0]?.settings);
 
   return result.trackables;
 };
@@ -26,6 +33,10 @@ export const getTrackable = async (id: string) => {
       Cookie: cookies().toString(),
     },
   });
+
+  if (res.status === 401) {
+    redirect("/login");
+  }
 
   const data = (await res.json()) as unknown;
 

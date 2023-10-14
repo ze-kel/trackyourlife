@@ -8,6 +8,27 @@
       "when": 1696956329140,
       "tag": "0000_sloppy_blizzard",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1696967044494,
+      "tag": "0001_gorgeous_tigra",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1697278319416,
+      "tag": "0002_elite_bill_hollister",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1697282815795,
+      "tag": "0003_good_darkstar",
+      "breakpoints": true
     }
   ]
 }

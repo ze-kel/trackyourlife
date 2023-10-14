@@ -64,16 +64,30 @@ export const trackableRecord = pgTable(
   "trackableRecord",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    trackableId: uuid("id")
+    trackableId: uuid("trackableId")
       .notNull()
       .references(() => trackable.id),
     date: date("date").unique().notNull(),
     value: varchar("value").notNull(),
+    userId: varchar("user_id", { length: USER_ID_LEN })
+      .notNull()
+      .references(() => auth_user.id),
   },
   (t) => ({
     unq: unique().on(t.id, t.date).nullsNotDistinct(),
   }),
 );
+
+export const recordRelations = relations(trackableRecord, ({ one }) => ({
+  trackableId: one(trackable, {
+    fields: [trackableRecord.trackableId],
+    references: [trackable.id],
+  }),
+  userId: one(auth_user, {
+    fields: [trackableRecord.userId],
+    references: [auth_user.id],
+  }),
+}));
 
 export type DbTrackableSelect = typeof trackable.$inferSelect;
 export type DbTrackableInsert = typeof trackable.$inferInsert;
