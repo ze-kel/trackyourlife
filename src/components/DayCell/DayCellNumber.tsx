@@ -1,6 +1,7 @@
 "use client";
 import cls from "clsx";
-import React, { useCallback, useMemo, useState } from "react";
+import type React from "react";
+import { useCallback, useMemo, useState } from "react";
 import clamp from "lodash/clamp";
 import debounce from "lodash/debounce";
 import EditableText from "@components/_UI/EditableText";

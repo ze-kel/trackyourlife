@@ -1,4 +1,4 @@
-import { cookies } from "next/headers";
+import * as context from "next/headers";
 import { NextResponse, type NextRequest } from "next/server";
 import { auth } from "src/auth/lucia";
 import { z } from "zod";
@@ -69,7 +69,6 @@ const makeTrackableSettings = (
   // Here z.coerce.date() auto converts them to JS dates.
   const parseRes = settingsParser.safeParse(trackable.settings);
   if (parseRes.success) {
-    console.log("parsed", parseRes.data);
     return parseRes.data;
   }
 
@@ -135,7 +134,7 @@ export const GET = async (
   { params }: { params: { id: string } },
 ) => {
   // Auth check
-  const authRequest = auth.handleRequest({ request, cookies });
+  const authRequest = auth.handleRequest(request.method, context);
   const session = await authRequest.validate();
   if (!session) {
     return new Response(null, {
@@ -169,7 +168,7 @@ export const POST = async (
   // { params }: { params: { id: string } }
 ) => {
   // Auth check
-  const authRequest = auth.handleRequest({ request, cookies });
+  const authRequest = auth.handleRequest(request.method, context);
   const session = await authRequest.validate();
   if (!session) {
     return new Response(null, {
@@ -209,7 +208,7 @@ export const POST = async (
     .insert(trackableRecord)
     .values(toInsert)
     .onConflictDoUpdate({
-      target: trackableRecord.date,
+      target: [trackableRecord.trackableId, trackableRecord.date],
       set: { value: input.data.value },
     });
 
@@ -222,7 +221,7 @@ export const DELETE = async (
   { params }: { params: { id: string } },
 ) => {
   // Auth check
-  const authRequest = auth.handleRequest({ request, cookies });
+  const authRequest = auth.handleRequest(request.method, context);
   const session = await authRequest.validate();
   if (!session) {
     return new Response(null, {

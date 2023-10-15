@@ -1,68 +1,71 @@
 import { auth } from "src/auth/lucia";
-import { cookies } from "next/headers";
+import * as context from "next/headers";
 import { NextResponse } from "next/server";
-import { LuciaError } from "lucia";
 
 import type { NextRequest } from "next/server";
-import { ZLogin } from "@t/user";
+import { ZRegister } from "@t/user";
 
 export const POST = async (request: NextRequest) => {
   const data = (await request.json()) as unknown;
 
   try {
-    const results = ZLogin.safeParse(data);
+    const results = ZRegister.safeParse(data);
     if (!results.success) {
       return NextResponse.json(
         {
-          error: "Incorrect username or password",
+          error: results.error.message,
         },
         {
           status: 400,
-        }
+        },
       );
     }
 
-    const { email, password } = results.data;
+    const { email, password, username, role } = results.data;
 
-    const user = await auth.useKey("username", email.toLowerCase(), password);
+    const user = await auth.createUser({
+      key: {
+        providerId: "username", // auth method
+        providerUserId: email.toLowerCase(), // unique id when using "username" auth method
+        password, // hashed by Lucia
+      },
+      attributes: {
+        email,
+        username,
+        role,
+      },
+    });
     const session = await auth.createSession({
       userId: user.userId,
       attributes: {},
     });
-    const authRequest = auth.handleRequest({
-      request,
-      cookies,
-    });
+    const authRequest = auth.handleRequest(request.method, context);
     authRequest.setSession(session);
     return new Response(null, {
       status: 302,
       headers: {
-        Location: "/", // redirect to profile page
+        Location: "/",
       },
     });
   } catch (e) {
-    if (
-      e instanceof LuciaError &&
-      (e.message === "AUTH_INVALID_KEY_ID" ||
-        e.message === "AUTH_INVALID_PASSWORD")
-    ) {
-      // user does not exist or invalid password
+    if (typeof e === "object" && e && "code" in e && e.code === "23505") {
       return NextResponse.json(
         {
-          error: "Incorrect username or password",
+          error: "This email is already registered",
         },
         {
           status: 400,
-        }
+        },
       );
     }
+
     return NextResponse.json(
       {
         error: "An unknown error occurred",
       },
       {
         status: 500,
-      }
+      },
     );
   }
 };

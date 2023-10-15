@@ -1,0 +1,2 @@
+ALTER TABLE "trackableRecord" DROP CONSTRAINT "trackableRecord_date_unique";--> statement-breakpoint
+ALTER TABLE "trackableRecord" ADD CONSTRAINT "trackableRecord_trackableId_date" PRIMARY KEY("trackableId","date");

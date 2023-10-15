@@ -6,7 +6,7 @@ import {
   json,
   uuid,
   date,
-  unique,
+  primaryKey,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
@@ -16,9 +16,11 @@ export const auth_user = pgTable("auth_user", {
   id: varchar("id", { length: USER_ID_LEN }).primaryKey(),
 
   email: varchar("email").unique().notNull(),
-  username: varchar("username").unique().notNull(),
+  username: varchar("username").notNull(),
 
   settings: json("settings").default({}).$type<Record<string, unknown>>(),
+  // Currently only used to identify users created by e2e testing
+  role: varchar("role"),
 });
 
 export const user_session = pgTable("user_session", {
@@ -63,18 +65,18 @@ export const trackableRelations = relations(trackable, ({ many }) => ({
 export const trackableRecord = pgTable(
   "trackableRecord",
   {
-    id: uuid("id").defaultRandom().primaryKey(),
     trackableId: uuid("trackableId")
       .notNull()
       .references(() => trackable.id),
-    date: date("date").unique().notNull(),
+    date: date("date").notNull(),
     value: varchar("value").notNull(),
     userId: varchar("user_id", { length: USER_ID_LEN })
       .notNull()
       .references(() => auth_user.id),
   },
   (t) => ({
-    unq: unique().on(t.id, t.date).nullsNotDistinct(),
+    pk: primaryKey(t.trackableId, t.date),
+    //unq: unique().on(t.trackableId, t.date).nullsNotDistinct(),
   }),
 );
 

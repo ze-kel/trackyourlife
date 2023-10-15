@@ -1,8 +1,8 @@
 {
   "version": "5",
   "dialect": "pg",
-  "id": "126fb113-6f80-4a5c-9833-26654b731351",
-  "prevId": "5af54a83-e4ac-43e0-bc64-fe55885f5d87",
+  "id": "0d7deec9-f98f-45f8-b2f4-c3e5c0fb69ae",
+  "prevId": "dd387f74-e4ea-4215-8c67-8d6bc8eaf622",
   "tables": {
     "auth_user": {
       "name": "auth_user",
@@ -32,6 +32,12 @@
           "primaryKey": false,
           "notNull": false,
           "default": "'{}'::json"
+        },
+        "role": {
+          "name": "role",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {},
@@ -41,16 +47,7 @@
         "auth_user_email_unique": {
           "name": "auth_user_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
-        },
-        "auth_user_username_unique": {
-          "name": "auth_user_username_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "username"
-          ]
+          "columns": ["email"]
         }
       }
     },
@@ -91,12 +88,8 @@
           "name": "trackable_user_id_auth_user_id_fk",
           "tableFrom": "trackable",
           "tableTo": "auth_user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -110,6 +103,13 @@
       "columns": {
         "id": {
           "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "trackableId": {
+          "name": "trackableId",
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
@@ -125,40 +125,46 @@
           "type": "varchar",
           "primaryKey": false,
           "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "varchar(15)",
+          "primaryKey": false,
+          "notNull": true
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "trackableRecord_id_trackable_id_fk": {
-          "name": "trackableRecord_id_trackable_id_fk",
+        "trackableRecord_trackableId_trackable_id_fk": {
+          "name": "trackableRecord_trackableId_trackable_id_fk",
           "tableFrom": "trackableRecord",
           "tableTo": "trackable",
-          "columnsFrom": [
-            "id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["trackableId"],
+          "columnsTo": ["id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "trackableRecord_user_id_auth_user_id_fk": {
+          "name": "trackableRecord_user_id_auth_user_id_fk",
+          "tableFrom": "trackableRecord",
+          "tableTo": "auth_user",
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
       },
-      "compositePrimaryKeys": {},
+      "compositePrimaryKeys": {
+        "trackableRecord_trackableId_date": {
+          "name": "trackableRecord_trackableId_date",
+          "columns": ["trackableId", "date"]
+        }
+      },
       "uniqueConstraints": {
-        "trackableRecord_date_unique": {
-          "name": "trackableRecord_date_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "date"
-          ]
-        },
         "trackableRecord_id_date_unique": {
           "name": "trackableRecord_id_date_unique",
           "nullsNotDistinct": true,
-          "columns": [
-            "id",
-            "date"
-          ]
+          "columns": ["id", "date"]
         }
       }
     },
@@ -191,12 +197,8 @@
           "name": "user_key_user_id_auth_user_id_fk",
           "tableFrom": "user_key",
           "tableTo": "auth_user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -239,12 +241,8 @@
           "name": "user_session_user_id_auth_user_id_fk",
           "tableFrom": "user_session",
           "tableTo": "auth_user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }

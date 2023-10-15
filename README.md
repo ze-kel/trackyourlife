@@ -12,7 +12,6 @@ App to track stuff. Kinds of like a habit tracker but more: data types, customiz
 
 ![](./public/screenshot.jpg)
 
-
 ### Self hosting
 
 These command used to work, and the setup is still there, though it needs and update and prod config. I'll do it sometime later.

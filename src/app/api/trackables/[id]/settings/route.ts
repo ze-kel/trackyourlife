@@ -1,4 +1,4 @@
-import { cookies } from "next/headers";
+import * as context from "next/headers";
 import { NextResponse, type NextRequest } from "next/server";
 import { auth } from "src/auth/lucia";
 
@@ -17,7 +17,7 @@ export const POST = async (
   { params }: { params: { id: string } },
 ) => {
   // Auth check
-  const authRequest = auth.handleRequest({ request: null, cookies });
+  const authRequest = auth.handleRequest(request.method, context);
   const session = await authRequest.validate();
   if (!session) {
     return new Response(null, {

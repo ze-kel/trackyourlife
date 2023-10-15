@@ -53,46 +53,44 @@ const Create = () => {
   };
 
   return (
-    <>ё
-      <div className="content-container flex flex-col gap-2">
-        <h3 className="w-full bg-inherit text-2xl font-semibold">
-          Create new Trackable
-        </h3>
-        <RadioTabs
-          value={newOne.type}
-          onValueChange={(v) => setType(v as ITrackableUnsaved["type"])}
-          className="mt-2"
-        >
-          <RadioTabItem value="boolean" id="boolean" className="w-full">
-            Boolean
-          </RadioTabItem>
-          <RadioTabItem value="number" id="number" className="w-full">
-            Number
-          </RadioTabItem>
-          <RadioTabItem value="range" id="range" className="w-full">
-            Range
-          </RadioTabItem>
-        </RadioTabs>
-        <div>
-          <h3 className="text-xl">Name</h3>
-          <Input
-            placeholder="Name"
-            className={clsx("my-2 w-fit")}
-            value={newOne.settings.name}
-            onChange={(e) => updateName(e.target.value)}
-          />
-        </div>
-        <TrackableSettingsManual trackable={newOne} setSettings={setSettings} />
-
-        <Button
-          onClick={() => void create()}
-          className="mt-5 w-full"
-          variant={"outline"}
-        >
-          Create
-        </Button>
+    <div className="content-container flex flex-col gap-2">
+      <h3 className="w-full bg-inherit text-2xl font-semibold">
+        Create new Trackable
+      </h3>
+      <RadioTabs
+        value={newOne.type}
+        onValueChange={(v) => setType(v as ITrackableUnsaved["type"])}
+        className="mt-2"
+      >
+        <RadioTabItem value="boolean" id="boolean" className="w-full">
+          Boolean
+        </RadioTabItem>
+        <RadioTabItem value="number" id="number" className="w-full">
+          Number
+        </RadioTabItem>
+        <RadioTabItem value="range" id="range" className="w-full">
+          Range
+        </RadioTabItem>
+      </RadioTabs>
+      <div>
+        <h3 className="text-xl">Name</h3>
+        <Input
+          placeholder="Name"
+          className={clsx("my-2 w-fit")}
+          value={newOne.settings.name}
+          onChange={(e) => updateName(e.target.value)}
+        />
       </div>
-    </>
+      <TrackableSettingsManual trackable={newOne} setSettings={setSettings} />
+
+      <Button
+        onClick={() => void create()}
+        className="mt-5 w-full"
+        variant={"outline"}
+      >
+        Create
+      </Button>
+    </div>
   );
 };
 

@@ -6,6 +6,7 @@ export const ZRegister = z.object({
   email,
   password: z.string().min(6).max(255),
   username: z.string().min(1),
+  role: z.string().optional(),
 });
 
 export type IRegister = z.infer<typeof ZRegister>;

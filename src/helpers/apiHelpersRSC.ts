@@ -21,8 +21,6 @@ export const getTrackableIds = async () => {
 
   const result = data as { trackables: ITrackable[] };
 
-  console.log(result.trackables[0]?.settings);
-
   return result.trackables;
 };
 

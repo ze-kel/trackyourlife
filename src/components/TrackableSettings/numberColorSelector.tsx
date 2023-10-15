@@ -4,7 +4,7 @@ import cloneDeep from "lodash/cloneDeep";
 import ColorSelector from "./colorSelector";
 import XIcon from "@heroicons/react/24/outline/XMarkIcon";
 import PlusIcon from "@heroicons/react/24/outline/PlusIcon";
-import { Fragment, useState } from "react";
+import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import type { ArrayElement } from "@t/helpers";
 import { AnimatePresence, motion } from "framer-motion";

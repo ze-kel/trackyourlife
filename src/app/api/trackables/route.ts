@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { cookies } from "next/headers";
+import * as context from "next/headers";
 import { NextResponse, type NextRequest } from "next/server";
 import { db } from "src/app/api/db";
 import {
@@ -11,7 +11,7 @@ import { trackable } from "src/schema";
 
 export const GET = async (request: NextRequest) => {
   // Auth check
-  const authRequest = auth.handleRequest({ request, cookies });
+  const authRequest = auth.handleRequest(request.method, context);
   const session = await authRequest.validate();
   if (!session) {
     return new Response(null, {
@@ -37,7 +37,7 @@ export const GET = async (request: NextRequest) => {
 
 export const PUT = async (request: NextRequest) => {
   // Auth check
-  const authRequest = auth.handleRequest({ request, cookies });
+  const authRequest = auth.handleRequest(request.method, context);
   const session = await authRequest.validate();
   if (!session) {
     return new Response(null, {

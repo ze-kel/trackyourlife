@@ -5,7 +5,7 @@ import DayCell from "../DayCell";
 import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
 import clsx from "clsx";
 import { Button } from "@/components/ui/button";
-import { ITrackable } from "@t/trackable";
+import type { ITrackable } from "@t/trackable";
 
 const Month = ({
   month,
