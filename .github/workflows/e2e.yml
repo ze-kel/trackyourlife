@@ -13,7 +13,7 @@ jobs:
       - name: Run tests
         run: npx playwright test
         env:
-          TEST-URL: ${{ github.event.deployment_status.environment_url }}
+          TEST_URL: ${{ github.event.deployment_status.environment_url }}
       - uses: actions/upload-artifact@v3
         if: always()
         with:
