@@ -1,3 +1,4 @@
+"use server";
 import { getBaseUrl } from "src/helpers/getBaseUrl";
 import { type ITrackable } from "src/types/trackable";
 import { cookies } from "next/headers";
@@ -31,6 +32,8 @@ export const getTrackable = async (id: string) => {
       Cookie: cookies().toString(),
     },
   });
+
+  console.log(res);
 
   if (res.status === 401) {
     redirect("/login");

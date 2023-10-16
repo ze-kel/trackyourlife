@@ -31,6 +31,7 @@ const DeleteButton = ({ id }: { id: string }) => {
   return (
     <AlertDialog>
       <AlertDialogTrigger
+        name="delete"
         className={buttonVariants({ variant: "outline", size: "icon" })}
       >
         <TrashIcon className="h-4 w-4" />

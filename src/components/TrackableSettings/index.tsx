@@ -49,6 +49,7 @@ const SettingsBoolean = ({
       <div>
         <h3 className="text-xl">Name</h3>
         <Input
+          placeholder="name"
           className="mt-2 w-fit"
           value={settings.name}
           onChange={(e) => changeName(e.target.value)}
@@ -121,6 +122,7 @@ const SettingsNumber = ({
       <div>
         <h3 className="text-xl">Name</h3>
         <Input
+          placeholder="name"
           className="mt-2 w-fit"
           value={settings.name}
           onChange={(e) => changeName(e.target.value)}
@@ -189,6 +191,7 @@ const SettingsRange = ({
       <div>
         <h3 className="text-xl">Name</h3>
         <Input
+          placeholder="name"
           className="mt-2 w-fit"
           value={settings.name}
           onChange={(e) => changeName(e.target.value)}

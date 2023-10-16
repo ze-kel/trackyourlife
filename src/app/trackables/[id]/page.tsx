@@ -22,7 +22,7 @@ const Trackable = async ({ params }: { params: { id: string } }) => {
             {trackable.settings.name || "unnamed"}
           </h2>
           <Link href={`/trackables/${params.id}/settings`} className="mr-2">
-            <Button variant="outline" size="icon">
+            <Button name="settings" variant="outline" size="icon">
               <GearIcon className="h-4 w-4" />
             </Button>
           </Link>

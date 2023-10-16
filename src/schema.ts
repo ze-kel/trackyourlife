@@ -28,7 +28,7 @@ export const user_session = pgTable("user_session", {
 
   userId: varchar("user_id", { length: 15 })
     .notNull()
-    .references(() => auth_user.id),
+    .references(() => auth_user.id, { onDelete: "cascade" }),
 
   activeExpires: bigint("active_expires", { mode: "number" }).notNull(),
 
@@ -40,7 +40,7 @@ export const user_key = pgTable("user_key", {
 
   userId: varchar("user_id", { length: USER_ID_LEN })
     .notNull()
-    .references(() => auth_user.id),
+    .references(() => auth_user.id, { onDelete: "cascade" }),
 
   hashedPassword: varchar("hashed_password", { length: 255 }),
 });
@@ -51,7 +51,7 @@ export const trackable = pgTable("trackable", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: varchar("user_id", { length: USER_ID_LEN })
     .notNull()
-    .references(() => auth_user.id),
+    .references(() => auth_user.id, { onDelete: "cascade" }),
 
   type: trackableTypeEnum("type").notNull(),
 
@@ -67,12 +67,12 @@ export const trackableRecord = pgTable(
   {
     trackableId: uuid("trackableId")
       .notNull()
-      .references(() => trackable.id),
+      .references(() => trackable.id, { onDelete: "cascade" }),
     date: date("date").notNull(),
     value: varchar("value").notNull(),
     userId: varchar("user_id", { length: USER_ID_LEN })
       .notNull()
-      .references(() => auth_user.id),
+      .references(() => auth_user.id, { onDelete: "cascade" }),
   },
   (t) => ({
     pk: primaryKey(t.trackableId, t.date),

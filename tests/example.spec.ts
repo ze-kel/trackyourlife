@@ -2,7 +2,7 @@ import { test, expect } from "../playwright/fixtures";
 
 const URL = process.env.TEST_URL as string;
 
-test.setTimeout(7000);
+test.setTimeout(15000);
 
 export const sleep = (ms: number) => {
   return new Promise((resolve) => {

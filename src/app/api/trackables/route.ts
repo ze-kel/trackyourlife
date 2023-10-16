@@ -1,25 +1,23 @@
 import { eq } from "drizzle-orm";
-import * as context from "next/headers";
+//import * as context from "next/headers";
 import { NextResponse, type NextRequest } from "next/server";
 import { db } from "src/app/api/db";
+import { checkForUser } from "src/app/api/helpers";
 import {
   prepareTrackable,
   trackableToCreate,
 } from "src/app/api/trackables/[id]/route";
-import { auth } from "src/auth/lucia";
+import { log } from "src/helpers/logger";
 import { trackable } from "src/schema";
 
 export const GET = async (request: NextRequest) => {
-  // Auth check
-  const authRequest = auth.handleRequest(request.method, context);
-  const session = await authRequest.validate();
-  if (!session) {
+  const userId = await checkForUser(request);
+
+  if (!userId) {
     return new Response(null, {
       status: 401,
     });
   }
-
-  const userId = session.user.userId;
 
   // TODO: getDateBounds({ type: "last", days: 31 }),
 
@@ -32,20 +30,19 @@ export const GET = async (request: NextRequest) => {
 
   const trackables = raw.map(prepareTrackable);
 
+  log(`API: Get all trackables ${userId}`);
+
   return NextResponse.json({ trackables });
 };
 
 export const PUT = async (request: NextRequest) => {
-  // Auth check
-  const authRequest = auth.handleRequest(request.method, context);
-  const session = await authRequest.validate();
-  if (!session) {
+  const userId = await checkForUser(request);
+
+  if (!userId) {
     return new Response(null, {
       status: 401,
     });
   }
-
-  const userId = session.user.userId;
 
   const data = (await request.json()) as unknown;
   const input = trackableToCreate.safeParse(data);
@@ -76,6 +73,8 @@ export const PUT = async (request: NextRequest) => {
   const url = request.nextUrl.clone();
 
   url.pathname = `trackables/${cr[0].id}`;
+
+  log(`API: Trackable created ${cr[0].id}`);
 
   return NextResponse.redirect(url);
 };

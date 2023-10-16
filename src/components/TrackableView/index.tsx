@@ -193,7 +193,11 @@ const TrackableView = ({ trackable }: { trackable: ITrackable }) => {
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-baseline gap-2">
           {view !== "years" && (
-            <Button variant="ghost" onClick={() => setView("years")}>
+            <Button
+              name="year"
+              variant="ghost"
+              onClick={() => setView("years")}
+            >
               {year}
             </Button>
           )}
@@ -203,20 +207,35 @@ const TrackableView = ({ trackable }: { trackable: ITrackable }) => {
               <div className="text-xl font-light text-neutral-200 dark:text-neutral-800">
                 /
               </div>
-              <Button variant={"ghost"} onClick={() => setView("months")}>
+              <Button
+                name="months"
+                variant={"ghost"}
+                onClick={() => setView("months")}
+              >
                 {format(new Date(year, month, 1), "MMMM")}
               </Button>
             </>
           )}
         </div>
         <div className="flex gap-2">
-          <Button onClick={() => increment(-1)} variant="outline" size="icon">
+          <Button
+            name="prevous month"
+            onClick={() => increment(-1)}
+            variant="outline"
+            size="icon"
+          >
             <ChevronLeftIcon className="h-4 w-4" />
           </Button>
-          <Button onClick={() => increment(1)} variant="outline" size="icon">
+          <Button
+            name="next month"
+            onClick={() => increment(1)}
+            variant="outline"
+            size="icon"
+          >
             <ChevronRightIcon className="h-4 w-4" />
           </Button>
           <Button
+            name="current month"
             variant="outline"
             onClick={openCurrentMonth}
             disabled={isCurrentMonth}

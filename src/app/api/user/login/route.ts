@@ -1,10 +1,10 @@
 import { auth } from "src/auth/lucia";
-import * as context from "next/headers";
 import { NextResponse } from "next/server";
 import { LuciaError } from "lucia";
 
 import type { NextRequest } from "next/server";
 import { ZLogin } from "@t/user";
+import { log } from "src/helpers/logger";
 
 export const POST = async (request: NextRequest) => {
   const data = (await request.json()) as unknown;
@@ -29,8 +29,10 @@ export const POST = async (request: NextRequest) => {
       userId: user.userId,
       attributes: {},
     });
-    const authRequest = auth.handleRequest(request.method, context);
+    const authRequest = auth.handleRequest(request);
     authRequest.setSession(session);
+
+    log(`API: User login ${email}`);
     return new Response(null, {
       status: 302,
       headers: {

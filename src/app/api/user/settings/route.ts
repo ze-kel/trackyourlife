@@ -1,23 +1,20 @@
 import { db } from "../../db";
-import * as context from "next/headers";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { auth } from "src/auth/lucia";
 import { ZUserSettings } from "@t/user";
 import { auth_user } from "src/schema";
 import { eq } from "drizzle-orm";
+import { checkForUser } from "src/app/api/helpers";
 
 export const GET = async (request: NextRequest) => {
   // Auth check
-  const authRequest = auth.handleRequest(request.method, context);
-  const session = await authRequest.validate();
-  if (!session) {
+  const userId = await checkForUser(request);
+
+  if (!userId) {
     return new Response(null, {
       status: 401,
     });
   }
-
-  const userId = session.user.userId;
 
   const user = await db.query.auth_user.findFirst({
     where: eq(auth_user.id, userId),
@@ -29,15 +26,14 @@ export const GET = async (request: NextRequest) => {
 };
 
 export const POST = async (request: NextRequest) => {
-  const authRequest = auth.handleRequest(request.method, context);
-  const session = await authRequest.validate();
-  if (!session) {
+  // Auth check
+  const userId = await checkForUser(request);
+
+  if (!userId) {
     return new Response(null, {
       status: 401,
     });
   }
-
-  const userId = session.user.userId;
 
   const data = (await request.json()) as unknown;
 

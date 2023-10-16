@@ -1,6 +1,4 @@
-import * as context from "next/headers";
 import { NextResponse, type NextRequest } from "next/server";
-import { auth } from "src/auth/lucia";
 import { z } from "zod";
 import { sub } from "date-fns";
 
@@ -22,6 +20,8 @@ import {
 } from "src/schema";
 import { db } from "src/app/api/db";
 import { and, eq } from "drizzle-orm";
+import { log } from "src/helpers/logger";
+import { checkForUser } from "src/app/api/helpers";
 
 export const trackableToCreate = z.discriminatedUnion("type", [
   z.object({
@@ -133,16 +133,13 @@ export const GET = async (
   request: NextRequest,
   { params }: { params: { id: string } },
 ) => {
-  // Auth check
-  const authRequest = auth.handleRequest(request.method, context);
-  const session = await authRequest.validate();
-  if (!session) {
+  const userId = await checkForUser(request);
+
+  if (!userId) {
     return new Response(null, {
       status: 401,
     });
   }
-
-  const userId = session.user.userId;
 
   const id = params.id;
 
@@ -159,6 +156,8 @@ export const GET = async (
 
   const returnedTrackable: ITrackable = prepareTrackable(tr);
 
+  log(`API: Trackable GET ${tr.id}`);
+
   return NextResponse.json(returnedTrackable);
 };
 
@@ -167,16 +166,13 @@ export const POST = async (
   request: NextRequest,
   // { params }: { params: { id: string } }
 ) => {
-  // Auth check
-  const authRequest = auth.handleRequest(request.method, context);
-  const session = await authRequest.validate();
-  if (!session) {
+  const userId = await checkForUser(request);
+
+  if (!userId) {
     return new Response(null, {
       status: 401,
     });
   }
-
-  const userId = session.user.userId;
 
   const data = (await request.json()) as unknown;
 
@@ -212,6 +208,8 @@ export const POST = async (
       set: { value: input.data.value },
     });
 
+  log(`API: Trackable Update ${input.data.id} ${date}`);
+
   return NextResponse.json(input.data);
 };
 
@@ -220,23 +218,21 @@ export const DELETE = async (
   request: NextRequest,
   { params }: { params: { id: string } },
 ) => {
-  // Auth check
-  const authRequest = auth.handleRequest(request.method, context);
-  const session = await authRequest.validate();
-  if (!session) {
+  const userId = await checkForUser(request);
+
+  if (!userId) {
     return new Response(null, {
       status: 401,
     });
   }
 
-  const userId = session.user.userId;
-
   const id = params.id;
 
-  // TODO Check if it cascades
   await db
     .delete(trackable)
-    .where(and(eq(trackable.userId, userId), eq(trackable, id)));
+    .where(and(eq(trackable.userId, userId), eq(trackable.id, id)));
 
-  return;
+  log(`API: Trackable Delete ${params.id}`);
+
+  return NextResponse.redirect(request.nextUrl.origin);
 };

@@ -1,9 +1,9 @@
 import { auth } from "src/auth/lucia";
-import * as context from "next/headers";
 import { NextResponse } from "next/server";
 
 import type { NextRequest } from "next/server";
 import { ZRegister } from "@t/user";
+import { log } from "src/helpers/logger";
 
 export const POST = async (request: NextRequest) => {
   const data = (await request.json()) as unknown;
@@ -39,8 +39,11 @@ export const POST = async (request: NextRequest) => {
       userId: user.userId,
       attributes: {},
     });
-    const authRequest = auth.handleRequest(request.method, context);
+    const authRequest = auth.handleRequest(request);
     authRequest.setSession(session);
+
+    log(`API: User created ${email}`);
+
     return new Response(null, {
       status: 302,
       headers: {
@@ -49,6 +52,8 @@ export const POST = async (request: NextRequest) => {
     });
   } catch (e) {
     if (typeof e === "object" && e && "code" in e && e.code === "23505") {
+      log(`API: Fail to create user, existing email`);
+
       return NextResponse.json(
         {
           error: "This email is already registered",
@@ -58,6 +63,8 @@ export const POST = async (request: NextRequest) => {
         },
       );
     }
+
+    log(`API: Fail to create user, UNKNOWN`);
 
     return NextResponse.json(
       {

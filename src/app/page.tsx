@@ -3,8 +3,6 @@ import TrackablesList from "@components/TrackablesList";
 import { Button } from "@/components/ui/button";
 import { getTrackableIds } from "src/helpers/apiHelpersRSC";
 
-export const revalidate = 0;
-
 const Page = async () => {
   const trackables = await getTrackableIds();
 

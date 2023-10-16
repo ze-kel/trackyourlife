@@ -1,9 +1,15 @@
 import { auth } from "./../auth/lucia";
 import { cache } from "react";
-import * as context from "next/headers";
+import { cookies } from "next/headers";
+//import * as context from "next/headers";
 
 const getPageSession = cache(() => {
-  const authRequest = auth.handleRequest("GET", context);
+  // const authRequest = auth.handleRequest("GET", context);
+
+  const authRequest = auth.handleRequest({
+    request: null,
+    cookies,
+  });
   return authRequest.validate();
 });
 

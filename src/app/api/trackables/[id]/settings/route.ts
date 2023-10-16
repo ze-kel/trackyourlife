@@ -1,6 +1,4 @@
-import * as context from "next/headers";
 import { NextResponse, type NextRequest } from "next/server";
-import { auth } from "src/auth/lucia";
 
 import { db } from "src/app/api/db";
 import { and, eq } from "drizzle-orm";
@@ -11,21 +9,20 @@ import {
   ZTrackableSettingsRange,
 } from "src/types/trackable";
 import { trackable } from "src/schema";
+import { checkForUser } from "src/app/api/helpers";
 
 export const POST = async (
   request: NextRequest,
   { params }: { params: { id: string } },
 ) => {
-  // Auth check
-  const authRequest = auth.handleRequest(request.method, context);
-  const session = await authRequest.validate();
-  if (!session) {
+  const userId = await checkForUser(request);
+
+  if (!userId) {
     return new Response(null, {
       status: 401,
     });
   }
 
-  const userId = session.user.userId;
   const id = params.id;
 
   const tr = await db.query.trackable.findFirst({

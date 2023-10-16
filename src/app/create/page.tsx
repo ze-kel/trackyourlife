@@ -4,14 +4,11 @@ import type {
   ITrackableSettings,
   ITrackableUnsaved,
 } from "src/types/trackable";
-import clsx from "clsx";
 import { useState } from "react";
-import { Input } from "@/components/ui/input";
 import cloneDeep from "lodash/cloneDeep";
 import { TrackableSettingsManual } from "@components/TrackableSettings";
-import { getBaseUrl } from "src/helpers/getBaseUrl";
-import { useRouter } from "next/navigation";
 import { RadioTabItem, RadioTabs } from "@/components/ui/radio-tabs";
+import { createTrackable } from "src/helpers/apiHelpersClient";
 
 const Create = () => {
   const [newOne, setNewOne] = useState<ITrackableUnsaved>({
@@ -19,25 +16,6 @@ const Create = () => {
     data: {},
     settings: { name: "" },
   });
-  const router = useRouter();
-
-  const create = async () => {
-    const res = await fetch(`${getBaseUrl()}/api/trackables`, {
-      method: "PUT",
-      body: JSON.stringify(newOne),
-      credentials: "include",
-    });
-
-    if (res.redirected) {
-      router.push(res.url);
-    }
-  };
-
-  const updateName = (name: string) => {
-    const update = cloneDeep(newOne);
-    update.settings.name = name;
-    setNewOne(update);
-  };
 
   const setType = (type: ITrackableUnsaved["type"]) => {
     // This assumes that all settings fields are optional
@@ -72,19 +50,10 @@ const Create = () => {
           Range
         </RadioTabItem>
       </RadioTabs>
-      <div>
-        <h3 className="text-xl">Name</h3>
-        <Input
-          placeholder="Name"
-          className={clsx("my-2 w-fit")}
-          value={newOne.settings.name}
-          onChange={(e) => updateName(e.target.value)}
-        />
-      </div>
       <TrackableSettingsManual trackable={newOne} setSettings={setSettings} />
 
       <Button
-        onClick={() => void create()}
+        onClick={() => void createTrackable(newOne)}
         className="mt-5 w-full"
         variant={"outline"}
       >

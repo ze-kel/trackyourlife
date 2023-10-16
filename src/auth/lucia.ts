@@ -1,5 +1,5 @@
 import { lucia } from "lucia";
-import { nextjs_future } from "lucia/middleware";
+import { nextjs } from "lucia/middleware";
 import { env } from "src/env/server.mjs";
 import "lucia/polyfill/node";
 import { pg as postgresAdapter } from "@lucia-auth/adapter-postgresql";
@@ -14,7 +14,7 @@ const tableNames = {
 // expect error
 export const auth = lucia({
   env: env.NODE_ENV === "production" ? "PROD" : "DEV",
-  middleware: nextjs_future(),
+  middleware: nextjs(),
   sessionCookie: {
     expires: false, // only for projects deployed to the edge
   },
