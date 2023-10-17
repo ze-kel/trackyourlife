@@ -1,12 +1,11 @@
 import { getBaseUrl } from "src/helpers/getBaseUrl";
-import type { ITrackableUnsaved } from "src/types/trackable";
 import {
   ZTrackableUpdate,
   type ITrackable,
   type ITrackableUpdate,
 } from "src/types/trackable";
 import type { IUserSettings } from "@t/user";
-import { revalidatePath } from "next/cache";
+//import { revalidateTag } from "next/cache";
 
 export const getTrackable = async (id: string) => {
   const res = await fetch(`${getBaseUrl()}/api/trackables/${id}`, {
@@ -37,21 +36,10 @@ export const updateTrackable: IChangeDay = async (update) => {
   return checked;
 };
 
-export const createTrackable = async (newOne: ITrackableUnsaved) => {
-  await fetch(`${getBaseUrl()}/api/trackables`, {
-    method: "PUT",
-    body: JSON.stringify(newOne),
-  });
-};
-
 export const deleteTrackable = async (id: string) => {
   await fetch(`${getBaseUrl()}/api/trackables/${id}`, {
     method: "DELETE",
   });
-
-  revalidatePath("/api/trackables");
-
-  revalidatePath("/");
 };
 
 export const updateSettings = async (update: IUserSettings) => {

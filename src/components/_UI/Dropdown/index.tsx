@@ -10,7 +10,7 @@ import {
   useDismiss,
 } from "@floating-ui/react";
 import clsx from "clsx";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, m } from "framer-motion";
 
 export interface IDropdown {
   mainPart: React.ReactNode;
@@ -68,7 +68,7 @@ const Dropdown = ({
       </div>
       {visible && (
         <AnimatePresence>
-          <motion.div
+          <m.div
             ref={refs.setFloating}
             initial={{
               opacity: 0,
@@ -92,7 +92,7 @@ const Dropdown = ({
             {...getFloatingProps()}
           >
             {hiddenPart}
-          </motion.div>
+          </m.div>
         </AnimatePresence>
       )}
     </>

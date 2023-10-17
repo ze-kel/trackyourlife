@@ -5,6 +5,7 @@ export const checkForUser = async (request: NextRequest) => {
   const authRequest = auth.handleRequest(request);
 
   const session = await authRequest.validate();
+  console.log("session", session);
 
   return session ? session.user.userId : null;
 };

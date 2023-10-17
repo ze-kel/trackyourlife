@@ -12,7 +12,7 @@ import type { IDayProps } from "./index";
 import { computeDayCellHelpers } from "./index";
 import { ThemeList } from "./DayCellBoolean";
 import type { IColorOptions, INumberSettings } from "@t/trackable";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, m } from "framer-motion";
 import DayNumber from "@components/DayCell/dayNumber";
 import { changeDay } from "src/helpers/actions";
 
@@ -241,7 +241,7 @@ export const DayCellNumber = ({
           <AnimatePresence>
             {!inInputEdit && isHover && style !== "mini" && (
               <>
-                <motion.div
+                <m.div
                   className="absolute left-[50%] top-0 z-20"
                   initial={{
                     opacity: 0,
@@ -259,8 +259,8 @@ export const DayCellNumber = ({
                     onClick={handlePlus}
                     className="h-6 w-6 cursor-pointer border border-neutral-500 bg-neutral-50 p-1 dark:bg-neutral-900"
                   />
-                </motion.div>
-                <motion.div
+                </m.div>
+                <m.div
                   className="absolute bottom-0 left-[50%] z-20"
                   initial={{
                     opacity: 0,
@@ -278,7 +278,7 @@ export const DayCellNumber = ({
                     onClick={handleMinus}
                     className=" h-6 w-6 cursor-pointer border border-neutral-500 bg-neutral-50 p-1 dark:bg-neutral-900"
                   />
-                </motion.div>
+                </m.div>
               </>
             )}
           </AnimatePresence>

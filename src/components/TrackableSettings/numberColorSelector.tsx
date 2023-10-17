@@ -7,7 +7,7 @@ import PlusIcon from "@heroicons/react/24/outline/PlusIcon";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import type { ArrayElement } from "@t/helpers";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, m } from "framer-motion";
 
 type IColorCodingValue = INumberSettings["colorCoding"];
 
@@ -44,7 +44,7 @@ const Pair = ({ value, onChange, remove }: INumberColorSelectorPair) => {
   };
 
   return (
-    <motion.div
+    <m.div
       layout
       transition={{
         duration: 0.25,
@@ -70,7 +70,7 @@ const Pair = ({ value, onChange, remove }: INumberColorSelectorPair) => {
       >
         <XIcon className="w-7 text-neutral-300 transition-colors hover:text-neutral-800  dark:text-neutral-700 dark:hover:text-neutral-100" />
       </div>
-    </motion.div>
+    </m.div>
   );
 };
 
@@ -138,7 +138,7 @@ const NumberColorSelector = ({
             </>
           )}
         </div>
-        <motion.div
+        <m.div
           layout
           transition={{ duration: 0.1 }}
           className="flex flex-col gap-2"
@@ -155,7 +155,7 @@ const NumberColorSelector = ({
               );
             })}
           </AnimatePresence>
-        </motion.div>
+        </m.div>
         <div
           className="flex cursor-pointer justify-center whitespace-nowrap text-neutral-300 transition-colors hover:text-neutral-800 dark:text-neutral-700 dark:hover:text-neutral-100"
           onClick={() => addNew()}

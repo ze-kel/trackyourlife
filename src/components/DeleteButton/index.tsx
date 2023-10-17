@@ -1,5 +1,4 @@
 "use client";
-import { useRouter } from "next/navigation";
 import { TrashIcon } from "@radix-ui/react-icons";
 
 import {
@@ -14,18 +13,15 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { buttonVariants } from "@/components/ui/button";
-import { deleteTrackable } from "src/helpers/apiHelpersClient";
+import { deleteTrackable } from "src/helpers/apiHelpersRSC";
 
 const DeleteButton = ({ id }: { id: string }) => {
-  const router = useRouter();
-
   if (!deleteTrackable) {
     throw new Error("Context error: Delete trackable");
   }
 
   const performDelete = async () => {
     await deleteTrackable(id);
-    router.push("/");
   };
 
   return (

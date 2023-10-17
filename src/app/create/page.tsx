@@ -8,9 +8,12 @@ import { useState } from "react";
 import cloneDeep from "lodash/cloneDeep";
 import { TrackableSettingsManual } from "@components/TrackableSettings";
 import { RadioTabItem, RadioTabs } from "@/components/ui/radio-tabs";
-import { createTrackable } from "src/helpers/apiHelpersClient";
+import { getBaseUrl } from "src/helpers/getBaseUrl";
+import { useRouter } from "next/navigation";
 
 const Create = () => {
+  const router = useRouter();
+
   const [newOne, setNewOne] = useState<ITrackableUnsaved>({
     type: "boolean",
     data: {},
@@ -28,6 +31,17 @@ const Create = () => {
     const update = cloneDeep(newOne);
     update.settings = settings;
     setNewOne(update);
+  };
+
+  const createTrackable = async () => {
+    const res = await fetch(`${getBaseUrl()}/api/trackables`, {
+      method: "PUT",
+      body: JSON.stringify(newOne),
+    });
+
+    if (res.redirected) {
+      router.refresh();
+    }
   };
 
   return (
@@ -53,7 +67,7 @@ const Create = () => {
       <TrackableSettingsManual trackable={newOne} setSettings={setSettings} />
 
       <Button
-        onClick={() => void createTrackable(newOne)}
+        onClick={() => void createTrackable()}
         className="mt-5 w-full"
         variant={"outline"}
       >

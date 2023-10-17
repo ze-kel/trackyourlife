@@ -6,7 +6,7 @@ import { computeDayCellHelpers } from "./index";
 import cls from "clsx";
 import { cva } from "class-variance-authority";
 import type { IColorOptions } from "src/types/trackable";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, m } from "framer-motion";
 import DayNumber from "@components/DayCell/dayNumber";
 import clamp from "lodash/clamp";
 import { changeDay } from "src/helpers/actions";
@@ -213,7 +213,7 @@ export const DayCellBoolean = ({
                     themeInactive,
                   )}
                 ></div>
-                <motion.div
+                <m.div
                   initial={{
                     scaleX: 0,
                     scaleY: 0,
@@ -251,7 +251,7 @@ export const DayCellBoolean = ({
                     themeActive,
                   )}
                 ></div>
-                <motion.div
+                <m.div
                   initial={{
                     scaleX: 0,
                     scaleY: 0,

@@ -3,6 +3,11 @@ import { getBaseUrl } from "src/helpers/getBaseUrl";
 import { type ITrackable } from "src/types/trackable";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import getPageSession from "src/helpers/getPageSesion";
+import { log } from "console";
+import { and, eq } from "drizzle-orm";
+import { db } from "src/app/api/db";
+import { trackable } from "src/schema";
 
 export type ITrackableBasic = Omit<ITrackable, "data">;
 
@@ -11,6 +16,9 @@ export const getTrackableIds = async () => {
     method: "GET",
     headers: {
       Cookie: cookies().toString(),
+    },
+    next: {
+      revalidate: 0,
     },
   });
 
@@ -33,8 +41,6 @@ export const getTrackable = async (id: string) => {
     },
   });
 
-  console.log(res);
-
   if (res.status === 401) {
     redirect("/login");
   }
@@ -42,4 +48,22 @@ export const getTrackable = async (id: string) => {
   const data = (await res.json()) as unknown;
 
   return data as ITrackable;
+};
+
+export const deleteTrackable = async (id: string) => {
+  const session = await getPageSession();
+  if (!session?.user.userId) {
+    return new Response(null, {
+      status: 401,
+    });
+  }
+
+  const userId = session.user.userId;
+
+  await db
+    .delete(trackable)
+    .where(and(eq(trackable.userId, userId), eq(trackable.id, id)));
+
+  log(`API: Trackable Delete ${id}`);
+  redirect("/");
 };

@@ -9,7 +9,7 @@ import style from "./curstomScrollbar.module.css";
 
 import type { IRangeSettings, ITrackable } from "@t/trackable";
 import clsx from "clsx";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, m } from "framer-motion";
 import DayNumber from "@components/DayCell/dayNumber";
 import { changeDay } from "src/helpers/actions";
 import { experimental_useOptimistic as useOptimistic } from "react";
@@ -130,7 +130,7 @@ const PopupSelector = ({ rangeMapping, onSelect }: PopupSelectorProps) => {
   const scrollBar = rangeMapping.length > 5;
 
   return (
-    <motion.div
+    <m.div
       className={clsx(
         style.miniScrollbar,
         "relative flex cursor-pointer flex-col overflow-hidden rounded-full border border-neutral-200 bg-neutral-50 dark:border-transparent dark:bg-neutral-800",
@@ -139,7 +139,7 @@ const PopupSelector = ({ rangeMapping, onSelect }: PopupSelectorProps) => {
       animate={{ height: `${panelH}px` }}
       transition={{ duration: 0.3 * AF, ease: [0, 0, 0, 1.1] }}
     >
-      <motion.div
+      <m.div
         initial={{
           marginTop: `${panelH * -0.5}px`,
         }}
@@ -153,7 +153,7 @@ const PopupSelector = ({ rangeMapping, onSelect }: PopupSelectorProps) => {
         <AnimatePresence>
           {rangeMapping.map((v, index) => {
             return (
-              <motion.div
+              <m.div
                 initial={{
                   translateY: getYAnimation(index),
                   scale: 0,
@@ -182,12 +182,12 @@ const PopupSelector = ({ rangeMapping, onSelect }: PopupSelectorProps) => {
                 }}
               >
                 <div className="">{v.emoji}</div>
-              </motion.div>
+              </m.div>
             );
           })}
         </AnimatePresence>
-      </motion.div>
-    </motion.div>
+      </m.div>
+    </m.div>
   );
 };
 

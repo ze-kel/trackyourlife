@@ -22,6 +22,7 @@ import { db } from "src/app/api/db";
 import { and, eq } from "drizzle-orm";
 import { log } from "src/helpers/logger";
 import { checkForUser } from "src/app/api/helpers";
+import { DeleteTrackable } from "src/app/api/trackables/apiFunctions";
 
 export const trackableToCreate = z.discriminatedUnion("type", [
   z.object({
@@ -128,21 +129,16 @@ export const getDateBounds = (limits: TGETLimits | undefined) => {
   }
 };
 
-// GET DATA
-export const GET = async (
-  request: NextRequest,
-  { params }: { params: { id: string } },
-) => {
-  const userId = await checkForUser(request);
+class ApiFunctionError extends Error {
+  code: number;
 
-  if (!userId) {
-    return new Response(null, {
-      status: 401,
-    });
+  constructor(message: string, code: number) {
+    super(message);
+    this.code = code;
   }
+}
 
-  const id = params.id;
-
+const GetTrackable = async (id: string, userId: string) => {
   const tr = await db.query.trackable.findFirst({
     where: and(eq(trackable.id, id), eq(trackable.userId, userId)),
     with: {
@@ -151,21 +147,39 @@ export const GET = async (
   });
 
   if (!tr) {
-    throw new Error("unable to find trackable");
+    throw new ApiFunctionError("Unable to find trackable", 400);
+  }
+  const returnedTrackable: ITrackable = prepareTrackable(tr);
+  log(`API: Trackable GET ${tr.id}`);
+  return returnedTrackable;
+};
+
+// GET DATA
+export const GET = async (
+  request: NextRequest,
+  { params }: { params: { id: string } },
+) => {
+  const userId = await checkForUser(request);
+
+  if (!userId) {
+    return NextResponse.json(null, {
+      status: 401,
+    });
   }
 
-  const returnedTrackable: ITrackable = prepareTrackable(tr);
-
-  log(`API: Trackable GET ${tr.id}`);
-
-  return NextResponse.json(returnedTrackable);
+  try {
+    const trackable = await GetTrackable(params.id, userId);
+    return NextResponse.json(trackable);
+  } catch (e) {
+    if (e instanceof ApiFunctionError) {
+      return NextResponse.json({}, { status: e.code, statusText: e.message });
+    }
+    return NextResponse.json({}, { status: 500, statusText: "Unknown errror" });
+  }
 };
 
 // UPDATE
-export const POST = async (
-  request: NextRequest,
-  // { params }: { params: { id: string } }
-) => {
+export const POST = async (request: NextRequest) => {
   const userId = await checkForUser(request);
 
   if (!userId) {
@@ -219,7 +233,6 @@ export const DELETE = async (
   { params }: { params: { id: string } },
 ) => {
   const userId = await checkForUser(request);
-
   if (!userId) {
     return new Response(null, {
       status: 401,
@@ -228,11 +241,7 @@ export const DELETE = async (
 
   const id = params.id;
 
-  await db
-    .delete(trackable)
-    .where(and(eq(trackable.userId, userId), eq(trackable.id, id)));
-
-  log(`API: Trackable Delete ${params.id}`);
+  await DeleteTrackable(id, userId);
 
   return NextResponse.redirect(request.nextUrl.origin);
 };

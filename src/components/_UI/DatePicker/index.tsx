@@ -18,7 +18,7 @@ import {
   DoubleArrowRightIcon,
 } from "@radix-ui/react-icons";
 import Dropdown from "../Dropdown";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, m } from "framer-motion";
 import useMeasure from "react-use-measure";
 import { Button } from "@/components/ui/button";
 import { CalendarIcon } from "@radix-ui/react-icons";
@@ -108,7 +108,7 @@ const DatePicker = ({
   };
 
   const calendar = (
-    <motion.div
+    <m.div
       animate={{ height: bounds.height > 0 ? bounds.height : undefined }}
       transition={{ duration: 0.15, ease: "easeInOut" }}
       className="flex w-fit flex-col overflow-hidden"
@@ -138,7 +138,7 @@ const DatePicker = ({
             initial={false}
             custom={moveDirection * 0.1}
           >
-            <motion.div
+            <m.div
               initial="enter"
               animate="middle"
               exit="exit"
@@ -149,7 +149,7 @@ const DatePicker = ({
               className="pointer-events-none select-none whitespace-nowrap"
             >
               {format(cursor, "MMMM yyyy")}
-            </motion.div>
+            </m.div>
           </AnimatePresence>
           <div className="flex">
             <Button
@@ -177,7 +177,7 @@ const DatePicker = ({
           initial={false}
           custom={moveDirection * 0.5}
         >
-          <motion.div
+          <m.div
             initial="enter"
             animate="middle"
             exit="exit"
@@ -207,10 +207,10 @@ const DatePicker = ({
                 {el}
               </div>
             ))}
-          </motion.div>
+          </m.div>
         </AnimatePresence>
       </div>
-    </motion.div>
+    </m.div>
   );
 
   const opener = (
