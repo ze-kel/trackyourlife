@@ -1,10 +1,12 @@
 import Link from "next/link";
 import TrackablesList from "@components/TrackablesList";
 import { Button } from "@/components/ui/button";
-import { getTrackableIds } from "src/helpers/apiHelpersRSC";
+import { RSAGetAllTrackables } from "src/app/api/trackables/serverActions";
 
 const Page = async () => {
-  const trackables = await getTrackableIds();
+  const trackables = await RSAGetAllTrackables({
+    limits: { type: "last", days: 7 },
+  });
 
   return (
     <div className="content-container flex w-full flex-col">

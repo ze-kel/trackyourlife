@@ -11,8 +11,8 @@ import type { IRangeSettings, ITrackable } from "@t/trackable";
 import clsx from "clsx";
 import { AnimatePresence, m } from "framer-motion";
 import DayNumber from "@components/DayCell/dayNumber";
-import { changeDay } from "src/helpers/actions";
 import { experimental_useOptimistic as useOptimistic } from "react";
+import { RSAUpdateTrackable } from "src/app/api/trackables/serverActions";
 
 const getRangeLabelMapping = (trackable: ITrackable) => {
   if (trackable.type !== "range" || !trackable.settings.labels) return;
@@ -262,7 +262,7 @@ export const DayCellRange = ({
   const handleSelect = async (v: string) => {
     setIsSelecting(false);
     setIsActive(v);
-    await changeDay({
+    await RSAUpdateTrackable({
       id: trackable.id,
       day,
       month,

@@ -9,8 +9,8 @@ import type { IColorOptions } from "src/types/trackable";
 import { AnimatePresence, m } from "framer-motion";
 import DayNumber from "@components/DayCell/dayNumber";
 import clamp from "lodash/clamp";
-import { changeDay } from "src/helpers/actions";
 import { experimental_useOptimistic as useOptimistic } from "react";
+import { RSAUpdateTrackable } from "src/app/api/trackables/serverActions";
 
 export const ThemeList: Record<IColorOptions, ""> = {
   neutral: "",
@@ -158,7 +158,7 @@ export const DayCellBoolean = ({
     const newVal = isActive ? "false" : "true";
 
     setIsActive(newVal === "true");
-    await changeDay({
+    await RSAUpdateTrackable({
       id: trackable.id,
       day,
       month,
@@ -187,6 +187,7 @@ export const DayCellBoolean = ({
 
   return (
     <button
+      data-value={inTrackRange ? isActive : undefined}
       ref={mainRef}
       tabIndex={inTrackRange ? 0 : -1}
       className={cls(

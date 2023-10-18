@@ -4,11 +4,11 @@ import { NextResponse } from "next/server";
 import { ZUserSettings } from "@t/user";
 import { auth_user } from "src/schema";
 import { eq } from "drizzle-orm";
-import { checkForUser } from "src/app/api/helpers";
+import { checkForSession } from "src/app/api/helpers";
 
 export const GET = async (request: NextRequest) => {
   // Auth check
-  const userId = await checkForUser(request);
+  const { userId } = await checkForSession(request);
 
   if (!userId) {
     return new Response(null, {
@@ -27,7 +27,7 @@ export const GET = async (request: NextRequest) => {
 
 export const POST = async (request: NextRequest) => {
   // Auth check
-  const userId = await checkForUser(request);
+  const { userId } = await checkForSession(request);
 
   if (!userId) {
     return new Response(null, {

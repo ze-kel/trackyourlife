@@ -8,12 +8,9 @@ import { useState } from "react";
 import cloneDeep from "lodash/cloneDeep";
 import { TrackableSettingsManual } from "@components/TrackableSettings";
 import { RadioTabItem, RadioTabs } from "@/components/ui/radio-tabs";
-import { getBaseUrl } from "src/helpers/getBaseUrl";
-import { useRouter } from "next/navigation";
+import { RSACreateTrackable } from "src/app/api/trackables/serverActions";
 
 const Create = () => {
-  const router = useRouter();
-
   const [newOne, setNewOne] = useState<ITrackableUnsaved>({
     type: "boolean",
     data: {},
@@ -34,14 +31,7 @@ const Create = () => {
   };
 
   const createTrackable = async () => {
-    const res = await fetch(`${getBaseUrl()}/api/trackables`, {
-      method: "PUT",
-      body: JSON.stringify(newOne),
-    });
-
-    if (res.redirected) {
-      router.refresh();
-    }
+    await RSACreateTrackable(newOne);
   };
 
   return (

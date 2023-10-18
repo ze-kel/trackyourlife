@@ -14,7 +14,7 @@ const SigOutButton = () => {
   const router = useRouter();
 
   const signOut = async () => {
-    await fetch("/api/logout", { method: "POST", credentials: "include" });
+    await fetch("/api/user/logout", { method: "POST", credentials: "include" });
     router.refresh();
   };
 

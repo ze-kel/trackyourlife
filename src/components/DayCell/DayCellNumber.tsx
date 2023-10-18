@@ -14,7 +14,7 @@ import { ThemeList } from "./DayCellBoolean";
 import type { IColorOptions, INumberSettings } from "@t/trackable";
 import { AnimatePresence, m } from "framer-motion";
 import DayNumber from "@components/DayCell/dayNumber";
-import { changeDay } from "src/helpers/actions";
+import { RSAUpdateTrackable } from "src/app/api/trackables/serverActions";
 
 const activeGen: Record<IColorOptions, string> = {
   neutral: "border-neutral-500 dark:border-neutral-700",
@@ -139,7 +139,7 @@ export const DayCellNumber = ({
 
   const updateValue = async (value: number) => {
     setDisplayedNumber(value);
-    await changeDay({
+    await RSAUpdateTrackable({
       id: trackable.id,
       day,
       month,

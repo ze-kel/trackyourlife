@@ -1,6 +1,7 @@
 import { auth } from "src/auth/lucia";
 import { NextResponse } from "next/server";
 
+import * as context from "next/headers";
 import type { NextRequest } from "next/server";
 import { ZRegister } from "@t/user";
 import { log } from "src/helpers/logger";
@@ -39,7 +40,8 @@ export const POST = async (request: NextRequest) => {
       userId: user.userId,
       attributes: {},
     });
-    const authRequest = auth.handleRequest(request);
+
+    const authRequest = auth.handleRequest(request.method, context);
     authRequest.setSession(session);
 
     log(`API: User created ${email}`);

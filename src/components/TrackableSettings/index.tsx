@@ -8,14 +8,13 @@ import type {
   ITrackable,
   ITrackableUnsaved,
 } from "@t/trackable";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import ColorSelector from "./colorSelector";
 import NumberColorSelector from "./numberColorSelector";
 import NumberLimitsSelector from "./numberLimitsSelector";
 import RangeLabelSelector from "./rangeLabelSelector";
-import { updateSettings } from "src/helpers/actions";
 import { Input } from "@/components/ui/input";
+import { RSAUpdateTrackableSettings } from "src/app/api/trackables/serverActions";
 
 interface ISubSettingsProps<T> {
   settings: T;
@@ -230,13 +229,14 @@ const SettingsRange = ({
 };
 
 const TrackableSettings = ({ trackable }: { trackable: ITrackable }) => {
-  const router = useRouter();
-
   const [settings, setSettings] = useState(trackable.settings);
 
   const handleSave = async () => {
-    await updateSettings({ id: trackable.id, settings });
-    router.push(`/trackables/${trackable.id}`);
+    await RSAUpdateTrackableSettings({
+      trackableId: trackable.id,
+      data: settings,
+      redirectToTrackablePage: true,
+    });
   };
 
   if (trackable.type === "boolean") {

@@ -1,11 +1,11 @@
 import { redirect } from "next/navigation";
 import getPageSession from "src/helpers/getPageSesion";
-import { getTrackable } from "src/helpers/apiHelpersRSC";
 import DeleteButton from "@components/DeleteButton";
 import TrackableSettings from "@components/TrackableSettings";
 import { Button } from "@/components/ui/button";
 import { CalendarIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
+import { RSAGetTrackable } from "src/app/api/trackables/serverActions";
 
 const Trackable = async ({ params }: { params: { id: string } }) => {
   const session = await getPageSession();
@@ -13,7 +13,10 @@ const Trackable = async ({ params }: { params: { id: string } }) => {
   if (!session) redirect("/login");
 
   try {
-    const trackable = await getTrackable(params.id);
+    const trackable = await RSAGetTrackable({
+      trackableId: params.id,
+      limits: { type: "last", days: 1 },
+    });
 
     return (
       <div className="content-container flex h-full max-h-full w-full flex-col">

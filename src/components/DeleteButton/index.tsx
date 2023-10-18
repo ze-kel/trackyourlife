@@ -13,15 +13,11 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { buttonVariants } from "@/components/ui/button";
-import { deleteTrackable } from "src/helpers/apiHelpersRSC";
+import { RSADeleteTrackable } from "src/app/api/trackables/serverActions";
 
 const DeleteButton = ({ id }: { id: string }) => {
-  if (!deleteTrackable) {
-    throw new Error("Context error: Delete trackable");
-  }
-
   const performDelete = async () => {
-    await deleteTrackable(id);
+    await RSADeleteTrackable(id);
   };
 
   return (
@@ -42,7 +38,10 @@ const DeleteButton = ({ id }: { id: string }) => {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={() => void performDelete()}>
+          <AlertDialogAction
+            name="confirm delete"
+            onClick={() => void performDelete()}
+          >
             Delete
           </AlertDialogAction>
         </AlertDialogFooter>
