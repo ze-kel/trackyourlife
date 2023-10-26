@@ -5,13 +5,12 @@ import { ThemeProvider } from "src/helpers/ThemeProvider";
 import getPageSession from "src/helpers/getPageSesion";
 import Header from "@components/Header";
 import { LazyMotionProvider } from "../helpers/lazyFramerMotionProvider";
+import type { ReactNode } from "react";
 
 export default async function RootLayout({
-  // Layouts must accept a children prop.
-  // This will be populated with nested layouts or pages
   children,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   const session = await getPageSession();
 

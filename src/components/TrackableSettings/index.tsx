@@ -15,6 +15,7 @@ import NumberLimitsSelector from "./numberLimitsSelector";
 import RangeLabelSelector from "./rangeLabelSelector";
 import { Input } from "@/components/ui/input";
 import { RSAUpdateTrackableSettings } from "src/app/api/trackables/serverActions";
+import ColorPicker from "@components/_UI/ColorPicker";
 
 interface ISubSettingsProps<T> {
   settings: T;
@@ -67,6 +68,10 @@ const SettingsBoolean = ({
 
       <div>
         <h3 className="text-xl">Checked color</h3>
+
+        <ColorPicker
+          savedColor={{ hue: 0, saturation: 0, lightness: 0 }}
+        ></ColorPicker>
         <ColorSelector
           active={settings.activeColor || "green"}
           onChange={changeActiveColor}

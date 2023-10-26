@@ -1,8 +1,7 @@
-FROM node:16
+FROM node:18
 WORKDIR /app
 COPY package.json .
 COPY package-lock.json .
-COPY startup.dev.sh .
 ARG NODE_ENV
 RUN if [ "$NODE_ENV" = "development" ]; \
         then npm install; \

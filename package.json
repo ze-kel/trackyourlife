@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:migrate": "npm run generate && npm run push && npm run dev",
     "build": "next build",
     "start": "next start",
     "start:dev": "dotenv -e .env.development next start",

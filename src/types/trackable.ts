@@ -3,6 +3,15 @@ import { z } from "zod";
 //
 // Settings
 //
+
+export const colorValue = z.object({
+  hue: z.number().min(0).max(360).default(0),
+  saturation: z.number().min(0).max(100).default(0),
+  lightness: z.number().min(0).max(100).default(0),
+});
+
+export type IColorValue = z.infer<typeof colorValue>;
+
 export const colorOption = z.enum([
   "neutral",
   "green",
