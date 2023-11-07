@@ -1,7 +1,10 @@
 "use client";
-import Dropdown from "@components/_UI/Dropdown";
+import {
+  Dropdown,
+  DropdownContent,
+  DropdownTrigger,
+} from "@components/_UI/Dropdown";
 import Link from "next/link";
-import { useState } from "react";
 import { ChevronDownIcon } from "@radix-ui/react-icons";
 import clsx from "clsx";
 import { Button } from "@/components/ui/button";
@@ -30,37 +33,7 @@ const SigOutButton = () => {
 };
 
 const Header = ({ user }: { user?: User }) => {
-  const [dropdown, setDropdown] = useState(false);
   const { theme, setTheme } = useTheme();
-
-  const dropV = (
-    <div className="relative flex cursor-pointer items-center transition-colors hover:text-neutral-600 dark:hover:text-neutral-50">
-      <p className="font-medium">{user ? user.username : ""}</p>
-      <ChevronDownIcon
-        className={clsx(
-          "w-6 transition-transform",
-          dropdown ? "rotate-180" : "",
-        )}
-      />
-    </div>
-  );
-
-  const dropH = (
-    <div className="flex flex-col items-end justify-end gap-2">
-      <RadioTabs value={theme} onValueChange={setTheme}>
-        <RadioTabItem value="light" id="light">
-          Light
-        </RadioTabItem>
-        <RadioTabItem value="system" id="system">
-          System
-        </RadioTabItem>
-        <RadioTabItem value="dark" id="dark">
-          Dark
-        </RadioTabItem>
-      </RadioTabs>
-      <SigOutButton key={"so"} />
-    </div>
-  );
 
   return (
     <div className="flex h-14 flex-shrink-0 justify-center border-b-2 border-neutral-300 bg-neutral-50 font-bold text-neutral-800 dark:border-neutral-900 dark:bg-neutral-950 dark:text-neutral-100">
@@ -70,13 +43,29 @@ const Header = ({ user }: { user?: User }) => {
         </Link>
 
         {user && (
-          <Dropdown
-            mainPart={dropV}
-            hiddenPart={dropH}
-            visible={dropdown}
-            setVisible={setDropdown}
-            placement="bottom-end"
-          />
+          <Dropdown placement="bottom-end">
+            <DropdownContent className="flex flex-col items-end justify-end gap-2">
+              <RadioTabs value={theme} onValueChange={setTheme}>
+                <RadioTabItem value="light" id="light">
+                  Light
+                </RadioTabItem>
+                <RadioTabItem value="system" id="system">
+                  System
+                </RadioTabItem>
+                <RadioTabItem value="dark" id="dark">
+                  Dark
+                </RadioTabItem>
+              </RadioTabs>
+              <SigOutButton key={"so"} />
+            </DropdownContent>
+
+            <DropdownTrigger>
+              <div className="relative flex cursor-pointer items-center transition-colors hover:text-neutral-600 dark:hover:text-neutral-50">
+                <p className="font-medium">{user ? user.username : ""}</p>
+                <ChevronDownIcon className={clsx("w-6 transition-transform")} />
+              </div>
+            </DropdownTrigger>
+          </Dropdown>
         )}
       </div>
     </div>

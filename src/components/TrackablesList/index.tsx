@@ -2,7 +2,7 @@
 import type { ITrackable } from "src/types/trackable";
 import Link from "next/link";
 import MiniTrackable from "./miniTrackable";
-import { useMemo } from "react";
+import {useMemo, useOptimistic} from "react";
 import FavButton from "@components/FavButton";
 
 const sortList = (list: ITrackable[]): ITrackable[] => {
@@ -22,6 +22,7 @@ const sortList = (list: ITrackable[]): ITrackable[] => {
 };
 
 const TrackablesList = ({ list }: { list: ITrackable[] }) => {
+
   const sortedList = useMemo(() => sortList(list), [list]);
 
   return (

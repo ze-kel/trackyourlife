@@ -1,17 +1,20 @@
 "use client";
-import Dropdown from "@components/_UI/Dropdown";
+import {
+  Dropdown,
+  DropdownContent,
+  DropdownTrigger,
+} from "@components/_UI/Dropdown";
 import { cva } from "class-variance-authority";
 import { useMemo, useState } from "react";
 import type { IDayProps } from "./index";
 import { computeDayCellHelpers } from ".";
-import { ThemeList } from "./DayCellBoolean";
 import style from "./curstomScrollbar.module.css";
 
 import type { IRangeSettings, ITrackable } from "@t/trackable";
 import clsx from "clsx";
 import { AnimatePresence, m } from "framer-motion";
 import DayNumber from "@components/DayCell/dayNumber";
-import { experimental_useOptimistic as useOptimistic } from "react";
+import { useOptimistic } from "react";
 import { RSAUpdateTrackable } from "src/app/api/trackables/serverActions";
 
 const getRangeLabelMapping = (trackable: ITrackable) => {
@@ -168,8 +171,7 @@ const PopupSelector = ({ rangeMapping, onSelect }: PopupSelectorProps) => {
                   ease: getEaseByIndex(index),
                 }}
                 key={index}
-                onClick={(e) => {
-                  e.stopPropagation();
+                onClick={() => {
                   void onSelect(v.internalKey);
                 }}
                 className={clsx(
@@ -206,7 +208,6 @@ const RangeClasses = cva(
         default: "h-16 border-2",
         mini: "h-6 border text-xs",
       },
-      colorCode: ThemeList,
     },
     compoundVariants: [
       {
@@ -287,23 +288,22 @@ export const DayCellRange = ({
     </button>
   );
 
-  const selector = (
-    <PopupSelector
-      rangeMapping={trackable.settings.labels}
-      onSelect={handleSelect}
-    />
-  );
-
-  return inTrackRange ? (
-    <Dropdown
-      visible={isSelecting}
-      setVisible={setIsSelecting}
-      mainPart={visiblePart}
-      hiddenPart={selector}
-      background={false}
-      placeCenter={true}
-    />
-  ) : (
-    visiblePart
+  return (
+    <>
+      <Dropdown
+        open={isSelecting}
+        onOpenChange={setIsSelecting}
+        background={false}
+        placeCenter={true}
+      >
+        <DropdownTrigger>{visiblePart}</DropdownTrigger>
+        <DropdownContent>
+          <PopupSelector
+            rangeMapping={trackable.settings.labels}
+            onSelect={handleSelect}
+          />
+        </DropdownContent>
+      </Dropdown>
+    </>
   );
 };

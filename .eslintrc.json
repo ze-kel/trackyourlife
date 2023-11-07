@@ -23,6 +23,7 @@
     "prettier"
   ],
   "rules": {
-    "@typescript-eslint/consistent-type-imports": "warn"
+    "@typescript-eslint/consistent-type-imports": "warn",
+    "react/prop-types": [0]
   }
 }

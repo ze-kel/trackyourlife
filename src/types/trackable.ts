@@ -4,26 +4,20 @@ import { z } from "zod";
 // Settings
 //
 
-export const colorValue = z.object({
+export const color = z.object({
   hue: z.number().min(0).max(360).default(0),
   saturation: z.number().min(0).max(100).default(0),
   lightness: z.number().min(0).max(100).default(0),
 });
 
+export type IColor = z.infer<typeof color>;
+
+export const colorValue = z.object({
+  lightMode: color,
+  darkMode: color,
+});
+
 export type IColorValue = z.infer<typeof colorValue>;
-
-export const colorOption = z.enum([
-  "neutral",
-  "green",
-  "lime",
-  "red",
-  "blue",
-  "purple",
-  "pink",
-  "orange",
-]);
-
-export type IColorOptions = z.infer<typeof colorOption>;
 
 const basics = {
   name: z.string().default("Unnamed Trackable").optional(),
@@ -35,8 +29,8 @@ export const ZTrackableSettingsBase = z.object(basics);
 
 export const ZTrackableSettingsBoolean = z.object({
   ...basics,
-  inactiveColor: colorOption.optional(),
-  activeColor: colorOption.optional(),
+  inactiveColor: colorValue.optional(),
+  activeColor: colorValue.optional(),
 });
 
 export const ZTrackableSettingsNumber = z.object({
@@ -53,7 +47,7 @@ export const ZTrackableSettingsNumber = z.object({
     .array(
       z.object({
         from: z.number(),
-        color: colorOption,
+        color: colorValue,
         // used to key inputs when editing, can be changed voluntarily
         id: z.string().optional(),
       }),

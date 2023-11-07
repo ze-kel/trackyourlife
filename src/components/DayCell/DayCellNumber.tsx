@@ -1,6 +1,7 @@
 "use client";
 import cls from "clsx";
 import type React from "react";
+import type { CSSProperties} from "react";
 import { useCallback, useMemo, useState } from "react";
 import clamp from "lodash/clamp";
 import debounce from "lodash/debounce";
@@ -10,50 +11,12 @@ import IconMinus from "@heroicons/react/24/outline/MinusIcon";
 import { cva } from "class-variance-authority";
 import type { IDayProps } from "./index";
 import { computeDayCellHelpers } from "./index";
-import { ThemeList } from "./DayCellBoolean";
-import type { IColorOptions, INumberSettings } from "@t/trackable";
+import type { IColorValue, INumberSettings } from "@t/trackable";
 import { AnimatePresence, m } from "framer-motion";
 import DayNumber from "@components/DayCell/dayNumber";
 import { RSAUpdateTrackable } from "src/app/api/trackables/serverActions";
-
-const activeGen: Record<IColorOptions, string> = {
-  neutral: "border-neutral-500 dark:border-neutral-700",
-  red: "border-red-500",
-  pink: "border-pink-500",
-  green: "border-green-500",
-  blue: "border-blue-500",
-  orange: "border-orange-500",
-  purple: "border-purple-500",
-  lime: "border-lime-500",
-};
-
-const activeGenProgress: Record<IColorOptions, string> = {
-  neutral: "bg-neutral-500 dark:bg-neutral-700",
-  red: "bg-red-500",
-  pink: "bg-pink-500",
-  green: "bg-green-500",
-  blue: "bg-blue-500",
-  orange: "bg-orange-500",
-  purple: "bg-purple-500",
-  lime: "bg-lime-500",
-};
-
-const Generated = (Object.keys(activeGen) as IColorOptions[]).reduce<
-  {
-    colorCode?: IColorOptions;
-    inTrackRange?: boolean;
-    progress: boolean;
-    className: string;
-  }[]
->((acc, key) => {
-  acc.push({
-    colorCode: key,
-    inTrackRange: true,
-    progress: false,
-    className: activeGen[key],
-  });
-  return acc;
-}, []);
+import { presetsMap } from "@components/_UI/ColorPicker/presets";
+import { makeColorString } from "@components/_UI/ColorPicker";
 
 const NumberClasses = cva(
   ["group relative items-center justify-center font-light transition-colors"],
@@ -64,26 +27,20 @@ const NumberClasses = cva(
         mini: "border h-6",
       },
       inTrackRange: {
-        true: "cursor-text",
+        true: "cursor-text border-[var(--themeLight)] dark:border-[var(--themeDark)]",
         false:
           "bg-neutral-100 text-neutral-300 dark:bg-neutral-900 dark:text-neutral-800",
       },
-      progress: {
-        true: "border-neutral-300 dark:border-neutral-800",
-      },
-      colorCode: ThemeList,
     },
     compoundVariants: [
       {
         inTrackRange: false,
         className: "border-transparent",
       },
-      ...Generated,
     ],
 
     defaultVariants: {
       style: "default",
-      colorCode: "neutral",
     },
   },
 );
@@ -150,11 +107,11 @@ export const DayCellNumber = ({
 
   const progress = getProgress(trackable.settings.limits, displayedNumber);
 
-  const findTheme = (): IColorOptions | undefined => {
+  const findTheme = (): IColorValue => {
     const cc = trackable.settings.colorCoding;
-    if (!cc || !cc.length) return;
+    if (!cc || !cc.length) return presetsMap.neutral;
 
-    let result: IColorOptions = cc[0]?.color || "neutral";
+    let result: IColorValue = cc[0]?.color || presetsMap.neutral;
 
     for (let i = 0; i < cc.length; i++) {
       const point = cc[i];
@@ -202,20 +159,21 @@ export const DayCellNumber = ({
     <div
       className={NumberClasses({
         inTrackRange,
-        colorCode: theme,
         style,
-        progress: progress !== null,
       })}
+      style={
+        {
+          "--themeLight": makeColorString(theme.lightMode),
+          "--themeDark": makeColorString(theme.darkMode),
+        } as CSSProperties
+      }
       key={day}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
       {progress !== null && (
         <div
-          className={cls(
-            "z-1 absolute bottom-0 w-full transition-all",
-            activeGenProgress[theme || "neutral"],
-          )}
+          className={cls("z-1 absolute bottom-0 w-full transition-all")}
           style={{ height: `${progress}%` }}
         ></div>
       )}

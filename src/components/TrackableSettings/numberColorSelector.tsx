@@ -1,13 +1,14 @@
 import { Input } from "@/components/ui/input";
-import type { INumberSettings } from "@t/trackable";
+import type { IColorValue, INumberSettings } from "@t/trackable";
 import cloneDeep from "lodash/cloneDeep";
-import ColorSelector from "./colorSelector";
 import XIcon from "@heroicons/react/24/outline/XMarkIcon";
 import PlusIcon from "@heroicons/react/24/outline/PlusIcon";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import type { ArrayElement } from "@t/helpers";
 import { AnimatePresence, m } from "framer-motion";
+import ColorPicker from "@components/_UI/ColorPicker";
+import { presetsArray } from "@components/_UI/ColorPicker/presets";
 
 type IColorCodingValue = INumberSettings["colorCoding"];
 
@@ -63,7 +64,7 @@ const Pair = ({ value, onChange, remove }: INumberColorSelectorPair) => {
         error={error}
         onBlur={removeIfEmpty}
       />
-      <ColorSelector active={value.color} onChange={(v) => changeColor(v)} />
+      <ColorPicker value={value.color} onChange={(v) => changeColor(v)} />
       <div
         className="flex w-7 cursor-pointer items-center justify-center"
         onClick={remove}
@@ -106,7 +107,11 @@ const NumberColorSelector = ({
     const v2 = cloneDeep(value);
     const before = v2[v2.length - 1];
     const from = before ? before.from + 1 : 0;
-    v2.push({ from, color: "neutral", id: uuidv4() });
+    v2.push({
+      from,
+      color: presetsArray[0] as IColorValue,
+      id: uuidv4(),
+    });
     recordUpdate(v2);
   };
 

@@ -3,19 +3,20 @@ import { Button } from "@/components/ui/button";
 import DatePicker from "@components/_UI/DatePicker";
 import type {
   IBooleanSettings,
+  IColorValue,
   INumberSettings,
   IRangeSettings,
   ITrackable,
   ITrackableUnsaved,
 } from "@t/trackable";
 import { useState } from "react";
-import ColorSelector from "./colorSelector";
 import NumberColorSelector from "./numberColorSelector";
 import NumberLimitsSelector from "./numberLimitsSelector";
 import RangeLabelSelector from "./rangeLabelSelector";
 import { Input } from "@/components/ui/input";
 import { RSAUpdateTrackableSettings } from "src/app/api/trackables/serverActions";
 import ColorPicker from "@components/_UI/ColorPicker";
+import { presetsArray } from "@components/_UI/ColorPicker/presets";
 
 interface ISubSettingsProps<T> {
   settings: T;
@@ -67,25 +68,20 @@ const SettingsBoolean = ({
       </div>
 
       <div>
-        <h3 className="text-xl">Checked color</h3>
+        <h3 className="mb-2 text-xl">Checked color</h3>
 
         <ColorPicker
-          savedColor={{ hue: 0, saturation: 0, lightness: 0 }}
-        ></ColorPicker>
-        <ColorSelector
-          active={settings.activeColor || "green"}
+          value={settings.activeColor || (presetsArray[4] as IColorValue)}
           onChange={changeActiveColor}
-          className="mt-2"
-        />
+        ></ColorPicker>
       </div>
 
       <div>
-        <h3 className="mt-4 text-xl">Unchecked color</h3>
-        <ColorSelector
-          active={settings.inactiveColor || "neutral"}
+        <h3 className="mb-2 text-xl">Unchecked color</h3>
+        <ColorPicker
+          value={settings.inactiveColor || (presetsArray[1] as IColorValue)}
           onChange={chaneInactiveColor}
-          className="mt-2"
-        />
+        ></ColorPicker>
       </div>
 
       {handleSave && (
