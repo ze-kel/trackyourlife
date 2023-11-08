@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import "../styles/globals.css";
-import { ThemeProvider } from "src/helpers/ThemeProvider";
+import { ThemeProvider } from "@components/Providers/ThemeProvider";
 
 import getPageSession from "src/helpers/getPageSesion";
 import Header from "@components/Header";
-import { LazyMotionProvider } from "../helpers/lazyFramerMotionProvider";
+import { LazyMotionProvider } from "../components/Providers/lazyFramerMotionProvider";
 import type { ReactNode } from "react";
 
 export default async function RootLayout({

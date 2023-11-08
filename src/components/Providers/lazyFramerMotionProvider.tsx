@@ -4,7 +4,7 @@ import { LazyMotion } from "framer-motion";
 import type { ReactNode } from "react";
 
 const loadFeatures = () =>
-  import("../helpers/lazyFramerMotion").then((res) => res.default);
+  import("./lazyFramerMotion").then((res) => res.default);
 
 export function LazyMotionProvider({ children }: { children: ReactNode }) {
   return (

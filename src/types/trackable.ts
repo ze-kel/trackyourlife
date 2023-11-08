@@ -43,6 +43,7 @@ export const ZTrackableSettingsNumber = z.object({
       showProgress: z.boolean().optional(),
     })
     .optional(),
+  colorCodingEnabled: z.boolean(),
   colorCoding: z
     .array(
       z.object({

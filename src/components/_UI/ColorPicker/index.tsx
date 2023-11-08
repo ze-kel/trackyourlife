@@ -11,6 +11,7 @@ import type { IColor, IColorValue } from "@t/trackable";
 import type { MouseEventHandler } from "react";
 import { useRef } from "react";
 import { clamp, range } from "src/helpers/animation";
+import { cn } from "@/lib/utils";
 
 export const makeColorString = (color: IColor) =>
   `hsl(${color.hue}, ${color.saturation}%, ${color.lightness}%)`;
@@ -57,12 +58,47 @@ const Controller = ({
       onMouseDown={startDrag}
     >
       <div
-        className="absolute h-full w-4 -translate-x-1/2 rounded-sm border-2 border-neutral-200 bg-white shadow-sm dark:border-neutral-800"
+        className="absolute h-full w-4 -translate-x-1/2 rounded-sm border-2 border-neutral-50 shadow-sm dark:border-neutral-950"
         style={{
           left: value + "%",
 
           background: backgroundCurrent,
         }}
+      ></div>
+    </div>
+  );
+};
+
+const ColorDisplay = ({
+  color,
+  className,
+  ...props
+}: {
+  color: IColorValue;
+  className?: string;
+}) => {
+  const currentLight = makeColorString(color.lightMode);
+  const currentDark = makeColorString(color.darkMode);
+
+  return (
+    <div
+      className={cn(
+        "relative flex h-9 w-9 items-center gap-4 overflow-hidden rounded-md border-2 border-neutral-200 bg-transparent pl-4 font-mono text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-950 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-800",
+        className,
+      )}
+      {...props}
+    >
+      <div
+        className="absolute left-0 top-0 z-10 h-full w-full"
+        style={{
+          background: currentLight,
+          // Manual transform because order matters
+          transform: "rotate(45deg) translateX(-50%) scaleY(10)",
+        }}
+      ></div>
+      <div
+        className="absolute left-0 top-0 h-full w-full"
+        style={{ background: currentDark }}
       ></div>
     </div>
   );
@@ -76,16 +112,11 @@ const Presets = ({
 }) => {
   return (
     <div className="flex gap-2">
-      {presetsArray.map(({ lightMode, darkMode }, index) => {
+      {presetsArray.map((col, index) => {
         return (
-          <div
-            onClick={() => setColor({ lightMode, darkMode })}
-            key={index}
-            className=" h-9 w-9 rounded-md border border-neutral-200 dark:border-neutral-800"
-            style={{
-              background: `hsl(${lightMode.hue}, ${lightMode.saturation}%, ${lightMode.lightness}%)`,
-            }}
-          ></div>
+          <button key={index} onClick={() => setColor(col)}>
+            <ColorDisplay color={col} />
+          </button>
         );
       })}
     </div>
@@ -172,9 +203,6 @@ const ColorPicker = ({
 }) => {
   const { lightMode, darkMode } = value;
 
-  const currentLight = `hsl(${lightMode.hue}, ${lightMode.saturation}%, ${lightMode.lightness}%)`;
-  const currentDark = `hsl(${darkMode.hue}, ${darkMode.saturation}%, ${darkMode.lightness}%)`;
-
   const setLight = (lightMode: IColor) => {
     onChange({ darkMode, lightMode });
   };
@@ -182,25 +210,26 @@ const ColorPicker = ({
     onChange({ darkMode, lightMode });
   };
 
+  const setBoth = (color: IColor) => {
+    onChange({ darkMode: color, lightMode: color });
+  };
+
+  const sameColors = JSON.stringify(lightMode) === JSON.stringify(darkMode);
+
   return (
     <div className="flex gap-4">
       <Dropdown>
-        <DropdownTrigger>
-          <button className="relative flex h-9 w-16 items-center gap-4 overflow-hidden rounded-md border-2 border-neutral-200 bg-transparent pl-4 font-mono text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-950 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-800 ">
-            <div
-              className="absolute left-0 top-0 z-10 h-9 w-16 -translate-x-1/4 -translate-y-1/3 -rotate-45"
-              style={{ background: currentLight }}
-            ></div>
-            <div
-              className="absolute left-0 top-0 h-full w-full"
-              style={{ background: currentDark }}
-            ></div>
-          </button>
+        <DropdownTrigger className="h-fit cursor-pointer">
+          <ColorDisplay color={value} className="w-36" />
         </DropdownTrigger>
 
         <DropdownContent className="p-4">
-          <Tabs defaultValue="light">
-            <TabsList className="w-full">
+          <Tabs defaultValue={sameColors ? "universal" : "light"}>
+            <TabsList className="w-full p-2">
+              <TabsTrigger className="w-full " value="universal">
+                Universal
+              </TabsTrigger>
+              <div className="mx-2 h-full w-2 bg-neutral-300 dark:bg-neutral-600"></div>
               <TabsTrigger className="w-full" value="light">
                 Light
               </TabsTrigger>
@@ -208,6 +237,9 @@ const ColorPicker = ({
                 Dark
               </TabsTrigger>
             </TabsList>
+            <TabsContent value="universal">
+              <Picker value={lightMode} onChange={setBoth} />
+            </TabsContent>
             <TabsContent value="light">
               <Picker value={lightMode} onChange={setLight} />
             </TabsContent>

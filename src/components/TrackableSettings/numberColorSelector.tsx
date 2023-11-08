@@ -20,6 +20,7 @@ interface INumberColorSelectorPair {
   remove: () => void;
 }
 
+
 const Pair = ({ value, onChange, remove }: INumberColorSelectorPair) => {
   const [fromInternal, setFromInternal] = useState<number>(value.from);
   const [error, setError] = useState(false);
