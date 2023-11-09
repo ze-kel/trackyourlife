@@ -14,22 +14,10 @@ import {
   UpdateTrackable,
   UpdateTrackableSettings,
 } from "src/app/api/trackables/apiFunctions";
-import { auth } from "src/auth/lucia";
-import * as context from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import type { TGETLimits } from "src/app/api/trackables/apiHelpers";
-
-const RSAGetUserId = async () => {
-  const authRequest = auth.handleRequest("GET", context);
-
-  const session = await authRequest.validate();
-  if (!session?.user.userId) {
-    redirect("/login");
-  }
-
-  return session.user.userId;
-};
+import { RSAGetUserId } from "src/app/api/helpers";
 
 export const RSAGetAllTrackables = async ({
   limits,

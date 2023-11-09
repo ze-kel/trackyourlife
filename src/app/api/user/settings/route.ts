@@ -1,10 +1,10 @@
-import { db } from "../../db";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { ZUserSettings } from "@t/user";
-import { auth_user } from "src/schema";
-import { eq } from "drizzle-orm";
-import { checkForSession } from "src/app/api/helpers";
+import { ApiFunctionError, checkForSession } from "src/app/api/helpers";
+import {
+  GetUserSettings,
+  UpdateUserSettings,
+} from "src/app/api/user/settings/apiFunctions";
 
 export const GET = async (request: NextRequest) => {
   // Auth check
@@ -16,13 +16,9 @@ export const GET = async (request: NextRequest) => {
     });
   }
 
-  const user = await db.query.auth_user.findFirst({
-    where: eq(auth_user.id, userId),
-  });
+  const settings = GetUserSettings({ userId });
 
-  if (!user) return NextResponse.json({});
-
-  return NextResponse.json(ZUserSettings.parse(user.settings));
+  return NextResponse.json(settings);
 };
 
 export const POST = async (request: NextRequest) => {
@@ -37,30 +33,13 @@ export const POST = async (request: NextRequest) => {
 
   const data = (await request.json()) as unknown;
 
-  const input = ZUserSettings.safeParse(data);
-  if (!input.success) {
-    return NextResponse.json(
-      {
-        error: input.error,
-      },
-      {
-        status: 400,
-      },
-    );
+  try {
+    const settings = await UpdateUserSettings({ data, userId });
+    return NextResponse.json(settings);
+  } catch (e) {
+    if (e instanceof ApiFunctionError) {
+      return NextResponse.json({}, { status: e.code, statusText: e.message });
+    }
+    return NextResponse.json({}, { status: 500, statusText: "Unknown errror" });
   }
-
-  const user = await db.query.auth_user.findFirst({
-    where: eq(auth_user.id, userId),
-  });
-
-  if (!user) {
-    throw new Error("Cant find user with provided ID to access settings");
-  }
-
-  await db
-    .update(auth_user)
-    .set({ settings: input.data })
-    .where(eq(auth_user.id, userId));
-
-  return NextResponse.json(input.data);
 };

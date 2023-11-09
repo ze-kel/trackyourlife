@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import DatePicker from "@components/_UI/DatePicker";
 import type {
   IBooleanSettings,
-  IColorValue,
   INumberSettings,
   IRangeSettings,
   ITrackable,
@@ -15,8 +14,9 @@ import NumberLimitsSelector from "./numberLimitsSelector";
 import RangeLabelSelector from "./rangeLabelSelector";
 import { Input } from "@/components/ui/input";
 import { RSAUpdateTrackableSettings } from "src/app/api/trackables/serverActions";
-import ColorPicker from "@components/_UI/ColorPicker";
-import { presetsArray } from "@components/_UI/ColorPicker/presets";
+
+import { presetsMap } from "@components/_UI/ColorPicker/presets";
+import ColorInput from "@components/_UI/ColorPicker/colorInput";
 
 interface ISubSettingsProps<T> {
   settings: T;
@@ -69,19 +69,18 @@ const SettingsBoolean = ({
 
       <div>
         <h3 className="mb-2 text-xl">Checked color</h3>
-
-        <ColorPicker
-          value={settings.activeColor || (presetsArray[4] as IColorValue)}
+        <ColorInput
+          value={settings.activeColor || presetsMap.green}
           onChange={changeActiveColor}
-        ></ColorPicker>
+        ></ColorInput>
       </div>
 
       <div>
         <h3 className="mb-2 text-xl">Unchecked color</h3>
-        <ColorPicker
-          value={settings.inactiveColor || (presetsArray[1] as IColorValue)}
+        <ColorInput
+          value={settings.inactiveColor || presetsMap.neutral}
           onChange={chaneInactiveColor}
-        ></ColorPicker>
+        ></ColorInput>
       </div>
 
       {handleSave && (

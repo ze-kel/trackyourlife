@@ -1,17 +1,13 @@
 import { Input } from "@/components/ui/input";
 import { Tabs } from "@/components/ui/tabs";
 import { presetsArray } from "@components/_UI/ColorPicker/presets";
-import {
-  Dropdown,
-  DropdownContent,
-  DropdownTrigger,
-} from "@components/_UI/Dropdown";
 import { TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { IColor, IColorValue } from "@t/trackable";
-import type { MouseEventHandler } from "react";
-import { useRef } from "react";
+import type { CSSProperties, MouseEventHandler } from "react";
+import { useEffect, useRef, useState } from "react";
 import { clamp, range } from "src/helpers/animation";
 import { cn } from "@/lib/utils";
+import { useTheme } from "next-themes";
 
 export const makeColorString = (color: IColor) =>
   `hsl(${color.hue}, ${color.saturation}%, ${color.lightness}%)`;
@@ -53,7 +49,7 @@ const Controller = ({
   return (
     <div
       ref={controllerRef}
-      className="relative flex h-9 w-64  rounded-md border-2 border-neutral-200 bg-transparent text-sm shadow-sm transition-colors  focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-950 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-800 "
+      className="w-fullrounded-md relative flex h-9 border-2 border-neutral-200 bg-transparent text-sm shadow-sm transition-colors  focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-950 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-800 "
       style={{ background: backgroundScale }}
       onMouseDown={startDrag}
     >
@@ -69,13 +65,14 @@ const Controller = ({
   );
 };
 
-const ColorDisplay = ({
+export const ColorDisplay = ({
   color,
   className,
-  ...props
+  style,
 }: {
   color: IColorValue;
   className?: string;
+  style?: CSSProperties;
 }) => {
   const currentLight = makeColorString(color.lightMode);
   const currentDark = makeColorString(color.darkMode);
@@ -83,10 +80,10 @@ const ColorDisplay = ({
   return (
     <div
       className={cn(
-        "relative flex h-9 w-9 items-center gap-4 overflow-hidden rounded-md border-2 border-neutral-200 bg-transparent pl-4 font-mono text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-950 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-800",
+        "relative flex h-9 w-full items-center overflow-hidden rounded-md border-2 border-neutral-200 bg-transparent font-mono text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-950 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-800",
         className,
       )}
-      {...props}
+      style={style}
     >
       <div
         className="absolute left-0 top-0 z-10 h-full w-full"
@@ -104,14 +101,16 @@ const ColorDisplay = ({
   );
 };
 
-const Presets = ({
+export const Presets = ({
   setColor,
+  className,
 }: {
   savedColor: IColorValue;
   setColor: (v: IColorValue) => void;
+  className?: string;
 }) => {
   return (
-    <div className="flex gap-2">
+    <div className={cn("grid grid-cols-8 gap-1", className)}>
       {presetsArray.map((col, index) => {
         return (
           <button key={index} onClick={() => setColor(col)}>
@@ -126,7 +125,7 @@ const Presets = ({
 const hueGradient =
   "linear-gradient(to right, rgb(255, 0, 0) 0%, rgb(255, 255, 0) 17%, rgb(0, 255, 0) 33%, rgb(0, 255, 255) 50%, rgb(0, 0, 255) 67%, rgb(255, 0, 255) 83%, rgb(255, 0, 0) 100%)";
 
-const Picker = ({
+export const Picker = ({
   value,
   onChange,
 }: {
@@ -145,7 +144,7 @@ const Picker = ({
     onChange({ hue, saturation, lightness });
   };
   return (
-    <div className="grid w-fit grid-cols-[1fr_3.5rem] gap-x-4 gap-y-2">
+    <div className="grid grid-cols-[1fr_3.5rem] gap-x-4 gap-y-2">
       <Controller
         value={(hue / 360) * 100}
         update={(v) => setHue(Math.round((v / 100) * 360))}
@@ -194,7 +193,7 @@ const Picker = ({
   );
 };
 
-const ColorPicker = ({
+export const ColorPicker = ({
   value,
   onChange,
 }: {
@@ -214,44 +213,58 @@ const ColorPicker = ({
     onChange({ darkMode: color, lightMode: color });
   };
 
-  const sameColors = JSON.stringify(lightMode) === JSON.stringify(darkMode);
+  const applyPreset = (color: IColorValue) => {
+    onChange(color);
+    setMode(
+      JSON.stringify(color.lightMode) === JSON.stringify(color.darkMode)
+        ? "universal"
+        : resolvedTheme,
+    );
+  };
+
+  const { resolvedTheme } = useTheme();
+  const [mode, setMode] = useState(
+    JSON.stringify(lightMode) === JSON.stringify(darkMode)
+      ? "universal"
+      : resolvedTheme,
+  );
+
+  useEffect(() => {
+    setMode(
+      JSON.stringify(lightMode) === JSON.stringify(darkMode)
+        ? "universal"
+        : resolvedTheme,
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resolvedTheme]);
 
   return (
-    <div className="flex gap-4">
-      <Dropdown>
-        <DropdownTrigger className="h-fit cursor-pointer">
-          <ColorDisplay color={value} className="w-36" />
-        </DropdownTrigger>
-
-        <DropdownContent className="p-4">
-          <Tabs defaultValue={sameColors ? "universal" : "light"}>
-            <TabsList className="w-full p-2">
-              <TabsTrigger className="w-full " value="universal">
-                Universal
-              </TabsTrigger>
-              <div className="mx-2 h-full w-2 bg-neutral-300 dark:bg-neutral-600"></div>
-              <TabsTrigger className="w-full" value="light">
-                Light
-              </TabsTrigger>
-              <TabsTrigger className="w-full" value="dark">
-                Dark
-              </TabsTrigger>
-            </TabsList>
-            <TabsContent value="universal">
-              <Picker value={lightMode} onChange={setBoth} />
-            </TabsContent>
-            <TabsContent value="light">
-              <Picker value={lightMode} onChange={setLight} />
-            </TabsContent>
-            <TabsContent value="dark">
-              <Picker value={darkMode} onChange={setDark} />
-            </TabsContent>
-          </Tabs>
-        </DropdownContent>
-      </Dropdown>
-
-      <Presets savedColor={value} setColor={onChange} />
-    </div>
+    <>
+      <Tabs value={mode} onValueChange={setMode}>
+        <TabsList className="w-full p-2">
+          <TabsTrigger className="w-full " value="universal">
+            Universal
+          </TabsTrigger>
+          <div className="mx-2 h-full w-2 bg-neutral-300 dark:bg-neutral-600"></div>
+          <TabsTrigger className="w-full" value="light">
+            Light
+          </TabsTrigger>
+          <TabsTrigger className="w-full" value="dark">
+            Dark
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="universal">
+          <Picker value={lightMode} onChange={setBoth} />
+        </TabsContent>
+        <TabsContent value="light">
+          <Picker value={lightMode} onChange={setLight} />
+        </TabsContent>
+        <TabsContent value="dark">
+          <Picker value={darkMode} onChange={setDark} />
+        </TabsContent>
+      </Tabs>
+      <Presets savedColor={value} setColor={applyPreset} className="mt-2" />
+    </>
   );
 };
 

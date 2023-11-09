@@ -12,12 +12,12 @@ export const color = z.object({
 
 export type IColor = z.infer<typeof color>;
 
-export const colorValue = z.object({
+export const ZColorValue = z.object({
   lightMode: color,
   darkMode: color,
 });
 
-export type IColorValue = z.infer<typeof colorValue>;
+export type IColorValue = z.infer<typeof ZColorValue>;
 
 const basics = {
   name: z.string().default("Unnamed Trackable").optional(),
@@ -29,8 +29,8 @@ export const ZTrackableSettingsBase = z.object(basics);
 
 export const ZTrackableSettingsBoolean = z.object({
   ...basics,
-  inactiveColor: colorValue.optional(),
-  activeColor: colorValue.optional(),
+  inactiveColor: ZColorValue.optional(),
+  activeColor: ZColorValue.optional(),
 });
 
 export const ZTrackableSettingsNumber = z.object({
@@ -43,12 +43,12 @@ export const ZTrackableSettingsNumber = z.object({
       showProgress: z.boolean().optional(),
     })
     .optional(),
-  colorCodingEnabled: z.boolean(),
+  colorCodingEnabled: z.boolean().optional(),
   colorCoding: z
     .array(
       z.object({
-        from: z.number(),
-        color: colorValue,
+        point: z.number(),
+        color: ZColorValue,
         // used to key inputs when editing, can be changed voluntarily
         id: z.string().optional(),
       }),

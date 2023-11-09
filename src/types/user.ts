@@ -1,3 +1,4 @@
+import { ZColorValue } from "@t/trackable";
 import { z } from "zod";
 
 const email = z.string().email("Email is invalid");
@@ -18,6 +19,8 @@ export const ZLogin = z.object({
 
 export type ILogin = z.infer<typeof ZLogin>;
 
-export const ZUserSettings = z.object({});
+export const ZUserSettings = z.object({
+  colorPresets: z.array(ZColorValue).optional(),
+});
 
 export type IUserSettings = z.infer<typeof ZUserSettings>;
