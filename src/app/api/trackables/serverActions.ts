@@ -17,14 +17,14 @@ import {
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import type { TGETLimits } from "src/app/api/trackables/apiHelpers";
-import { RSAGetUserId } from "src/app/api/helpers";
+import { RSAGetUserIdAndRedirect } from "src/app/api/helpers";
 
 export const RSAGetAllTrackables = async ({
   limits,
 }: {
   limits?: TGETLimits;
 }) => {
-  const userId = await RSAGetUserId();
+  const userId = await RSAGetUserIdAndRedirect();
   return await GetAllTrackables({ userId, limits });
 };
 
@@ -35,18 +35,18 @@ export const RSAGetTrackable = async ({
   trackableId: ITrackable["id"];
   limits?: TGETLimits;
 }) => {
-  const userId = await RSAGetUserId();
+  const userId = await RSAGetUserIdAndRedirect();
   return await GetTrackable({ trackableId, userId, limits });
 };
 
 export const RSACreateTrackable = async (data: ITrackableUnsaved) => {
-  const userId = await RSAGetUserId();
+  const userId = await RSAGetUserIdAndRedirect();
   const result = await CreateTrackable({ data, userId });
   redirect("/trackables/" + result.id);
 };
 
 export const RSAUpdateTrackable = async (data: ITrackableUpdate) => {
-  const userId = await RSAGetUserId();
+  const userId = await RSAGetUserIdAndRedirect();
 
   const result = await UpdateTrackable({ data, userId });
   revalidatePath(`/trackables/${result.id}`);
@@ -55,7 +55,7 @@ export const RSAUpdateTrackable = async (data: ITrackableUpdate) => {
 };
 
 export const RSADeleteTrackable = async (trackableId: ITrackable["id"]) => {
-  const userId = await RSAGetUserId();
+  const userId = await RSAGetUserIdAndRedirect();
   await DeleteTrackable({ trackableId, userId });
 
   redirect("/");
@@ -70,7 +70,7 @@ export const RSAUpdateTrackableSettings = async ({
   data: ITrackableSettings;
   redirectToTrackablePage?: boolean;
 }) => {
-  const userId = await RSAGetUserId();
+  const userId = await RSAGetUserIdAndRedirect();
 
   const result = await UpdateTrackableSettings({ trackableId, data, userId });
 

@@ -10,8 +10,8 @@ import DayNumber from "@components/DayCell/dayNumber";
 import clamp from "lodash/clamp";
 import { useOptimistic } from "react";
 import { RSAUpdateTrackable } from "src/app/api/trackables/serverActions";
-import { makeColorString } from "@components/_UI/ColorPicker";
 import { presetsMap } from "@components/_UI/ColorPicker/presets";
+import { makeColorString } from "src/helpers/colorTools";
 
 const BooleanClasses = cva(
   [

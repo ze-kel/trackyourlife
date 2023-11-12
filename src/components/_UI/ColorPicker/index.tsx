@@ -1,194 +1,276 @@
 import { Input } from "@/components/ui/input";
 import { Tabs } from "@/components/ui/tabs";
-import { presetsArray } from "@components/_UI/ColorPicker/presets";
 import { TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type { IColor, IColorValue } from "@t/trackable";
-import type { CSSProperties, MouseEventHandler } from "react";
-import { useEffect, useRef, useState } from "react";
-import { clamp, range } from "src/helpers/animation";
-import { cn } from "@/lib/utils";
+import type { IColorHSL, IColorRGB, IColorValue } from "@t/trackable";
+import { Fragment, useEffect, useState } from "react";
+import { clamp } from "src/helpers/animation";
 import { useTheme } from "next-themes";
+import { HSLToRGB, RGBToHSL, makeColorString } from "src/helpers/colorTools";
+import { RadioTabItem, RadioTabs } from "@/components/ui/radio-tabs";
+import { Controller, Controller2D } from "./contoller";
 
-export const makeColorString = (color: IColor) =>
-  `hsl(${color.hue}, ${color.saturation}%, ${color.lightness}%)`;
-
-const Controller = ({
+const CustomInput = ({
   value,
-  update,
-  backgroundCurrent,
-  backgroundScale,
+  onChange,
+  limits = { min: 0, max: 255 },
 }: {
   value: number;
-  update: (v: number) => void;
-  backgroundCurrent: string;
-  backgroundScale: string;
+  limits?: { min: number; max: number };
+  onChange: (v: number) => void;
 }) => {
-  const controllerRef = useRef<HTMLDivElement>(null);
-
-  const startDrag: MouseEventHandler = (e) => {
-    if (!controllerRef.current) return;
-    // Left click only
-    if (e.nativeEvent.button !== 0) return;
-    const { width, left } = controllerRef.current.getBoundingClientRect();
-
-    const moveHadler = (e: MouseEvent) => {
-      const position = range(0, width, 0, 100, e.clientX - left);
-      update(position);
-    };
-
-    moveHadler(e as unknown as MouseEvent);
-
-    const upHandler = () => {
-      removeEventListener("mousemove", moveHadler);
-      removeEventListener("mouseup", upHandler);
-    };
-    addEventListener("mousemove", moveHadler);
-    addEventListener("mouseup", upHandler);
-  };
+  const [isEmpty, setEmpty] = useState(false);
 
   return (
-    <div
-      ref={controllerRef}
-      className="w-fullrounded-md relative flex h-9 border-2 border-neutral-200 bg-transparent text-sm shadow-sm transition-colors  focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-950 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-800 "
-      style={{ background: backgroundScale }}
-      onMouseDown={startDrag}
-    >
-      <div
-        className="absolute h-full w-4 -translate-x-1/2 rounded-sm border-2 border-neutral-50 shadow-sm dark:border-neutral-950"
-        style={{
-          left: value + "%",
-
-          background: backgroundCurrent,
-        }}
-      ></div>
-    </div>
-  );
-};
-
-export const ColorDisplay = ({
-  color,
-  className,
-  style,
-}: {
-  color: IColorValue;
-  className?: string;
-  style?: CSSProperties;
-}) => {
-  const currentLight = makeColorString(color.lightMode);
-  const currentDark = makeColorString(color.darkMode);
-
-  return (
-    <div
-      className={cn(
-        "relative flex h-9 w-full items-center overflow-hidden rounded-md border-2 border-neutral-200 bg-transparent font-mono text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-950 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-800",
-        className,
-      )}
-      style={style}
-    >
-      <div
-        className="absolute left-0 top-0 z-10 h-full w-full"
-        style={{
-          background: currentLight,
-          // Manual transform because order matters
-          transform: "rotate(45deg) translateX(-50%) scaleY(10)",
-        }}
-      ></div>
-      <div
-        className="absolute left-0 top-0 h-full w-full"
-        style={{ background: currentDark }}
-      ></div>
-    </div>
-  );
-};
-
-export const Presets = ({
-  setColor,
-  className,
-}: {
-  savedColor: IColorValue;
-  setColor: (v: IColorValue) => void;
-  className?: string;
-}) => {
-  return (
-    <div className={cn("grid grid-cols-8 gap-1", className)}>
-      {presetsArray.map((col, index) => {
-        return (
-          <button key={index} onClick={() => setColor(col)}>
-            <ColorDisplay color={col} />
-          </button>
-        );
-      })}
-    </div>
+    <Input
+      className="w-full text-center"
+      type="number"
+      value={isEmpty ? "" : value}
+      onChange={(e) => {
+        // This code allows input to be empty when editing
+        if (Number.isNaN(e.target.valueAsNumber)) {
+          setEmpty(true);
+          return;
+        }
+        setEmpty(false);
+        const numb = clamp(e.target.valueAsNumber, limits.min, limits.max);
+        onChange(numb);
+      }}
+      onBlur={() => {
+        if (isEmpty) setEmpty(false);
+      }}
+    />
   );
 };
 
 const hueGradient =
   "linear-gradient(to right, rgb(255, 0, 0) 0%, rgb(255, 255, 0) 17%, rgb(0, 255, 0) 33%, rgb(0, 255, 255) 50%, rgb(0, 0, 255) 67%, rgb(255, 0, 255) 83%, rgb(255, 0, 0) 100%)";
+const hueGradientDynamic = (s: number, l: number) =>
+  `linear-gradient(to right, hsl(0, ${s}%, ${l}%) 0%, hsl(60, ${s}%, ${l}%) 17%, hsl(120, ${s}%, ${l}%)33%, hsl(180, ${s}%, ${l}%) 50%, hsl(240, ${s}%, ${l}%) 67%, hsl(300, ${s}%, ${l}%) 83%, hsl(360, ${s}%, ${l}%) 100%)`;
 
-export const Picker = ({
-  value,
+type IKey = "hue" | "saturation" | "lightness" | "red" | "green" | "blue";
+
+const DynamicController = ({
+  rgb,
+  hsl,
+  setRGB,
+  setHSL,
+  controlKey,
+}: {
+  rgb: IColorRGB;
+  hsl: IColorHSL;
+  setRGB: (v: Partial<IColorRGB>) => void;
+  setHSL: (v: Partial<IColorHSL>) => void;
+  controlKey: IKey;
+}) => {
+  switch (controlKey) {
+    case "red":
+      return (
+        <Fragment key={controlKey}>
+          <Controller2D
+            x={rgb.b}
+            y={rgb.g}
+            maxX={255}
+            maxY={255}
+            onChange={(b, g) => setRGB({ b, g })}
+            background={`linear-gradient(to top left, rgb(${rgb.r}, 255, 255), rgba(${rgb.r}, 128, 128, 0), rgb(${rgb.r}, 0, 0)), linear-gradient(to top right, rgb(${rgb.r},255,0), rgba(${rgb.r}, 153, 150, 0), rgb(${rgb.r}, 0, 255)) rgba(${rgb.r}, 153, 150, 1)`}
+            // background={`url("data:image/svg+xml;utf8,%3Csvg preserveAspectRatio='none' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3ClinearGradient id='g'%3E%3Cstop offset='0' stop-color='%23fff' stop-opacity='0'%3E%3C/stop%3E%3Cstop offset='1' stop-color='%23fff' stop-opacity='1'%3E%3C/stop%3E%3C/linearGradient%3E%3Cmask id='m'%3E%3Crect x='0' y='0' width='1' height='1' fill='url(%23g)'%3E%3C/rect%3E%3C/mask%3E%3ClinearGradient id='a' gradientTransform='rotate(90)'%3E%3Cstop offset='0' stop-color='magenta'%3E%3C/stop%3E%3Cstop offset='1' stop-color='white'%3E%3C/stop%3E%3C/linearGradient%3E%3ClinearGradient id='b' gradientTransform='rotate(90)'%3E%3Cstop offset='0' stop-color='yellow'%3E%3C/stop%3E%3Cstop offset='1' stop-color='red'%3E%3C/stop%3E%3C/linearGradient%3E%3C/defs%3E%3Crect x='0' y='0' width='1' height='1' fill='url(%23a)' mask='url(%23m)'%3E%3C/rect%3E%3Crect x='0' y='0' width='1' height='1' fill='url(%23b)' mask='url(%23m)' transform='translate(1,1) rotate(180)'%3E%3C/rect%3E%3C/svg%3E")`}
+          />
+          <Controller
+            key={controlKey}
+            value={rgb.r}
+            onChange={(v) => setRGB({ r: Math.round(v) })}
+            maxVal={255}
+            backgroundCurrent={makeColorString(hsl)}
+            backgroundScale={`linear-gradient(to right, rgb(0,${rgb.g}, ${rgb.b}) 0%, rgb(255,${rgb.g}, ${rgb.b}) 100% )`}
+          />
+        </Fragment>
+      );
+
+    case "green":
+      return (
+        <Fragment key={controlKey}>
+          <Controller2D
+            x={rgb.b}
+            y={rgb.g}
+            maxX={255}
+            maxY={255}
+            onChange={(b, g) => setRGB({ b, g })}
+            background={`linear-gradient(to bottom right, rgb(0,${rgb.g},0), rgba(128, ${rgb.g}, 128, 0), rgb(255, ${rgb.g}, 255)), linear-gradient(to bottom left, rgb(0, ${rgb.g}, 255), rgba(150, ${rgb.g}, 150, 0), rgb(255, ${rgb.g}, 0)), rgba(150, ${rgb.g}, 150, 1)`}
+          />
+          <Controller
+            key={controlKey}
+            value={rgb.g}
+            onChange={(v) => setRGB({ g: v })}
+            maxVal={255}
+            backgroundCurrent={makeColorString(hsl)}
+            backgroundScale={`linear-gradient(to right, rgb(${rgb.r}, 0, ${rgb.b}) 0%, rgb(${rgb.r}, 255, ${rgb.b}) 100% )`}
+          />
+        </Fragment>
+      );
+
+    case "blue":
+      return (
+        <Fragment key={controlKey}>
+          {" "}
+          <Controller2D
+            x={rgb.g}
+            y={rgb.r}
+            maxX={255}
+            maxY={255}
+            onChange={(g, r) => setRGB({ g, r })}
+            // , linear-gradient(to bottom left, rgb(0, ${rgb.g}, 255), rgba(150, ${rgb.g}, 150, 0), rgb(255, ${rgb.g}, 0)), rgba(150, ${rgb.g}, 150, 1)
+            background={`linear-gradient(to bottom right, rgb(0, 0, ${rgb.b}), rgba(128, 128, ${rgb.b}, 0), rgb(255, 255, ${rgb.b})), linear-gradient(to bottom left, rgb(0, 255, ${rgb.b}), rgba(150, 150, ${rgb.b}, 0), rgb(255, 0, ${rgb.b})), rgba(150, 150, ${rgb.b}, 1)`}
+          />
+          <Controller
+            key={controlKey}
+            value={rgb.b}
+            onChange={(v) => setRGB({ b: v })}
+            maxVal={255}
+            backgroundCurrent={makeColorString(hsl)}
+            backgroundScale={`linear-gradient(to right, rgb(${rgb.r}, ${rgb.g}, 0) 0%, rgb(${rgb.r}, ${rgb.g}, 255) 100% )`}
+          />
+        </Fragment>
+      );
+
+    case "hue":
+      return (
+        <Fragment key={controlKey}>
+          <Controller2D
+            x={hsl.s}
+            y={hsl.l}
+            maxX={100}
+            maxY={100}
+            onChange={(s, l) => setHSL({ s, l })}
+            background={`linear-gradient(to bottom, black 0%, transparent 50%, white 100%), linear-gradient(to right, hsl(${hsl.h}, 0%, 50%) 0%, hsl(${hsl.h}, 100%, 50%) 100%)`}
+          />
+          <Controller
+            value={hsl.h}
+            onChange={(v) => setHSL({ h: v })}
+            maxVal={360}
+            backgroundCurrent={makeColorString(hsl)}
+            backgroundScale={hueGradient}
+          />
+        </Fragment>
+      );
+    case "saturation":
+      return (
+        <Fragment key={controlKey}>
+          <Controller2D
+            x={hsl.h}
+            y={hsl.l}
+            maxX={360}
+            maxY={100}
+            onChange={(h, l) => setHSL({ h, l })}
+            background={`linear-gradient(to bottom, black 0%, transparent 50%, white 100%), ${hueGradientDynamic(
+              hsl.s,
+              50,
+            )}`}
+          />
+          <Controller
+            value={hsl.s}
+            onChange={(v) => setHSL({ s: v })}
+            maxVal={100}
+            backgroundCurrent={makeColorString(hsl)}
+            backgroundScale={`linear-gradient(to right, hsl(${hsl.h}, 0%, ${hsl.l}%) 0%, hsl(${hsl.h}, 100%, ${hsl.l}%) 100% )`}
+          />
+        </Fragment>
+      );
+
+    case "lightness":
+      return (
+        <Fragment key={controlKey}>
+          <Controller2D
+            x={hsl.h}
+            y={hsl.s}
+            maxX={360}
+            maxY={100}
+            onChange={(h, s) => setHSL({ h, s })}
+            background={`
+            linear-gradient(to bottom, hsl(0, 0%, ${
+              hsl.l
+            }%) 0%, transparent 100%), ${hueGradientDynamic(100, hsl.l)}`}
+          />
+          <Controller
+            value={hsl.l}
+            onChange={(v) => setHSL({ l: v })}
+            maxVal={100}
+            backgroundCurrent={makeColorString(hsl)}
+            backgroundScale={`linear-gradient(to right, hsl(${hsl.h}, ${hsl.s}%, 0%) 0%, hsl(${hsl.h}, ${hsl.s}%, 100%) 100% )`}
+          />
+        </Fragment>
+      );
+  }
+};
+
+export const PickerRGB = ({
+  hsl,
   onChange,
 }: {
-  value: IColor;
-  onChange: (v: IColor) => void;
+  hsl: IColorHSL;
+  onChange: (v: IColorHSL) => void;
 }) => {
-  const { hue, saturation, lightness } = value;
+  const rgb = HSLToRGB(hsl);
 
-  const setHue = (hue: number) => {
-    onChange({ hue, saturation, lightness });
+  const setRGB = (vals: Partial<IColorRGB>) => {
+    onChange(RGBToHSL({ ...rgb, ...vals }));
   };
-  const setSaturation = (saturation: number) => {
-    onChange({ hue, saturation, lightness });
+
+  const setHSL = (vals: Partial<IColorHSL>) => {
+    onChange({ ...hsl, ...vals });
   };
-  const setLightness = (lightness: number) => {
-    onChange({ hue, saturation, lightness });
-  };
+
+  const [controlKey, setControlKey] = useState<IKey>("hue");
+
   return (
-    <div className="grid grid-cols-[1fr_3.5rem] gap-x-4 gap-y-2">
-      <Controller
-        value={(hue / 360) * 100}
-        update={(v) => setHue(Math.round((v / 100) * 360))}
-        backgroundScale={hueGradient}
-        backgroundCurrent={`hsl(${hue}, 100%, 50%)`}
+    <div className="grid gap-x-4 gap-y-2">
+      <DynamicController
+        rgb={rgb}
+        hsl={hsl}
+        setRGB={setRGB}
+        setHSL={setHSL}
+        controlKey={controlKey}
       />
-      <Input
-        className="w-14 text-center"
-        type="number"
-        value={hue}
-        onChange={(e) =>
-          setHue(Math.round(clamp(e.target.valueAsNumber, 0, 360)))
-        }
-      />
-
-      <Controller
-        value={saturation}
-        update={(v) => setSaturation(Math.round(clamp(v, 0, 100)))}
-        backgroundScale={`linear-gradient(to right, hsl(${hue}, 0%, ${lightness}%) 0%, hsl(${hue},  100%, ${lightness}%) 100%)`}
-        backgroundCurrent={`hsl(${hue}, ${saturation}%, ${lightness}%)`}
-      />
-      <Input
-        className="w-14 text-center"
-        type="number"
-        value={saturation}
-        onChange={(e) =>
-          setSaturation(Math.round(clamp(e.target.valueAsNumber, 0, 100)))
-        }
-      />
-
-      <Controller
-        value={lightness}
-        update={(v) => setLightness(Math.round(clamp(v, 0, 100)))}
-        backgroundScale={`linear-gradient(to right, hsl(${hue}, ${saturation}%, 0%) 0%, hsl(${hue},  ${saturation}%, 50%) 50%, hsl(${hue}, ${saturation}%, 100%) 100%)`}
-        backgroundCurrent={`hsl(${hue}, ${saturation}%, ${lightness}%)`}
-      />
-      <Input
-        className="w-14 text-center"
-        type="number"
-        value={lightness}
-        onChange={(e) =>
-          setLightness(Math.round(clamp(e.target.valueAsNumber, 0, 100)))
-        }
-      />
+      <div className="grid grid-cols-6 gap-1">
+        <CustomInput
+          value={rgb.r}
+          onChange={(v) => setRGB({ r: clamp(v, 0, 255) })}
+        />
+        <CustomInput
+          value={rgb.g}
+          onChange={(v) => setRGB({ g: clamp(v, 0, 255) })}
+        />
+        <CustomInput
+          value={rgb.b}
+          onChange={(v) => setRGB({ b: clamp(v, 0, 255) })}
+        />
+        <CustomInput
+          value={hsl.h}
+          limits={{ min: 0, max: 360 }}
+          onChange={(v) => setHSL({ h: v })}
+        />
+        <CustomInput
+          value={hsl.s}
+          limits={{ min: 0, max: 100 }}
+          onChange={(v) => setHSL({ s: v })}
+        />
+        <CustomInput
+          value={hsl.l}
+          limits={{ min: 0, max: 100 }}
+          onChange={(v) => setHSL({ l: v })}
+        />
+      </div>
+      <RadioTabs
+        className="grid grid-cols-6 gap-1"
+        value={controlKey}
+        onValueChange={(v) => setControlKey(v as IKey)}
+      >
+        <RadioTabItem value="red">R</RadioTabItem>
+        <RadioTabItem value="green">G</RadioTabItem>
+        <RadioTabItem value="blue">B</RadioTabItem>
+        <RadioTabItem value="hue">H</RadioTabItem>
+        <RadioTabItem value="saturation">S</RadioTabItem>
+        <RadioTabItem value="lightness">L</RadioTabItem>
+      </RadioTabs>
     </div>
   );
 };
@@ -202,17 +284,19 @@ export const ColorPicker = ({
 }) => {
   const { lightMode, darkMode } = value;
 
-  const setLight = (lightMode: IColor) => {
+  const setLight = (lightMode: IColorHSL) => {
     onChange({ darkMode, lightMode });
   };
-  const setDark = (darkMode: IColor) => {
+  const setDark = (darkMode: IColorHSL) => {
     onChange({ darkMode, lightMode });
   };
 
-  const setBoth = (color: IColor) => {
+  const setBoth = (color: IColorHSL) => {
+    console.log("setboth", color);
     onChange({ darkMode: color, lightMode: color });
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const applyPreset = (color: IColorValue) => {
     onChange(color);
     setMode(
@@ -254,16 +338,15 @@ export const ColorPicker = ({
           </TabsTrigger>
         </TabsList>
         <TabsContent value="universal">
-          <Picker value={lightMode} onChange={setBoth} />
+          <PickerRGB hsl={lightMode} onChange={setBoth} />
         </TabsContent>
         <TabsContent value="light">
-          <Picker value={lightMode} onChange={setLight} />
+          <PickerRGB hsl={lightMode} onChange={setLight} />
         </TabsContent>
         <TabsContent value="dark">
-          <Picker value={darkMode} onChange={setDark} />
+          <PickerRGB hsl={darkMode} onChange={setDark} />
         </TabsContent>
       </Tabs>
-      <Presets savedColor={value} setColor={applyPreset} className="mt-2" />
     </>
   );
 };

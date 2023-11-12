@@ -1,7 +1,7 @@
 "use client";
 import cls from "clsx";
 import type React from "react";
-import type { CSSProperties} from "react";
+import type { CSSProperties } from "react";
 import { useCallback, useMemo, useState } from "react";
 import clamp from "lodash/clamp";
 import debounce from "lodash/debounce";
@@ -16,7 +16,7 @@ import { AnimatePresence, m } from "framer-motion";
 import DayNumber from "@components/DayCell/dayNumber";
 import { RSAUpdateTrackable } from "src/app/api/trackables/serverActions";
 import { presetsMap } from "@components/_UI/ColorPicker/presets";
-import { makeColorString } from "@components/_UI/ColorPicker";
+import { makeColorString } from "src/helpers/colorTools";
 
 const NumberClasses = cva(
   ["group relative items-center justify-center font-light transition-colors"],

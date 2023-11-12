@@ -1,20 +1,29 @@
 import { z } from "zod";
+import { v4 as uuidv4 } from "uuid";
 
 //
 // Settings
 //
 
-export const color = z.object({
-  hue: z.number().min(0).max(360).default(0),
-  saturation: z.number().min(0).max(100).default(0),
-  lightness: z.number().min(0).max(100).default(0),
+export const colorRGB = z.object({
+  r: z.number().min(0).max(255).default(0),
+  g: z.number().min(0).max(255).default(0),
+  b: z.number().min(0).max(255).default(0),
 });
 
-export type IColor = z.infer<typeof color>;
+export type IColorRGB = z.infer<typeof colorRGB>;
+
+export const colorHSL = z.object({
+  h: z.number().min(0).max(360).default(0),
+  s: z.number().min(0).max(100).default(0),
+  l: z.number().min(0).max(100).default(0),
+});
+
+export type IColorHSL = z.infer<typeof colorHSL>;
 
 export const ZColorValue = z.object({
-  lightMode: color,
-  darkMode: color,
+  lightMode: colorHSL,
+  darkMode: colorHSL,
 });
 
 export type IColorValue = z.infer<typeof ZColorValue>;
@@ -50,7 +59,7 @@ export const ZTrackableSettingsNumber = z.object({
         point: z.number(),
         color: ZColorValue,
         // used to key inputs when editing, can be changed voluntarily
-        id: z.string().optional(),
+        id: z.string().uuid().default(uuidv4),
       }),
     )
     .optional(),
@@ -64,7 +73,7 @@ export const ZTrackableSettingsRange = z.object({
         internalKey: z.string().min(1),
         emoji: z.string().emoji(),
         // used to key inputs when editing, can be changed voluntarily
-        id: z.string().optional(),
+        id: z.string().uuid().default(uuidv4),
       }),
     )
     .optional(),

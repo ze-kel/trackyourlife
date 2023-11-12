@@ -9,12 +9,21 @@ export const checkForSession = async (request: NextRequest) => {
   return { session, authRequest, userId: session?.user.userId };
 };
 
+export const RSAGetUserIdAndRedirect = async () => {
+  const id = await RSAGetUserId();
+  if (id === null) {
+    redirect("/login");
+  }
+
+  return id;
+};
+
 export const RSAGetUserId = async () => {
   const authRequest = auth.handleRequest("GET", context);
 
   const session = await authRequest.validate();
   if (!session?.user.userId) {
-    redirect("/login");
+    return null;
   }
 
   return session.user.userId;

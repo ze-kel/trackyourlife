@@ -15,7 +15,8 @@ export default async function RootLayout({
   children: ReactNode;
 }) {
   const session = await getPageSession();
-  const userSettigns = await RSAGetUserSettings();
+  
+  const userSettigns =  await RSAGetUserSettings();
 
   return (
     <html lang="en" suppressHydrationWarning>
