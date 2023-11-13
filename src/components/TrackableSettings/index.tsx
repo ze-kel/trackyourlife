@@ -14,7 +14,7 @@ import NumberLimitsSelector from "./numberLimitsSelector";
 import RangeLabelSelector from "./rangeLabelSelector";
 import { Input } from "@/components/ui/input";
 import { RSAUpdateTrackableSettings } from "src/app/api/trackables/serverActions";
-
+import { v4 as uuidv4 } from "uuid";
 import { presetsMap } from "@components/_UI/ColorPicker/presets";
 import ColorInput from "@components/_UI/ColorPicker/colorInput";
 
@@ -150,7 +150,12 @@ const SettingsNumber = ({
       <div>
         <h3 className="mb-2 text-xl">Color coding</h3>
         <NumberColorSelector
-          initialValue={settings.colorCoding}
+          value={
+            settings.colorCoding || [
+              { point: 0, color: presetsMap.red, id: uuidv4() },
+              { point: 100, color: presetsMap.green, id: uuidv4() },
+            ]
+          }
           onChange={changeColorCoding}
         />
       </div>
@@ -227,6 +232,7 @@ const SettingsRange = ({
     </div>
   );
 };
+
 
 const TrackableSettings = ({ trackable }: { trackable: ITrackable }) => {
   const [settings, setSettings] = useState(trackable.settings);

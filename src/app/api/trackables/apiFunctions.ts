@@ -10,8 +10,7 @@ import { format } from "date-fns";
 import { and, between, eq } from "drizzle-orm";
 import { db } from "src/app/api/db";
 import { ApiFunctionError } from "src/app/api/helpers";
-import type {
-  TGETLimits} from "src/app/api/trackables/apiHelpers";
+import type { TGETLimits } from "src/app/api/trackables/apiHelpers";
 import {
   getDateBounds,
   prepareTrackable,
@@ -28,8 +27,6 @@ export const GetAllTrackables = async ({
   limits?: TGETLimits;
 }) => {
   const bounds = getDateBounds(limits || { type: "last", days: 31 });
-
-  console.log(bounds);
 
   const raw = await db.query.trackable.findMany({
     where: eq(trackable.userId, userId),

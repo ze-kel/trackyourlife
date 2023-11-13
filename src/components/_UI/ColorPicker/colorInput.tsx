@@ -16,13 +16,13 @@ const ColorInput = ({
 }) => {
   return (
     <div className="flex gap-4">
-      <Dropdown>
+      <Dropdown placement="right">
         <DropdownTrigger className="h-fit cursor-pointer">
           <ColorDisplay color={value} className="w-36" />
         </DropdownTrigger>
 
         <DropdownContent className="p-4">
-          <ColorPicker value={value} onChange={onChange} />
+          <ColorPicker value={value} onChange={onChange} className="max-w-md" />
         </DropdownContent>
       </Dropdown>
     </div>

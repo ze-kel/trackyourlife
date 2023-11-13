@@ -1,4 +1,5 @@
-import { useRef, MouseEventHandler } from "react";
+import type { MouseEventHandler } from "react";
+import { useRef } from "react";
 import { range } from "src/helpers/animation";
 
 export const Controller = ({

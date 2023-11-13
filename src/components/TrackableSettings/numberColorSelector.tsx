@@ -1,8 +1,8 @@
 import type { IColorValue, INumberSettings } from "@t/trackable";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import type { ArrayElement } from "@t/helpers";
-import ColorPicker from "@components/_UI/ColorPicker";
+import ColorPicker, { BetterNumberInput } from "@components/_UI/ColorPicker";
 import { presetsMap } from "@components/_UI/ColorPicker/presets";
 import { range } from "src/helpers/animation";
 import { Input } from "@/components/ui/input";
@@ -10,15 +10,13 @@ import { cn } from "@/lib/utils";
 import { InterpolateColors, makeColorString } from "src/helpers/colorTools";
 import { ColorDisplay } from "@components/_UI/ColorPicker/presetsPanel";
 import { useTheme } from "next-themes";
+import { Button } from "@/components/ui/button";
+import { Cross1Icon, PlusCircledIcon } from "@radix-ui/react-icons";
+import { RadioTabItem, RadioTabs } from "@/components/ui/radio-tabs";
 
 type IColorCodingValue = INumberSettings["colorCoding"];
 
 type IColorCodingItem = ArrayElement<NonNullable<IColorCodingValue>>;
-
-export interface INumberColorSelector {
-  initialValue: IColorCodingValue;
-  onChange: (a: IColorCodingValue) => void;
-}
 
 const makeGradient = (
   values: IColorCodingItem[],
@@ -69,16 +67,16 @@ const getActualMax = (
   return Math.max(a, b);
 };
 
-const getColorAtPosition = ({
+export const getColorAtPosition = ({
   value,
   point,
 }: {
   value: IColorCodingItem[];
   point: number;
 }): IColorValue => {
-  console.log(value);
   if (!value.length) return presetsMap.neutral;
   if (value.length === 1 && value[0]) return value[0].color;
+  console.log(point);
 
   let leftSide: IColorCodingItem | undefined = undefined;
   let rightSide: IColorCodingItem | undefined = undefined;
@@ -94,8 +92,10 @@ const getColorAtPosition = ({
 
   if (!leftSide && rightSide) return rightSide.color;
   if (!rightSide && leftSide) return leftSide.color;
-
   if (!leftSide || !rightSide) return presetsMap.neutral;
+
+  if (point === leftSide.point) return leftSide.color;
+  if (point === rightSide.point) return rightSide.color;
 
   const proportion = range(leftSide.point, rightSide.point, 0, 1, point);
 
@@ -120,7 +120,21 @@ const ControllerGradient = ({
   value: IColorCodingItem[];
   onChange: (v: IColorCodingItem[]) => void;
 }) => {
-  const controllerRef = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLDivElement>(null);
+
+  const [gradientWidth, setGradientWidth] = useState<number>();
+
+  useEffect(() => {
+    const r = () => {
+      if (!ref.current) return;
+      setGradientWidth(ref.current.getBoundingClientRect().width);
+    };
+    r();
+    addEventListener("resize", r);
+    return () => {
+      removeEventListener("resize", r);
+    };
+  });
 
   const [minInput, setMinInput] = useState<number | null>(
     getActualMin(value[0]?.point, null),
@@ -134,22 +148,19 @@ const ControllerGradient = ({
 
   const setById = (id: string, point: number) => {
     const newValue = [...value];
-    const i = value.findIndex((v) => v.id === id);
-    const a = newValue[i];
+    const a = newValue.find((v) => v.id === id);
     if (!a) return;
     a.point = point;
     onChange(newValue);
   };
 
   const addColor = (e: React.MouseEvent) => {
-    if (!controllerRef.current) return;
+    if (!ref.current) return;
     const newVal = [...value];
 
-    const { width, left } = controllerRef.current.getBoundingClientRect();
-
+    const { width, left } = ref.current.getBoundingClientRect();
     const coordinate = e.clientX - left;
     const point = Math.round(range(0, width, actualMin, actualMax, coordinate));
-
     const color = getColorAtPosition({ value, point });
     const id = uuidv4();
 
@@ -162,12 +173,11 @@ const ControllerGradient = ({
 
   const startDrag = (e: React.MouseEvent, id: string) => {
     setSelectedColor(id);
-    if (!controllerRef.current) return;
     // Left click only
     if (e.nativeEvent.button !== 0) return;
 
-    const { width, left, top, height } =
-      controllerRef.current.getBoundingClientRect();
+    if (!ref.current) return;
+    const { width, left, top, height } = ref.current.getBoundingClientRect();
 
     const moveHadler = (e: MouseEvent) => {
       setIsDragging(true);
@@ -192,22 +202,25 @@ const ControllerGradient = ({
       removeEventListener("mousemove", moveHadler);
       removeEventListener("mouseup", upHandler);
 
-      if (!controllerRef.current) return;
-
-      const { top, height } = controllerRef.current.getBoundingClientRect();
+      if (!ref.current) return;
+      const { top, height } = ref.current.getBoundingClientRect();
 
       const vertical = e.clientY - top - height / 2;
 
-      if (Math.abs(vertical) > height * 1.5) {
-        const newVal = [...value].filter((v) => v.id !== id);
-        setSelectedColor(newVal[0]?.id || "");
-        onChange(newVal);
+      if (Math.abs(vertical) > height * 1.5 && value.length > 1) {
+        removeColor(id);
       }
       setSelectedColorRemove(0);
     };
 
     addEventListener("mousemove", moveHadler);
     addEventListener("mouseup", upHandler);
+  };
+
+  const removeColor = (id: string) => {
+    const newVal = [...value].filter((v) => v.id !== id);
+    setSelectedColor(newVal[0]?.id || "");
+    onChange(newVal);
   };
 
   const setInputsToActual = () => {
@@ -235,6 +248,11 @@ const ControllerGradient = ({
   };
 
   const { resolvedTheme } = useTheme();
+  const [gradientPreivewTheme, setGradientPreviewTheme] = useState("dark");
+
+  useEffect(() => {
+    setGradientPreviewTheme(resolvedTheme || "");
+  }, [resolvedTheme]);
 
   return (
     <>
@@ -243,7 +261,11 @@ const ControllerGradient = ({
           <div
             className={cn(
               "absolute z-50 h-[200%] w-full -translate-y-1/2 ",
-              selectedColorRemove === 0 ? "cursor-grabbing" : "cursor-default",
+              selectedColorRemove === 0
+                ? "cursor-grabbing"
+                : value.length > 1
+                ? "cursor-default"
+                : "cursor-not-allowed",
             )}
           ></div>
         )}
@@ -262,19 +284,18 @@ const ControllerGradient = ({
           className="w-16"
         />
         <div
-          ref={controllerRef}
-          className="relative box-border flex h-9 w-full cursor-copy overflow-hidden rounded-md border-2 border-neutral-200 bg-transparent text-sm shadow-sm transition-colors  focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-950 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-800 "
+          className="relative box-border flex h-9 w-full cursor-copy rounded-lg border-2 border-neutral-200 bg-transparent text-sm shadow-sm transition-colors  focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-950 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-800 "
           style={{
             background: makeGradient(
               value,
               actualMin,
               actualMax,
-              resolvedTheme,
+              gradientPreivewTheme,
             ),
           }}
           onClick={addColor}
         >
-          <div>
+          <div ref={ref} className="relative w-full">
             {value.map((v) => {
               return (
                 <div
@@ -283,21 +304,36 @@ const ControllerGradient = ({
                   onClick={(e) => {
                     e.stopPropagation();
                   }}
-                  className="absolute top-0 h-full w-4 cursor-grab  rounded-sm border border-black transition-transform"
+                  className={cn(
+                    "absolute top-1/2 h-[125%] cursor-grab overflow-hidden rounded-lg border-2 border-transparent",
+                    v.id === selectedColor &&
+                      "z-20 border-neutral-50 dark:border-neutral-950",
+                    v.id === selectedColor &&
+                      value.length > 1 &&
+                      selectedColorRemove !== 0 &&
+                      "opacity-25",
+                  )}
                   style={{
-                    left: range(actualMin, actualMax, 0, 100, v.point) + "%",
-                    transform: `translateX(-50%) translateY(${
-                      v.id === selectedColor ? selectedColorRemove * 66 : 0
-                    }%)`,
+                    // This is fallback for SSR where we cant get width and therefore cant do Translate()
+                    left: gradientWidth
+                      ? 0
+                      : range(actualMin, actualMax, 0, 100, v.point) + "%",
+                    transform: `${
+                      gradientWidth
+                        ? `translateX(calc(-50% + ${
+                            gradientWidth *
+                            range(actualMin, actualMax, 0, 1, v.point)
+                          }px))`
+                        : "translateX(-50%)"
+                    } translateY(-50%)`,
                   }}
                 >
-                  <ColorDisplay
-                    color={v.color}
-                    className={cn(
-                      "h-full rounded-sm border",
-                      v.id === selectedColor && "dark:border-white",
-                    )}
-                  />
+                  <div className="h-full rounded-md border-2 border-neutral-950 shadow-lg shadow-neutral-50 dark:border-neutral-50">
+                    <ColorDisplay
+                      color={v.color}
+                      className={cn("box-border h-full w-2 rounded-md border")}
+                    />
+                  </div>
                 </div>
               );
             })}
@@ -317,38 +353,87 @@ const ControllerGradient = ({
           }}
           className="w-16"
         />
+
+        <RadioTabs
+          suppressHydrationWarning={true}
+          value={gradientPreivewTheme}
+          onValueChange={setGradientPreviewTheme}
+        >
+          <RadioTabItem suppressHydrationWarning={true} value="light">
+            Light
+          </RadioTabItem>
+          <RadioTabItem suppressHydrationWarning={true} value="dark">
+            Dark
+          </RadioTabItem>
+        </RadioTabs>
       </div>
 
-      <div>
-        {selectedColorObject ? (
-          <ColorPicker
-            value={selectedColorObject}
-            onChange={updateSelectedColor}
-          />
-        ) : (
-          ""
-        )}
+      <div className="flex gap-4">
+        <div className="w-full">
+          {selectedColorObject && (
+            <ColorPicker
+              value={selectedColorObject}
+              onChange={updateSelectedColor}
+            />
+          )}
+        </div>
+        <div className="w-full max-w-xs">
+          <div className="flex h-fit flex-col gap-2 rounded-lg bg-neutral-800 p-1">
+            {value.map((v) => (
+              <div
+                key={v.id}
+                className={cn(
+                  "flex gap-2 p-2",
+                  v.id === selectedColor
+                    ? "rounded-md bg-neutral-950"
+                    : "cursor-pointer",
+                )}
+                onClick={() => setSelectedColor(v.id)}
+              >
+                <ColorDisplay color={v.color} />
+                <BetterNumberInput
+                  value={v.point}
+                  limits={{ min: actualMin, max: actualMax }}
+                  onChange={(val) => setById(v.id, val)}
+                />
+                <Button
+                  disabled={value.length < 2}
+                  variant={"ghost"}
+                  size={"icon"}
+                  className="flex-shrink-0"
+                >
+                  <Cross1Icon
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removeColor(v.id);
+                    }}
+                  />
+                </Button>
+              </div>
+            ))}
+          </div>
+          <Button variant="outline" className="mt-2 w-full">
+            <PlusCircledIcon className="mr-2 opacity-50" />
+            Add color
+          </Button>
+        </div>
       </div>
     </>
   );
 };
 
 const NumberColorSelector = ({
-  initialValue,
+  value,
   onChange,
-}: INumberColorSelector) => {
-  const [value, updateValue] = useState<IColorCodingItem[]>(
-    initialValue || [
-      { point: 0, color: presetsMap.red, id: uuidv4() },
-      { point: 100, color: presetsMap.green, id: uuidv4() },
-    ],
-  );
-
+}: {
+  value: NonNullable<IColorCodingValue>;
+  onChange: (v: NonNullable<IColorCodingValue>) => void;
+}) => {
   const sorted = value.sort((a, b) => a.point - b.point);
 
   return (
     <div className="flex flex-col gap-2">
-      <ControllerGradient value={sorted} onChange={updateValue} />
+      <ControllerGradient value={sorted} onChange={onChange} />
     </div>
   );
 };

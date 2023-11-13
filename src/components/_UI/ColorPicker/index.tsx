@@ -9,7 +9,7 @@ import { HSLToRGB, RGBToHSL, makeColorString } from "src/helpers/colorTools";
 import { RadioTabItem, RadioTabs } from "@/components/ui/radio-tabs";
 import { Controller, Controller2D } from "./contoller";
 
-const CustomInput = ({
+export const BetterNumberInput = ({
   value,
   onChange,
   limits = { min: 0, max: 255 },
@@ -111,7 +111,6 @@ const DynamicController = ({
     case "blue":
       return (
         <Fragment key={controlKey}>
-          {" "}
           <Controller2D
             x={rgb.g}
             y={rgb.r}
@@ -231,29 +230,29 @@ export const PickerRGB = ({
         controlKey={controlKey}
       />
       <div className="grid grid-cols-6 gap-1">
-        <CustomInput
+        <BetterNumberInput
           value={rgb.r}
           onChange={(v) => setRGB({ r: clamp(v, 0, 255) })}
         />
-        <CustomInput
+        <BetterNumberInput
           value={rgb.g}
           onChange={(v) => setRGB({ g: clamp(v, 0, 255) })}
         />
-        <CustomInput
+        <BetterNumberInput
           value={rgb.b}
           onChange={(v) => setRGB({ b: clamp(v, 0, 255) })}
         />
-        <CustomInput
+        <BetterNumberInput
           value={hsl.h}
           limits={{ min: 0, max: 360 }}
           onChange={(v) => setHSL({ h: v })}
         />
-        <CustomInput
+        <BetterNumberInput
           value={hsl.s}
           limits={{ min: 0, max: 100 }}
           onChange={(v) => setHSL({ s: v })}
         />
-        <CustomInput
+        <BetterNumberInput
           value={hsl.l}
           limits={{ min: 0, max: 100 }}
           onChange={(v) => setHSL({ l: v })}
@@ -278,9 +277,11 @@ export const PickerRGB = ({
 export const ColorPicker = ({
   value,
   onChange,
+  className,
 }: {
   value: IColorValue;
   onChange: (v: IColorValue) => void;
+  className?: string;
 }) => {
   const { lightMode, darkMode } = value;
 
@@ -323,31 +324,29 @@ export const ColorPicker = ({
   }, [resolvedTheme]);
 
   return (
-    <>
-      <Tabs value={mode} onValueChange={setMode}>
-        <TabsList className="w-full p-2">
-          <TabsTrigger className="w-full " value="universal">
-            Universal
-          </TabsTrigger>
-          <div className="mx-2 h-full w-2 bg-neutral-300 dark:bg-neutral-600"></div>
-          <TabsTrigger className="w-full" value="light">
-            Light
-          </TabsTrigger>
-          <TabsTrigger className="w-full" value="dark">
-            Dark
-          </TabsTrigger>
-        </TabsList>
-        <TabsContent value="universal">
-          <PickerRGB hsl={lightMode} onChange={setBoth} />
-        </TabsContent>
-        <TabsContent value="light">
-          <PickerRGB hsl={lightMode} onChange={setLight} />
-        </TabsContent>
-        <TabsContent value="dark">
-          <PickerRGB hsl={darkMode} onChange={setDark} />
-        </TabsContent>
-      </Tabs>
-    </>
+    <Tabs value={mode} onValueChange={setMode} className={className}>
+      <TabsList className="w-full p-2">
+        <TabsTrigger className="w-full " value="universal">
+          Universal
+        </TabsTrigger>
+        <div className="mx-2 h-full w-2 bg-neutral-300 dark:bg-neutral-600"></div>
+        <TabsTrigger className="w-full" value="light">
+          Light
+        </TabsTrigger>
+        <TabsTrigger className="w-full" value="dark">
+          Dark
+        </TabsTrigger>
+      </TabsList>
+      <TabsContent value="universal">
+        <PickerRGB hsl={lightMode} onChange={setBoth} />
+      </TabsContent>
+      <TabsContent value="light">
+        <PickerRGB hsl={lightMode} onChange={setLight} />
+      </TabsContent>
+      <TabsContent value="dark">
+        <PickerRGB hsl={darkMode} onChange={setDark} />
+      </TabsContent>
+    </Tabs>
   );
 };
 

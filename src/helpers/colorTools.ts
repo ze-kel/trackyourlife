@@ -8,11 +8,14 @@ export const InterpolateColors = (
   second: IColorHSL,
   ratio: number,
 ): IColorHSL => {
+  if (ratio >= 1) return second;
+  if (ratio <= 0) return first;
+
   const c = chroma
     .mix(
       chroma.hsl(first.h, first.s / 100, first.l / 100),
       chroma.hsl(second.h, second.s / 100, second.l / 100),
-      1 - ratio,
+      ratio,
       "rgb",
     )
     .hsl();
@@ -32,4 +35,3 @@ export const HSLToRGB = ({ h, s, l }: IColorHSL): IColorRGB => {
   const [r, g, b] = chroma.hsl(h, s / 100, l / 100).rgb(true);
   return { r, g, b };
 };
-

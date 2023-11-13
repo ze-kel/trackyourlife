@@ -11,12 +11,13 @@ import IconMinus from "@heroicons/react/24/outline/MinusIcon";
 import { cva } from "class-variance-authority";
 import type { IDayProps } from "./index";
 import { computeDayCellHelpers } from "./index";
-import type { IColorValue, INumberSettings } from "@t/trackable";
+import type { INumberSettings } from "@t/trackable";
 import { AnimatePresence, m } from "framer-motion";
 import DayNumber from "@components/DayCell/dayNumber";
 import { RSAUpdateTrackable } from "src/app/api/trackables/serverActions";
 import { presetsMap } from "@components/_UI/ColorPicker/presets";
 import { makeColorString } from "src/helpers/colorTools";
+import { getColorAtPosition } from "@components/TrackableSettings/numberColorSelector";
 
 const NumberClasses = cva(
   ["group relative items-center justify-center font-light transition-colors"],
@@ -107,27 +108,15 @@ export const DayCellNumber = ({
 
   const progress = getProgress(trackable.settings.limits, displayedNumber);
 
-  const findTheme = (): IColorValue => {
-    const cc = trackable.settings.colorCoding;
-    if (!cc || !cc.length) return presetsMap.neutral;
-
-    let result: IColorValue = cc[0]?.color || presetsMap.neutral;
-
-    for (let i = 0; i < cc.length; i++) {
-      const point = cc[i];
-      if (!point) throw new Error("Error and find color loop");
-
-      if (Number(displayedNumber) < point.from) {
-        return result;
-      }
-
-      result = point.color;
+  const color = useMemo(() => {
+    if (!trackable.settings.colorCoding) {
+      return presetsMap.neutral;
     }
-
-    return result;
-  };
-
-  const theme = findTheme();
+    return getColorAtPosition({
+      value: trackable.settings.colorCoding,
+      point: displayedNumber,
+    });
+  }, [displayedNumber]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedUpdateValue = useCallback(debounce(updateValue, 400), [
@@ -163,8 +152,8 @@ export const DayCellNumber = ({
       })}
       style={
         {
-          "--themeLight": makeColorString(theme.lightMode),
-          "--themeDark": makeColorString(theme.darkMode),
+          "--themeLight": makeColorString(color.lightMode),
+          "--themeDark": makeColorString(color.darkMode),
         } as CSSProperties
       }
       key={day}
@@ -173,7 +162,9 @@ export const DayCellNumber = ({
     >
       {progress !== null && (
         <div
-          className={cls("z-1 absolute bottom-0 w-full transition-all")}
+          className={cls(
+            "z-1 absolute bottom-0 w-full bg-[var(--themeLight)] transition-all dark:bg-[var(--themeDark)]",
+          )}
           style={{ height: `${progress}%` }}
         ></div>
       )}
