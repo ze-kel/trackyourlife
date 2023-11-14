@@ -293,7 +293,6 @@ export const ColorPicker = ({
   };
 
   const setBoth = (color: IColorHSL) => {
-    console.log("setboth", color);
     onChange({ darkMode: color, lightMode: color });
   };
 
@@ -303,7 +302,7 @@ export const ColorPicker = ({
     setMode(
       JSON.stringify(color.lightMode) === JSON.stringify(color.darkMode)
         ? "universal"
-        : resolvedTheme,
+        : resolvedTheme || "dark",
     );
   };
 
@@ -311,14 +310,14 @@ export const ColorPicker = ({
   const [mode, setMode] = useState(
     JSON.stringify(lightMode) === JSON.stringify(darkMode)
       ? "universal"
-      : resolvedTheme,
+      : "dark",
   );
 
   useEffect(() => {
     setMode(
       JSON.stringify(lightMode) === JSON.stringify(darkMode)
         ? "universal"
-        : resolvedTheme,
+        : resolvedTheme || "dark",
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resolvedTheme]);

@@ -3,7 +3,7 @@ import {
   Dropdown,
   DropdownContent,
   DropdownTrigger,
-} from "@components/_UI/Dropdown";
+} from "@components/Dropdown";
 import { cva } from "class-variance-authority";
 import { useMemo, useState } from "react";
 import type { IDayProps } from "./index";

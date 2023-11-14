@@ -5,7 +5,7 @@ import * as context from "next/headers";
 
 import type { NextRequest } from "next/server";
 import { ZLogin } from "@t/user";
-import { log } from "src/helpers/logger";
+import { log } from "console";
 
 export const POST = async (request: NextRequest) => {
   const data = (await request.json()) as unknown;

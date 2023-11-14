@@ -1,11 +1,12 @@
-import ColorPicker from "@components/_UI/ColorPicker";
-import { ColorDisplay } from "@components/_UI/ColorPicker/presetsPanel";
+import ColorPicker from "@components/Colors";
+import { ColorDisplay } from "@components/Colors/presetsPanel";
 import {
   Dropdown,
   DropdownTrigger,
   DropdownContent,
-} from "@components/_UI/Dropdown";
+} from "@components/Dropdown";
 import type { IColorValue } from "@t/trackable";
+import { useState } from "react";
 
 const ColorInput = ({
   value,
@@ -14,15 +15,24 @@ const ColorInput = ({
   value: IColorValue;
   onChange: (v: IColorValue) => void;
 }) => {
+  const [color, setColor] = useState(value);
+
   return (
     <div className="flex gap-4">
       <Dropdown placement="right">
         <DropdownTrigger className="h-fit cursor-pointer">
-          <ColorDisplay color={value} className="w-36" />
+          <ColorDisplay color={color} className="w-36" />
         </DropdownTrigger>
 
         <DropdownContent className="p-4">
-          <ColorPicker value={value} onChange={onChange} className="max-w-md" />
+          <ColorPicker
+            value={color}
+            onChange={(v) => {
+              setColor(v);
+              onChange(v);
+            }}
+            className="max-w-md"
+          />
         </DropdownContent>
       </Dropdown>
     </div>

@@ -1,4 +1,4 @@
-import { presetsArray } from "@components/_UI/ColorPicker/presets";
+import { presetsArray } from "@components/Colors/presets";
 import type { IColorValue } from "@t/trackable";
 import type { CSSProperties } from "react";
 import { cn } from "@/lib/utils";
@@ -25,11 +25,12 @@ export const ColorDisplay = ({
       style={style}
     >
       <div
-        className="absolute left-0 top-0 z-10 h-full w-full"
+        className="absolute left-1/2 top-0 z-10 h-full w-full"
         style={{
           background: currentLight,
           // Manual transform because order matters
-          transform: "rotate(45deg) translateX(-50%) scaleY(10)",
+          transform: "rotate(35deg) scale(4)",
+          transformOrigin: "left",
         }}
       ></div>
       <div

@@ -2,13 +2,13 @@ import type { IColorValue, INumberSettings } from "@t/trackable";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import type { ArrayElement } from "@t/helpers";
-import ColorPicker, { BetterNumberInput } from "@components/_UI/ColorPicker";
-import { presetsMap } from "@components/_UI/ColorPicker/presets";
+import ColorPicker, { BetterNumberInput } from "@components/Colors";
+import { presetsMap } from "@components/Colors/presets";
 import { range } from "src/helpers/animation";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { InterpolateColors, makeColorString } from "src/helpers/colorTools";
-import { ColorDisplay } from "@components/_UI/ColorPicker/presetsPanel";
+import { ColorDisplay } from "@components/Colors/presetsPanel";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { Cross1Icon, PlusCircledIcon } from "@radix-ui/react-icons";
@@ -76,7 +76,6 @@ export const getColorAtPosition = ({
 }): IColorValue => {
   if (!value.length) return presetsMap.neutral;
   if (value.length === 1 && value[0]) return value[0].color;
-  console.log(point);
 
   let leftSide: IColorCodingItem | undefined = undefined;
   let rightSide: IColorCodingItem | undefined = undefined;
@@ -429,11 +428,19 @@ const NumberColorSelector = ({
   value: NonNullable<IColorCodingValue>;
   onChange: (v: NonNullable<IColorCodingValue>) => void;
 }) => {
-  const sorted = value.sort((a, b) => a.point - b.point);
+  const [innerValue, setInnerValue] = useState(value);
+
+  const sorted = innerValue.sort((a, b) => a.point - b.point);
 
   return (
     <div className="flex flex-col gap-2">
-      <ControllerGradient value={sorted} onChange={onChange} />
+      <ControllerGradient
+        value={sorted}
+        onChange={(v) => {
+          setInnerValue(v);
+          onChange(v);
+        }}
+      />
     </div>
   );
 };

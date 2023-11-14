@@ -1,12 +1,11 @@
 "use client";
-import { Button } from "@/components/ui/button";
 import type {
   ITrackableSettings,
   ITrackableUnsaved,
 } from "src/types/trackable";
 import { useState } from "react";
 import cloneDeep from "lodash/cloneDeep";
-import { TrackableSettingsManual } from "@components/TrackableSettings";
+import TrackableSettings from "@components/TrackableSettings";
 import { RadioTabItem, RadioTabs } from "@/components/ui/radio-tabs";
 import { RSACreateTrackable } from "src/app/api/trackables/serverActions";
 
@@ -23,15 +22,8 @@ const Create = () => {
     update.type = type;
     setNewOne(update);
   };
-
-  const setSettings = (settings: ITrackableSettings) => {
-    const update = cloneDeep(newOne);
-    update.settings = settings;
-    setNewOne(update);
-  };
-
-  const createTrackable = async () => {
-    await RSACreateTrackable(newOne);
+  const createTrackable = async (settings: ITrackableSettings) => {
+    await RSACreateTrackable({ ...newOne, settings });
   };
 
   return (
@@ -54,15 +46,11 @@ const Create = () => {
           Range
         </RadioTabItem>
       </RadioTabs>
-      <TrackableSettingsManual trackable={newOne} setSettings={setSettings} />
-
-      <Button
-        onClick={() => void createTrackable()}
-        className="mt-5 w-full"
-        variant={"outline"}
-      >
-        Create
-      </Button>
+      <TrackableSettings
+        trackable={newOne}
+        handleSave={createTrackable}
+        customSaveButtonText="Create"
+      />
     </div>
   );
 };

@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import * as context from "next/headers";
 import type { NextRequest } from "next/server";
 import { ZRegister } from "@t/user";
-import { log } from "src/helpers/logger";
+import { log } from "console";
 
 export const POST = async (request: NextRequest) => {
   const data = (await request.json()) as unknown;
@@ -66,7 +66,7 @@ export const POST = async (request: NextRequest) => {
       );
     }
 
-    log(`API: Fail to create user, UNKNOWN`);
+    log(`API: Fail to create user, UNKNOWN`, e);
 
     return NextResponse.json(
       {

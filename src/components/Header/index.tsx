@@ -3,7 +3,7 @@ import {
   Dropdown,
   DropdownContent,
   DropdownTrigger,
-} from "@components/_UI/Dropdown";
+} from "@components/Dropdown";
 import Link from "next/link";
 import { ChevronDownIcon } from "@radix-ui/react-icons";
 import clsx from "clsx";

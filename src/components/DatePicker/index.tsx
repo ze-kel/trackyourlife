@@ -40,10 +40,12 @@ const DatePicker = ({
   };
   className?: string;
 }) => {
+  const [innerDate, setInnerDate] = useState(date);
+
   const calRef = useRef<HTMLDivElement>(null);
   const [isOpened, setIsOpened] = useState(false);
 
-  const [cursor, setCursor] = useState(startOfMonth(date || new Date()));
+  const [cursor, setCursor] = useState(startOfMonth(innerDate || new Date()));
   const [ref, bounds] = useMeasure();
 
   const toRender = getDaysInMonth(cursor);
@@ -65,7 +67,9 @@ const DatePicker = ({
 
   const recordDate = (day: number) => {
     if (!inLimit(day)) return;
-    onChange(new Date(cursor.getFullYear(), cursor.getMonth(), day));
+    const d = new Date(cursor.getFullYear(), cursor.getMonth(), day);
+    setInnerDate(d);
+    onChange(d);
     setIsOpened(false);
   };
 
@@ -117,7 +121,7 @@ const DatePicker = ({
         <DropdownTrigger>
           <Button variant={"outline"} className="min-w-[200px]">
             <span className="">
-              {date ? format(date, "d MMMM yyyy") : "No date set"}
+              {innerDate ? format(innerDate, "d MMMM yyyy") : "No date set"}
             </span>
             <CalendarIcon className="ml-auto h-4 w-4 " />
           </Button>

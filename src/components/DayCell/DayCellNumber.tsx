@@ -5,7 +5,7 @@ import type { CSSProperties } from "react";
 import { useCallback, useMemo, useState } from "react";
 import clamp from "lodash/clamp";
 import debounce from "lodash/debounce";
-import EditableText from "@components/_UI/EditableText";
+import EditableText from "@components/EditableText";
 import IconPlus from "@heroicons/react/24/outline/PlusIcon";
 import IconMinus from "@heroicons/react/24/outline/MinusIcon";
 import { cva } from "class-variance-authority";
@@ -15,9 +15,9 @@ import type { INumberSettings } from "@t/trackable";
 import { AnimatePresence, m } from "framer-motion";
 import DayNumber from "@components/DayCell/dayNumber";
 import { RSAUpdateTrackable } from "src/app/api/trackables/serverActions";
-import { presetsMap } from "@components/_UI/ColorPicker/presets";
+import { presetsMap } from "@components/Colors/presets";
 import { makeColorString } from "src/helpers/colorTools";
-import { getColorAtPosition } from "@components/TrackableSettings/numberColorSelector";
+import { getColorAtPosition } from "@components/Colors/numberColorSelector";
 
 const NumberClasses = cva(
   ["group relative items-center justify-center font-light transition-colors"],
@@ -109,13 +109,14 @@ export const DayCellNumber = ({
   const progress = getProgress(trackable.settings.limits, displayedNumber);
 
   const color = useMemo(() => {
-    if (!trackable.settings.colorCoding) {
+    if (!trackable.settings.colorCoding || displayedNumber === 0) {
       return presetsMap.neutral;
     }
     return getColorAtPosition({
       value: trackable.settings.colorCoding,
       point: displayedNumber,
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [displayedNumber]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
