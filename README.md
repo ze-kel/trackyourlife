@@ -12,17 +12,27 @@ App to track stuff. Kinds of like a habit tracker but more: data types, customiz
 
 ![](./public/screenshot.jpg)
 
-### Self hosting
+### Development
 
-You can develop locally using composeU.sh and composeD.sh
-Start
+Option A:
+Run next locally, host postgres somewhere.
 
-```
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build
-```
+1. Create remote database
+2. Add .env.development with "DATABASE_URL" defined
+3. Run `npm run dev`
+4. http://localhost:3000/
 
-Stop
+Option B:
+Use docker to spin up local postgres
 
-```
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml down
-```
+1. Install docker
+2. Run `make start-development`
+3. http://localhost:1337/
+
+To run e2e test add "TEST_URL" to your .env.development and run `npm run test`
+
+### Deployment
+
+1. git clone
+2. `make build-production`
+3. `make start-production`

@@ -150,8 +150,8 @@ const ViewController = ({
   openCurrentMonth: () => void;
 }) => {
   return (
-    <div className="mb-4 flex items-center justify-between">
-      <div className="flex items-baseline gap-2">
+    <div className="mb-4 flex flex-col-reverse gap-2 md:flex-row md:items-center md:justify-between">
+      <div className="flex items-baseline gap-2 self-center">
         {typeof year === "number" && (
           <Button name="year" variant="ghost" onClick={() => setView("years")}>
             {year}
@@ -165,7 +165,7 @@ const ViewController = ({
             </div>
             <Button
               name="months"
-              variant={"ghost"}
+              variant="ghost"
               onClick={() => setView("months")}
             >
               {format(new Date(year, month, 1), "MMMM")}
@@ -173,7 +173,7 @@ const ViewController = ({
           </>
         )}
       </div>
-      <div className="flex gap-2">
+      <div className="flex w-fit gap-2 self-end">
         <Button
           name="prevous month"
           onClick={() => increment(-1)}

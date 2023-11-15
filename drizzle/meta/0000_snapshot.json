@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "pg",
-  "id": "dd387f74-e4ea-4215-8c67-8d6bc8eaf622",
+  "id": "370ca763-fcd0-4ee0-94aa-63135eeb9573",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "auth_user": {
@@ -47,7 +47,9 @@
         "auth_user_email_unique": {
           "name": "auth_user_email_unique",
           "nullsNotDistinct": false,
-          "columns": ["email"]
+          "columns": [
+            "email"
+          ]
         }
       }
     },
@@ -88,9 +90,13 @@
           "name": "trackable_user_id_auth_user_id_fk",
           "tableFrom": "trackable",
           "tableTo": "auth_user",
-          "columnsFrom": ["user_id"],
-          "columnsTo": ["id"],
-          "onDelete": "no action",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -101,13 +107,6 @@
       "name": "trackableRecord",
       "schema": "",
       "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
         "trackableId": {
           "name": "trackableId",
           "type": "uuid",
@@ -139,34 +138,39 @@
           "name": "trackableRecord_trackableId_trackable_id_fk",
           "tableFrom": "trackableRecord",
           "tableTo": "trackable",
-          "columnsFrom": ["trackableId"],
-          "columnsTo": ["id"],
-          "onDelete": "no action",
+          "columnsFrom": [
+            "trackableId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "trackableRecord_user_id_auth_user_id_fk": {
           "name": "trackableRecord_user_id_auth_user_id_fk",
           "tableFrom": "trackableRecord",
           "tableTo": "auth_user",
-          "columnsFrom": ["user_id"],
-          "columnsTo": ["id"],
-          "onDelete": "no action",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "trackableRecord_date_unique": {
-          "name": "trackableRecord_date_unique",
-          "nullsNotDistinct": false,
-          "columns": ["date"]
-        },
-        "trackableRecord_id_date_unique": {
-          "name": "trackableRecord_id_date_unique",
-          "nullsNotDistinct": true,
-          "columns": ["id", "date"]
+      "compositePrimaryKeys": {
+        "trackableRecord_trackableId_date": {
+          "name": "trackableRecord_trackableId_date",
+          "columns": [
+            "trackableId",
+            "date"
+          ]
         }
-      }
+      },
+      "uniqueConstraints": {}
     },
     "user_key": {
       "name": "user_key",
@@ -197,9 +201,13 @@
           "name": "user_key_user_id_auth_user_id_fk",
           "tableFrom": "user_key",
           "tableTo": "auth_user",
-          "columnsFrom": ["user_id"],
-          "columnsTo": ["id"],
-          "onDelete": "no action",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -241,9 +249,13 @@
           "name": "user_session_user_id_auth_user_id_fk",
           "tableFrom": "user_session",
           "tableTo": "auth_user",
-          "columnsFrom": ["user_id"],
-          "columnsTo": ["id"],
-          "onDelete": "no action",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },

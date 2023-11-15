@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { buttonVariants } from "@/components/ui/button";
 import { RSADeleteTrackable } from "src/app/api/trackables/serverActions";
+import { cn } from "@/lib/utils";
 
 const DeleteButton = ({ id }: { id: string }) => {
   const performDelete = async () => {
@@ -24,7 +25,10 @@ const DeleteButton = ({ id }: { id: string }) => {
     <AlertDialog>
       <AlertDialogTrigger
         name="delete"
-        className={buttonVariants({ variant: "outline", size: "icon" })}
+        className={cn(
+          buttonVariants({ variant: "outline", size: "icon" }),
+          "shrink-0",
+        )}
       >
         <TrashIcon className="h-4 w-4" />
       </AlertDialogTrigger>

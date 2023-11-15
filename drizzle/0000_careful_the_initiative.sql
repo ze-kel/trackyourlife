@@ -21,13 +21,11 @@ CREATE TABLE IF NOT EXISTS "trackable" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "trackableRecord" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"trackableId" uuid NOT NULL,
 	"date" date NOT NULL,
 	"value" varchar NOT NULL,
 	"user_id" varchar(15) NOT NULL,
-	CONSTRAINT "trackableRecord_date_unique" UNIQUE("date"),
-	CONSTRAINT "trackableRecord_id_date_unique" UNIQUE NULLS NOT DISTINCT("id","date")
+	CONSTRAINT trackableRecord_trackableId_date PRIMARY KEY("trackableId","date")
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "user_key" (
@@ -44,31 +42,31 @@ CREATE TABLE IF NOT EXISTS "user_session" (
 );
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "trackable" ADD CONSTRAINT "trackable_user_id_auth_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "auth_user"("id") ON DELETE no action ON UPDATE no action;
+ ALTER TABLE "trackable" ADD CONSTRAINT "trackable_user_id_auth_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "auth_user"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "trackableRecord" ADD CONSTRAINT "trackableRecord_trackableId_trackable_id_fk" FOREIGN KEY ("trackableId") REFERENCES "trackable"("id") ON DELETE no action ON UPDATE no action;
+ ALTER TABLE "trackableRecord" ADD CONSTRAINT "trackableRecord_trackableId_trackable_id_fk" FOREIGN KEY ("trackableId") REFERENCES "trackable"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "trackableRecord" ADD CONSTRAINT "trackableRecord_user_id_auth_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "auth_user"("id") ON DELETE no action ON UPDATE no action;
+ ALTER TABLE "trackableRecord" ADD CONSTRAINT "trackableRecord_user_id_auth_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "auth_user"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "user_key" ADD CONSTRAINT "user_key_user_id_auth_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "auth_user"("id") ON DELETE no action ON UPDATE no action;
+ ALTER TABLE "user_key" ADD CONSTRAINT "user_key_user_id_auth_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "auth_user"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "user_session" ADD CONSTRAINT "user_session_user_id_auth_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "auth_user"("id") ON DELETE no action ON UPDATE no action;
+ ALTER TABLE "user_session" ADD CONSTRAINT "user_session_user_id_auth_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "auth_user"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

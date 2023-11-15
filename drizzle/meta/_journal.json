@@ -5,29 +5,8 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1697396432801,
-      "tag": "0000_youthful_proudstar",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1697399909665,
-      "tag": "0001_bumpy_blackheart",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1697400047174,
-      "tag": "0002_cute_arclight",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "5",
-      "when": 1697488945548,
-      "tag": "0003_cuddly_thundra",
+      "when": 1700062832925,
+      "tag": "0000_careful_the_initiative",
       "breakpoints": true
     }
   ]

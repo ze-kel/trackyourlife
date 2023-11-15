@@ -4,16 +4,18 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "dev:migrate": "npm run generate && npm run push && npm run dev",
     "build": "next build",
     "start": "next start",
     "start:dev": "dotenv -e .env.development next start",
     "lint": "next lint",
-    "prettier": "prettier . --write",
     "test": "dotenv -e .env.development playwright test",
-    "vercel-build": "next build",
     "generate": "dotenv -e .env.development drizzle-kit generate:pg",
-    "push": "dotenv -e .env.development drizzle-kit push:pg"
+    "push": "dotenv -e .env.development drizzle-kit push:pg",
+    "migrate": "npx --yes tsx ./src/app/api/migrate.ts",
+    "migrate:env": "dotenv -e .env.development npm run migrate",
+    "vercel:build": "npm run migrate && npm run build",
+    "docker:push": "drizzle-kit push:pg",
+    "docker:push:dev": "npm run docker:push && npm run dev"
   },
   "dependencies": {
     "@floating-ui/react": "^0.26.1",
