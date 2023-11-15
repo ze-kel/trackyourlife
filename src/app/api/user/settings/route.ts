@@ -1,75 +1,45 @@
-import { prisma } from "../../db";
-import { cookies } from "next/headers";
-import { NextResponse, type NextRequest } from "next/server";
-import { auth } from "src/auth/lucia";
-import { ZUserSettings } from "@t/user";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
+import { ApiFunctionError, checkForSession } from "src/app/api/helpers";
+import {
+  GetUserSettings,
+  UpdateUserSettings,
+} from "src/app/api/user/settings/apiFunctions";
 
 export const GET = async (request: NextRequest) => {
   // Auth check
-  const authRequest = auth.handleRequest({ request, cookies });
-  const session = await authRequest.validate();
-  if (!session) {
+  const { userId } = await checkForSession(request);
+
+  if (!userId) {
     return new Response(null, {
       status: 401,
     });
   }
 
-  const userId = session.user.userId;
+  const settings = GetUserSettings({ userId });
 
-  const user = await prisma.user.findFirst({
-    where: {
-      id: userId,
-    },
-  });
-
-  if (!user) return {};
-
-  return NextResponse.json(ZUserSettings.parse(user.settings));
+  return NextResponse.json(settings);
 };
 
 export const POST = async (request: NextRequest) => {
-  const authRequest = auth.handleRequest({ request, cookies });
-  const session = await authRequest.validate();
-  if (!session) {
+  // Auth check
+  const { userId } = await checkForSession(request);
+
+  if (!userId) {
     return new Response(null, {
       status: 401,
     });
   }
 
-  const userId = session.user.userId;
-
   const data = (await request.json()) as unknown;
 
-  const input = ZUserSettings.safeParse(data);
-  if (!input.success) {
-    return NextResponse.json(
-      {
-        error: input.error,
-      },
-      {
-        status: 400,
-      },
-    );
+  try {
+    const settings = await UpdateUserSettings({ data, userId });
+    return NextResponse.json(settings);
+  } catch (e) {
+    if (e instanceof ApiFunctionError) {
+      return NextResponse.json({}, { status: e.code, statusText: e.message });
+    }
+    return NextResponse.json({}, { status: 500, statusText: "Unknown errror" });
   }
-
-  const user = await prisma.user.findFirst({
-    where: {
-      id: userId,
-    },
-  });
-
-  if (!user) {
-    throw new Error("Cant find user with provided ID to access settings");
-  }
-
-  await prisma.user.update({
-    where: {
-      id: userId,
-    },
-    data: {
-      settings: input.data,
-    },
-  });
-
-  return NextResponse.json(input.data);
 };

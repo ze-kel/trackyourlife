@@ -1,62 +1,17 @@
 "use client";
-import type { MouseEvent } from "react";
+import type { CSSProperties, MouseEvent } from "react";
 import { useMemo, useRef, useState } from "react";
 import type { IDayProps } from "./index";
 import { computeDayCellHelpers } from "./index";
 import cls from "clsx";
 import { cva } from "class-variance-authority";
-import type { IColorOptions } from "src/types/trackable";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, m } from "framer-motion";
 import DayNumber from "@components/DayCell/dayNumber";
 import clamp from "lodash/clamp";
-import { changeDay } from "src/helpers/actions";
-import { experimental_useOptimistic as useOptimistic } from "react";
-
-export const ThemeList: Record<IColorOptions, ""> = {
-  neutral: "",
-  red: "",
-  pink: "",
-  green: "",
-  blue: "",
-  orange: "",
-  purple: "",
-  lime: "",
-};
-
-const activeGen: Record<IColorOptions, Record<"bg" | "hover", string>> = {
-  neutral: {
-    bg: "bg-neutral-200 dark:bg-neutral-700",
-    hover: "hover:border-neutral-700",
-  },
-  red: {
-    bg: "bg-red-500",
-    hover: "hover:border-red-500",
-  },
-  pink: {
-    bg: "bg-pink-500",
-    hover: "hover:border-pink-500",
-  },
-  green: {
-    bg: "bg-green-500",
-    hover: "hover:border-green-500",
-  },
-  blue: {
-    bg: "bg-blue-500",
-    hover: "hover:border-blue-500",
-  },
-  orange: {
-    bg: "bg-orange-500",
-    hover: "hover:border-orange-500",
-  },
-  purple: {
-    bg: "bg-purple-500",
-    hover: "hover:border-purple-500",
-  },
-  lime: {
-    bg: "bg-lime-500",
-    hover: "hover:border-lime-500",
-  },
-};
+import { useOptimistic } from "react";
+import { RSAUpdateTrackable } from "src/app/api/trackables/serverActions";
+import { presetsMap } from "@components/Colors/presets";
+import { makeColorString } from "src/helpers/colorTools";
 
 const BooleanClasses = cva(
   [
@@ -70,7 +25,7 @@ const BooleanClasses = cva(
       },
       inTrackRange: {
         true: "cursor-pointer",
-        false: "cursor-default",
+        false: "cursor-default bg-neutral-100 dark:bg-neutral-900",
       },
       active: {
         true: "",
@@ -81,12 +36,14 @@ const BooleanClasses = cva(
       {
         active: false,
         inTrackRange: true,
-        className: "",
+        className:
+          "border-[var(--themeInactiveLight)] hover:border-[var(--themeActiveLight)] dark:border-[var(--themeInactiveDark)] dark:hover:border-[var(--themeActiveDark)]",
       },
       {
-        active: false,
-        inTrackRange: false,
-        className: "bg-neutral-100  dark:bg-neutral-900",
+        active: true,
+        inTrackRange: true,
+        className:
+          "hover:border-[var(--themeInactiveLight)] border-[var(--themeActiveLight)] dark:hover:border-[var(--themeInactiveDark)] dark:border-[var(--themeActiveDark)]",
       },
     ],
     defaultVariants: {
@@ -158,7 +115,7 @@ export const DayCellBoolean = ({
     const newVal = isActive ? "false" : "true";
 
     setIsActive(newVal === "true");
-    await changeDay({
+    await RSAUpdateTrackable({
       id: trackable.id,
       day,
       month,
@@ -167,26 +124,27 @@ export const DayCellBoolean = ({
     });
   };
 
-  const themeActive = trackable.settings.activeColor
-    ? activeGen[trackable.settings.activeColor].bg
-    : activeGen.lime.bg;
+  const themeActive = trackable.settings.activeColor;
+  const themeInactive = trackable.settings.inactiveColor;
 
-  const themeInactive = trackable.settings.inactiveColor
-    ? activeGen[trackable.settings.inactiveColor].bg
-    : activeGen.neutral.bg;
+  const activeLight = themeActive?.lightMode || presetsMap.green.lightMode;
+  const activeDark = themeActive?.darkMode || presetsMap.green.darkMode;
 
-  const hoverActive = trackable.settings.activeColor
-    ? activeGen[trackable.settings.activeColor].hover
-    : activeGen.lime.hover;
-
-  const hoverInactive = trackable.settings.inactiveColor
-    ? activeGen[trackable.settings.inactiveColor].hover
-    : activeGen.neutral.hover;
-
-  const borderClass = isActive ? hoverInactive : hoverActive;
+  const inactiveLight =
+    themeInactive?.lightMode || presetsMap.neutral.lightMode;
+  const inactiveDark = themeInactive?.darkMode || presetsMap.neutral.darkMode;
 
   return (
     <button
+      style={
+        {
+          "--themeActiveLight": makeColorString(activeLight),
+          "--themeActiveDark": makeColorString(activeDark),
+          "--themeInactiveLight": makeColorString(inactiveLight),
+          "--themeInactiveDark": makeColorString(inactiveDark),
+        } as CSSProperties
+      }
+      data-value={inTrackRange ? isActive : undefined}
       ref={mainRef}
       tabIndex={inTrackRange ? 0 : -1}
       className={cls(
@@ -195,7 +153,6 @@ export const DayCellBoolean = ({
           active: isActive,
           style,
         }),
-        inTrackRange && borderClass,
       )}
       disabled={!inTrackRange}
       key={day}
@@ -204,81 +161,46 @@ export const DayCellBoolean = ({
     >
       {inTrackRange && (
         <>
-          <AnimatePresence initial={false}>
-            {isActive && (
-              <>
-                <div
-                  className={cls(
-                    "absolute left-0 top-0 h-full  w-full",
-                    themeInactive,
-                  )}
-                ></div>
-                <motion.div
-                  initial={{
-                    scaleX: 0,
-                    scaleY: 0,
-                  }}
-                  animate={{
-                    scaleX: 1.2,
-                    scaleY: 1.2,
-                  }}
-                  transition={{
-                    duration: ANIMATION_TIME,
-                    ease: EASE,
-                    scaleY: {
-                      duration: ANIMATION_TIME * whRatio,
-                      ease: EASE,
-                    },
-                  }}
-                  className={cls(
-                    "absolute left-0 top-0 h-full  w-full",
-                    themeActive,
-                  )}
-                  style={{
-                    transformOrigin: `
-              ${clickPoint[0] || 50}% ${clickPoint[1] || 50}%`,
-                  }}
-                />
-              </>
+          {/* This is a background layer with color we're animating from */}
+          <div
+            className={cls(
+              "absolute left-0 top-0 h-full  w-full",
+              isActive
+                ? "bg-[var(--themeInactiveLight)] dark:bg-[var(--themeInactiveDark)]"
+                : "bg-[var(--themeActiveLight)] dark:bg-[var(--themeActiveDark)]",
             )}
-          </AnimatePresence>
+          ></div>
+          {/* This is animating layer with with active color */}
           <AnimatePresence initial={false}>
-            {!isActive && (
-              <>
-                <div
-                  className={cls(
-                    "absolute left-0 top-0 h-full  w-full",
-                    themeActive,
-                  )}
-                ></div>
-                <motion.div
-                  initial={{
-                    scaleX: 0,
-                    scaleY: 0,
-                  }}
-                  animate={{
-                    scaleX: 1.2,
-                    scaleY: 1.2,
-                  }}
-                  transition={{
-                    duration: ANIMATION_TIME,
-                    ease: EASE,
-                    scaleY: {
-                      duration: ANIMATION_TIME * whRatio,
-                      ease: EASE,
-                    },
-                  }}
-                  className={cls(
-                    "absolute left-0 top-0 h-full  w-full",
-                    themeInactive,
-                  )}
-                  style={{
-                    transformOrigin: `
+            <m.div
+              key={String(isActive)}
+              initial={{
+                scaleX: 0,
+                scaleY: 0,
+              }}
+              animate={{
+                scaleX: 1.2,
+                scaleY: 1.2,
+              }}
+              transition={{
+                duration: ANIMATION_TIME,
+                ease: EASE,
+                scaleY: {
+                  duration: ANIMATION_TIME * whRatio,
+                  ease: EASE,
+                },
+              }}
+              className={cls(
+                "absolute left-0 top-0 h-full  w-full",
+                isActive
+                  ? "bg-[var(--themeActiveLight)] dark:bg-[var(--themeActiveDark)]"
+                  : "bg-[var(--themeInactiveLight)] dark:bg-[var(--themeInactiveDark)]",
+              )}
+              style={{
+                transformOrigin: `
               ${clickPoint[0] || 50}% ${clickPoint[1] || 50}%`,
-                  }}
-                />
-              </>
-            )}
+              }}
+            />
           </AnimatePresence>
         </>
       )}

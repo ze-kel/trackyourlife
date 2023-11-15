@@ -1,5 +1,4 @@
 "use client";
-import { useRouter } from "next/navigation";
 import { TrashIcon } from "@radix-ui/react-icons";
 
 import {
@@ -14,24 +13,22 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { buttonVariants } from "@/components/ui/button";
-import { deleteTrackable } from "src/helpers/apiHelpersClient";
+import { RSADeleteTrackable } from "src/app/api/trackables/serverActions";
+import { cn } from "@/lib/utils";
 
 const DeleteButton = ({ id }: { id: string }) => {
-  const router = useRouter();
-
-  if (!deleteTrackable) {
-    throw new Error("Context error: Delete trackable");
-  }
-
   const performDelete = async () => {
-    await deleteTrackable(id);
-    router.push("/");
+    await RSADeleteTrackable(id);
   };
 
   return (
     <AlertDialog>
       <AlertDialogTrigger
-        className={buttonVariants({ variant: "outline", size: "icon" })}
+        name="delete"
+        className={cn(
+          buttonVariants({ variant: "outline", size: "icon" }),
+          "shrink-0",
+        )}
       >
         <TrashIcon className="h-4 w-4" />
       </AlertDialogTrigger>
@@ -45,7 +42,10 @@ const DeleteButton = ({ id }: { id: string }) => {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={() => void performDelete()}>
+          <AlertDialogAction
+            name="confirm delete"
+            onClick={() => void performDelete()}
+          >
             Delete
           </AlertDialogAction>
         </AlertDialogFooter>

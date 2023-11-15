@@ -1,4 +1,4 @@
-"use server";
+"use client";
 import type { ITrackable } from "src/types/trackable";
 import Link from "next/link";
 import MiniTrackable from "./miniTrackable";
@@ -34,7 +34,7 @@ const TrackablesList = ({ list }: { list: ITrackable[] }) => {
           <div className="flex justify-between">
             <Link href={`/trackables/${tr.id}`} className="block w-fit">
               <h3 className="w-fit cursor-pointer text-xl font-light">
-                {tr.settings.name}
+                {tr.settings.name || "unnamed"}
               </h3>
             </Link>
             <FavButton trackable={tr} />

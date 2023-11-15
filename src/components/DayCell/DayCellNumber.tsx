@@ -1,58 +1,23 @@
 "use client";
 import cls from "clsx";
-import React, { useCallback, useMemo, useState } from "react";
+import type React from "react";
+import type { CSSProperties } from "react";
+import { useCallback, useMemo, useState } from "react";
 import clamp from "lodash/clamp";
 import debounce from "lodash/debounce";
-import EditableText from "@components/_UI/EditableText";
+import EditableText from "@components/EditableText";
 import IconPlus from "@heroicons/react/24/outline/PlusIcon";
 import IconMinus from "@heroicons/react/24/outline/MinusIcon";
 import { cva } from "class-variance-authority";
 import type { IDayProps } from "./index";
 import { computeDayCellHelpers } from "./index";
-import { ThemeList } from "./DayCellBoolean";
-import type { IColorOptions, INumberSettings } from "@t/trackable";
-import { AnimatePresence, motion } from "framer-motion";
+import type { INumberSettings } from "@t/trackable";
+import { AnimatePresence, m } from "framer-motion";
 import DayNumber from "@components/DayCell/dayNumber";
-import { changeDay } from "src/helpers/actions";
-
-const activeGen: Record<IColorOptions, string> = {
-  neutral: "border-neutral-500 dark:border-neutral-700",
-  red: "border-red-500",
-  pink: "border-pink-500",
-  green: "border-green-500",
-  blue: "border-blue-500",
-  orange: "border-orange-500",
-  purple: "border-purple-500",
-  lime: "border-lime-500",
-};
-
-const activeGenProgress: Record<IColorOptions, string> = {
-  neutral: "bg-neutral-500 dark:bg-neutral-700",
-  red: "bg-red-500",
-  pink: "bg-pink-500",
-  green: "bg-green-500",
-  blue: "bg-blue-500",
-  orange: "bg-orange-500",
-  purple: "bg-purple-500",
-  lime: "bg-lime-500",
-};
-
-const Generated = (Object.keys(activeGen) as IColorOptions[]).reduce<
-  {
-    colorCode?: IColorOptions;
-    inTrackRange?: boolean;
-    progress: boolean;
-    className: string;
-  }[]
->((acc, key) => {
-  acc.push({
-    colorCode: key,
-    inTrackRange: true,
-    progress: false,
-    className: activeGen[key],
-  });
-  return acc;
-}, []);
+import { RSAUpdateTrackable } from "src/app/api/trackables/serverActions";
+import { presetsMap } from "@components/Colors/presets";
+import { makeColorString } from "src/helpers/colorTools";
+import { getColorAtPosition } from "@components/Colors/numberColorSelector";
 
 const NumberClasses = cva(
   ["group relative items-center justify-center font-light transition-colors"],
@@ -63,26 +28,20 @@ const NumberClasses = cva(
         mini: "border h-6",
       },
       inTrackRange: {
-        true: "cursor-text",
+        true: "cursor-text border-[var(--themeLight)] dark:border-[var(--themeDark)]",
         false:
           "bg-neutral-100 text-neutral-300 dark:bg-neutral-900 dark:text-neutral-800",
       },
-      progress: {
-        true: "border-neutral-300 dark:border-neutral-800",
-      },
-      colorCode: ThemeList,
     },
     compoundVariants: [
       {
         inTrackRange: false,
         className: "border-transparent",
       },
-      ...Generated,
     ],
 
     defaultVariants: {
       style: "default",
-      colorCode: "neutral",
     },
   },
 );
@@ -138,7 +97,7 @@ export const DayCellNumber = ({
 
   const updateValue = async (value: number) => {
     setDisplayedNumber(value);
-    await changeDay({
+    await RSAUpdateTrackable({
       id: trackable.id,
       day,
       month,
@@ -149,27 +108,16 @@ export const DayCellNumber = ({
 
   const progress = getProgress(trackable.settings.limits, displayedNumber);
 
-  const findTheme = (): IColorOptions | undefined => {
-    const cc = trackable.settings.colorCoding;
-    if (!cc || !cc.length) return;
-
-    let result: IColorOptions = cc[0]?.color || "neutral";
-
-    for (let i = 0; i < cc.length; i++) {
-      const point = cc[i];
-      if (!point) throw new Error("Error and find color loop");
-
-      if (Number(displayedNumber) < point.from) {
-        return result;
-      }
-
-      result = point.color;
+  const color = useMemo(() => {
+    if (!trackable.settings.colorCoding || displayedNumber === 0) {
+      return presetsMap.neutral;
     }
-
-    return result;
-  };
-
-  const theme = findTheme();
+    return getColorAtPosition({
+      value: trackable.settings.colorCoding,
+      point: displayedNumber,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [displayedNumber]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedUpdateValue = useCallback(debounce(updateValue, 400), [
@@ -201,10 +149,14 @@ export const DayCellNumber = ({
     <div
       className={NumberClasses({
         inTrackRange,
-        colorCode: theme,
         style,
-        progress: progress !== null,
       })}
+      style={
+        {
+          "--themeLight": makeColorString(color.lightMode),
+          "--themeDark": makeColorString(color.darkMode),
+        } as CSSProperties
+      }
       key={day}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
@@ -212,8 +164,7 @@ export const DayCellNumber = ({
       {progress !== null && (
         <div
           className={cls(
-            "z-1 absolute bottom-0 w-full transition-all",
-            activeGenProgress[theme || "neutral"],
+            "z-1 absolute bottom-0 w-full bg-[var(--themeLight)] transition-all dark:bg-[var(--themeDark)]",
           )}
           style={{ height: `${progress}%` }}
         ></div>
@@ -240,7 +191,7 @@ export const DayCellNumber = ({
           <AnimatePresence>
             {!inInputEdit && isHover && style !== "mini" && (
               <>
-                <motion.div
+                <m.div
                   className="absolute left-[50%] top-0 z-20"
                   initial={{
                     opacity: 0,
@@ -258,8 +209,8 @@ export const DayCellNumber = ({
                     onClick={handlePlus}
                     className="h-6 w-6 cursor-pointer border border-neutral-500 bg-neutral-50 p-1 dark:bg-neutral-900"
                   />
-                </motion.div>
-                <motion.div
+                </m.div>
+                <m.div
                   className="absolute bottom-0 left-[50%] z-20"
                   initial={{
                     opacity: 0,
@@ -277,7 +228,7 @@ export const DayCellNumber = ({
                     onClick={handleMinus}
                     className=" h-6 w-6 cursor-pointer border border-neutral-500 bg-neutral-50 p-1 dark:bg-neutral-900"
                   />
-                </motion.div>
+                </m.div>
               </>
             )}
           </AnimatePresence>

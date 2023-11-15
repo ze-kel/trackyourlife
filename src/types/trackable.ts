@@ -1,24 +1,36 @@
 import { z } from "zod";
+import { v4 as uuidv4 } from "uuid";
 
 //
 // Settings
 //
-export const colorOption = z.enum([
-  "neutral",
-  "green",
-  "lime",
-  "red",
-  "blue",
-  "purple",
-  "pink",
-  "orange",
-]);
 
-export type IColorOptions = z.infer<typeof colorOption>;
+export const colorRGB = z.object({
+  r: z.number().min(0).max(255).default(0),
+  g: z.number().min(0).max(255).default(0),
+  b: z.number().min(0).max(255).default(0),
+});
+
+export type IColorRGB = z.infer<typeof colorRGB>;
+
+export const colorHSL = z.object({
+  h: z.number().min(0).max(360).default(0),
+  s: z.number().min(0).max(100).default(0),
+  l: z.number().min(0).max(100).default(0),
+});
+
+export type IColorHSL = z.infer<typeof colorHSL>;
+
+export const ZColorValue = z.object({
+  lightMode: colorHSL,
+  darkMode: colorHSL,
+});
+
+export type IColorValue = z.infer<typeof ZColorValue>;
 
 const basics = {
   name: z.string().default("Unnamed Trackable").optional(),
-  startDate: z.coerce.date().optional(),
+  startDate: z.string().datetime().optional(),
   favorite: z.boolean().optional(),
 };
 
@@ -26,8 +38,8 @@ export const ZTrackableSettingsBase = z.object(basics);
 
 export const ZTrackableSettingsBoolean = z.object({
   ...basics,
-  inactiveColor: colorOption.optional(),
-  activeColor: colorOption.optional(),
+  inactiveColor: ZColorValue.optional(),
+  activeColor: ZColorValue.optional(),
 });
 
 export const ZTrackableSettingsNumber = z.object({
@@ -40,13 +52,14 @@ export const ZTrackableSettingsNumber = z.object({
       showProgress: z.boolean().optional(),
     })
     .optional(),
+  colorCodingEnabled: z.boolean().optional(),
   colorCoding: z
     .array(
       z.object({
-        from: z.number(),
-        color: colorOption,
+        point: z.number(),
+        color: ZColorValue,
         // used to key inputs when editing, can be changed voluntarily
-        id: z.string().optional(),
+        id: z.string().uuid().default(uuidv4),
       }),
     )
     .optional(),
@@ -60,7 +73,7 @@ export const ZTrackableSettingsRange = z.object({
         internalKey: z.string().min(1),
         emoji: z.string().emoji(),
         // used to key inputs when editing, can be changed voluntarily
-        id: z.string().optional(),
+        id: z.string().uuid().default(uuidv4),
       }),
     )
     .optional(),

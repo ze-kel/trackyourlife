@@ -1,6 +1,5 @@
 "use client";
 import type { IRangeSettings } from "@t/trackable";
-import GenericInput from "@components/_UI/Input";
 import cloneDeep from "lodash/cloneDeep";
 import { useState } from "react";
 import clsx from "clsx";
@@ -13,7 +12,6 @@ import {
 } from "@radix-ui/react-icons";
 import type { ArrayElement } from "@t/helpers";
 import { v4 as uuidv4 } from "uuid";
-import { z } from "zod";
 import emojiRegex from "emoji-regex";
 import { Button } from "@/components/ui/button";
 import {
@@ -88,14 +86,11 @@ const Pair = ({
 
       <HoverCard>
         <HoverCardTrigger>
-          <GenericInput
+          <Input
             value={value.emoji}
-            onChange={selectEmoji}
-            schema={z.string().emoji("")}
+            onChange={(e) => selectEmoji(e.target.value)}
             className="w-10"
-            noError
-            updateFromOnchage
-          ></GenericInput>
+          />
         </HoverCardTrigger>
         <HoverCardContent>
           <div className="">

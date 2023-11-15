@@ -5,7 +5,7 @@ import DayCell from "../DayCell";
 import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
 import clsx from "clsx";
 import { Button } from "@/components/ui/button";
-import { ITrackable } from "@t/trackable";
+import type { ITrackable } from "@t/trackable";
 
 const Month = ({
   month,
@@ -134,12 +134,93 @@ const Decade = ({
   );
 };
 
+const ViewController = ({
+  year,
+  month,
+  increment,
+  setView,
+  isCurrentMonth,
+  openCurrentMonth,
+}: {
+  year?: number;
+  month?: number;
+  isCurrentMonth: boolean;
+  setView: (v: TView) => void;
+  increment: (v: number) => void;
+  openCurrentMonth: () => void;
+}) => {
+  return (
+    <div className="mb-4 flex flex-col-reverse gap-2 md:flex-row md:items-center md:justify-between">
+      <div className="flex items-baseline gap-2 self-center">
+        {typeof year === "number" && (
+          <Button name="year" variant="ghost" onClick={() => setView("years")}>
+            {year}
+          </Button>
+        )}
+
+        {typeof year === "number" && typeof month === "number" && (
+          <>
+            <div className="text-xl font-light text-neutral-200 dark:text-neutral-800">
+              /
+            </div>
+            <Button
+              name="months"
+              variant="ghost"
+              onClick={() => setView("months")}
+            >
+              {format(new Date(year, month, 1), "MMMM")}
+            </Button>
+          </>
+        )}
+      </div>
+      <div className="flex w-fit gap-2 self-end">
+        <Button
+          name="prevous month"
+          onClick={() => increment(-1)}
+          variant="outline"
+          size="icon"
+        >
+          <ChevronLeftIcon className="h-4 w-4" />
+        </Button>
+        <Button
+          name="next month"
+          onClick={() => increment(1)}
+          variant="outline"
+          size="icon"
+        >
+          <ChevronRightIcon className="h-4 w-4" />
+        </Button>
+        <Button
+          name="current month"
+          variant="outline"
+          onClick={openCurrentMonth}
+          disabled={isCurrentMonth}
+        >
+          Today
+        </Button>
+      </div>
+    </div>
+  );
+};
+
 type TView = "days" | "months" | "years";
 
-const TrackableView = ({ trackable }: { trackable: ITrackable }) => {
+const TrackableView = ({
+  trackable,
+  y,
+  m,
+}: {
+  y?: number;
+  m?: number;
+  trackable: ITrackable;
+}) => {
   const now = new Date();
-  const [year, setYear] = useState(now.getFullYear());
-  const [month, setMonth] = useState(now.getMonth());
+  const [year, setYear] = useState(
+    typeof y === "number" ? y : new Date().getFullYear(),
+  );
+  const [month, setMonth] = useState(
+    typeof m === "number" ? m : new Date().getMonth(),
+  );
   const [view, setView] = useState<TView>("days");
 
   const [yearOffset, setyearOffset] = useState(0);
@@ -190,41 +271,14 @@ const TrackableView = ({ trackable }: { trackable: ITrackable }) => {
 
   return (
     <>
-      <div className="mb-4 flex items-center justify-between">
-        <div className="flex items-baseline gap-2">
-          {view !== "years" && (
-            <Button variant="ghost" onClick={() => setView("years")}>
-              {year}
-            </Button>
-          )}
-
-          {view === "days" && (
-            <>
-              <div className="text-xl font-light text-neutral-200 dark:text-neutral-800">
-                /
-              </div>
-              <Button variant={"ghost"} onClick={() => setView("months")}>
-                {format(new Date(year, month, 1), "MMMM")}
-              </Button>
-            </>
-          )}
-        </div>
-        <div className="flex gap-2">
-          <Button onClick={() => increment(-1)} variant="outline" size="icon">
-            <ChevronLeftIcon className="h-4 w-4" />
-          </Button>
-          <Button onClick={() => increment(1)} variant="outline" size="icon">
-            <ChevronRightIcon className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="outline"
-            onClick={openCurrentMonth}
-            disabled={isCurrentMonth}
-          >
-            Today
-          </Button>
-        </div>
-      </div>
+      <ViewController
+        year={year}
+        month={month}
+        isCurrentMonth={isCurrentMonth}
+        setView={setView}
+        openCurrentMonth={openCurrentMonth}
+        increment={increment}
+      />
       {view === "days" && (
         <Month trackable={trackable} year={year} month={month} />
       )}

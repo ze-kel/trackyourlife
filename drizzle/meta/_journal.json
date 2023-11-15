@@ -1,0 +1,13 @@
+{
+  "version": "5",
+  "dialect": "pg",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1700062832925,
+      "tag": "0000_careful_the_initiative",
+      "breakpoints": true
+    }
+  ]
+}

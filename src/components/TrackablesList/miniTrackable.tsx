@@ -1,4 +1,4 @@
-"use server";
+"use client";
 import DayCell from "@components/DayCell";
 import type { ITrackable } from "@t/trackable";
 import clsx from "clsx";

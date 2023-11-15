@@ -2,9 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
-  experimental: {
-    serverActions: true,
-  },
+  output: "standalone",
 };
 
-module.exports = nextConfig;
+module.exports = nextConfig

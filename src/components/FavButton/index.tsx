@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { HeartFilledIcon, HeartIcon } from "@radix-ui/react-icons";
 import type { ITrackable } from "@t/trackable";
 import { useState, useEffect } from "react";
-import { updateSettings } from "src/helpers/actions";
+import { RSAUpdateTrackableSettings } from "src/app/api/trackables/serverActions";
 
 function useOptimistic<T>(passthrough: T) {
   const [value, setValue] = useState<T>(passthrough);
@@ -20,9 +20,9 @@ const FavButton = ({ trackable }: { trackable: ITrackable }) => {
 
   const switchFav = async () => {
     setVal(!trackable.settings.favorite);
-    await updateSettings({
-      id: trackable.id,
-      settings: {
+    await RSAUpdateTrackableSettings({
+      trackableId: trackable.id,
+      data: {
         ...trackable.settings,
         favorite: !trackable.settings.favorite,
       },

@@ -1,17 +1,13 @@
 "use client";
-import { Button } from "@/components/ui/button";
 import type {
   ITrackableSettings,
   ITrackableUnsaved,
 } from "src/types/trackable";
-import clsx from "clsx";
 import { useState } from "react";
-import { Input } from "@/components/ui/input";
 import cloneDeep from "lodash/cloneDeep";
-import { TrackableSettingsManual } from "@components/TrackableSettings";
-import { getBaseUrl } from "src/helpers/getBaseUrl";
-import { useRouter } from "next/navigation";
+import TrackableSettings from "@components/TrackableSettings";
 import { RadioTabItem, RadioTabs } from "@/components/ui/radio-tabs";
+import { RSACreateTrackable } from "src/app/api/trackables/serverActions";
 
 const Create = () => {
   const [newOne, setNewOne] = useState<ITrackableUnsaved>({
@@ -19,25 +15,6 @@ const Create = () => {
     data: {},
     settings: { name: "" },
   });
-  const router = useRouter();
-
-  const create = async () => {
-    const res = await fetch(`${getBaseUrl()}/api/trackables`, {
-      method: "PUT",
-      body: JSON.stringify(newOne),
-      credentials: "include",
-    });
-
-    if (res.redirected) {
-      router.push(res.url);
-    }
-  };
-
-  const updateName = (name: string) => {
-    const update = cloneDeep(newOne);
-    update.settings.name = name;
-    setNewOne(update);
-  };
 
   const setType = (type: ITrackableUnsaved["type"]) => {
     // This assumes that all settings fields are optional
@@ -45,54 +22,36 @@ const Create = () => {
     update.type = type;
     setNewOne(update);
   };
-
-  const setSettings = (settings: ITrackableSettings) => {
-    const update = cloneDeep(newOne);
-    update.settings = settings;
-    setNewOne(update);
+  const createTrackable = async (settings: ITrackableSettings) => {
+    await RSACreateTrackable({ ...newOne, settings });
   };
 
   return (
-    <>ё
-      <div className="content-container flex flex-col gap-2">
-        <h3 className="w-full bg-inherit text-2xl font-semibold">
-          Create new Trackable
-        </h3>
-        <RadioTabs
-          value={newOne.type}
-          onValueChange={(v) => setType(v as ITrackableUnsaved["type"])}
-          className="mt-2"
-        >
-          <RadioTabItem value="boolean" id="boolean" className="w-full">
-            Boolean
-          </RadioTabItem>
-          <RadioTabItem value="number" id="number" className="w-full">
-            Number
-          </RadioTabItem>
-          <RadioTabItem value="range" id="range" className="w-full">
-            Range
-          </RadioTabItem>
-        </RadioTabs>
-        <div>
-          <h3 className="text-xl">Name</h3>
-          <Input
-            placeholder="Name"
-            className={clsx("my-2 w-fit")}
-            value={newOne.settings.name}
-            onChange={(e) => updateName(e.target.value)}
-          />
-        </div>
-        <TrackableSettingsManual trackable={newOne} setSettings={setSettings} />
-
-        <Button
-          onClick={() => void create()}
-          className="mt-5 w-full"
-          variant={"outline"}
-        >
-          Create
-        </Button>
-      </div>
-    </>
+    <div className="content-container flex flex-col gap-2">
+      <h3 className="w-full bg-inherit text-2xl font-semibold">
+        Create new Trackable
+      </h3>
+      <RadioTabs
+        value={newOne.type}
+        onValueChange={(v) => setType(v as ITrackableUnsaved["type"])}
+        className="mt-2"
+      >
+        <RadioTabItem value="boolean" id="boolean" className="w-full">
+          Boolean
+        </RadioTabItem>
+        <RadioTabItem value="number" id="number" className="w-full">
+          Number
+        </RadioTabItem>
+        <RadioTabItem value="range" id="range" className="w-full">
+          Range
+        </RadioTabItem>
+      </RadioTabs>
+      <TrackableSettings
+        trackable={newOne}
+        handleSave={createTrackable}
+        customSaveButtonText="Create"
+      />
+    </div>
   );
 };
 
