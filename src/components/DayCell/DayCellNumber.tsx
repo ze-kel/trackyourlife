@@ -1,50 +1,19 @@
 "use client";
 import cls from "clsx";
 import type React from "react";
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { useCallback, useMemo, useState } from "react";
 import clamp from "lodash/clamp";
 import debounce from "lodash/debounce";
 import EditableText from "@components/EditableText";
 import IconPlus from "@heroicons/react/24/outline/PlusIcon";
 import IconMinus from "@heroicons/react/24/outline/MinusIcon";
-import { cva } from "class-variance-authority";
-import type { IDayProps } from "./index";
-import { computeDayCellHelpers } from "./index";
 import type { INumberSettings } from "@t/trackable";
 import { AnimatePresence, m } from "framer-motion";
-import DayNumber from "@components/DayCell/dayNumber";
-import { RSAUpdateTrackable } from "src/app/api/trackables/serverActions";
 import { presetsMap } from "@components/Colors/presets";
 import { makeColorString } from "src/helpers/colorTools";
 import { getColorAtPosition } from "@components/Colors/numberColorSelector";
-
-const NumberClasses = cva(
-  ["group relative items-center justify-center font-light transition-colors"],
-  {
-    variants: {
-      style: {
-        default: "h-16 border-2",
-        mini: "border h-6",
-      },
-      inTrackRange: {
-        true: "cursor-text border-[var(--themeLight)] dark:border-[var(--themeDark)]",
-        false:
-          "bg-neutral-100 text-neutral-300 dark:bg-neutral-900 dark:text-neutral-800",
-      },
-    },
-    compoundVariants: [
-      {
-        inTrackRange: false,
-        className: "border-transparent",
-      },
-    ],
-
-    defaultVariants: {
-      style: "default",
-    },
-  },
-);
+import { cn } from "@/lib/utils";
 
 const getProgress = (
   limits: INumberSettings["limits"],
@@ -65,55 +34,39 @@ const getProgress = (
 };
 
 export const DayCellNumber = ({
-  trackable,
-  day,
-  month,
-  year,
-  style,
-}: IDayProps) => {
-  if (trackable.type !== "number") {
-    throw new Error("Not number trackable passed to number dayCell");
-  }
-
-  const { dateKey, inTrackRange, isToday } = useMemo(
-    () =>
-      computeDayCellHelpers({
-        day,
-        month,
-        year,
-        startDate: trackable.settings.startDate,
-      }),
-    [day, month, year, trackable.settings.startDate],
-  );
-
+  value,
+  onChange,
+  settings,
+  children,
+  className,
+}: {
+  value?: string;
+  onChange?: (v: string) => Promise<void> | void;
+  settings: INumberSettings;
+  children: ReactNode;
+  className?: string;
+}) => {
   // Not using optimistic here because it resets when leaving hover for some reason
-  const [displayedNumber, setDisplayedNumber] = useState(
-    Number(trackable.data[dateKey] || 0),
-  );
+  const [displayedNumber, setDisplayedNumber] = useState(Number(value || 0));
 
   const [inInputEdit, setInInputEdit] = useState(false);
 
   const [isHover, setHover] = useState(false);
 
   const updateValue = async (value: number) => {
-    setDisplayedNumber(value);
-    await RSAUpdateTrackable({
-      id: trackable.id,
-      day,
-      month,
-      year,
-      value: String(value),
-    });
+    if (onChange) {
+      await onChange(String(value));
+    }
   };
 
-  const progress = getProgress(trackable.settings.limits, displayedNumber);
+  const progress = getProgress(settings.limits, displayedNumber);
 
   const color = useMemo(() => {
-    if (!trackable.settings.colorCoding || displayedNumber === 0) {
+    if (!settings.colorCoding || displayedNumber === 0) {
       return presetsMap.neutral;
     }
     return getColorAtPosition({
-      value: trackable.settings.colorCoding,
+      value: settings.colorCoding,
       point: displayedNumber,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -121,9 +74,7 @@ export const DayCellNumber = ({
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedUpdateValue = useCallback(debounce(updateValue, 400), [
-    day,
-    month,
-    year,
+    updateValue,
   ]);
 
   const handlePlus = (e: React.MouseEvent) => {
@@ -147,17 +98,18 @@ export const DayCellNumber = ({
   };
   return (
     <div
-      className={NumberClasses({
-        inTrackRange,
-        style,
-      })}
+      className={cn(
+        className,
+        "items-center justify-center overflow-visible",
+        "transition-all ease-in-out",
+        "cursor-text border-[var(--themeLight)] dark:border-[var(--themeDark)]",
+      )}
       style={
         {
           "--themeLight": makeColorString(color.lightMode),
           "--themeDark": makeColorString(color.darkMode),
         } as CSSProperties
       }
-      key={day}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
@@ -169,71 +121,66 @@ export const DayCellNumber = ({
           style={{ height: `${progress}%` }}
         ></div>
       )}
-
-      <DayNumber style={style} day={day} isToday={isToday} />
-      {inTrackRange && (
-        <>
-          <EditableText
-            value={displayedNumber || 0}
-            isNumber={true}
-            updater={handleInputUpdate}
-            saveOnChange={true}
-            className={cls(
-              "relative z-10 flex h-full w-full select-none items-center justify-center bg-inherit text-center font-semibold outline-none transition-all",
-              displayedNumber === 0 && !inInputEdit
-                ? "text-neutral-200 dark:text-neutral-800"
-                : "text-neutral-800 dark:text-neutral-300",
-              style === "mini" ? "text-xs" : "text-xl",
-            )}
-            classNameInput="focus:outline-neutral-300 dark:focus:outline-neutral-600"
-            editModeSetter={setInInputEdit}
-          />
-          <AnimatePresence>
-            {!inInputEdit && isHover && style !== "mini" && (
-              <>
-                <m.div
-                  className="absolute left-[50%] top-0 z-20"
-                  initial={{
-                    opacity: 0,
-                    translateY: "-25%",
-                    translateX: "-50%",
-                  }}
-                  animate={{
-                    opacity: 1,
-                    translateY: "-50%",
-                  }}
-                  exit={{ opacity: 0, translateY: "-25%" }}
-                  transition={{ duration: 0.2, opacity: { duration: 0.1 } }}
-                >
-                  <IconPlus
-                    onClick={handlePlus}
-                    className="h-6 w-6 cursor-pointer border border-neutral-500 bg-neutral-50 p-1 dark:bg-neutral-900"
-                  />
-                </m.div>
-                <m.div
-                  className="absolute bottom-0 left-[50%] z-20"
-                  initial={{
-                    opacity: 0,
-                    translateY: "25%",
-                    translateX: "-50%",
-                  }}
-                  animate={{
-                    opacity: 1,
-                    translateY: "50%",
-                  }}
-                  exit={{ opacity: 0, translateY: "25%" }}
-                  transition={{ duration: 0.2, opacity: { duration: 0.1 } }}
-                >
-                  <IconMinus
-                    onClick={handleMinus}
-                    className=" h-6 w-6 cursor-pointer border border-neutral-500 bg-neutral-50 p-1 dark:bg-neutral-900"
-                  />
-                </m.div>
-              </>
-            )}
-          </AnimatePresence>
-        </>
-      )}
+      {children}
+      <EditableText
+        value={displayedNumber || 0}
+        isNumber={true}
+        updater={handleInputUpdate}
+        saveOnChange={true}
+        className={cls(
+          "relative z-10 flex h-full w-full select-none items-center justify-center bg-inherit text-center font-semibold outline-none transition-all",
+          displayedNumber === 0 && !inInputEdit
+            ? "text-neutral-200 dark:text-neutral-800"
+            : "text-neutral-800 dark:text-neutral-300",
+          "text-xl",
+        )}
+        classNameInput="focus:outline-neutral-300 dark:focus:outline-neutral-600"
+        editModeSetter={setInInputEdit}
+      />
+      <AnimatePresence>
+        {!inInputEdit && isHover && (
+          <>
+            <m.div
+              className="absolute left-[50%] top-0 z-20"
+              initial={{
+                opacity: 0,
+                translateY: "-25%",
+                translateX: "-50%",
+              }}
+              animate={{
+                opacity: 1,
+                translateY: "-50%",
+              }}
+              exit={{ opacity: 0, translateY: "-25%" }}
+              transition={{ duration: 0.2, opacity: { duration: 0.1 } }}
+            >
+              <IconPlus
+                onClick={handlePlus}
+                className="h-6 w-6 cursor-pointer border border-neutral-500 bg-neutral-50 p-1 dark:bg-neutral-900"
+              />
+            </m.div>
+            <m.div
+              className="absolute bottom-0 left-[50%] z-20"
+              initial={{
+                opacity: 0,
+                translateY: "25%",
+                translateX: "-50%",
+              }}
+              animate={{
+                opacity: 1,
+                translateY: "50%",
+              }}
+              exit={{ opacity: 0, translateY: "25%" }}
+              transition={{ duration: 0.2, opacity: { duration: 0.1 } }}
+            >
+              <IconMinus
+                onClick={handleMinus}
+                className=" h-6 w-6 cursor-pointer border border-neutral-500 bg-neutral-50 p-1 dark:bg-neutral-900"
+              />
+            </m.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

@@ -49,7 +49,10 @@ export const RSAUpdateTrackable = async (data: ITrackableUpdate) => {
   const userId = await RSAGetUserIdAndRedirect();
 
   const result = await UpdateTrackable({ data, userId });
-  revalidatePath(`/trackables/${result.id}`);
+
+  // Update is handler by react query, we do not need to revalidate
+  // revalidatePath(`/trackables/${result.id}`);
+  // revalidatePath("/");
 
   return result;
 };
@@ -74,10 +77,11 @@ export const RSAUpdateTrackableSettings = async ({
 
   const result = await UpdateTrackableSettings({ trackableId, data, userId });
 
-  revalidatePath(`/trackables/${trackableId}`);
-  revalidatePath(`/`);
+  // revalidatePath(`/trackables/${trackableId}`);
+  // revalidatePath(`/`);
 
   if (redirectToTrackablePage) {
+    revalidatePath(`/trackables/${trackableId}`);
     redirect("/trackables/" + trackableId);
   }
   return result;

@@ -6,14 +6,14 @@ import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
 import clsx from "clsx";
 import { Button } from "@/components/ui/button";
 import type { ITrackable } from "@t/trackable";
+import TrackableProvider from "@components/Providers/TrackableProvider";
+import { ErrorBoundary } from "react-error-boundary";
 
 const Month = ({
   month,
   year,
   mini,
-  trackable,
 }: {
-  trackable: ITrackable;
   month: number;
   year: number;
   mini?: boolean;
@@ -39,7 +39,6 @@ const Month = ({
       ))}
       {dates.map((el) => (
         <DayCell
-          trackable={trackable}
           key={`${month}-${el}`}
           year={year}
           month={month}
@@ -63,9 +62,7 @@ const monthsBeforeToday = (year: number) => {
 const Year = ({
   year,
   openMonth,
-  trackable,
 }: {
-  trackable: ITrackable;
   year: number;
   openMonth: (n: number) => void;
 }) => {
@@ -95,7 +92,7 @@ const Year = ({
             >
               <span>{format(new Date(year, m, 1), "MMMM")}</span>
             </h5>
-            <Month trackable={trackable} year={year} month={m} mini={true} />
+            <Month year={year} month={m} mini={true} />
           </div>
         ))}
       </div>
@@ -206,13 +203,13 @@ const ViewController = ({
 type TView = "days" | "months" | "years";
 
 const TrackableView = ({
-  trackable,
   y,
   m,
+  id,
 }: {
   y?: number;
   m?: number;
-  trackable: ITrackable;
+  id: ITrackable["id"];
 }) => {
   const now = new Date();
   const [year, setYear] = useState(
@@ -270,7 +267,7 @@ const TrackableView = ({
   };
 
   return (
-    <>
+    <TrackableProvider id={id}>
       <ViewController
         year={year}
         month={month}
@@ -279,16 +276,18 @@ const TrackableView = ({
         openCurrentMonth={openCurrentMonth}
         increment={increment}
       />
-      {view === "days" && (
-        <Month trackable={trackable} year={year} month={month} />
-      )}
-      {view === "months" && (
-        <Year trackable={trackable} year={year} openMonth={openMonth} />
-      )}
-      {view === "years" && (
-        <Decade yearOffset={yearOffset} openYear={openYear} />
-      )}
-    </>
+      <ErrorBoundary
+        fallbackRender={({ error }: { error: Error }) => {
+          return <div>{error.message}</div>;
+        }}
+      >
+        {view === "days" && <Month year={year} month={month} />}
+        {view === "months" && <Year year={year} openMonth={openMonth} />}
+        {view === "years" && (
+          <Decade yearOffset={yearOffset} openYear={openYear} />
+        )}
+      </ErrorBoundary>
+    </TrackableProvider>
   );
 };
 

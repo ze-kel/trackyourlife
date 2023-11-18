@@ -1,86 +1,36 @@
 "use client";
-import type { CSSProperties, MouseEvent } from "react";
-import { useMemo, useRef, useState } from "react";
-import type { IDayProps } from "./index";
-import { computeDayCellHelpers } from "./index";
+import type { CSSProperties, MouseEvent, ReactNode } from "react";
+import { useRef, useState } from "react";
 import cls from "clsx";
-import { cva } from "class-variance-authority";
 import { AnimatePresence, m } from "framer-motion";
-import DayNumber from "@components/DayCell/dayNumber";
 import clamp from "lodash/clamp";
 import { useOptimistic } from "react";
-import { RSAUpdateTrackable } from "src/app/api/trackables/serverActions";
 import { presetsMap } from "@components/Colors/presets";
 import { makeColorString } from "src/helpers/colorTools";
-
-const BooleanClasses = cva(
-  [
-    "relative overflow-hidden border-transparent transition-all duration-400 ease-in-out select-none outline-none focus:outline-neutral-300 dark:focus:outline-neutral-600",
-  ],
-  {
-    variants: {
-      style: {
-        default: "h-16 border-2",
-        mini: "h-6 border",
-      },
-      inTrackRange: {
-        true: "cursor-pointer",
-        false: "cursor-default bg-neutral-100 dark:bg-neutral-900",
-      },
-      active: {
-        true: "",
-        false: "",
-      },
-    },
-    compoundVariants: [
-      {
-        active: false,
-        inTrackRange: true,
-        className:
-          "border-[var(--themeInactiveLight)] hover:border-[var(--themeActiveLight)] dark:border-[var(--themeInactiveDark)] dark:hover:border-[var(--themeActiveDark)]",
-      },
-      {
-        active: true,
-        inTrackRange: true,
-        className:
-          "hover:border-[var(--themeInactiveLight)] border-[var(--themeActiveLight)] dark:hover:border-[var(--themeInactiveDark)] dark:border-[var(--themeActiveDark)]",
-      },
-    ],
-    defaultVariants: {
-      style: "default",
-    },
-  },
-);
+import { cn } from "@/lib/utils";
+import type { IBooleanSettings } from "@t/trackable";
 
 const ANIMATION_TIME = 0.3;
 const EASE = [0, 0.2, 0.5, 1];
 
 export const DayCellBoolean = ({
-  trackable,
-  day,
-  month,
-  year,
-  style,
-}: IDayProps) => {
-  if (trackable.type !== "boolean") {
-    throw new Error("Not boolena trackable passed to boolean dayCell");
-  }
-
-  const { dateKey, inTrackRange, isToday } = useMemo(
-    () =>
-      computeDayCellHelpers({
-        day,
-        month,
-        year,
-        startDate: trackable.settings.startDate,
-      }),
-    [day, month, year, trackable.settings.startDate],
-  );
-
+  value,
+  onChange,
+  settings,
+  children,
+  className,
+}: {
+  value?: string;
+  onChange?: (v: string) => Promise<void> | void;
+  settings: IBooleanSettings;
+  children: ReactNode;
+  className?: string;
+}) => {
   const [isActive, setIsActive] = useOptimistic(
-    trackable.data[dateKey] === "true",
-    (_, value: boolean) => {
-      return value;
+    value === "true",
+    (_, v: boolean) => {
+      console.log("opt call");
+      return v;
     },
   );
 
@@ -110,22 +60,16 @@ export const DayCellBoolean = ({
       console.warn("DayCellBoolean animation error");
     }
 
-    if (!inTrackRange) return;
-
     const newVal = isActive ? "false" : "true";
 
     setIsActive(newVal === "true");
-    await RSAUpdateTrackable({
-      id: trackable.id,
-      day,
-      month,
-      year,
-      value: newVal,
-    });
+    if (onChange) {
+      await onChange(newVal);
+    }
   };
 
-  const themeActive = trackable.settings.activeColor;
-  const themeInactive = trackable.settings.inactiveColor;
+  const themeActive = settings.activeColor;
+  const themeInactive = settings.inactiveColor;
 
   const activeLight = themeActive?.lightMode || presetsMap.green.lightMode;
   const activeDark = themeActive?.darkMode || presetsMap.green.darkMode;
@@ -144,68 +88,61 @@ export const DayCellBoolean = ({
           "--themeInactiveDark": makeColorString(inactiveDark),
         } as CSSProperties
       }
-      data-value={inTrackRange ? isActive : undefined}
+      data-value={isActive}
       ref={mainRef}
-      tabIndex={inTrackRange ? 0 : -1}
-      className={cls(
-        BooleanClasses({
-          inTrackRange,
-          active: isActive,
-          style,
-        }),
+      tabIndex={0}
+      className={cn(
+        className,
+        "transition-all ease-in-out",
+        isActive
+          ? "border-[var(--themeActiveLight)] hover:border-[var(--themeInactiveLight)] dark:border-[var(--themeActiveDark)] dark:hover:border-[var(--themeInactiveDark)]"
+          : "border-[var(--themeInactiveLight)] hover:border-[var(--themeActiveLight)] dark:border-[var(--themeInactiveDark)] dark:hover:border-[var(--themeActiveDark)]",
       )}
-      disabled={!inTrackRange}
-      key={day}
       onMouseDown={(e) => e.preventDefault()}
       onClick={(e) => void handleClick(e)}
     >
-      {inTrackRange && (
-        <>
-          {/* This is a background layer with color we're animating from */}
-          <div
-            className={cls(
-              "absolute left-0 top-0 h-full  w-full",
-              isActive
-                ? "bg-[var(--themeInactiveLight)] dark:bg-[var(--themeInactiveDark)]"
-                : "bg-[var(--themeActiveLight)] dark:bg-[var(--themeActiveDark)]",
-            )}
-          ></div>
-          {/* This is animating layer with with active color */}
-          <AnimatePresence initial={false}>
-            <m.div
-              key={String(isActive)}
-              initial={{
-                scaleX: 0,
-                scaleY: 0,
-              }}
-              animate={{
-                scaleX: 1.2,
-                scaleY: 1.2,
-              }}
-              transition={{
-                duration: ANIMATION_TIME,
-                ease: EASE,
-                scaleY: {
-                  duration: ANIMATION_TIME * whRatio,
-                  ease: EASE,
-                },
-              }}
-              className={cls(
-                "absolute left-0 top-0 h-full  w-full",
-                isActive
-                  ? "bg-[var(--themeActiveLight)] dark:bg-[var(--themeActiveDark)]"
-                  : "bg-[var(--themeInactiveLight)] dark:bg-[var(--themeInactiveDark)]",
-              )}
-              style={{
-                transformOrigin: `
+      {/* This is a background layer with color we're animating from */}
+      <div
+        className={cls(
+          "absolute left-0 top-0 h-full w-full",
+          isActive
+            ? "bg-[var(--themeInactiveLight)] dark:bg-[var(--themeInactiveDark)]"
+            : "bg-[var(--themeActiveLight)] dark:bg-[var(--themeActiveDark)]",
+        )}
+      ></div>
+      {/* This is animating layer with with active color */}
+      <AnimatePresence initial={false}>
+        <m.div
+          key={String(isActive)}
+          initial={{
+            scaleX: 0,
+            scaleY: 0,
+          }}
+          animate={{
+            scaleX: 1.2,
+            scaleY: 1.2,
+          }}
+          transition={{
+            duration: ANIMATION_TIME,
+            ease: EASE,
+            scaleY: {
+              duration: ANIMATION_TIME * whRatio,
+              ease: EASE,
+            },
+          }}
+          className={cls(
+            "absolute left-0 top-0 h-full  w-full",
+            isActive
+              ? "bg-[var(--themeActiveLight)] dark:bg-[var(--themeActiveDark)]"
+              : "bg-[var(--themeInactiveLight)] dark:bg-[var(--themeInactiveDark)]",
+          )}
+          style={{
+            transformOrigin: `
               ${clickPoint[0] || 50}% ${clickPoint[1] || 50}%`,
-              }}
-            />
-          </AnimatePresence>
-        </>
-      )}
-
-      <DayNumber style={style} day={day} isToday={isToday} />
+          }}
+        />
+      </AnimatePresence>
+      {children}
     </button>
   );
 };

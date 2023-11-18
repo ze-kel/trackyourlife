@@ -8,7 +8,7 @@ import { range } from "src/helpers/animation";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { InterpolateColors, makeColorString } from "src/helpers/colorTools";
-import { ColorDisplay } from "@components/Colors/presetsPanel";
+import { ColorDisplay } from "@components/Colors/colorDisplay";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { Cross1Icon, PlusCircledIcon } from "@radix-ui/react-icons";

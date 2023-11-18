@@ -4,26 +4,21 @@ import {
   DropdownContent,
   DropdownTrigger,
 } from "@components/Dropdown";
-import { cva } from "class-variance-authority";
-import { useMemo, useState } from "react";
-import type { IDayProps } from "./index";
-import { computeDayCellHelpers } from ".";
+import type { ReactNode } from "react";
+import { useState } from "react";
 import style from "./curstomScrollbar.module.css";
 
-import type { IRangeSettings, ITrackable } from "@t/trackable";
+import type { IRangeSettings } from "@t/trackable";
 import clsx from "clsx";
 import { AnimatePresence, m } from "framer-motion";
-import DayNumber from "@components/DayCell/dayNumber";
 import { useOptimistic } from "react";
-import { RSAUpdateTrackable } from "src/app/api/trackables/serverActions";
+import { cn } from "@/lib/utils";
 
-const getRangeLabelMapping = (trackable: ITrackable) => {
-  if (trackable.type !== "range" || !trackable.settings.labels) return;
-
-  const labels = trackable.settings.labels;
+const getRangeLabelMapping = (settings: IRangeSettings) => {
+  if (!settings.labels) return;
 
   const map: Record<string, string> = {};
-  labels.forEach((v) => {
+  settings.labels.forEach((v) => {
     map[v.internalKey] = v.emoji;
   });
 
@@ -32,7 +27,7 @@ const getRangeLabelMapping = (trackable: ITrackable) => {
 
 interface PopupSelectorProps {
   rangeMapping: IRangeSettings["labels"];
-  onSelect: (v: string) => Promise<void>;
+  onSelect: (v: string) => void;
 }
 
 // Animation time multiplier. Keep at 1, unless you're debugging.
@@ -193,46 +188,20 @@ const PopupSelector = ({ rangeMapping, onSelect }: PopupSelectorProps) => {
   );
 };
 
-const RangeClasses = cva(
-  [
-    "group w-full relative box-border flex items-center justify-center font-light transition-colors outline-none focus:outline-neutral-300 dark:focus:outline-neutral-600",
-  ],
-  {
-    variants: {
-      inTrackRange: {
-        true: "cursor-pointer border-neutral-200 dark:border-neutral-900",
-        false:
-          "bg-neutral-100 text-neutral-300 dark:bg-neutral-900 dark:text-neutral-800 border-transparent",
-      },
-      style: {
-        default: "h-16 border-2",
-        mini: "h-6 border text-xs",
-      },
-    },
-    compoundVariants: [
-      {
-        inTrackRange: true,
-        className: "text-neutral-500  dark:text-neutral-700",
-      },
-    ],
-    defaultVariants: {
-      style: "default",
-    },
-  },
-);
-
 export const DayCellRange = ({
-  trackable,
-  day,
-  month,
-  year,
-  style,
-}: IDayProps) => {
-  const rangeLabelMapping = getRangeLabelMapping(trackable);
-
-  if (trackable.type !== "range") {
-    throw new Error("Not range trackable passed to trackable dayCell");
-  }
+  value,
+  onChange,
+  settings,
+  children,
+  className,
+}: {
+  value?: string;
+  onChange?: (v: string) => Promise<void> | void;
+  settings: IRangeSettings;
+  children: ReactNode;
+  className?: string;
+}) => {
+  const rangeLabelMapping = getRangeLabelMapping(settings);
 
   if (!rangeLabelMapping) {
     throw new Error("Range label mapping error");
@@ -240,53 +209,19 @@ export const DayCellRange = ({
 
   const [isSelecting, setIsSelecting] = useState(false);
 
-  const { dateKey, inTrackRange, isToday } = useMemo(
-    () =>
-      computeDayCellHelpers({
-        day,
-        month,
-        year,
-        startDate: trackable.settings.startDate,
-      }),
-    [day, month, year, trackable.settings.startDate],
-  );
-
-  const [dayValue, setIsActive] = useOptimistic(
-    trackable.data[dateKey],
-    (_, value: string) => {
-      return value;
-    },
-  );
+  const [dayValue, setIsActive] = useOptimistic(value, (_, value: string) => {
+    return value;
+  });
 
   const em = dayValue ? (rangeLabelMapping[dayValue] as string) : "❓";
 
   const handleSelect = async (v: string) => {
     setIsSelecting(false);
     setIsActive(v);
-    await RSAUpdateTrackable({
-      id: trackable.id,
-      day,
-      month,
-      year,
-      value: v,
-    });
+    if (onChange) {
+      await onChange(v);
+    }
   };
-
-  const visiblePart = (
-    <button
-      tabIndex={inTrackRange ? 0 : -1}
-      className={RangeClasses({
-        inTrackRange,
-        style,
-      })}
-      disabled={!inTrackRange}
-      key={day}
-    >
-      <DayNumber style={style} day={day} isToday={isToday} />
-
-      {dayValue && <div className="text-xl">{em}</div>}
-    </button>
-  );
 
   return (
     <>
@@ -296,11 +231,25 @@ export const DayCellRange = ({
         background={false}
         placeCenter={true}
       >
-        <DropdownTrigger>{visiblePart}</DropdownTrigger>
+        <DropdownTrigger>
+          <button
+            tabIndex={0}
+            className={cn(
+              className,
+              "flex items-center justify-center",
+              "transition-colors",
+              "cursor-pointer border-neutral-200 dark:border-neutral-900",
+              "text-neutral-500  dark:text-neutral-700",
+            )}
+          >
+            {children}
+            {dayValue && <div className="text-xl">{em}</div>}
+          </button>
+        </DropdownTrigger>
         <DropdownContent>
           <PopupSelector
-            rangeMapping={trackable.settings.labels}
-            onSelect={handleSelect}
+            rangeMapping={settings.labels}
+            onSelect={(v) => void handleSelect(v)}
           />
         </DropdownContent>
       </Dropdown>

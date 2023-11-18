@@ -1,5 +1,5 @@
 import ColorPicker from "@components/Colors";
-import { ColorDisplay } from "@components/Colors/presetsPanel";
+import { ColorDisplay } from "@components/Colors/colorDisplay";
 import {
   Dropdown,
   DropdownTrigger,
