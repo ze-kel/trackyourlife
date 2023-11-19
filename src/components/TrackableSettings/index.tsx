@@ -17,6 +17,7 @@ import { v4 as uuidv4 } from "uuid";
 import { presetsMap } from "@components/Colors/presets";
 import ColorInput from "@components/Colors/colorInput";
 import { Button } from "@/components/ui/button";
+import { DropdownMobileTitleProvider } from "@components/Dropdown";
 
 export const SettingsBoolean = ({
   settings,
@@ -27,18 +28,22 @@ export const SettingsBoolean = ({
     <>
       <div>
         <h3 className="mb-2 text-xl">Checked color</h3>
-        <ColorInput
-          value={settings.current.activeColor || presetsMap.green}
-          onChange={(v) => (settings.current.activeColor = v)}
-        ></ColorInput>
+        <DropdownMobileTitleProvider title="Checked color">
+          <ColorInput
+            value={settings.current.activeColor || presetsMap.green}
+            onChange={(v) => (settings.current.activeColor = v)}
+          />
+        </DropdownMobileTitleProvider>
       </div>
 
       <div>
         <h3 className="mb-2 text-xl">Unchecked color</h3>
-        <ColorInput
-          value={settings.current.inactiveColor || presetsMap.neutral}
-          onChange={(v) => (settings.current.inactiveColor = v)}
-        ></ColorInput>
+        <DropdownMobileTitleProvider title="Unchecked color">
+          <ColorInput
+            value={settings.current.inactiveColor || presetsMap.neutral}
+            onChange={(v) => (settings.current.inactiveColor = v)}
+          ></ColorInput>
+        </DropdownMobileTitleProvider>
       </div>
     </>
   );
@@ -117,16 +122,18 @@ const TrackableSettings = ({
 
       <div>
         <h3 className="text-xl">Tracking Start</h3>
-        <DatePicker
-          date={
-            settings.current.startDate
-              ? new Date(settings.current.startDate)
-              : undefined
-          }
-          onChange={(v) => (settings.current.startDate = String(v))}
-          limits={{ start: new Date(1990, 0, 1), end: new Date() }}
-          className="mt-2"
-        />
+        <DropdownMobileTitleProvider title="Tracking Start">
+          <DatePicker
+            date={
+              settings.current.startDate
+                ? new Date(settings.current.startDate)
+                : undefined
+            }
+            onChange={(v) => (settings.current.startDate = String(v))}
+            limits={{ start: new Date(1990, 0, 1), end: new Date() }}
+            className="mt-2"
+          />
+        </DropdownMobileTitleProvider>
       </div>
 
       {trackable.type === "boolean" && <SettingsBoolean settings={settings} />}

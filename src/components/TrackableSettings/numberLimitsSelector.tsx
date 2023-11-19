@@ -1,9 +1,9 @@
 import { Input } from "@/components/ui/input";
 import type { INumberSettings } from "@t/trackable";
-import clsx from "clsx";
 import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { cn } from "@/lib/utils";
 
 export interface IRangeLabelSelector {
   value: INumberSettings["limits"];
@@ -33,13 +33,13 @@ const NumberLimitsSelector = ({
   };
 
   return (
-    <div className={clsx("flex flex-col gap-1", className)}>
-      <div className="flex gap-2 text-neutral-400 dark:text-neutral-500">
-        <div className="w-52">Min</div>
-        <div className="w-52">Max</div>
-      </div>
+    <div className={cn("flex flex-col gap-2", className)}>
+      <div className="grid w-fit grid-cols-1 gap-1 sm:grid-cols-2 sm:gap-x-3">
+        <div className="w-52 text-neutral-400 dark:text-neutral-500">Min</div>
+        <div className="w-52 text-neutral-400 dark:text-neutral-500 max-sm:row-start-3 max-sm:row-end-3">
+          Max
+        </div>
 
-      <div className="flex gap-2">
         <Input
           className="w-52"
           value={String(innerValue?.min)}
@@ -52,6 +52,7 @@ const NumberLimitsSelector = ({
           error={isError}
           type="number"
         />
+
         <Input
           className="w-52"
           value={String(innerValue?.max)}

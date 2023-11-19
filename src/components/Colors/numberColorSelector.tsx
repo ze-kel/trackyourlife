@@ -1,4 +1,5 @@
 import type { IColorValue, INumberSettings } from "@t/trackable";
+import type { TouchEvent } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import type { ArrayElement } from "@t/helpers";
@@ -13,6 +14,7 @@ import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { Cross1Icon, PlusCircledIcon } from "@radix-ui/react-icons";
 import { RadioTabItem, RadioTabs } from "@/components/ui/radio-tabs";
+import { useRefSize } from "@components/Colors/contoller";
 
 type IColorCodingValue = INumberSettings["colorCoding"];
 
@@ -121,19 +123,7 @@ const ControllerGradient = ({
 }) => {
   const ref = useRef<HTMLDivElement>(null);
 
-  const [gradientWidth, setGradientWidth] = useState<number>();
-
-  useEffect(() => {
-    const r = () => {
-      if (!ref.current) return;
-      setGradientWidth(ref.current.getBoundingClientRect().width);
-    };
-    r();
-    addEventListener("resize", r);
-    return () => {
-      removeEventListener("resize", r);
-    };
-  });
+  const { width, dataRef } = useRefSize(ref);
 
   const [minInput, setMinInput] = useState<number | null>(
     getActualMin(value[0]?.point, null),
@@ -157,7 +147,7 @@ const ControllerGradient = ({
     if (!ref.current) return;
     const newVal = [...value];
 
-    const { width, left } = ref.current.getBoundingClientRect();
+    const { width, left } = dataRef.current;
     const coordinate = e.clientX - left;
     const point = Math.round(range(0, width, actualMin, actualMax, coordinate));
     const color = getColorAtPosition({ value, point });
@@ -168,52 +158,76 @@ const ControllerGradient = ({
     setSelectedColor(id);
   };
 
-  const [isDragging, setIsDragging] = useState(false);
+  const [isDragging, setIsDragging] = useState(true);
 
-  const startDrag = (e: React.MouseEvent, id: string) => {
-    setSelectedColor(id);
+  const move = (id: string, clientX: number, clientY: number) => {
+    const { width, left, top, height } = dataRef.current;
+    setIsDragging(true);
+    const position = Math.round(
+      range(0, width, actualMin, actualMax, clientX - left),
+    );
+
+    const vertical = clientY - top - height / 2;
+
+    if (Math.abs(vertical) > height * 1.5) {
+      setSelectedColorRemove(Math.abs(vertical) === vertical ? 1 : -1);
+    } else {
+      setSelectedColorRemove(0);
+    }
+
+    setById(id, position);
+  };
+
+  const up = (id: string, clientY: number) => {
+    setIsDragging(false);
+
+    const { top, height } = dataRef.current;
+
+    const vertical = clientY - top - height / 2;
+
+    if (Math.abs(vertical) > height * 1.5 && value.length > 1) {
+      removeColor(id);
+    }
+    setSelectedColorRemove(0);
+  };
+
+  const startMouseDrag = (e: React.MouseEvent, id: string) => {
     // Left click only
     if (e.nativeEvent.button !== 0) return;
 
-    if (!ref.current) return;
-    const { width, left, top, height } = ref.current.getBoundingClientRect();
+    setSelectedColor(id);
 
-    const moveHadler = (e: MouseEvent) => {
-      setIsDragging(true);
+    const moveHandler = (e: MouseEvent) => {
       e.preventDefault();
-      const position = Math.round(
-        range(0, width, actualMin, actualMax, e.clientX - left),
-      );
-
-      const vertical = e.clientY - top - height / 2;
-
-      if (Math.abs(vertical) > height * 1.5) {
-        setSelectedColorRemove(Math.abs(vertical) === vertical ? 1 : -1);
-      } else {
-        setSelectedColorRemove(0);
-      }
-
-      setById(id, position);
+      move(id, e.clientX, e.clientY);
     };
 
     const upHandler = (e: MouseEvent) => {
-      setIsDragging(false);
-      removeEventListener("mousemove", moveHadler);
+      up(id, e.clientY);
+      removeEventListener("mousemove", moveHandler);
       removeEventListener("mouseup", upHandler);
-
-      if (!ref.current) return;
-      const { top, height } = ref.current.getBoundingClientRect();
-
-      const vertical = e.clientY - top - height / 2;
-
-      if (Math.abs(vertical) > height * 1.5 && value.length > 1) {
-        removeColor(id);
-      }
-      setSelectedColorRemove(0);
     };
 
-    addEventListener("mousemove", moveHadler);
+    addEventListener("mousemove", moveHandler);
     addEventListener("mouseup", upHandler);
+  };
+
+  const startTouch = (id: string) => {
+    setSelectedColor(id);
+  };
+
+  const touchMove = (e: TouchEvent, id: string) => {
+    const t = e.touches[0];
+    if (t) {
+      move(id, t.clientX, t.clientY);
+    }
+  };
+
+  const touchEnd = (e: TouchEvent, id: string) => {
+    const t = e.touches[0];
+    if (t) {
+      up(id, t.clientY);
+    }
   };
 
   const removeColor = (id: string) => {
@@ -239,15 +253,15 @@ const ControllerGradient = ({
 
   const updateSelectedColor = (color: IColorValue) => {
     const newVal = [...value];
-    const v = value[selectedColorIndex];
+    const v = newVal[selectedColorIndex];
     if (!v) throw new Error("No value[selectedColorIndex]");
+    newVal[selectedColorIndex] = { ...v, color };
 
-    value[selectedColorIndex] = { ...v, color };
     onChange(newVal);
   };
 
   const { resolvedTheme } = useTheme();
-  const [gradientPreivewTheme, setGradientPreviewTheme] = useState("dark");
+  const [gradientPreviewTheme, setGradientPreviewTheme] = useState("dark");
 
   useEffect(() => {
     setGradientPreviewTheme(resolvedTheme || "");
@@ -255,8 +269,8 @@ const ControllerGradient = ({
 
   return (
     <>
-      <div className="flex gap-2">
-        {isDragging && (
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-[min-content_1fr_min-content_min-content]">
+        {isDragging && false && (
           <div
             className={cn(
               "absolute z-50 h-[200%] w-full -translate-y-1/2 ",
@@ -280,16 +294,16 @@ const ControllerGradient = ({
                 : e.target.valueAsNumber,
             );
           }}
-          className="w-16"
+          className="w-16 "
         />
         <div
-          className="relative box-border flex h-9 w-full cursor-copy rounded-lg border-2 border-neutral-200 bg-transparent text-sm shadow-sm transition-colors  focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-950 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-800 "
+          className="relative box-border flex h-9 w-full cursor-copy rounded-lg border-2 border-neutral-200 bg-transparent text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1  focus-visible:ring-neutral-950 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-800 max-sm:col-span-full max-sm:row-start-2 max-sm:row-end-2 "
           style={{
             background: makeGradient(
               value,
               actualMin,
               actualMax,
-              gradientPreivewTheme,
+              gradientPreviewTheme,
             ),
           }}
           onClick={addColor}
@@ -299,12 +313,15 @@ const ControllerGradient = ({
               return (
                 <div
                   key={v.id}
-                  onMouseDown={(e) => startDrag(e, v.id)}
+                  onTouchStart={() => startTouch(v.id)}
+                  onTouchMove={(e) => touchMove(e, v.id)}
+                  onTouchEnd={(e) => touchEnd(e, v.id)}
+                  onMouseDown={(e) => startMouseDrag(e, v.id)}
                   onClick={(e) => {
                     e.stopPropagation();
                   }}
                   className={cn(
-                    "absolute top-1/2 h-[125%] cursor-grab overflow-hidden rounded-lg border-2 border-transparent",
+                    "absolute top-1/2 h-[125%] cursor-grab touch-none overflow-hidden rounded-lg border-2 border-transparent",
                     v.id === selectedColor &&
                       "z-20 border-neutral-50 dark:border-neutral-950",
                     v.id === selectedColor &&
@@ -314,23 +331,24 @@ const ControllerGradient = ({
                   )}
                   style={{
                     // This is fallback for SSR where we cant get width and therefore cant do Translate()
-                    left: gradientWidth
+                    left: width
                       ? 0
                       : range(actualMin, actualMax, 0, 100, v.point) + "%",
                     transform: `${
-                      gradientWidth
+                      width
                         ? `translateX(calc(-50% + ${
-                            gradientWidth *
-                            range(actualMin, actualMax, 0, 1, v.point)
+                            width * range(actualMin, actualMax, 0, 1, v.point)
                           }px))`
                         : "translateX(-50%)"
                     } translateY(-50%)`,
                   }}
                 >
-                  <div className="h-full rounded-md border-2 border-neutral-950 shadow-lg shadow-neutral-50 dark:border-neutral-50">
+                  <div className="h-full overflow-hidden rounded-md border-2 border-neutral-950 shadow-lg shadow-neutral-50 dark:border-neutral-50">
                     <ColorDisplay
                       color={v.color}
-                      className={cn("box-border h-full w-2 rounded-md border")}
+                      className={cn(
+                        "box-border h-full w-2 overflow-hidden rounded-md border max-sm:w-4",
+                      )}
                     />
                   </div>
                 </div>
@@ -338,36 +356,47 @@ const ControllerGradient = ({
             })}
           </div>
         </div>
-        <Input
-          error={actualMax !== maxInput}
-          value={maxInput === null ? "" : maxInput}
-          type="number"
-          onBlur={setInputsToActual}
-          onChange={(e) => {
-            setMaxInput(
-              Number.isNaN(e.target.valueAsNumber)
-                ? null
-                : e.target.valueAsNumber,
-            );
-          }}
-          className="w-16"
-        />
+        <div className="justify-self-end">
+          <Input
+            error={actualMax !== maxInput}
+            value={maxInput === null ? "" : maxInput}
+            type="number"
+            onBlur={setInputsToActual}
+            onChange={(e) => {
+              setMaxInput(
+                Number.isNaN(e.target.valueAsNumber)
+                  ? null
+                  : e.target.valueAsNumber,
+              );
+            }}
+            className="w-16 "
+          />
+        </div>
 
         <RadioTabs
           suppressHydrationWarning={true}
-          value={gradientPreivewTheme}
+          value={gradientPreviewTheme}
           onValueChange={setGradientPreviewTheme}
+          className="max-sm:col-span-full max-sm:row-start-1 max-sm:row-end-1"
         >
-          <RadioTabItem suppressHydrationWarning={true} value="light">
+          <RadioTabItem
+            suppressHydrationWarning={true}
+            value="light"
+            className="w-full"
+          >
             Light
           </RadioTabItem>
-          <RadioTabItem suppressHydrationWarning={true} value="dark">
+          <RadioTabItem
+            suppressHydrationWarning={true}
+            value="dark"
+            className="w-full"
+          >
             Dark
           </RadioTabItem>
         </RadioTabs>
       </div>
 
-      <div className="flex gap-4">
+      <div className="flex flex-col-reverse gap-4 sm:flex-row">
         <div className="w-full">
           {selectedColorObject && (
             <ColorPicker
@@ -376,7 +405,7 @@ const ControllerGradient = ({
             />
           )}
         </div>
-        <div className="w-full max-w-xs">
+        <div className="w-full sm:max-w-xs">
           <div className="flex h-fit flex-col gap-2 rounded-lg bg-neutral-800 p-1">
             {value.map((v) => (
               <div

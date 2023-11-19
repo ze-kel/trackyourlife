@@ -1,13 +1,11 @@
 "use client";
-import cls from "clsx";
 import type React from "react";
 import type { CSSProperties, ReactNode } from "react";
 import { useCallback, useMemo, useState } from "react";
 import clamp from "lodash/clamp";
 import debounce from "lodash/debounce";
 import EditableText from "@components/EditableText";
-import IconPlus from "@heroicons/react/24/outline/PlusIcon";
-import IconMinus from "@heroicons/react/24/outline/MinusIcon";
+import { PlusIcon, MinusIcon } from "@radix-ui/react-icons";
 import type { INumberSettings } from "@t/trackable";
 import { AnimatePresence, m } from "framer-motion";
 import { presetsMap } from "@components/Colors/presets";
@@ -115,9 +113,9 @@ export const DayCellNumber = ({
     >
       {progress !== null && (
         <div
-          className={cls(
-            "z-1 absolute bottom-0 w-full bg-[var(--themeLight)] transition-all dark:bg-[var(--themeDark)]",
-          )}
+          className={
+            "z-1 absolute bottom-0 w-full bg-[var(--themeLight)] transition-all dark:bg-[var(--themeDark)]"
+          }
           style={{ height: `${progress}%` }}
         ></div>
       )}
@@ -127,7 +125,7 @@ export const DayCellNumber = ({
         isNumber={true}
         updater={handleInputUpdate}
         saveOnChange={true}
-        className={cls(
+        className={cn(
           "relative z-10 flex h-full w-full select-none items-center justify-center bg-inherit text-center font-semibold outline-none transition-all",
           displayedNumber === 0 && !inInputEdit
             ? "text-neutral-200 dark:text-neutral-800"
@@ -154,7 +152,7 @@ export const DayCellNumber = ({
               exit={{ opacity: 0, translateY: "-25%" }}
               transition={{ duration: 0.2, opacity: { duration: 0.1 } }}
             >
-              <IconPlus
+              <PlusIcon
                 onClick={handlePlus}
                 className="h-6 w-6 cursor-pointer border border-neutral-500 bg-neutral-50 p-1 dark:bg-neutral-900"
               />
@@ -173,7 +171,7 @@ export const DayCellNumber = ({
               exit={{ opacity: 0, translateY: "25%" }}
               transition={{ duration: 0.2, opacity: { duration: 0.1 } }}
             >
-              <IconMinus
+              <MinusIcon
                 onClick={handleMinus}
                 className=" h-6 w-6 cursor-pointer border border-neutral-500 bg-neutral-50 p-1 dark:bg-neutral-900"
               />

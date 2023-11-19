@@ -10,12 +10,7 @@ import DayNumber from "@components/DayCell/dayNumber";
 import { cn } from "@/lib/utils";
 import { useTrackableContextSafe } from "@components/Providers/TrackableProvider";
 
-export interface IDayProps {
-  day: number;
-  month: number;
-  year: number;
-  style?: "mini";
-}
+export interface IDayProps {}
 
 export const computeDayCellHelpers = ({
   day,
@@ -34,10 +29,10 @@ export const computeDayCellHelpers = ({
   const dateKey = formatDateKey({ day, month, year });
   const beforeToday = isBefore(dateDay, dateNow);
 
-  const startCovented = startDate ? new Date(startDate) : undefined;
+  const startConvented = startDate ? new Date(startDate) : undefined;
 
-  const afterLimit = startCovented
-    ? isSameDay(dateDay, startCovented) || isAfter(dateDay, startCovented)
+  const afterLimit = startConvented
+    ? isSameDay(dateDay, startConvented) || isAfter(dateDay, startConvented)
     : true;
   const inTrackRange = beforeToday && afterLimit;
   const isToday = isSameDay(dateNow, dateDay);
@@ -45,7 +40,17 @@ export const computeDayCellHelpers = ({
   return { dateKey, inTrackRange, isToday };
 };
 
-const DayCell = ({ day, month, year }: IDayProps) => {
+const DayCell = ({
+  day,
+  month,
+  year,
+  className,
+}: {
+  day: number;
+  month: number;
+  year: number;
+  className?: string;
+}) => {
   const { trackable, update } = useTrackableContextSafe();
 
   const { dateKey, inTrackRange, isToday } = useMemo(
@@ -61,12 +66,14 @@ const DayCell = ({ day, month, year }: IDayProps) => {
 
   if (!trackable) return <></>;
 
-  const updateHanler = async (value: string) => {
+  const updateHandler = async (value: string) => {
     await update({ value, day, month, year });
   };
 
-  const baseClasses =
-    "w-full relative select-none overflow-hidden border-transparent outline-none focus:outline-neutral-300 dark:focus:outline-neutral-600 h-16 border-2";
+  const baseClasses = cn(
+    "w-full relative select-none overflow-hidden border-transparent outline-none focus:outline-neutral-300 dark:focus:outline-neutral-600 h-16 border-2",
+    className,
+  );
 
   if (!inTrackRange)
     return (
@@ -86,7 +93,7 @@ const DayCell = ({ day, month, year }: IDayProps) => {
         className={baseClasses}
         value={trackable.data[dateKey]}
         settings={trackable.settings}
-        onChange={updateHanler}
+        onChange={updateHandler}
       >
         <DayNumber day={day} isToday={isToday} />
       </DayCellBoolean>
@@ -99,7 +106,7 @@ const DayCell = ({ day, month, year }: IDayProps) => {
         className={baseClasses}
         value={trackable.data[dateKey]}
         settings={trackable.settings}
-        onChange={updateHanler}
+        onChange={updateHandler}
       >
         <DayNumber day={day} isToday={isToday} />
       </DayCellNumber>
@@ -112,7 +119,7 @@ const DayCell = ({ day, month, year }: IDayProps) => {
         className={baseClasses}
         value={trackable.data[dateKey]}
         settings={trackable.settings}
-        onChange={updateHanler}
+        onChange={updateHandler}
       >
         <DayNumber day={day} isToday={isToday} />
       </DayCellRange>

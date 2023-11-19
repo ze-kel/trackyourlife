@@ -2,7 +2,6 @@
 import type { IRangeSettings } from "@t/trackable";
 import cloneDeep from "lodash/cloneDeep";
 import { useState } from "react";
-import clsx from "clsx";
 import { AnimatePresence } from "framer-motion";
 import { Reorder, useDragControls } from "framer-motion";
 import {
@@ -79,7 +78,7 @@ const Pair = ({
     >
       <Input
         value={value.internalKey}
-        className={clsx("col-start-1 col-end-1 w-64")}
+        className={"col-start-1 col-end-1 w-64"}
         error={duplicate || !value.internalKey}
         onChange={(e) => updateKey(e.target.value)}
       />

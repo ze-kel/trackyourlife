@@ -1,4 +1,4 @@
-import clsx from "clsx";
+import { cn } from "@/lib/utils";
 import type { ChangeEvent, FocusEvent, KeyboardEvent, MouseEvent } from "react";
 import { useState, useEffect, useRef } from "react";
 
@@ -103,7 +103,7 @@ const EditableText = ({
         value={inputVal}
         onChange={handelEdit}
         onBlur={() => void commit()}
-        className={clsx(className, classNameInput)}
+        className={cn(className, classNameInput)}
         onKeyUp={handleKeyUp}
         style={style}
       />
@@ -115,7 +115,7 @@ const EditableText = ({
       tabIndex={0}
       onFocus={goToEdit}
       onClick={goToEdit}
-      className={clsx(className, classNameText)}
+      className={cn(className, classNameText)}
       style={style}
     >
       {value}

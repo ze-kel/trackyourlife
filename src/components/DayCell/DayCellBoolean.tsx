@@ -1,7 +1,6 @@
 "use client";
 import type { CSSProperties, MouseEvent, ReactNode } from "react";
 import { useRef, useState } from "react";
-import cls from "clsx";
 import { AnimatePresence, m } from "framer-motion";
 import clamp from "lodash/clamp";
 import { useOptimistic } from "react";
@@ -29,7 +28,6 @@ export const DayCellBoolean = ({
   const [isActive, setIsActive] = useOptimistic(
     value === "true",
     (_, v: boolean) => {
-      console.log("opt call");
       return v;
     },
   );
@@ -103,7 +101,7 @@ export const DayCellBoolean = ({
     >
       {/* This is a background layer with color we're animating from */}
       <div
-        className={cls(
+        className={cn(
           "absolute left-0 top-0 h-full w-full",
           isActive
             ? "bg-[var(--themeInactiveLight)] dark:bg-[var(--themeInactiveDark)]"
@@ -130,7 +128,7 @@ export const DayCellBoolean = ({
               ease: EASE,
             },
           }}
-          className={cls(
+          className={cn(
             "absolute left-0 top-0 h-full  w-full",
             isActive
               ? "bg-[var(--themeActiveLight)] dark:bg-[var(--themeActiveDark)]"

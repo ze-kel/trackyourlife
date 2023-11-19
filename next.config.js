@@ -3,6 +3,9 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   output: "standalone",
+  experimental: {
+    windowHistorySupport: true,
+  },
 };
 
-module.exports = nextConfig
+module.exports = nextConfig;

@@ -9,7 +9,6 @@ import { useState } from "react";
 import style from "./curstomScrollbar.module.css";
 
 import type { IRangeSettings } from "@t/trackable";
-import clsx from "clsx";
 import { AnimatePresence, m } from "framer-motion";
 import { useOptimistic } from "react";
 import { cn } from "@/lib/utils";
@@ -129,7 +128,7 @@ const PopupSelector = ({ rangeMapping, onSelect }: PopupSelectorProps) => {
 
   return (
     <m.div
-      className={clsx(
+      className={cn(
         style.miniScrollbar,
         "relative flex cursor-pointer flex-col overflow-hidden rounded-full border border-neutral-200 bg-neutral-50 dark:border-transparent dark:bg-neutral-800",
       )}
@@ -144,9 +143,7 @@ const PopupSelector = ({ rangeMapping, onSelect }: PopupSelectorProps) => {
         animate={{ marginTop: "0" }}
         transition={{ duration: 0.3 * AF, ease: [0, 0, 0, 1.1] }}
         style={{ height: `${panelH}px` }}
-        className={clsx(
-          scrollBar && "customScrollBar overflow-x-hidden pl-0.5",
-        )}
+        className={cn(scrollBar && "customScrollBar overflow-x-hidden pl-0.5")}
       >
         <AnimatePresence>
           {rangeMapping.map((v, index) => {
@@ -169,7 +166,7 @@ const PopupSelector = ({ rangeMapping, onSelect }: PopupSelectorProps) => {
                 onClick={() => {
                   void onSelect(v.internalKey);
                 }}
-                className={clsx(
+                className={cn(
                   "w-11  rounded-full px-2 text-center transition-colors hover:bg-lime-500",
                 )}
                 style={{
@@ -246,7 +243,7 @@ export const DayCellRange = ({
             {dayValue && <div className="text-xl">{em}</div>}
           </button>
         </DropdownTrigger>
-        <DropdownContent>
+        <DropdownContent disableMobileAdaptation>
           <PopupSelector
             rangeMapping={settings.labels}
             onSelect={(v) => void handleSelect(v)}

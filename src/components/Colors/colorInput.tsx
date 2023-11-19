@@ -31,7 +31,7 @@ const ColorInput = ({
               setColor(v);
               onChange(v);
             }}
-            className="max-w-md"
+            className="sm:max-w-md"
           />
         </DropdownContent>
       </Dropdown>

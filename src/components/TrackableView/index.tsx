@@ -3,11 +3,11 @@ import { getDaysInMonth, getISODay, getMonth, getYear, format } from "date-fns";
 import { useState } from "react";
 import DayCell from "../DayCell";
 import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
-import clsx from "clsx";
 import { Button } from "@/components/ui/button";
 import type { ITrackable } from "@t/trackable";
 import TrackableProvider from "@components/Providers/TrackableProvider";
 import { ErrorBoundary } from "react-error-boundary";
+import { cn } from "@/lib/utils";
 
 const Month = ({
   month,
@@ -32,7 +32,7 @@ const Month = ({
   return (
     <div
       id={myId}
-      className={clsx("grid grid-cols-7 grid-rows-6", mini ? "gap-1" : "gap-1")}
+      className={cn("grid grid-cols-7 grid-rows-6", mini ? "gap-1" : "gap-1")}
     >
       {prepend.map((_, i) => (
         <div key={i}> </div>
@@ -43,20 +43,22 @@ const Month = ({
           year={year}
           month={month}
           day={el}
-          style={mini ? "mini" : undefined}
+          className={mini ? "h-6" : ""}
         />
       ))}
     </div>
   );
 };
 
-const monthsBeforeToday = (year: number) => {
+const activeMonths = (year: number) => {
   const now = new Date();
   if (year < getYear(now)) {
     return 12;
   }
-  // getMonth is zero indexed, so Jan is 0
-  return getMonth(now) + 1;
+  if (year > getYear(now)) {
+    return -1;
+  }
+  return getMonth(now);
 };
 
 const Year = ({
@@ -66,7 +68,7 @@ const Year = ({
   year: number;
   openMonth: (n: number) => void;
 }) => {
-  const active = monthsBeforeToday(year);
+  const active = activeMonths(year);
   const toRender = 12;
 
   const months = Array(toRender)
@@ -74,29 +76,21 @@ const Year = ({
     .map((_, i) => i);
 
   return (
-    <>
-      <div className="my-4 grid gap-x-3 gap-y-2 sm:grid-cols-2 md:grid-cols-4">
-        {months.map((m) => (
-          <div
-            key={`${year}-${m}`}
-            className="group cursor-pointer rounded-md border border-transparent px-2 py-1 transition-colors hover:border-neutral-200 dark:hover:border-neutral-700"
-            onClick={() => openMonth(m)}
-          >
-            <h5
-              className={clsx(
-                "mb-1 font-semibold transition-colors",
-                m < active
-                  ? "text-neutral-600 group-hover:text-neutral-800 dark:text-neutral-400 dark:group-hover:text-neutral-200"
-                  : "text-neutral-400 group-hover:text-neutral-600 dark:text-neutral-700 dark:group-hover:text-neutral-500",
-              )}
-            >
-              <span>{format(new Date(year, m, 1), "MMMM")}</span>
-            </h5>
-            <Month year={year} month={m} mini={true} />
-          </div>
-        ))}
-      </div>
-    </>
+    <div className="my-4 grid gap-x-3 gap-y-2 sm:grid-cols-2 md:grid-cols-4">
+      {months.map((m) => (
+        <button
+          disabled={m > active}
+          key={`${year}-${m}`}
+          className="cursor-pointer rounded-md border border-transparent px-2 py-1 transition-colors hover:bg-neutral-200 disabled:pointer-events-none disabled:cursor-default disabled:bg-transparent dark:hover:bg-neutral-900 dark:disabled:bg-transparent"
+          onClick={() => openMonth(m)}
+        >
+          <h5 className={cn("mb-1 font-semibold transition-colors")}>
+            <span>{format(new Date(year, m, 1), "MMMM")}</span>
+          </h5>
+          <Month year={year} month={m} mini={true} />
+        </button>
+      ))}
+    </div>
   );
 };
 
@@ -172,7 +166,7 @@ const ViewController = ({
       </div>
       <div className="flex w-fit gap-2 self-end">
         <Button
-          name="prevous month"
+          name="previous month"
           onClick={() => increment(-1)}
           variant="outline"
           size="icon"
@@ -247,6 +241,13 @@ const TrackableView = ({
     }
     setYear(newYear);
     setMonth(newMonth);
+
+    // waiting for https://github.com/vercel/next.js/pull/58438
+    window.history.replaceState(
+      {},
+      "",
+      window.location.origin + `/trackables/${id}/${newYear}/${newMonth + 1}`,
+    );
   };
 
   const openMonth = (m: number) => {

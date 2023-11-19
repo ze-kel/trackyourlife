@@ -29,7 +29,7 @@ export const ColorDisplay = ({
         style={{
           background: currentLight,
           // Manual transform because order matters
-          transform: "rotate(35deg) scale(4)",
+          transform: "rotate(35deg) scale(10)",
           transformOrigin: "left",
         }}
       ></div>

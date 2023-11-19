@@ -1,9 +1,9 @@
 "use client";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import DayCell from "@components/DayCell";
 import { useTrackableContextSafe } from "@components/Providers/TrackableProvider";
 import { HeartFilledIcon, HeartIcon } from "@radix-ui/react-icons";
-import clsx from "clsx";
 import { format, getDaysInMonth } from "date-fns";
 import Link from "next/link";
 import { useMemo } from "react";
@@ -73,7 +73,7 @@ const MiniTrackable = ({ className }: { className?: string }) => {
         }
       >
         <div
-          className={clsx(
+          className={cn(
             "sm grid grid-cols-3 gap-x-1 gap-y-1 md:grid-cols-6",
             className,
           )}
@@ -84,7 +84,7 @@ const MiniTrackable = ({ className }: { className?: string }) => {
               return (
                 <div
                   key={index}
-                  className={clsx(
+                  className={cn(
                     "gap-1",
                     index === 0 ? "hidden md:flex" : "flex",
                     index > 3 ? "flex-col-reverse md:flex-col" : "flex-col",
