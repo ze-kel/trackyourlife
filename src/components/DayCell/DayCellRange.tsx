@@ -6,23 +6,13 @@ import {
 } from "@components/Dropdown";
 import type { ReactNode } from "react";
 import { useState } from "react";
-import style from "./curstomScrollbar.module.css";
+import style from "./customScrollbar.module.css";
 
 import type { IRangeSettings } from "@t/trackable";
 import { AnimatePresence, m } from "framer-motion";
 import { useOptimistic } from "react";
 import { cn } from "@/lib/utils";
-
-const getRangeLabelMapping = (settings: IRangeSettings) => {
-  if (!settings.labels) return;
-
-  const map: Record<string, string> = {};
-  settings.labels.forEach((v) => {
-    map[v.internalKey] = v.emoji;
-  });
-
-  return map;
-};
+import { useDayCellContextRange } from "@components/Providers/DayCellProvider";
 
 interface PopupSelectorProps {
   rangeMapping: IRangeSettings["labels"];
@@ -188,21 +178,15 @@ const PopupSelector = ({ rangeMapping, onSelect }: PopupSelectorProps) => {
 export const DayCellRange = ({
   value,
   onChange,
-  settings,
   children,
   className,
 }: {
   value?: string;
   onChange?: (v: string) => Promise<void> | void;
-  settings: IRangeSettings;
   children: ReactNode;
   className?: string;
 }) => {
-  const rangeLabelMapping = getRangeLabelMapping(settings);
-
-  if (!rangeLabelMapping) {
-    throw new Error("Range label mapping error");
-  }
+  const { labelMapping, labels } = useDayCellContextRange();
 
   const [isSelecting, setIsSelecting] = useState(false);
 
@@ -210,7 +194,7 @@ export const DayCellRange = ({
     return value;
   });
 
-  const em = dayValue ? (rangeLabelMapping[dayValue] as string) : "❓";
+  const em = dayValue ? (labelMapping[dayValue] as string) : "❓";
 
   const handleSelect = async (v: string) => {
     setIsSelecting(false);
@@ -245,7 +229,7 @@ export const DayCellRange = ({
         </DropdownTrigger>
         <DropdownContent disableMobileAdaptation>
           <PopupSelector
-            rangeMapping={settings.labels}
+            rangeMapping={labels}
             onSelect={(v) => void handleSelect(v)}
           />
         </DropdownContent>

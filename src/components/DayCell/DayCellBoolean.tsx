@@ -1,13 +1,10 @@
 "use client";
-import type { CSSProperties, MouseEvent, ReactNode } from "react";
+import type { MouseEvent, ReactNode } from "react";
 import { useRef, useState } from "react";
 import { AnimatePresence, m } from "framer-motion";
 import clamp from "lodash/clamp";
-import { useOptimistic } from "react";
-import { presetsMap } from "@components/Colors/presets";
-import { makeColorString } from "src/helpers/colorTools";
 import { cn } from "@/lib/utils";
-import type { IBooleanSettings } from "@t/trackable";
+import { useDayCellContextBoolean } from "@components/Providers/DayCellProvider";
 
 const ANIMATION_TIME = 0.3;
 const EASE = [0, 0.2, 0.5, 1];
@@ -15,22 +12,18 @@ const EASE = [0, 0.2, 0.5, 1];
 export const DayCellBoolean = ({
   value,
   onChange,
-  settings,
   children,
   className,
 }: {
   value?: string;
   onChange?: (v: string) => Promise<void> | void;
-  settings: IBooleanSettings;
   children: ReactNode;
   className?: string;
 }) => {
-  const [isActive, setIsActive] = useOptimistic(
-    value === "true",
-    (_, v: boolean) => {
-      return v;
-    },
-  );
+  // Even though we're not using any values from context it's useful to check whether it's provided
+  const {} = useDayCellContextBoolean();
+
+  const isActive = value === "true";
 
   const mainRef = useRef<HTMLButtonElement>(null);
   // Point where click happened in % relative to button box. Used for animation
@@ -60,32 +53,14 @@ export const DayCellBoolean = ({
 
     const newVal = isActive ? "false" : "true";
 
-    setIsActive(newVal === "true");
+    // setIsActive(newVal === "true");
     if (onChange) {
       await onChange(newVal);
     }
   };
 
-  const themeActive = settings.activeColor;
-  const themeInactive = settings.inactiveColor;
-
-  const activeLight = themeActive?.lightMode || presetsMap.green.lightMode;
-  const activeDark = themeActive?.darkMode || presetsMap.green.darkMode;
-
-  const inactiveLight =
-    themeInactive?.lightMode || presetsMap.neutral.lightMode;
-  const inactiveDark = themeInactive?.darkMode || presetsMap.neutral.darkMode;
-
   return (
     <button
-      style={
-        {
-          "--themeActiveLight": makeColorString(activeLight),
-          "--themeActiveDark": makeColorString(activeDark),
-          "--themeInactiveLight": makeColorString(inactiveLight),
-          "--themeInactiveDark": makeColorString(inactiveDark),
-        } as CSSProperties
-      }
       data-value={isActive}
       ref={mainRef}
       tabIndex={0}

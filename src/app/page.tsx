@@ -9,6 +9,7 @@ import {
 } from "@tanstack/react-query";
 
 const Page = async () => {
+  console.log("page");
   const trackables = await RSAGetAllTrackables({
     limits: { type: "last", days: 7 },
   });
@@ -20,6 +21,7 @@ const Page = async () => {
   for (const tr of trackables) {
     ids.push(tr.id);
     queryClient.setQueryData(["trackable", tr.id], tr);
+    queryClient.setQueryData(["trackable", tr.id, "settings"], tr.settings);
   }
 
   return (

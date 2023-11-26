@@ -95,7 +95,7 @@ const MiniTrackable = ({ className }: { className?: string }) => {
                       {format(date, "EEEE")}
                     </span>
                   </div>
-                  <DayCell {...day} key={index} />
+                  <DayCell {...day} key={index} className="h-16" />
                 </div>
               );
             })}

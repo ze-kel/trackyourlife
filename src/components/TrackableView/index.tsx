@@ -38,13 +38,14 @@ const Month = ({
         <div key={i}> </div>
       ))}
       {dates.map((el) => (
-        <DayCell
-          key={`${month}-${el}`}
-          year={year}
-          month={month}
-          day={el}
-          className={mini ? "h-6" : ""}
-        />
+        <div key={`${month}-${el}`}>
+          <DayCell
+            year={year}
+            month={month}
+            day={el}
+            className={mini ? "aspect-square" : "aspect-square sm:h-16"}
+          />
+        </div>
       ))}
     </div>
   );
@@ -76,7 +77,7 @@ const Year = ({
     .map((_, i) => i);
 
   return (
-    <div className="my-4 grid gap-x-3 gap-y-2 sm:grid-cols-2 md:grid-cols-4">
+    <div className="my-4 grid gap-x-3 gap-y-2 sm:grid-cols-2 md:grid-cols-3">
       {months.map((m) => (
         <button
           disabled={m > active}

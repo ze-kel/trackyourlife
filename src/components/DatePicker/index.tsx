@@ -117,7 +117,7 @@ const DatePicker = ({
         onOpenChange={setIsOpened}
         placement="bottom-start"
       >
-        <DropdownTrigger>
+        <DropdownTrigger className="w-fit">
           <Button variant={"outline"} className="min-w-[200px]">
             <span className="">
               {innerDate ? format(innerDate, "d MMMM yyyy") : "No date set"}
@@ -201,6 +201,7 @@ const DatePicker = ({
                 animate="middle"
                 exit="exit"
                 custom={moveDirection * 0.5}
+                className={"grid w-fit grid-cols-7 gap-1"}
                 transition={{ duration: 0.15, ease: "easeInOut" }}
                 variants={variants}
                 key={cursor.toString()}

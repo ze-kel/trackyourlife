@@ -71,7 +71,7 @@ const DayCell = ({
   };
 
   const baseClasses = cn(
-    "w-full relative select-none overflow-hidden border-transparent outline-none focus:outline-neutral-300 dark:focus:outline-neutral-600 h-16 border-2",
+    "w-full relative select-none overflow-hidden border-transparent outline-none focus:outline-neutral-300 dark:focus:outline-neutral-600 border-2",
     className,
   );
 
@@ -92,7 +92,6 @@ const DayCell = ({
       <DayCellBoolean
         className={baseClasses}
         value={trackable.data[dateKey]}
-        settings={trackable.settings}
         onChange={updateHandler}
       >
         <DayNumber day={day} isToday={isToday} />
@@ -105,7 +104,6 @@ const DayCell = ({
       <DayCellNumber
         className={baseClasses}
         value={trackable.data[dateKey]}
-        settings={trackable.settings}
         onChange={updateHandler}
       >
         <DayNumber day={day} isToday={isToday} />
@@ -118,7 +116,6 @@ const DayCell = ({
       <DayCellRange
         className={baseClasses}
         value={trackable.data[dateKey]}
-        settings={trackable.settings}
         onChange={updateHandler}
       >
         <DayNumber day={day} isToday={isToday} />

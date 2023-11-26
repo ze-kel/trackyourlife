@@ -15,6 +15,8 @@ import { Button } from "@/components/ui/button";
 import { Cross1Icon, PlusCircledIcon } from "@radix-ui/react-icons";
 import { RadioTabItem, RadioTabs } from "@/components/ui/radio-tabs";
 import { useRefSize } from "@components/Colors/contoller";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 type IColorCodingValue = INumberSettings["colorCoding"];
 
@@ -406,14 +408,14 @@ const ControllerGradient = ({
           )}
         </div>
         <div className="w-full sm:max-w-xs">
-          <div className="flex h-fit flex-col gap-2 rounded-lg bg-neutral-800 p-1">
+          <div className="flex h-fit flex-col gap-2 rounded-lg bg-neutral-100 p-1 dark:bg-neutral-800">
             {value.map((v) => (
               <div
                 key={v.id}
                 className={cn(
-                  "flex gap-2 p-2",
+                  "flex gap-2 p-2 transition-all",
                   v.id === selectedColor
-                    ? "rounded-md bg-neutral-950"
+                    ? "rounded-md bg-neutral-50 shadow dark:bg-neutral-950 dark:shadow-none"
                     : "cursor-pointer",
                 )}
                 onClick={() => setSelectedColor(v.id)}
@@ -451,25 +453,51 @@ const ControllerGradient = ({
 };
 
 const NumberColorSelector = ({
+  enabled,
+  onEnabledChange,
   value,
   onChange,
 }: {
-  value: NonNullable<IColorCodingValue>;
+  enabled?: boolean;
+  onEnabledChange: (v: boolean) => void;
+  value: IColorCodingValue;
   onChange: (v: NonNullable<IColorCodingValue>) => void;
 }) => {
-  const [innerValue, setInnerValue] = useState(value);
+  const [innerEnabled, setInnerEnabled] = useState(enabled || false);
+  const [innerValue, setInnerValue] = useState(
+    value || [
+      { point: 0, color: presetsMap.red, id: uuidv4() },
+      { point: 100, color: presetsMap.green, id: uuidv4() },
+    ],
+  );
 
   const sorted = innerValue.sort((a, b) => a.point - b.point);
 
   return (
     <div className="flex flex-col gap-2">
-      <ControllerGradient
-        value={sorted}
-        onChange={(v) => {
-          setInnerValue(v);
-          onChange(v);
-        }}
-      />
+      <div className="mt-1 flex items-center space-x-2">
+        <Switch
+          id="show-progress"
+          checked={innerEnabled}
+          onCheckedChange={(v) => {
+            setInnerEnabled(v);
+            onEnabledChange(v);
+            if (true && !value) {
+              onChange(innerValue);
+            }
+          }}
+        />
+        <Label htmlFor="show-progress">Use color coding</Label>
+      </div>
+      {innerEnabled && (
+        <ControllerGradient
+          value={sorted}
+          onChange={(v) => {
+            setInnerValue(v);
+            onChange(v);
+          }}
+        />
+      )}
     </div>
   );
 };

@@ -158,12 +158,12 @@ export const Controller2D = ({
   };
 
   const starMouseDrag: MouseEventHandler = (e) => {
-    if (!ref.current) return;
     // Left click only
     if (e.nativeEvent.button !== 0) return;
+      forceRefresh();
 
     const moveHandler = (e: MouseEvent) => {
-      move(e.clientX - left, e.clientY - dataRef.current.top);
+      move(e.clientX - dataRef.current.left, e.clientY - dataRef.current.top);
     };
 
     moveHandler(e as unknown as MouseEvent);

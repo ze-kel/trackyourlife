@@ -50,6 +50,7 @@ const Trackable = async ({
     },
   });
   const data = queryClient.getQueryData(["trackable", params.id]) as ITrackable;
+  queryClient.setQueryData(["trackable", params.id, "settings"], data.settings);
 
   try {
     return (

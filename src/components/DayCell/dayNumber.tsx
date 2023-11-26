@@ -14,7 +14,7 @@ const DayNumber = ({
     <>
       <span
         className={cn(
-          "absolute left-2 top-1 select-none text-xs text-neutral-800 sm:text-base",
+          "absolute left-0.5 top-0.5 select-none text-xs text-neutral-800 sm:left-2 sm:top-1 sm:text-base",
           isToday ? "font-normal underline" : "font-light ",
         )}
       >

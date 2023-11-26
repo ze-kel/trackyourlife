@@ -1,4 +1,5 @@
 "use client";
+import { MemoDayCellProvider } from "@components/Providers/DayCellProvider";
 import type {
   ITrackable,
   ITrackableSettings,
@@ -86,7 +87,19 @@ const TrackableProvider = ({
     },
   });
 
-  const updateSettingsHander = async ({
+  const settings = useQuery({
+    queryKey: ["trackable", id, "settings"],
+    queryFn: async () => {
+      const data = queryClient.getQueryData<ITrackable>(["trackable", id]);
+      if (!data) {
+        const res = await RSAGetTrackable({ trackableId: id });
+        return res.settings;
+      }
+      return data.settings;
+    },
+  });
+
+  const updateSettingsHandler = async ({
     data,
     redirectToTrackablePage,
   }: {
@@ -101,7 +114,7 @@ const TrackableProvider = ({
   };
 
   const settingsMutation = useMutation({
-    mutationFn: updateSettingsHander,
+    mutationFn: updateSettingsHandler,
     onMutate: async (upd) => {
       if (upd.redirectToTrackablePage) return;
       await queryClient.cancelQueries({ queryKey: ["trackable", id] });
@@ -112,11 +125,17 @@ const TrackableProvider = ({
         old.settings = upd.data;
         return old;
       });
+      await queryClient.invalidateQueries({
+        queryKey: ["trackable", id, "settings"],
+      });
       return { previous };
     },
-    onError: (_, update, context) => {
+    onError: async (_, update, context) => {
       if (!context || update.redirectToTrackablePage) return;
       queryClient.setQueryData(["trackable", id], context.previous);
+      await queryClient.invalidateQueries({
+        queryKey: ["trackable", id, "settings"],
+      });
     },
   });
 
@@ -142,7 +161,9 @@ const TrackableProvider = ({
         settingsUpdatePartial,
       }}
     >
-      {children}
+      <MemoDayCellProvider type={query.data?.type} settings={settings.data}>
+        {children}
+      </MemoDayCellProvider>
     </TrackableContext.Provider>
   );
 };

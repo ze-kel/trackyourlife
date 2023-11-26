@@ -1,50 +1,29 @@
 "use client";
 import type React from "react";
 import type { CSSProperties, ReactNode } from "react";
-import { useCallback, useMemo, useState } from "react";
-import clamp from "lodash/clamp";
+import { useCallback, useMemo, useRef, useState } from "react";
 import debounce from "lodash/debounce";
 import EditableText from "@components/EditableText";
 import { PlusIcon, MinusIcon } from "@radix-ui/react-icons";
-import type { INumberSettings } from "@t/trackable";
 import { AnimatePresence, m } from "framer-motion";
-import { presetsMap } from "@components/Colors/presets";
 import { makeColorString } from "src/helpers/colorTools";
-import { getColorAtPosition } from "@components/Colors/numberColorSelector";
 import { cn } from "@/lib/utils";
-
-const getProgress = (
-  limits: INumberSettings["limits"],
-  val: number | undefined,
-) => {
-  if (
-    !limits ||
-    !limits.showProgress ||
-    typeof limits.max === "undefined" ||
-    typeof limits.min === "undefined" ||
-    typeof val === "undefined"
-  ) {
-    return null;
-  }
-  return Math.round(
-    (clamp(val, limits.min, limits.max) / (limits.max - limits.min)) * 100,
-  );
-};
+import { useDayCellContextNumber } from "@components/Providers/DayCellProvider";
 
 export const DayCellNumber = ({
   value,
   onChange,
-  settings,
   children,
   className,
 }: {
   value?: string;
   onChange?: (v: string) => Promise<void> | void;
-  settings: INumberSettings;
   children: ReactNode;
   className?: string;
 }) => {
-  // Not using optimistic here because it resets when leaving hover for some reason
+  // Even though we're not using any values from context it's useful to check whether it's provided
+  const { valueToColor, valueToProgressPercentage } = useDayCellContextNumber();
+
   const [displayedNumber, setDisplayedNumber] = useState(Number(value || 0));
 
   const [inInputEdit, setInInputEdit] = useState(false);
@@ -57,16 +36,10 @@ export const DayCellNumber = ({
     }
   };
 
-  const progress = getProgress(settings.limits, displayedNumber);
+  const progress = valueToProgressPercentage(displayedNumber);
 
   const color = useMemo(() => {
-    if (!settings.colorCoding || displayedNumber === 0) {
-      return presetsMap.neutral;
-    }
-    return getColorAtPosition({
-      value: settings.colorCoding,
-      point: displayedNumber,
-    });
+    return valueToColor(displayedNumber);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [displayedNumber]);
 
@@ -75,17 +48,36 @@ export const DayCellNumber = ({
     updateValue,
   ]);
 
-  const handlePlus = (e: React.MouseEvent) => {
+  const intervalRef = useRef<ReturnType<typeof setTimeout>>();
+  const intervalCounter = useRef(0);
+
+  const mouseDown = (e: React.MouseEvent, direction: number) => {
     e.stopPropagation();
     e.preventDefault();
-    setDisplayedNumber(displayedNumber + 1);
-    void debouncedUpdateValue(displayedNumber + 1);
+
+    setDisplayedNumber(displayedNumber + 1 * direction);
+
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = undefined;
+    }
+
+    intervalRef.current = setInterval(() => {
+      intervalCounter.current++;
+      setDisplayedNumber(
+        displayedNumber + 1 * intervalCounter.current * direction,
+      );
+    }, 100);
   };
-  const handleMinus = (e: React.MouseEvent) => {
+
+  const mouseUp = (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
-    setDisplayedNumber(displayedNumber - 1);
-    void debouncedUpdateValue(displayedNumber - 1);
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = undefined;
+      intervalCounter.current = 0;
+    }
   };
 
   const handleInputUpdate = (val: number) => {
@@ -100,7 +92,10 @@ export const DayCellNumber = ({
         className,
         "items-center justify-center overflow-visible",
         "transition-all ease-in-out",
-        "cursor-text border-[var(--themeLight)] dark:border-[var(--themeDark)]",
+        "cursor-text",
+        displayedNumber === 0
+          ? "border-neutral-200 dark:border-neutral-900"
+          : "border-[var(--themeLight)] dark:border-[var(--themeDark)]",
       )}
       style={
         {
@@ -130,7 +125,7 @@ export const DayCellNumber = ({
           displayedNumber === 0 && !inInputEdit
             ? "text-neutral-200 dark:text-neutral-800"
             : "text-neutral-800 dark:text-neutral-300",
-          "text-xl",
+          "text-sm sm:text-xl",
         )}
         classNameInput="focus:outline-neutral-300 dark:focus:outline-neutral-600"
         editModeSetter={setInInputEdit}
@@ -153,7 +148,8 @@ export const DayCellNumber = ({
               transition={{ duration: 0.2, opacity: { duration: 0.1 } }}
             >
               <PlusIcon
-                onClick={handlePlus}
+                onMouseDown={(e) => mouseDown(e, 1)}
+                onMouseUp={mouseUp}
                 className="h-6 w-6 cursor-pointer border border-neutral-500 bg-neutral-50 p-1 dark:bg-neutral-900"
               />
             </m.div>
@@ -172,7 +168,8 @@ export const DayCellNumber = ({
               transition={{ duration: 0.2, opacity: { duration: 0.1 } }}
             >
               <MinusIcon
-                onClick={handleMinus}
+                onMouseDown={(e) => mouseDown(e, -1)}
+                onMouseUp={mouseUp}
                 className=" h-6 w-6 cursor-pointer border border-neutral-500 bg-neutral-50 p-1 dark:bg-neutral-900"
               />
             </m.div>

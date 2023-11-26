@@ -1,5 +1,5 @@
 "use client";
-import type { ITrackable } from "src/types/trackable";
+import type { ITrackable, ITrackableSettings } from "src/types/trackable";
 import MiniTrackable from "./miniTrackable";
 import { m } from "framer-motion";
 import TrackableProvider from "@components/Providers/TrackableProvider";
@@ -11,11 +11,19 @@ const sortList = (
   list: ITrackable["id"][],
   queryClient: QueryClient,
 ): ITrackable["id"][] => {
-  const newList: ITrackable[] = list.map((id) => {
-    return queryClient.getQueryData(["trackable", id]) as ITrackable;
+  const newList = list.map((id) => {
+    return {
+      id,
+      settings: queryClient.getQueryData<ITrackableSettings>([
+        "trackable",
+        id,
+        "settings",
+      ]),
+    };
   });
 
   newList.sort((a, b) => {
+    if (!a.settings || !b.settings) return 0;
     if (a.settings.favorite && !b.settings.favorite) return -1;
     if (!a.settings.favorite && b.settings.favorite) return 1;
 
@@ -35,10 +43,10 @@ const TrackablesList = ({ list }: { list: ITrackable["id"][] }) => {
 
   useEffect(() => {
     const m = list.map((v) => ({
-      queryKey: ["trackable", v],
+      queryKey: ["trackable", v, "settings"],
     }));
     const obs = new QueriesObserver(queryClient, m);
-    obs.subscribe((upd) => {
+    obs.subscribe(() => {
       setSorted(sortList(list, queryClient));
     });
   });

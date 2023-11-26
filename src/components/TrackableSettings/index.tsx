@@ -13,7 +13,6 @@ import NumberColorSelector from "../Colors/numberColorSelector";
 import NumberLimitsSelector from "./numberLimitsSelector";
 import RangeLabelSelector from "./rangeLabelSelector";
 import { Input } from "@/components/ui/input";
-import { v4 as uuidv4 } from "uuid";
 import { presetsMap } from "@components/Colors/presets";
 import ColorInput from "@components/Colors/colorInput";
 import { Button } from "@/components/ui/button";
@@ -57,10 +56,13 @@ export const SettingsNumber = ({
   return (
     <>
       <div>
-        <h3 className="text-xl">Limits</h3>
+        <h3 className="text-xl">Progress</h3>
+
         <NumberLimitsSelector
-          value={settings.current.limits}
-          onChange={(v) => (settings.current.limits = v)}
+          enabled={settings.current.progressEnabled}
+          onEnabledChange={(v) => (settings.current.progressEnabled = v)}
+          value={settings.current.progress}
+          onChange={(v) => (settings.current.progress = v)}
           className="mt-2"
         />
       </div>
@@ -68,12 +70,9 @@ export const SettingsNumber = ({
       <div>
         <h3 className="mb-2 text-xl">Color coding</h3>
         <NumberColorSelector
-          value={
-            settings.current.colorCoding || [
-              { point: 0, color: presetsMap.red, id: uuidv4() },
-              { point: 100, color: presetsMap.green, id: uuidv4() },
-            ]
-          }
+          enabled={settings.current.colorCodingEnabled}
+          onEnabledChange={(v) => (settings.current.colorCodingEnabled = v)}
+          value={settings.current.colorCoding}
           onChange={(v) => (settings.current.colorCoding = v)}
         />
       </div>
@@ -109,7 +108,7 @@ const TrackableSettings = ({
   const settings = useRef(trackable.settings);
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-4">
       <div>
         <h3 className="text-xl">Name</h3>
         <Input
