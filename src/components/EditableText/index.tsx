@@ -95,9 +95,14 @@ const EditableText = ({
 
   const inputRef = useRef<HTMLInputElement>(null);
 
+  useEffect(() => {
+    setInputVal(value);
+  }, [value]);
+
   if (editMode) {
     return (
       <input
+        inputMode={isNumber ? "decimal" : "text"}
         type={isNumber ? "number" : "text"}
         ref={inputRef}
         value={inputVal}

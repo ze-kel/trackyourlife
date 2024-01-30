@@ -145,13 +145,18 @@ const ControllerGradient = ({
     onChange(newValue);
   };
 
-  const addColor = (e: React.MouseEvent) => {
-    if (!ref.current) return;
-    const newVal = [...value];
+  const addColor = (e?: React.MouseEvent) => {
+    let point = 50;
 
-    const { width, left } = dataRef.current;
-    const coordinate = e.clientX - left;
-    const point = Math.round(range(0, width, actualMin, actualMax, coordinate));
+    if (e) {
+      if (!ref.current) return;
+
+      const { width, left } = dataRef.current;
+      const coordinate = e.clientX - left;
+      point = Math.round(range(0, width, actualMin, actualMax, coordinate));
+    }
+
+    const newVal = [...value];
     const color = getColorAtPosition({ value, point });
     const id = uuidv4();
 
@@ -442,7 +447,11 @@ const ControllerGradient = ({
               </div>
             ))}
           </div>
-          <Button variant="outline" className="mt-2 w-full">
+          <Button
+            variant="outline"
+            className="mt-2 w-full"
+            onClick={() => addColor()}
+          >
             <PlusCircledIcon className="mr-2 opacity-50" />
             Add color
           </Button>

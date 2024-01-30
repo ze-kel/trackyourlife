@@ -80,7 +80,7 @@ const DayCell = ({
       <div
         className={cn(
           baseClasses,
-          "cursor-default bg-neutral-100 dark:bg-neutral-900",
+          "h-full cursor-default bg-neutral-100 dark:bg-neutral-900",
         )}
       >
         <DayNumber day={day} isToday={isToday} />
