@@ -1,10 +1,14 @@
-import { auth } from "src/auth/lucia";
 import { NextResponse } from "next/server";
+import { Argon2id } from "oslo/password";
 
-import * as context from "next/headers";
+import { cookies } from "next/headers";
 import type { NextRequest } from "next/server";
 import { ZRegister } from "@t/user";
 import { log } from "console";
+import { db } from "src/app/api/db";
+import { auth_user } from "src/schema";
+import { generateId } from "lucia";
+import { lucia } from "src/auth/lucia";
 
 export const POST = async (request: NextRequest) => {
   const data = (await request.json()) as unknown;
@@ -24,25 +28,28 @@ export const POST = async (request: NextRequest) => {
 
     const { email, password, username, role } = results.data;
 
-    const user = await auth.createUser({
-      key: {
-        providerId: "username", // auth method
-        providerUserId: email.toLowerCase(), // unique id when using "username" auth method
-        password, // hashed by Lucia
-      },
-      attributes: {
-        email,
-        username,
-        role,
-      },
-    });
-    const session = await auth.createSession({
-      userId: user.userId,
-      attributes: {},
-    });
+    const hashedPassword = await new Argon2id().hash(password);
+    const userId = generateId(15);
 
-    const authRequest = auth.handleRequest(request.method, context);
-    authRequest.setSession(session);
+    const usr = await db
+      .insert(auth_user)
+      .values({
+        id: userId,
+        username,
+        email: email.toLowerCase(),
+        hashedPassword,
+        settings: {},
+        role: "user",
+      })
+      .returning();
+
+    const session = await lucia.createSession(userId, {});
+    const sessionCookie = lucia.createSessionCookie(session.id);
+    cookies().set(
+      sessionCookie.name,
+      sessionCookie.value,
+      sessionCookie.attributes,
+    );
 
     log(`API: User created ${email}`);
 

@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { GearIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import getPageSession from "src/helpers/getPageSesion";
 import { RSAGetTrackable } from "src/app/api/trackables/serverActions";
 import type { ITrackable } from "@t/trackable";
 import {
@@ -12,6 +11,7 @@ import {
   HydrationBoundary,
   dehydrate,
 } from "@tanstack/react-query";
+import { validateRequest } from "src/auth/lucia";
 
 const verifyYear = (y: string | undefined) => {
   if (!y || y.length !== 4) return;
@@ -35,7 +35,7 @@ const Trackable = async ({
 }: {
   params: { id: string; dateInfo: string[] };
 }) => {
-  const session = await getPageSession();
+  const { session } = await validateRequest();
   if (!session) redirect("/login");
 
   const queryClient = new QueryClient();

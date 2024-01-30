@@ -7,7 +7,7 @@ export const POST = async (
   request: NextRequest,
   { params }: { params: { id: string } },
 ) => {
-  const { userId } = await checkForSession(request);
+  const { userId } = await checkForSession();
 
   if (!userId) {
     return new Response(null, {

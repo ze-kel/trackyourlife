@@ -1,18 +1,24 @@
-import { auth } from "src/auth/lucia";
+import { cookies } from "next/headers";
 import type { NextRequest } from "next/server";
-import { checkForSession } from "src/app/api/helpers";
+import { lucia, validateRequest } from "src/auth/lucia";
 
 export const POST = async (request: NextRequest) => {
-  const { session, authRequest } = await checkForSession(request);
+  const { session } = await validateRequest();
+
   if (!session) {
     return new Response(null, {
       status: 401,
     });
   }
-  // make sure to invalidate the current session!
-  await auth.invalidateSession(session.sessionId);
-  // delete session cookie
-  authRequest.setSession(null);
+  await lucia.invalidateSession(session.id);
+
+  const sessionCookie = lucia.createBlankSessionCookie();
+  cookies().set(
+    sessionCookie.name,
+    sessionCookie.value,
+    sessionCookie.attributes,
+  );
+
   return new Response(null, {
     status: 302,
     headers: {

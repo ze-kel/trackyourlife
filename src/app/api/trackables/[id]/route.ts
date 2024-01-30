@@ -12,7 +12,7 @@ export const GET = async (
   request: NextRequest,
   { params }: { params: { id: string } },
 ) => {
-  const { userId } = await checkForSession(request);
+  const { userId } = await checkForSession();
 
   if (!userId) {
     return NextResponse.json(null, {
@@ -33,7 +33,7 @@ export const GET = async (
 
 // UPDATE
 export const POST = async (request: NextRequest) => {
-  const { userId } = await checkForSession(request);
+  const { userId } = await checkForSession();
 
   if (!userId) {
     return new Response(null, {
@@ -60,7 +60,7 @@ export const DELETE = async (
   request: NextRequest,
   { params }: { params: { id: string } },
 ) => {
-  const { userId } = await checkForSession(request);
+  const { userId } = await checkForSession();
   if (!userId) {
     return new Response(null, {
       status: 401,

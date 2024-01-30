@@ -1,5 +1,4 @@
 import { redirect } from "next/navigation";
-import getPageSession from "src/helpers/getPageSesion";
 import DeleteButton from "@components/DeleteButton";
 import TrackableSettings from "@components/TrackableSettings";
 import { Button } from "@/components/ui/button";
@@ -10,13 +9,14 @@ import {
   RSAUpdateTrackableSettings,
 } from "src/app/api/trackables/serverActions";
 import type { ITrackableSettings } from "@t/trackable";
+import { validateRequest } from "src/auth/lucia";
 
 const TrackableSettingsPage = async ({
   params,
 }: {
   params: { id: string };
 }) => {
-  const session = await getPageSession();
+  const { session } = await validateRequest();
 
   if (!session) redirect("/login");
 

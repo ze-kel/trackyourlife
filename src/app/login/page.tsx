@@ -1,9 +1,10 @@
 import { redirect } from "next/navigation";
 import LoginForm from "./form";
-import getPageSession from "src/helpers/getPageSesion";
+import { validateRequest } from "src/auth/lucia";
 
 const LoginPage = async () => {
-  const session = await getPageSession();
+  const { session } = await validateRequest();
+
   if (session) redirect("/");
 
   return <LoginForm />;
