@@ -83,6 +83,8 @@ export const recordRelations = relations(trackableRecord, ({ one }) => ({
   }),
 }));
 
+export type DbUserSelect = typeof auth_user.$inferSelect;
+
 export type DbTrackableSelect = typeof trackable.$inferSelect;
 export type DbTrackableInsert = typeof trackable.$inferInsert;
 
