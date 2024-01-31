@@ -11,7 +11,7 @@ import {
 const Page = async () => {
   console.log("page");
   const trackables = await RSAGetAllTrackables({
-    limits: { type: "last", days: 7 },
+    limits: { type: "last", days: 31 },
   });
 
   const queryClient = new QueryClient();

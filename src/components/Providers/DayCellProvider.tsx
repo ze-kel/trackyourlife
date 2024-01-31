@@ -185,7 +185,6 @@ export const DayCellProvider = ({
   settings: ITrackable["settings"] | undefined;
   children: ReactNode;
 }) => {
-  console.log("dc");
   if (!type || !settings) {
     return <>{children}</>;
   }
