@@ -1,4 +1,3 @@
-import clsx from "clsx";
 import {
   addMonths,
   format,
@@ -96,7 +95,7 @@ const DatePicker = ({
     return true;
   };
 
-  const highlightSeleted =
+  const highlightSelected =
     date && isSameMonth(date, cursor) ? date.getDate() : -1;
 
   const variants = {
@@ -112,13 +111,13 @@ const DatePicker = ({
   };
 
   return (
-    <div className={clsx(className)}>
+    <div className={className}>
       <Dropdown
         open={isOpened}
         onOpenChange={setIsOpened}
         placement="bottom-start"
       >
-        <DropdownTrigger>
+        <DropdownTrigger className="w-fit">
           <Button variant={"outline"} className="min-w-[200px]">
             <span className="">
               {innerDate ? format(innerDate, "d MMMM yyyy") : "No date set"}
@@ -129,107 +128,100 @@ const DatePicker = ({
 
         <DropdownContent>
           <m.div
+            ref={ref}
             animate={{ height: bounds.height > 0 ? bounds.height : undefined }}
             transition={{ duration: 0.15, ease: "easeInOut" }}
-            className="flex w-fit flex-col overflow-hidden"
+            className="flex w-full flex-col items-center overflow-hidden md:w-fit"
           >
-            <div ref={ref}>
-              <div className="flex w-full items-center justify-between py-2">
-                <div className="flex">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    disabled={isSameMonth(limits.start, cursor)}
-                    onClick={() => moveCursorMonths(-12)}
-                  >
-                    <DoubleArrowLeftIcon className="w-7" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    disabled={isSameMonth(limits.start, cursor)}
-                    onClick={() => moveCursorMonths(-1)}
-                  >
-                    <ChevronLeftIcon className="w-7" />
-                  </Button>
-                </div>
-                <AnimatePresence
-                  mode="popLayout"
-                  initial={false}
-                  custom={moveDirection * 0.1}
+            <div className="flex w-full items-center justify-between py-2">
+              <div className="flex">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  disabled={isSameMonth(limits.start, cursor)}
+                  onClick={() => moveCursorMonths(-12)}
                 >
-                  <m.div
-                    initial="enter"
-                    animate="middle"
-                    exit="exit"
-                    transition={{ duration: 0.15, ease: "easeInOut" }}
-                    variants={variants}
-                    custom={moveDirection * 0.1}
-                    key={cursor.toString()}
-                    className="pointer-events-none select-none whitespace-nowrap"
-                  >
-                    {format(cursor, "MMMM yyyy")}
-                  </m.div>
-                </AnimatePresence>
-                <div className="flex">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    disabled={isSameMonth(new Date(), cursor)}
-                    onClick={() => moveCursorMonths(1)}
-                  >
-                    <ChevronRightIcon className="w-7" />
-                  </Button>
-
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    disabled={isSameMonth(new Date(), cursor)}
-                    onClick={() => moveCursorMonths(1)}
-                  >
-                    <DoubleArrowRightIcon className="w-7" />
-                  </Button>
-                </div>
+                  <DoubleArrowLeftIcon className="w-7" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  disabled={isSameMonth(limits.start, cursor)}
+                  onClick={() => moveCursorMonths(-1)}
+                >
+                  <ChevronLeftIcon className="w-7" />
+                </Button>
               </div>
-
               <AnimatePresence
                 mode="popLayout"
                 initial={false}
-                custom={moveDirection * 0.5}
+                custom={moveDirection * 0.1}
               >
                 <m.div
                   initial="enter"
                   animate="middle"
                   exit="exit"
-                  custom={moveDirection * 0.5}
                   transition={{ duration: 0.15, ease: "easeInOut" }}
-                  className={clsx("grid w-fit grid-cols-7 gap-1")}
                   variants={variants}
+                  custom={moveDirection * 0.1}
                   key={cursor.toString()}
+                  className="pointer-events-none select-none whitespace-nowrap"
                 >
-                  {prepend.map((_, i) => (
-                    <div key={`${cursor.getMonth()}—prep—${i}`}></div>
-                  ))}
-                  {dates.map((el) => (
-                    <div
-                      className={clsx(
-                        "flex h-9 w-9 items-center justify-center rounded-full border-2 transition-colors ",
-                        el === highlightSeleted
-                          ? "border-lime-500"
-                          : "border-transparent",
-                        inLimit(el)
-                          ? "cursor-pointer hover:border-lime-500"
-                          : "text-neutral-200 dark:text-neutral-800",
-                      )}
-                      key={`${cursor.getMonth()}-${el}`}
-                      onClick={() => recordDate(el)}
-                    >
-                      {el}
-                    </div>
-                  ))}
+                  {format(cursor, "MMMM yyyy")}
                 </m.div>
               </AnimatePresence>
+              <div className="flex">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  disabled={isSameMonth(new Date(), cursor)}
+                  onClick={() => moveCursorMonths(1)}
+                >
+                  <ChevronRightIcon className="w-7" />
+                </Button>
+
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  disabled={isSameMonth(new Date(), cursor)}
+                  onClick={() => moveCursorMonths(12)}
+                >
+                  <DoubleArrowRightIcon className="w-7" />
+                </Button>
+              </div>
             </div>
+
+            <AnimatePresence
+              mode="popLayout"
+              initial={false}
+              custom={moveDirection * 0.5}
+            >
+              <m.div
+                initial="enter"
+                animate="middle"
+                exit="exit"
+                custom={moveDirection * 0.5}
+                className={"grid w-fit grid-cols-7 gap-1"}
+                transition={{ duration: 0.15, ease: "easeInOut" }}
+                variants={variants}
+                key={cursor.toString()}
+              >
+                {prepend.map((_, i) => (
+                  <div key={`${cursor.getMonth()}—prep—${i}`}></div>
+                ))}
+                {dates.map((el) => (
+                  <Button
+                    className="h-9 sm:w-9"
+                    disabled={!inLimit(el)}
+                    variant={el === highlightSelected ? "default" : "ghost"}
+                    key={`${cursor.getMonth()}-${el}`}
+                    onClick={() => recordDate(el)}
+                  >
+                    {el}
+                  </Button>
+                ))}
+              </m.div>
+            </AnimatePresence>
           </m.div>
         </DropdownContent>
       </Dropdown>

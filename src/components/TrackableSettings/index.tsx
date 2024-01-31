@@ -13,10 +13,10 @@ import NumberColorSelector from "../Colors/numberColorSelector";
 import NumberLimitsSelector from "./numberLimitsSelector";
 import RangeLabelSelector from "./rangeLabelSelector";
 import { Input } from "@/components/ui/input";
-import { v4 as uuidv4 } from "uuid";
 import { presetsMap } from "@components/Colors/presets";
 import ColorInput from "@components/Colors/colorInput";
 import { Button } from "@/components/ui/button";
+import { DropdownMobileTitleProvider } from "@components/Dropdown";
 
 export const SettingsBoolean = ({
   settings,
@@ -27,18 +27,22 @@ export const SettingsBoolean = ({
     <>
       <div>
         <h3 className="mb-2 text-xl">Checked color</h3>
-        <ColorInput
-          value={settings.current.activeColor || presetsMap.green}
-          onChange={(v) => (settings.current.activeColor = v)}
-        ></ColorInput>
+        <DropdownMobileTitleProvider title="Checked color">
+          <ColorInput
+            value={settings.current.activeColor || presetsMap.green}
+            onChange={(v) => (settings.current.activeColor = v)}
+          />
+        </DropdownMobileTitleProvider>
       </div>
 
       <div>
         <h3 className="mb-2 text-xl">Unchecked color</h3>
-        <ColorInput
-          value={settings.current.inactiveColor || presetsMap.neutral}
-          onChange={(v) => (settings.current.inactiveColor = v)}
-        ></ColorInput>
+        <DropdownMobileTitleProvider title="Unchecked color">
+          <ColorInput
+            value={settings.current.inactiveColor || presetsMap.neutral}
+            onChange={(v) => (settings.current.inactiveColor = v)}
+          ></ColorInput>
+        </DropdownMobileTitleProvider>
       </div>
     </>
   );
@@ -52,10 +56,13 @@ export const SettingsNumber = ({
   return (
     <>
       <div>
-        <h3 className="text-xl">Limits</h3>
+        <h3 className="text-xl">Progress</h3>
+
         <NumberLimitsSelector
-          value={settings.current.limits}
-          onChange={(v) => (settings.current.limits = v)}
+          enabled={settings.current.progressEnabled}
+          onEnabledChange={(v) => (settings.current.progressEnabled = v)}
+          value={settings.current.progress}
+          onChange={(v) => (settings.current.progress = v)}
           className="mt-2"
         />
       </div>
@@ -63,12 +70,9 @@ export const SettingsNumber = ({
       <div>
         <h3 className="mb-2 text-xl">Color coding</h3>
         <NumberColorSelector
-          value={
-            settings.current.colorCoding || [
-              { point: 0, color: presetsMap.red, id: uuidv4() },
-              { point: 100, color: presetsMap.green, id: uuidv4() },
-            ]
-          }
+          enabled={settings.current.colorCodingEnabled}
+          onEnabledChange={(v) => (settings.current.colorCodingEnabled = v)}
+          value={settings.current.colorCoding}
           onChange={(v) => (settings.current.colorCoding = v)}
         />
       </div>
@@ -104,7 +108,7 @@ const TrackableSettings = ({
   const settings = useRef(trackable.settings);
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-4">
       <div>
         <h3 className="text-xl">Name</h3>
         <Input
@@ -117,16 +121,18 @@ const TrackableSettings = ({
 
       <div>
         <h3 className="text-xl">Tracking Start</h3>
-        <DatePicker
-          date={
-            settings.current.startDate
-              ? new Date(settings.current.startDate)
-              : undefined
-          }
-          onChange={(v) => (settings.current.startDate = String(v))}
-          limits={{ start: new Date(1990, 0, 1), end: new Date() }}
-          className="mt-2"
-        />
+        <DropdownMobileTitleProvider title="Tracking Start">
+          <DatePicker
+            date={
+              settings.current.startDate
+                ? new Date(settings.current.startDate)
+                : undefined
+            }
+            onChange={(v) => (settings.current.startDate = String(v))}
+            limits={{ start: new Date(1990, 0, 1), end: new Date() }}
+            className="mt-2"
+          />
+        </DropdownMobileTitleProvider>
       </div>
 
       {trackable.type === "boolean" && <SettingsBoolean settings={settings} />}

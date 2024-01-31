@@ -4,8 +4,14 @@ import { Button } from "@/components/ui/button";
 import { GearIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import getPageSession from "src/helpers/getPageSesion";
 import { RSAGetTrackable } from "src/app/api/trackables/serverActions";
+import type { ITrackable } from "@t/trackable";
+import {
+  QueryClient,
+  HydrationBoundary,
+  dehydrate,
+} from "@tanstack/react-query";
+import { validateRequest } from "src/auth/lucia";
 
 const verifyYear = (y: string | undefined) => {
   if (!y || y.length !== 4) return;
@@ -29,33 +35,41 @@ const Trackable = async ({
 }: {
   params: { id: string; dateInfo: string[] };
 }) => {
-  const session = await getPageSession();
-
+  const { session } = await validateRequest();
   if (!session) redirect("/login");
 
-  const year = verifyYear(params.dateInfo[0]);
-  const month = verifyMonth(params.dateInfo[1]);
+  const queryClient = new QueryClient();
+
+  const year = params.dateInfo && verifyYear(params.dateInfo[0]);
+  const month = params.dateInfo && verifyMonth(params.dateInfo[1]);
+
+  await queryClient.prefetchQuery({
+    queryKey: ["trackable", params.id],
+    queryFn: async () => {
+      return await RSAGetTrackable({ trackableId: params.id });
+    },
+  });
+  const data = queryClient.getQueryData(["trackable", params.id]) as ITrackable;
+  queryClient.setQueryData(["trackable", params.id, "settings"], data.settings);
 
   try {
-    const trackable = await RSAGetTrackable({ trackableId: params.id });
-
     return (
       <div className="content-container flex h-full max-h-full w-full flex-col">
         <div className="mb-4 flex w-full items-center justify-between">
-          <h2 className="w-full bg-inherit text-2xl font-semibold">
-            {trackable.settings.name || "unnamed"}
+          <h2 className="w-full bg-inherit text-xl font-semibold md:text-2xl">
+            {data.settings.name}
           </h2>
           <Link href={`/trackables/${params.id}/settings`} className="mr-2">
             <Button name="settings" variant="outline" size="icon">
               <GearIcon className="h-4 w-4" />
             </Button>
           </Link>
-          <DeleteButton id={trackable.id} />
+          <DeleteButton id={params.id} />
         </div>
 
-        {params.dateInfo}
-
-        <TrackableView trackable={trackable} y={year} m={month} />
+        <HydrationBoundary state={dehydrate(queryClient)}>
+          <TrackableView id={params.id} m={month} y={year} />
+        </HydrationBoundary>
       </div>
     );
   } catch (e) {

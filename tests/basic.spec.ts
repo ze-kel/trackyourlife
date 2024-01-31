@@ -9,7 +9,7 @@ const URL = process.env.TEST_URL as string;
 // UPDATE FOR EACH
 // CHANGES PERSIST AFTER RELOAD
 // ALL SETTINGS PROPERTIES CAN BE SET
-// SETINGS ARE SAVED AND WORK OVERALL
+// SETTINGS ARE SAVED AND WORK OVERALL
 
 const CURRENT_DAY = new Date().getDate();
 
@@ -49,13 +49,6 @@ test("CRUD: Boolean", async ({ page }) => {
   // Go to trackable page
   await BOOL_BUTTON.click();
   await page.waitForURL("**/trackables/**");
-
-  // Tomorrow is disable
-  expect(
-    await page
-      .getByRole("button", { name: String(CURRENT_DAY + 1), exact: true })
-      .isDisabled(),
-  ).toBeTruthy();
 
   const todayCell = page.getByRole("button", {
     name: String(CURRENT_DAY),

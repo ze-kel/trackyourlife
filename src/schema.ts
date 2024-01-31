@@ -1,22 +1,22 @@
 import {
   pgEnum,
   pgTable,
-  bigint,
   varchar,
   json,
   uuid,
   date,
   primaryKey,
+  timestamp,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
-const USER_ID_LEN = 15;
-
 export const auth_user = pgTable("auth_user", {
-  id: varchar("id", { length: USER_ID_LEN }).primaryKey(),
+  id: varchar("id").primaryKey(),
 
   email: varchar("email").unique().notNull(),
   username: varchar("username").notNull(),
+
+  hashedPassword: varchar("hashed_password").notNull(),
 
   settings: json("settings").default({}).$type<Record<string, unknown>>(),
   // Currently only used to identify users created by e2e testing
@@ -24,32 +24,23 @@ export const auth_user = pgTable("auth_user", {
 });
 
 export const user_session = pgTable("user_session", {
-  id: varchar("id", { length: 128 }).primaryKey(),
+  id: varchar("id").primaryKey(),
 
-  userId: varchar("user_id", { length: 15 })
+  userId: varchar("user_id")
     .notNull()
-    .references(() => auth_user.id, { onDelete: "cascade" }),
+    .references(() => auth_user.id),
 
-  activeExpires: bigint("active_expires", { mode: "number" }).notNull(),
-
-  idleExpires: bigint("idle_expires", { mode: "number" }).notNull(),
-});
-
-export const user_key = pgTable("user_key", {
-  id: varchar("id", { length: 255 }).primaryKey(),
-
-  userId: varchar("user_id", { length: USER_ID_LEN })
-    .notNull()
-    .references(() => auth_user.id, { onDelete: "cascade" }),
-
-  hashedPassword: varchar("hashed_password", { length: 255 }),
+  expiresAt: timestamp("expires_at", {
+    withTimezone: true,
+    mode: "date",
+  }).notNull(),
 });
 
 export const trackableTypeEnum = pgEnum("type", ["boolean", "number", "range"]);
 
 export const trackable = pgTable("trackable", {
   id: uuid("id").defaultRandom().primaryKey(),
-  userId: varchar("user_id", { length: USER_ID_LEN })
+  userId: varchar("user_id")
     .notNull()
     .references(() => auth_user.id, { onDelete: "cascade" }),
 
@@ -70,7 +61,7 @@ export const trackableRecord = pgTable(
       .references(() => trackable.id, { onDelete: "cascade" }),
     date: date("date").notNull(),
     value: varchar("value").notNull(),
-    userId: varchar("user_id", { length: USER_ID_LEN })
+    userId: varchar("user_id")
       .notNull()
       .references(() => auth_user.id, { onDelete: "cascade" }),
   },
@@ -90,6 +81,8 @@ export const recordRelations = relations(trackableRecord, ({ one }) => ({
     references: [auth_user.id],
   }),
 }));
+
+export type DbUserSelect = typeof auth_user.$inferSelect;
 
 export type DbTrackableSelect = typeof trackable.$inferSelect;
 export type DbTrackableInsert = typeof trackable.$inferInsert;

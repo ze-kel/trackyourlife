@@ -8,6 +8,27 @@
       "when": 1700062832925,
       "tag": "0000_careful_the_initiative",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1706645219038,
+      "tag": "0001_condemned_ikaris",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1706645366596,
+      "tag": "0002_previous_grey_gargoyle",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1706649594897,
+      "tag": "0003_massive_mauler",
+      "breakpoints": true
     }
   ]
 }

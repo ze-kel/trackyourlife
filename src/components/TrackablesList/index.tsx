@@ -1,14 +1,29 @@
 "use client";
-import type { ITrackable } from "src/types/trackable";
-import Link from "next/link";
+import type { ITrackable, ITrackableSettings } from "src/types/trackable";
 import MiniTrackable from "./miniTrackable";
-import { useMemo } from "react";
-import FavButton from "@components/FavButton";
+import { m } from "framer-motion";
+import TrackableProvider from "@components/Providers/TrackableProvider";
+import type { QueryClient } from "@tanstack/react-query";
+import { QueriesObserver, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 
-const sortList = (list: ITrackable[]): ITrackable[] => {
-  const newList = [...list];
+const sortList = (
+  list: ITrackable["id"][],
+  queryClient: QueryClient,
+): ITrackable["id"][] => {
+  const newList = list.map((id) => {
+    return {
+      id,
+      settings: queryClient.getQueryData<ITrackableSettings>([
+        "trackable",
+        id,
+        "settings",
+      ]),
+    };
+  });
 
   newList.sort((a, b) => {
+    if (!a.settings || !b.settings) return 0;
     if (a.settings.favorite && !b.settings.favorite) return -1;
     if (!a.settings.favorite && b.settings.favorite) return 1;
 
@@ -18,29 +33,37 @@ const sortList = (list: ITrackable[]): ITrackable[] => {
     return aName.localeCompare(bName);
   });
 
-  return newList;
+  return newList.map((v) => v.id);
 };
 
-const TrackablesList = ({ list }: { list: ITrackable[] }) => {
-  const sortedList = useMemo(() => sortList(list), [list]);
+const TrackablesList = ({ list }: { list: ITrackable["id"][] }) => {
+  const queryClient = useQueryClient();
+
+  const [sorted, setSorted] = useState(sortList(list, queryClient));
+
+  useEffect(() => {
+    const m = list.map((v) => ({
+      queryKey: ["trackable", v, "settings"],
+    }));
+    const obs = new QueriesObserver(queryClient, m);
+    obs.subscribe(() => {
+      setSorted(sortList(list, queryClient));
+    });
+  });
 
   return (
     <div className="grid gap-5">
-      {sortedList.map((tr) => (
-        <article
-          key={tr.id}
+      {sorted.map((id, index) => (
+        <m.div
+          layout
+          layoutId={String(index)}
+          key={id}
           className="border-b border-neutral-200 py-2 last:border-0 dark:border-neutral-800"
         >
-          <div className="flex justify-between">
-            <Link href={`/trackables/${tr.id}`} className="block w-fit">
-              <h3 className="w-fit cursor-pointer text-xl font-light">
-                {tr.settings.name || "unnamed"}
-              </h3>
-            </Link>
-            <FavButton trackable={tr} />
-          </div>
-          <MiniTrackable trackable={tr} className="my-4" />
-        </article>
+          <TrackableProvider id={id}>
+            <MiniTrackable className="my-4" />
+          </TrackableProvider>
+        </m.div>
       ))}
     </div>
   );

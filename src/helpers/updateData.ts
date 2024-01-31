@@ -5,7 +5,7 @@ import type { Optional } from "@t/helpers";
 
 const updateData = (
   trackable: ITrackable,
-  { day, month, year, value }: Optional<ITrackableUpdate, "value">,
+  { day, month, year, value }: Optional<Omit<ITrackableUpdate, "id">, "value">,
 ) => {
   const nTrackable = trackable;
 

@@ -3,16 +3,14 @@ import { isSameDay, isBefore, isAfter } from "date-fns";
 import formatDateKey from "src/helpers/formatDateKey";
 import { DayCellBoolean } from "./DayCellBoolean";
 import { DayCellNumber } from "./DayCellNumber";
-import type { ITrackable, ITrackableSettings } from "src/types/trackable";
+import type { ITrackableSettings } from "src/types/trackable";
 import { DayCellRange } from "./DayCellRange";
+import { useMemo } from "react";
+import DayNumber from "@components/DayCell/dayNumber";
+import { cn } from "@/lib/utils";
+import { useTrackableContextSafe } from "@components/Providers/TrackableProvider";
 
-export interface IDayProps {
-  trackable: ITrackable;
-  day: number;
-  month: number;
-  year: number;
-  style?: "mini";
-}
+export interface IDayProps {}
 
 export const computeDayCellHelpers = ({
   day,
@@ -31,10 +29,10 @@ export const computeDayCellHelpers = ({
   const dateKey = formatDateKey({ day, month, year });
   const beforeToday = isBefore(dateDay, dateNow);
 
-  const startCovented = startDate ? new Date(startDate) : undefined;
+  const startConvented = startDate ? new Date(startDate) : undefined;
 
-  const afterLimit = startCovented
-    ? isSameDay(dateDay, startCovented) || isAfter(dateDay, startCovented)
+  const afterLimit = startConvented
+    ? isSameDay(dateDay, startConvented) || isAfter(dateDay, startConvented)
     : true;
   const inTrackRange = beforeToday && afterLimit;
   const isToday = isSameDay(dateNow, dateDay);
@@ -42,19 +40,87 @@ export const computeDayCellHelpers = ({
   return { dateKey, inTrackRange, isToday };
 };
 
-const DayCell = (data: IDayProps) => {
-  const trackable = data.trackable;
+const DayCell = ({
+  day,
+  month,
+  year,
+  className,
+}: {
+  day: number;
+  month: number;
+  year: number;
+  className?: string;
+}) => {
+  const { trackable, update } = useTrackableContextSafe();
+
+  const { dateKey, inTrackRange, isToday } = useMemo(
+    () =>
+      computeDayCellHelpers({
+        day,
+        month,
+        year,
+        startDate: trackable?.settings.startDate,
+      }),
+    [day, month, year, trackable?.settings.startDate],
+  );
+
+  if (!trackable) return <></>;
+
+  const updateHandler = async (value: string) => {
+    await update({ value, day, month, year });
+  };
+
+  const baseClasses = cn(
+    "w-full relative select-none overflow-hidden border-transparent outline-none focus:outline-neutral-300 dark:focus:outline-neutral-600 border-2",
+    className,
+  );
+
+  if (!inTrackRange)
+    return (
+      <div
+        className={cn(
+          baseClasses,
+          "h-full cursor-default bg-neutral-100 dark:bg-neutral-900",
+        )}
+      >
+        <DayNumber day={day} isToday={isToday} />
+      </div>
+    );
 
   if (trackable.type === "boolean") {
-    return <DayCellBoolean {...data} />;
+    return (
+      <DayCellBoolean
+        className={baseClasses}
+        value={trackable.data[dateKey]}
+        onChange={updateHandler}
+      >
+        <DayNumber day={day} isToday={isToday} />
+      </DayCellBoolean>
+    );
   }
 
   if (trackable.type === "number") {
-    return <DayCellNumber {...data} />;
+    return (
+      <DayCellNumber
+        className={baseClasses}
+        value={trackable.data[dateKey]}
+        onChange={updateHandler}
+      >
+        <DayNumber day={day} isToday={isToday} />
+      </DayCellNumber>
+    );
   }
 
   if (trackable.type === "range") {
-    return <DayCellRange {...data} />;
+    return (
+      <DayCellRange
+        className={baseClasses}
+        value={trackable.data[dateKey]}
+        onChange={updateHandler}
+      >
+        <DayNumber day={day} isToday={isToday} />
+      </DayCellRange>
+    );
   }
 
   throw new Error("Unsupported trackable type");

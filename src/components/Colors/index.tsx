@@ -22,7 +22,7 @@ export const BetterNumberInput = ({
 
   return (
     <Input
-      className="w-full text-center"
+      className="w-full text-center max-sm:p-0 max-sm:text-xs"
       type="number"
       value={isEmpty ? "" : value}
       onChange={(e) => {

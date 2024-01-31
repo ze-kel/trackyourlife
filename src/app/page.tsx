@@ -2,11 +2,27 @@ import Link from "next/link";
 import TrackablesList from "@components/TrackablesList";
 import { Button } from "@/components/ui/button";
 import { RSAGetAllTrackables } from "src/app/api/trackables/serverActions";
+import {
+  HydrationBoundary,
+  QueryClient,
+  dehydrate,
+} from "@tanstack/react-query";
 
 const Page = async () => {
+  console.log("page");
   const trackables = await RSAGetAllTrackables({
-    limits: { type: "last", days: 7 },
+    limits: { type: "last", days: 31 },
   });
+
+  const queryClient = new QueryClient();
+
+  const ids: string[] = [];
+
+  for (const tr of trackables) {
+    ids.push(tr.id);
+    queryClient.setQueryData(["trackable", tr.id], tr);
+    queryClient.setQueryData(["trackable", tr.id, "settings"], tr.settings);
+  }
 
   return (
     <div className="content-container flex w-full flex-col">
@@ -16,9 +32,11 @@ const Page = async () => {
           <Button variant="outline">Create</Button>
         </Link>
       </div>
-      <div className="mt-2">
-        <TrackablesList list={trackables}></TrackablesList>
-      </div>
+      <HydrationBoundary state={dehydrate(queryClient)}>
+        <div className="mt-2">
+          <TrackablesList list={ids}></TrackablesList>
+        </div>
+      </HydrationBoundary>
     </div>
   );
 };

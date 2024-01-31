@@ -1,12 +1,12 @@
 "use client";
 import {
+  DropdownMobileTitleProvider,
   Dropdown,
   DropdownContent,
   DropdownTrigger,
 } from "@components/Dropdown";
 import Link from "next/link";
 import { ChevronDownIcon } from "@radix-ui/react-icons";
-import clsx from "clsx";
 import { Button } from "@/components/ui/button";
 import type { User } from "lucia";
 import { useRouter } from "next/navigation";
@@ -43,29 +43,31 @@ const Header = ({ user }: { user?: User }) => {
         </Link>
 
         {user && (
-          <Dropdown placement="bottom-end">
-            <DropdownContent className="flex flex-col items-end justify-end gap-2">
-              <RadioTabs value={theme} onValueChange={setTheme}>
-                <RadioTabItem value="light" id="light">
-                  Light
-                </RadioTabItem>
-                <RadioTabItem value="system" id="system">
-                  System
-                </RadioTabItem>
-                <RadioTabItem value="dark" id="dark">
-                  Dark
-                </RadioTabItem>
-              </RadioTabs>
-              <SigOutButton key={"so"} />
-            </DropdownContent>
+          <DropdownMobileTitleProvider title={user ? user.username : ""}>
+            <Dropdown placement="bottom-end">
+              <DropdownContent className="flex flex-col gap-2">
+                <RadioTabs value={theme} onValueChange={setTheme}>
+                  <RadioTabItem value="light" id="light">
+                    Light
+                  </RadioTabItem>
+                  <RadioTabItem value="system" id="system">
+                    System
+                  </RadioTabItem>
+                  <RadioTabItem value="dark" id="dark">
+                    Dark
+                  </RadioTabItem>
+                </RadioTabs>
+                <SigOutButton key={"so"} />
+              </DropdownContent>
 
-            <DropdownTrigger>
-              <div className="relative flex cursor-pointer items-center transition-colors hover:text-neutral-600 dark:hover:text-neutral-50">
-                <p className="font-medium">{user ? user.username : ""}</p>
-                <ChevronDownIcon className={clsx("w-6 transition-transform")} />
-              </div>
-            </DropdownTrigger>
-          </Dropdown>
+              <DropdownTrigger>
+                <div className="relative flex cursor-pointer items-center transition-colors hover:text-neutral-600 dark:hover:text-neutral-50">
+                  <p className="font-medium">{user ? user.username : ""}</p>
+                  <ChevronDownIcon className={"w-6 transition-transform"} />
+                </div>
+              </DropdownTrigger>
+            </Dropdown>
+          </DropdownMobileTitleProvider>
         )}
       </div>
     </div>

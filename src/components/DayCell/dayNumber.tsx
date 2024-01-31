@@ -1,4 +1,4 @@
-import cls from "clsx";
+import { cn } from "@/lib/utils";
 
 const DayNumber = ({
   style,
@@ -13,8 +13,8 @@ const DayNumber = ({
   return (
     <>
       <span
-        className={cls(
-          "absolute left-2 top-1 select-none text-xs text-neutral-800 sm:text-base",
+        className={cn(
+          "absolute left-0.5 top-0.5 select-none text-xs text-neutral-800 sm:left-2 sm:top-1 sm:text-base",
           isToday ? "font-normal underline" : "font-light ",
         )}
       >

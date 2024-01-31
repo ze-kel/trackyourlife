@@ -1,26 +1,51 @@
-import type { MouseEventHandler, RefObject } from "react";
-import { useEffect, useRef, useState } from "react";
+import type { MouseEventHandler, RefObject, TouchEvent } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { range } from "src/helpers/animation";
 
-const useRefSize = (ref: RefObject<HTMLDivElement>) => {
-  const [width, setWidth] = useState<number>();
-  const [height, setHeight] = useState<number>();
+type IUseRefSizeReturn = {
+  width: number;
+  height: number;
+  top: number;
+  left: number;
+};
 
-  useEffect(() => {
-    const r = () => {
-      if (!ref.current) return;
-      const { width, height } = ref.current.getBoundingClientRect();
-      setWidth(width);
-      setHeight(height);
-    };
-    r();
-    addEventListener("resize", r);
-    return () => {
-      removeEventListener("resize", r);
-    };
+// Note that when we access properties on render we can use regular data to rerender on change
+// But when we access stuff in handlers(i.e mousemove\touchmove) we should use ref to guarantee up to date values
+export const useRefSize = (ref: RefObject<HTMLDivElement>) => {
+  const dataRef = useRef({ width: 0, height: 0, left: 0, top: 0 });
+  const [data, setData] = useState<IUseRefSizeReturn>({
+    width: 0,
+    height: 0,
+    left: 0,
+    top: 0,
   });
 
-  return { width, height };
+  const calculate = useCallback(() => {
+    if (!ref.current) return;
+    const { width, height, top, left } = ref.current.getBoundingClientRect();
+    const data = {
+      width,
+      height,
+      top,
+      left,
+    };
+
+    setData(data);
+    dataRef.current = data;
+  }, []);
+
+  useEffect(() => {
+    calculate();
+    addEventListener("resize", calculate);
+    addEventListener("scroll", calculate);
+    return () => {
+      removeEventListener("resize", calculate);
+      removeEventListener("scroll", calculate);
+    };
+  }, []);
+
+  // Force refresh is useful when initial rendering position will be inaccurate later(i.e. modal that animate when appearing)
+  return { ...data, dataRef, forceRefresh: calculate };
 };
 
 export const Controller = ({
@@ -38,36 +63,49 @@ export const Controller = ({
 }) => {
   const ref = useRef<HTMLDivElement>(null);
 
-  const { width } = useRefSize(ref);
+  const { width, dataRef, forceRefresh } = useRefSize(ref);
 
-  const startDrag: MouseEventHandler = (e) => {
-    if (!ref.current) return;
+  const move = (x: number) => {
+    const { width, left } = dataRef.current;
+    const position = range(0, width, 0, 100, x - left);
+
+    onChange(Math.round((position / 100) * maxVal));
+  };
+
+  const startMouseDrag: MouseEventHandler = (e) => {
+    forceRefresh();
     // Left click only
     if (e.nativeEvent.button !== 0) return;
-    const { width, left } = ref.current.getBoundingClientRect();
 
-    const moveHadler = (e: MouseEvent) => {
-      const position = range(0, width, 0, 100, e.clientX - left);
-      onChange(Math.round((position / 100) * maxVal));
+    const moveHandler = (e: MouseEvent) => {
+      move(e.clientX);
     };
 
-    moveHadler(e as unknown as MouseEvent);
+    moveHandler(e as unknown as MouseEvent);
 
     const upHandler = () => {
-      removeEventListener("mousemove", moveHadler);
+      removeEventListener("mousemove", moveHandler);
       removeEventListener("mouseup", upHandler);
     };
-    addEventListener("mousemove", moveHadler);
+    addEventListener("mousemove", moveHandler);
     addEventListener("mouseup", upHandler);
   };
 
   const xPercent = (value / maxVal) * 100;
 
+  const dragHandler = (e: TouchEvent<HTMLDivElement>) => {
+    const t = e.touches[0];
+    if (t) {
+      move(t.clientX);
+    }
+  };
+
   return (
     <div
-      className="relative flex h-9 w-full rounded-lg border-2 border-neutral-200 bg-transparent text-sm shadow-sm transition-colors  focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-950 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-800 "
+      className="relative flex h-9 w-full touch-none rounded-lg border-2 border-neutral-200 bg-transparent text-sm shadow-sm transition-colors  focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-950 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-800 "
       style={{ background: backgroundScale }}
-      onMouseDown={startDrag}
+      onMouseDown={startMouseDrag}
+      onTouchMove={dragHandler}
     >
       <div ref={ref} className="relative w-full">
         <div
@@ -110,28 +148,44 @@ export const Controller2D = ({
 }) => {
   const ref = useRef<HTMLDivElement>(null);
 
-  const { width, height } = useRefSize(ref);
+  const { width, left, height, dataRef, forceRefresh } = useRefSize(ref);
 
-  const startDrag: MouseEventHandler = (e) => {
-    if (!ref.current) return;
+  const move = (xPos: number, yPos: number) => {
+    const { width, height } = dataRef.current;
+    const x = range(0, width, 0, maxX, xPos);
+    const y = range(0, height, 0, maxY, yPos);
+    onChange(Math.round(x), Math.round(y));
+  };
+
+  const starMouseDrag: MouseEventHandler = (e) => {
     // Left click only
     if (e.nativeEvent.button !== 0) return;
-    const { width, height, top, left } = ref.current.getBoundingClientRect();
+      forceRefresh();
 
-    const moveHadler = (e: MouseEvent) => {
-      const x = range(0, width, 0, maxX, e.clientX - left);
-      const y = range(0, height, 0, maxY, e.clientY - top);
-      onChange(Math.round(x), Math.round(y));
+    const moveHandler = (e: MouseEvent) => {
+      move(e.clientX - dataRef.current.left, e.clientY - dataRef.current.top);
     };
 
-    moveHadler(e as unknown as MouseEvent);
+    moveHandler(e as unknown as MouseEvent);
 
     const upHandler = () => {
-      removeEventListener("mousemove", moveHadler);
+      removeEventListener("mousemove", moveHandler);
       removeEventListener("mouseup", upHandler);
     };
-    addEventListener("mousemove", moveHadler);
+    addEventListener("mousemove", moveHandler);
     addEventListener("mouseup", upHandler);
+  };
+
+  const touchStart = (e: TouchEvent<HTMLDivElement>) => {
+    forceRefresh();
+    touchHandler(e);
+  };
+
+  const touchHandler = (e: TouchEvent<HTMLDivElement>) => {
+    const t = e.touches[0];
+    if (t) {
+      move(t.clientX - left, t.clientY - dataRef.current.top);
+    }
   };
 
   const xPercent = (x / maxX) * 100;
@@ -140,9 +194,11 @@ export const Controller2D = ({
   return (
     <div
       ref={ref}
-      className="relative flex h-48 w-full overflow-hidden rounded-md border-2 border-neutral-200 bg-transparent text-sm shadow-sm transition-colors  focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-950 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-800 "
+      className="relative flex h-48 w-full touch-none overflow-hidden rounded-md border-2 border-neutral-200 bg-transparent text-sm shadow-sm transition-colors  focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-950 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-800 "
       style={{ background }}
-      onMouseDown={startDrag}
+      onMouseDown={starMouseDrag}
+      onTouchMove={touchHandler}
+      onTouchStart={touchStart}
     >
       <div
         className={

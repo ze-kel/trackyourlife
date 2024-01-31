@@ -26,6 +26,19 @@ export const InterpolateColors = (
 export const makeColorString = (color: IColorHSL) =>
   `hsl(${color.h}, ${color.s}%, ${color.l}%)`;
 
+export const getContrastierColorForDay = ({ h, s, l }: IColorHSL) => {
+  const withBlack = chroma.contrast(
+    chroma.hsl(h, s / 100, l / 100),
+    chroma.rgb(0, 0, 0),
+  );
+  const withWhite = chroma.contrast(
+    chroma.hsl(h, s / 100, l / 100),
+    chroma.rgb(255, 255, 255),
+  );
+
+  return withBlack > withWhite ? "black" : "white";
+};
+
 export const RGBToHSL = ({ r, g, b }: IColorRGB): IColorHSL => {
   const [h, s, l] = chroma.rgb(r, g, b).hsl();
   return { h, s: s * 100, l: l * 100 };

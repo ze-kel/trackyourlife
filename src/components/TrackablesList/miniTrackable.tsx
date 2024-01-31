@@ -1,9 +1,13 @@
 "use client";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import DayCell from "@components/DayCell";
-import type { ITrackable } from "@t/trackable";
-import clsx from "clsx";
+import { useTrackableContextSafe } from "@components/Providers/TrackableProvider";
+import { HeartFilledIcon, HeartIcon } from "@radix-ui/react-icons";
 import { format, getDaysInMonth } from "date-fns";
+import Link from "next/link";
 import { useMemo } from "react";
+import { ErrorBoundary } from "react-error-boundary";
 
 const generateDates = (days: number) => {
   const today = new Date();
@@ -34,45 +38,71 @@ const generateDates = (days: number) => {
 
 const NUM_OF_DAYS = 6;
 
-const MiniTrackable = ({
-  className,
-  trackable,
-}: {
-  className?: string;
-  trackable: ITrackable;
-}) => {
+const MiniTrackable = ({ className }: { className?: string }) => {
   const daysToRender = useMemo(() => generateDates(NUM_OF_DAYS), []);
 
+  const { trackable, settingsUpdatePartial } = useTrackableContextSafe();
+
   return (
-    <div
-      className={clsx(
-        "sm grid grid-cols-3 gap-x-1 gap-y-1 md:grid-cols-6",
-        className,
-      )}
-    >
-      <>
-        {daysToRender.map((day, index) => {
-          const date = new Date(day.year, day.month, day.day);
-          return (
-            <div
-              key={index}
-              className={clsx(
-                "gap-1",
-                index === 0 ? "hidden md:flex" : "flex",
-                index > 3 ? "flex-col-reverse md:flex-col" : "flex-col",
-              )}
-            >
-              <div className="px-1 text-xs ">
-                <span className="text-neutral-400 dark:text-neutral-700">
-                  {format(date, "EEEE")}
-                </span>
-              </div>
-              <DayCell {...day} trackable={trackable} key={index} />
-            </div>
-          );
-        })}
-      </>
-    </div>
+    <>
+      <div className="flex justify-between">
+        <Link href={`/trackables/${trackable?.id}`} className="block w-fit">
+          <h3 className="w-fit cursor-pointer text-xl font-light">
+            {trackable?.settings.name || "unnamed"}
+          </h3>
+        </Link>
+
+        <Button
+          variant={"ghost"}
+          size={"icon"}
+          onClick={() =>
+            void settingsUpdatePartial({
+              favorite: !trackable?.settings.favorite,
+            })
+          }
+        >
+          {trackable?.settings.favorite ? <HeartFilledIcon /> : <HeartIcon />}
+        </Button>
+      </div>
+
+      <ErrorBoundary
+        fallback={
+          <div className="flex h-12 items-center justify-center bg-neutral-200 dark:bg-neutral-900">
+            Error occured
+          </div>
+        }
+      >
+        <div
+          className={cn(
+            "sm grid grid-cols-3 gap-x-1 gap-y-1 md:grid-cols-6",
+            className,
+          )}
+        >
+          <>
+            {daysToRender.map((day, index) => {
+              const date = new Date(day.year, day.month, day.day);
+              return (
+                <div
+                  key={index}
+                  className={cn(
+                    "gap-1",
+                    index === 0 ? "hidden md:flex" : "flex",
+                    index > 3 ? "flex-col-reverse md:flex-col" : "flex-col",
+                  )}
+                >
+                  <div className="px-1 text-xs ">
+                    <span className="text-neutral-400 dark:text-neutral-700">
+                      {format(date, "EEEE")}
+                    </span>
+                  </div>
+                  <DayCell {...day} key={index} className="h-16" />
+                </div>
+              );
+            })}
+          </>
+        </div>
+      </ErrorBoundary>
+    </>
   );
 };
 

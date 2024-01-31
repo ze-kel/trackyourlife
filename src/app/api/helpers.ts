@@ -1,32 +1,19 @@
-import type { NextRequest } from "next/server";
-import { auth } from "src/auth/lucia";
-import * as context from "next/headers";
 import { redirect } from "next/navigation";
+import { validateRequest } from "src/auth/lucia";
 
-export const checkForSession = async (request: NextRequest) => {
-  const authRequest = auth.handleRequest(request.method, context);
-  const session = await authRequest.validate();
-  return { session, authRequest, userId: session?.user.userId };
+export const checkForSession = async () => {
+  const { session, user } = await validateRequest();
+
+  return { session, user, userId: session?.userId };
 };
 
 export const RSAGetUserIdAndRedirect = async () => {
-  const id = await RSAGetUserId();
-  if (id === null) {
+  const { userId } = await checkForSession();
+  if (!userId) {
     redirect("/login");
   }
 
-  return id;
-};
-
-export const RSAGetUserId = async () => {
-  const authRequest = auth.handleRequest("GET", context);
-
-  const session = await authRequest.validate();
-  if (!session?.user.userId) {
-    return null;
-  }
-
-  return session.user.userId;
+  return userId;
 };
 
 export class ApiFunctionError extends Error {

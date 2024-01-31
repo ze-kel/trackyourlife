@@ -45,11 +45,11 @@ export const ZTrackableSettingsBoolean = z.object({
 export const ZTrackableSettingsNumber = z.object({
   ...basics,
   incrementBy: z.number().min(1).optional(),
-  limits: z
+  progressEnabled: z.boolean().optional(),
+  progress: z
     .object({
       min: z.number().optional(),
       max: z.number().optional(),
-      showProgress: z.boolean().optional(),
     })
     .optional(),
   colorCodingEnabled: z.boolean().optional(),
