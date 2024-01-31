@@ -1,8 +1,7 @@
 import { cookies } from "next/headers";
-import type { NextRequest } from "next/server";
 import { lucia, validateRequest } from "src/auth/lucia";
 
-export const POST = async (request: NextRequest) => {
+export const POST = async () => {
   const { session } = await validateRequest();
 
   if (!session) {

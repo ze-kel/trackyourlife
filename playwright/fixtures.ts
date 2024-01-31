@@ -37,10 +37,10 @@ export const test = baseTest.extend<object, { workerStorageState: string }>({
         username: "autotester",
         role: "autotester",
       };
+
       // Important: make sure we authenticate in a clean environment by unsetting storage state.
       const context = await request.newContext({ storageState: undefined });
 
-      // Send authentication request. Replace with your own.
       const r = await context.post(URL + "/api/user/create", {
         data: { ...account },
       });

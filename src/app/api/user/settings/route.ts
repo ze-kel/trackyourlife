@@ -6,9 +6,9 @@ import {
   UpdateUserSettings,
 } from "src/app/api/user/settings/apiFunctions";
 
-export const GET = async (request: NextRequest) => {
+export const GET = async () => {
   // Auth check
-  const { userId } = await checkForSession(request);
+  const { userId } = await checkForSession();
 
   if (!userId) {
     return new Response(null, {
@@ -23,7 +23,7 @@ export const GET = async (request: NextRequest) => {
 
 export const POST = async (request: NextRequest) => {
   // Auth check
-  const { userId } = await checkForSession(request);
+  const { userId } = await checkForSession();
 
   if (!userId) {
     return new Response(null, {

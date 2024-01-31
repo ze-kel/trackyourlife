@@ -2,10 +2,18 @@ import { verifyRequestOrigin } from "lucia";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export async function middleware(request: NextRequest): Promise<NextResponse> {
-  if (request.method === "GET") {
+export function middleware(request: NextRequest): NextResponse {
+  console.log(request.nextUrl.pathname);
+
+  if (
+    request.method === "GET" ||
+    // For auto tests
+    request.nextUrl.pathname.startsWith("/api/user/create") ||
+    request.nextUrl.pathname.startsWith("/api/user/login")
+  ) {
     return NextResponse.next();
   }
+
   const originHeader = request.headers.get("Origin");
   // NOTE: You may need to use `X-Forwarded-Host` instead
   const hostHeader = request.headers.get("Host");

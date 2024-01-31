@@ -13,7 +13,6 @@
     "push": "dotenv -e .env.development drizzle-kit push:pg",
     "migrate": "npx --yes tsx ./src/app/api/migrate.ts",
     "migrate:env": "dotenv -e .env.development npm run migrate",
-    "migrate:prod": "dotenv -e .env.production npm run migrate",
     "vercel:build": "npm run migrate && npm run build",
     "docker:push": "drizzle-kit push:pg",
     "docker:push:dev": "npm run docker:push && npm run dev"

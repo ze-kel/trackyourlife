@@ -5,7 +5,7 @@ import {
   GetAllTrackables,
 } from "src/app/api/trackables/apiFunctions";
 
-export const GET = async (request: NextRequest) => {
+export const GET = async () => {
   const { userId } = await checkForSession();
 
   if (!userId) {

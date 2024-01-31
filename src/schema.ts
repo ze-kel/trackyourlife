@@ -1,7 +1,6 @@
 import {
   pgEnum,
   pgTable,
-  bigint,
   varchar,
   json,
   uuid,

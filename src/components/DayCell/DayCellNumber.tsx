@@ -3,14 +3,11 @@ import type React from "react";
 import type { CSSProperties, ReactNode } from "react";
 import { useCallback, useMemo, useRef, useState } from "react";
 import debounce from "lodash/debounce";
-import EditableText from "@components/EditableText";
 import { PlusIcon, MinusIcon } from "@radix-ui/react-icons";
 import { AnimatePresence, m } from "framer-motion";
 import { makeColorString } from "src/helpers/colorTools";
 import { cn } from "@/lib/utils";
 import { useDayCellContextNumber } from "@components/Providers/DayCellProvider";
-import { useWindowSize } from "src/helpers/useWindowSize";
-import { Dropdown } from "@components/Dropdown";
 import { isMobile } from "react-device-detect";
 
 export const DayCellNumber = ({
@@ -29,11 +26,9 @@ export const DayCellNumber = ({
 
   const [displayedNumber, setDisplayedNumber] = useState(Number(value || 0));
 
-  const [inInputEdit, setInInputEdit] = useState(false);
+  const [inInputEdit] = useState(false);
 
   const [isHover, setHover] = useState(false);
-
-  const { width } = useWindowSize();
 
   const updateValue = async (value: number) => {
     if (onChange) {

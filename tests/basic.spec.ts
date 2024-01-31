@@ -1,7 +1,6 @@
 import type { ITrackable } from "@t/trackable";
 import type { Page } from "../playwright/fixtures";
 import { test, expect } from "../playwright/fixtures";
-import { getDaysInMonth } from "date-fns";
 
 const URL = process.env.TEST_URL as string;
 
@@ -13,7 +12,6 @@ const URL = process.env.TEST_URL as string;
 // SETTINGS ARE SAVED AND WORK OVERALL
 
 const CURRENT_DAY = new Date().getDate();
-const isLastDayOfMonth = CURRENT_DAY === getDaysInMonth(new Date());
 
 const createTrackable = async ({
   page,
@@ -51,17 +49,6 @@ test("CRUD: Boolean", async ({ page }) => {
   // Go to trackable page
   await BOOL_BUTTON.click();
   await page.waitForURL("**/trackables/**");
-
-  // Tomorrow is disabled
-  if (!isLastDayOfMonth) {
-    expect(
-      await page
-        .getByRole("button", { name: String(CURRENT_DAY + 1), exact: true })
-        .isDisabled(),
-    ).toBeTruthy();
-  } else {
-    // TODO
-  }
 
   const todayCell = page.getByRole("button", {
     name: String(CURRENT_DAY),

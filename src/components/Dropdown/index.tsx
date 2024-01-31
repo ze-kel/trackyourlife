@@ -57,7 +57,7 @@ const DropdownTrigger = ({
 
   return (
     <div
-      ref={context.refs.setReference}
+      ref={(...args) => context.refs.setReference(...args)}
       className={className}
       {...getReferenceProps()}
     >
@@ -117,7 +117,7 @@ const DropdownContent = ({
       <AnimatePresence>
         {context.open && (
           <div
-            ref={context.refs.setFloating}
+            ref={(...args) => context.refs.setFloating(...args)}
             className={cn(
               "z-50",
               "absolute left-0 top-0 h-full w-full pt-20 shadow-lg",
@@ -173,7 +173,7 @@ const DropdownContent = ({
     <AnimatePresence>
       {context.open && (
         <m.div
-          ref={context.refs.setFloating}
+          ref={(...args) => context.refs.setFloating(...args)}
           initial={{
             opacity: 0,
           }}

@@ -1,5 +1,3 @@
-import type { NextRequest } from "next/server";
-import * as context from "next/headers";
 import { redirect } from "next/navigation";
 import { validateRequest } from "src/auth/lucia";
 

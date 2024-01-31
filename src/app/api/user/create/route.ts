@@ -31,7 +31,7 @@ export const POST = async (request: NextRequest) => {
     const hashedPassword = await new Argon2id().hash(password);
     const userId = generateId(15);
 
-    const usr = await db
+    await db
       .insert(auth_user)
       .values({
         id: userId,
@@ -39,7 +39,7 @@ export const POST = async (request: NextRequest) => {
         email: email.toLowerCase(),
         hashedPassword,
         settings: {},
-        role: "user",
+        role: role === "autotester" ? "autotester" : "user",
       })
       .returning();
 

@@ -31,7 +31,7 @@ export default async function RootLayout({
                 enableSystem
               >
                 <div className="h-full max-h-full min-h-screen bg-neutral-50 text-neutral-900 dark:bg-neutral-950 dark:text-neutral-50">
-                  <Header user={user}></Header>
+                  <Header user={user || undefined}></Header>
                   <div className="mx-auto box-border w-full pt-6">
                     {children}
                   </div>
