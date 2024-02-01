@@ -8,7 +8,7 @@ import { AnimatePresence, m } from "framer-motion";
 import { makeColorString } from "src/helpers/colorTools";
 import { cn } from "@/lib/utils";
 import { useDayCellContextNumber } from "@components/Providers/DayCellProvider";
-import { isMobile } from "react-device-detect";
+import { useMediaQuery } from "usehooks-ts";
 
 export const DayCellNumber = ({
   value,
@@ -21,6 +21,8 @@ export const DayCellNumber = ({
   children: ReactNode;
   className?: string;
 }) => {
+  const isTouch = useMediaQuery("(hover: none)");
+
   const { valueToColor, valueToProgressPercentage } = useDayCellContextNumber();
 
   const [internalNumber, setInternalNumber] = useState(Number(value || 0));
@@ -128,7 +130,7 @@ export const DayCellNumber = ({
         } as CSSProperties
       }
       onMouseEnter={() => {
-        if (!isMobile) setHover(true);
+        if (!isTouch) setHover(true);
       }}
       onMouseLeave={(e) => {
         setHover(false);
