@@ -1,5 +1,4 @@
 /* eslint-disable react/display-name */
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type {
   FloatingContext,
@@ -19,8 +18,6 @@ import {
 import { AnimatePresence, m } from "framer-motion";
 import type { ReactNode } from "react";
 import { createContext, useContext, useState } from "react";
-import { useWindowSize } from "src/helpers/useWindowSize";
-import { Cross1Icon } from "@radix-ui/react-icons";
 
 export type IDropdown = {
   open?: boolean;
@@ -48,7 +45,7 @@ const DropdownTrigger = ({
 }) => {
   const { context } = useContext(DropdownContext);
 
-  if (!context) throw new Error("");
+  if (!context) throw new Error("DropdownTrigger no context");
 
   const { getReferenceProps } = useInteractions([
     useClick(context),
@@ -66,31 +63,11 @@ const DropdownTrigger = ({
   );
 };
 
-const DropdownMobileTitleContext = createContext("");
-
-export const DropdownMobileTitleProvider = ({
-  title,
-  children,
-}: {
-  title: string;
-  children: ReactNode;
-}) => {
-  return (
-    <DropdownMobileTitleContext.Provider value={title}>
-      {children}
-    </DropdownMobileTitleContext.Provider>
-  );
-};
-
-// Corresponds to sm in tailwind
-const MOBILE_BREAKPOINT = 640;
-
 const defaultBackgroundClasses =
   "overflow-hidden box-border rounded-md border border-neutral-200 bg-white p-2 text-neutral-950 shadow dark:border-neutral-800 dark:bg-neutral-950 dark:text-neutral-50";
 
 const DropdownContent = ({
   className,
-  disableMobileAdaptation,
   children,
 }: {
   disableMobileAdaptation?: boolean;
@@ -105,69 +82,6 @@ const DropdownContent = ({
     useClick(context),
     useDismiss(context),
   ]);
-
-  const size = useWindowSize();
-
-  const isMobile = size.width < MOBILE_BREAKPOINT;
-
-  const mobileTitle = useContext(DropdownMobileTitleContext);
-
-  if (isMobile && !disableMobileAdaptation) {
-    return (
-      <AnimatePresence>
-        {context.open && (
-          <div
-            ref={(...args) => context.refs.setFloating(...args)}
-            className={cn(
-              "z-50",
-              "absolute left-0 top-0 h-full w-full pt-20 shadow-lg",
-            )}
-          >
-            <m.div
-              initial={{
-                opacity: 0,
-              }}
-              animate={{
-                opacity: 0.5,
-              }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              onClick={() => context.onOpenChange(false)}
-              className="absolute left-0 top-0 z-50 h-full w-full bg-black "
-            />
-            <m.div
-              initial={{
-                top: "100%",
-              }}
-              animate={{
-                top: 0,
-              }}
-              exit={{ top: "100%", opacity: 0 }}
-              transition={{ duration: 0.3, ease: [0, 0.4, 0.4, 1.05] }}
-              className={cn(
-                background && defaultBackgroundClasses + " rounded-2xl",
-                "h-full w-full",
-                className,
-                "relative z-[51] overflow-scroll",
-              )}
-            >
-              <div className="flex items-center justify-between px-2 pb-3">
-                <h2 className="text-xl">{mobileTitle}</h2>
-                <Button
-                  variant={"ghost"}
-                  size={"icon"}
-                  onClick={() => context.onOpenChange(false)}
-                >
-                  <Cross1Icon />
-                </Button>
-              </div>
-              {children}
-            </m.div>
-          </div>
-        )}
-      </AnimatePresence>
-    );
-  }
 
   return (
     <AnimatePresence>

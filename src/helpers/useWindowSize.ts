@@ -6,6 +6,9 @@ interface WindowSize {
   height: number;
 }
 
+// Corresponds to sm in tailwind
+export const MOBILE_BREAKPOINT = 640;
+
 export function useWindowSize(): WindowSize {
   const [windowSize, setWindowSize] = useState<WindowSize>({
     width: 0,
