@@ -21,13 +21,11 @@ export const DayCellNumber = ({
   children: ReactNode;
   className?: string;
 }) => {
-  // Even though we're not using any values from context it's useful to check whether it's provided
   const { valueToColor, valueToProgressPercentage } = useDayCellContextNumber();
 
-  const [displayedNumber, setDisplayedNumber] = useState(Number(value || 0));
-
+  const [internalNumber, setInternalNumber] = useState(Number(value || 0));
+  const [rawInput, setRawInput] = useState<string>(String(internalNumber));
   const [inInputEdit] = useState(false);
-
   const [isHover, setHover] = useState(false);
 
   const updateValue = async (value: number) => {
@@ -36,12 +34,39 @@ export const DayCellNumber = ({
     }
   };
 
-  const progress = valueToProgressPercentage(displayedNumber);
+  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+
+    //
+    // This is needed to force decimal points to be "."
+    // We need to force them because otherwise decimal input is bugged in safari
+    // for people who have a language and region mismatch(i.e region with 30.2 convention an language with 30,2 convention).
+    // So ios keyboard might show , as a separator, but browser will say that for value 30,2 valueasnumber is NaN
+    // https://github.com/home-assistant/frontend/pull/18268#issuecomment-1769182417
+    // For the same reason  input type is set to text, because otherwise it will not allow input with wrong decimal
+    //
+    const replaced = value.replace(",", ".");
+    setRawInput(replaced);
+    const numeric = Number(replaced);
+
+    if (!Number.isNaN(numeric)) {
+      setInternalNumber(numeric);
+      void debouncedUpdateValue(numeric);
+    }
+  };
+
+  const handleInputBlur = () => {
+    if (String(internalNumber) !== rawInput) {
+      setRawInput(String(internalNumber));
+    }
+  };
+
+  const progress = valueToProgressPercentage(internalNumber);
 
   const color = useMemo(() => {
-    return valueToColor(displayedNumber);
+    return valueToColor(internalNumber);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [displayedNumber]);
+  }, [internalNumber]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedUpdateValue = useCallback(debounce(updateValue, 400), [
@@ -55,7 +80,9 @@ export const DayCellNumber = ({
     e.stopPropagation();
     e.preventDefault();
 
-    setDisplayedNumber(displayedNumber + 1 * direction);
+    const v = internalNumber + 1 * direction;
+    setInternalNumber(v);
+    setRawInput(String(v));
 
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
@@ -64,9 +91,9 @@ export const DayCellNumber = ({
 
     intervalRef.current = setInterval(() => {
       intervalCounter.current++;
-      setDisplayedNumber(
-        displayedNumber + 1 * intervalCounter.current * direction,
-      );
+      const v = internalNumber + 1 * intervalCounter.current * direction;
+      setInternalNumber(v);
+      setRawInput(String(v));
     }, 100);
   };
 
@@ -82,14 +109,6 @@ export const DayCellNumber = ({
     }
   };
 
-  const handleInputUpdate = (val: number) => {
-    console.log(val);
-    if (val !== displayedNumber) {
-      setDisplayedNumber(val);
-      void debouncedUpdateValue(val);
-    }
-  };
-
   return (
     <div
       className={cn(
@@ -97,7 +116,7 @@ export const DayCellNumber = ({
         "items-center justify-center overflow-visible",
         "transition-all ease-in-out",
         "cursor-text",
-        displayedNumber === 0
+        internalNumber === 0
           ? "border-neutral-200 dark:border-neutral-900"
           : "border-[var(--themeLight)] dark:border-[var(--themeDark)]",
         "h-20",
@@ -128,17 +147,18 @@ export const DayCellNumber = ({
 
       <input
         inputMode={"decimal"}
-        type={"number"}
-        value={displayedNumber}
+        type={"text"}
+        value={rawInput}
         className={cn(
           "relative z-10 flex h-full w-full select-none items-center justify-center bg-inherit text-center font-semibold outline-none transition-all",
-          displayedNumber === 0 && !inInputEdit
+          internalNumber === 0 && !inInputEdit
             ? "text-neutral-200 dark:text-neutral-800"
             : "text-neutral-800 dark:text-neutral-300",
           "text-sm sm:text-xl",
           "focus:outline-neutral-300 dark:focus:outline-neutral-600",
         )}
-        onChange={(e) => handleInputUpdate(e.target.valueAsNumber)}
+        onChange={handleInput}
+        onBlur={handleInputBlur}
       />
       <AnimatePresence>
         {!inInputEdit && isHover && (
