@@ -11,11 +11,12 @@ import {
   DeleteTrackable,
   GetAllTrackables,
   GetTrackable,
+  GetTrackableData,
+  GetTrackableSettings,
   UpdateTrackable,
   UpdateTrackableSettings,
 } from "src/app/api/trackables/apiFunctions";
 import { redirect } from "next/navigation";
-import { revalidatePath } from "next/cache";
 import type { TGETLimits } from "src/app/api/trackables/apiHelpers";
 import { RSAGetUserIdAndRedirect } from "src/app/api/helpers";
 
@@ -39,6 +40,26 @@ export const RSAGetTrackable = async ({
   return await GetTrackable({ trackableId, userId, limits });
 };
 
+export const RSAGetTrackableSettings = async ({
+  trackableId,
+}: {
+  trackableId: ITrackable["id"];
+}) => {
+  const userId = await RSAGetUserIdAndRedirect();
+  return await GetTrackableSettings({ trackableId, userId });
+};
+
+export const RSAGetTrackableData = async ({
+  trackableId,
+  limits,
+}: {
+  trackableId: ITrackable["id"];
+  limits: TGETLimits;
+}) => {
+  const userId = await RSAGetUserIdAndRedirect();
+  return await GetTrackableData({ trackableId, userId, limits });
+};
+
 export const RSACreateTrackable = async (data: ITrackableUnsaved) => {
   const userId = await RSAGetUserIdAndRedirect();
   const result = await CreateTrackable({ data, userId });
@@ -49,10 +70,6 @@ export const RSAUpdateTrackable = async (data: ITrackableUpdate) => {
   const userId = await RSAGetUserIdAndRedirect();
 
   const result = await UpdateTrackable({ data, userId });
-
-  // Update is handler by react query, we do not need to revalidate
-  // revalidatePath(`/trackables/${result.id}`);
-  // revalidatePath("/");
 
   return result;
 };
@@ -77,11 +94,7 @@ export const RSAUpdateTrackableSettings = async ({
 
   const result = await UpdateTrackableSettings({ trackableId, data, userId });
 
-  // revalidatePath(`/trackables/${trackableId}`);
-  // revalidatePath(`/`);
-
   if (redirectToTrackablePage) {
-    revalidatePath(`/trackables/${trackableId}`);
     redirect("/trackables/" + trackableId);
   }
   return result;

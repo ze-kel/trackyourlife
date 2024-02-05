@@ -9,6 +9,9 @@ import { useMemo } from "react";
 import DayNumber from "@components/DayCell/dayNumber";
 import { cn } from "@/lib/utils";
 import { useTrackableContextSafe } from "@components/Providers/TrackableProvider";
+import { useQuery } from "@tanstack/react-query";
+import { RSAGetTrackableData } from "src/app/api/trackables/serverActions";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export interface IDayProps {}
 
@@ -51,7 +54,17 @@ const DayCell = ({
   year: number;
   className?: string;
 }) => {
-  const { trackable, update } = useTrackableContextSafe();
+  const { id, trackable, settings, update } = useTrackableContextSafe();
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["trackable", trackable?.id, year, month],
+    queryFn: async () => {
+      return await RSAGetTrackableData({
+        trackableId: id,
+        limits: { type: "month", month, year },
+      });
+    },
+  });
 
   const { dateKey, inTrackRange, isToday } = useMemo(
     () =>
@@ -59,9 +72,9 @@ const DayCell = ({
         day,
         month,
         year,
-        startDate: trackable?.settings.startDate,
+        startDate: settings?.startDate,
       }),
-    [day, month, year, trackable?.settings.startDate],
+    [day, month, year, settings?.startDate],
   );
 
   if (!trackable) return <></>;
@@ -74,6 +87,17 @@ const DayCell = ({
     "w-full relative select-none overflow-hidden border-transparent outline-none focus:outline-neutral-300 dark:focus:outline-neutral-600 border-2",
     className,
   );
+
+  if (isLoading || !data) {
+    return (
+      <Skeleton
+        className={cn(
+          baseClasses,
+          "h-full cursor-default bg-neutral-100 dark:bg-neutral-900",
+        )}
+      />
+    );
+  }
 
   if (!inTrackRange)
     return (
@@ -91,7 +115,7 @@ const DayCell = ({
     return (
       <DayCellBoolean
         className={baseClasses}
-        value={trackable.data[dateKey]}
+        value={data[dateKey]}
         onChange={updateHandler}
       >
         <DayNumber day={day} isToday={isToday} />
@@ -103,7 +127,7 @@ const DayCell = ({
     return (
       <DayCellNumber
         className={baseClasses}
-        value={trackable.data[dateKey]}
+        value={data[dateKey]}
         onChange={updateHandler}
       >
         <DayNumber day={day} isToday={isToday} />
@@ -115,7 +139,7 @@ const DayCell = ({
     return (
       <DayCellRange
         className={baseClasses}
-        value={trackable.data[dateKey]}
+        value={data[dateKey]}
         onChange={updateHandler}
       >
         <DayNumber day={day} isToday={isToday} />

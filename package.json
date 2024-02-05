@@ -8,7 +8,7 @@
     "start": "next start",
     "start:dev": "dotenv -e .env.development next start",
     "lint": "next lint",
-    "test": "dotenv -e .env.development playwright test",
+    "test": "dotenv -e .env.development playwright test --headed",
     "generate": "dotenv -e .env.development drizzle-kit generate:pg",
     "push": "dotenv -e .env.development drizzle-kit push:pg",
     "migrate": "npx --yes tsx ./src/app/api/migrate.ts",

@@ -27,7 +27,6 @@ const NumberLimitsSelector = ({
   const [isError, setIsError] = useState(false);
 
   const checkValidityAndPush = (min: number, max: number) => {
-    console.log("minmax", min, max);
     if (
       typeof min === "number" &&
       typeof max === "number" &&

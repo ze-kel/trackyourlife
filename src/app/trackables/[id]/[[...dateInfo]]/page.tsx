@@ -5,7 +5,6 @@ import { GearIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { RSAGetTrackable } from "src/app/api/trackables/serverActions";
-import type { ITrackable } from "@t/trackable";
 import {
   QueryClient,
   HydrationBoundary,
@@ -40,24 +39,36 @@ const Trackable = async ({
 
   const queryClient = new QueryClient();
 
-  const year = params.dateInfo && verifyYear(params.dateInfo[0]);
-  const month = params.dateInfo && verifyMonth(params.dateInfo[1]);
+  const year =
+    (params.dateInfo && verifyYear(params.dateInfo[0])) ||
+    new Date().getFullYear();
+  const month =
+    (params.dateInfo && verifyMonth(params.dateInfo[1])) ||
+    new Date().getMonth();
 
-  await queryClient.prefetchQuery({
-    queryKey: ["trackable", params.id],
-    queryFn: async () => {
-      return await RSAGetTrackable({ trackableId: params.id });
+  const res = await RSAGetTrackable({
+    trackableId: params.id,
+    limits: {
+      type: "month",
+      year,
+      month,
     },
   });
-  const data = queryClient.getQueryData(["trackable", params.id]) as ITrackable;
-  queryClient.setQueryData(["trackable", params.id, "settings"], data.settings);
+
+  queryClient.setQueryData(["trackable", params.id], {
+    type: res.type,
+    id: res.id,
+  });
+  queryClient.setQueryData(["trackable", params.id, "settings"], res.settings);
+
+  queryClient.setQueryData(["trackable", params.id, year, month], res.data);
 
   try {
     return (
       <div className="content-container flex h-full max-h-full w-full flex-col">
         <div className="mb-4 flex w-full items-center justify-between">
           <h2 className="w-full bg-inherit text-xl font-semibold md:text-2xl">
-            {data.settings.name}
+            {res.settings.name}
           </h2>
           <Link href={`/trackables/${params.id}/settings`} className="mr-2">
             <Button name="settings" variant="outline" size="icon">

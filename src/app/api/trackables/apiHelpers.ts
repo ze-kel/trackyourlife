@@ -23,7 +23,7 @@ export const trackableToCreate = z.discriminatedUnion("type", [
   }),
 ]);
 
-const makeTrackableData = (trackableData: DbTrackableRecordSelect[]) => {
+export const makeTrackableData = (trackableData: DbTrackableRecordSelect[]) => {
   const result: ITrackable["data"] = {};
 
   trackableData.forEach((el) => {
@@ -32,7 +32,7 @@ const makeTrackableData = (trackableData: DbTrackableRecordSelect[]) => {
   return result;
 };
 
-const makeTrackableSettings = (
+export const makeTrackableSettings = (
   trackable: DbTrackableSelect,
 ): ITrackableSettings => {
   let settingsParser;
@@ -110,7 +110,7 @@ export const getDateBounds = (limits: TGETLimits | undefined) => {
   if (limits.type === "last") {
     return {
       from: sub(new Date(), { days: limits.days }).toDateString(),
-      to: "infinity",
+      to: PG_INFINITY,
     };
   }
 

@@ -7,11 +7,20 @@ import {
   QueryClient,
   dehydrate,
 } from "@tanstack/react-query";
+import { subMonths } from "date-fns";
 
 const Page = async () => {
-  console.log("page");
+  const curDate = new Date();
+
+  const year = curDate.getFullYear();
+  const month = curDate.getMonth();
+
   const trackables = await RSAGetAllTrackables({
-    limits: { type: "last", days: 31 },
+    limits: {
+      type: "month",
+      year,
+      month,
+    },
   });
 
   const queryClient = new QueryClient();
@@ -21,7 +30,28 @@ const Page = async () => {
   for (const tr of trackables) {
     ids.push(tr.id);
     queryClient.setQueryData(["trackable", tr.id], tr);
+    queryClient.setQueryData(["trackable", tr.id, year, month], tr.data);
     queryClient.setQueryData(["trackable", tr.id, "settings"], tr.settings);
+  }
+
+  // Prefetch previous month if needed
+  if (curDate.getDate() < 7) {
+    const prevDate = subMonths(curDate, 1);
+
+    const year = prevDate.getFullYear();
+    const month = prevDate.getMonth();
+
+    const trackablesPrevious = await RSAGetAllTrackables({
+      limits: {
+        type: "month",
+        year,
+        month,
+      },
+    });
+
+    for (const tr of trackablesPrevious) {
+      queryClient.setQueryData(["trackable", tr.id, year, month], tr.data);
+    }
   }
 
   return (

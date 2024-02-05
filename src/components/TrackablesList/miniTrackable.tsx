@@ -41,14 +41,15 @@ const NUM_OF_DAYS = 6;
 const MiniTrackable = ({ className }: { className?: string }) => {
   const daysToRender = useMemo(() => generateDates(NUM_OF_DAYS), []);
 
-  const { trackable, settingsUpdatePartial } = useTrackableContextSafe();
+  const { trackable, settings, settingsUpdatePartial } =
+    useTrackableContextSafe();
 
   return (
     <>
       <div className="flex justify-between">
         <Link href={`/trackables/${trackable?.id}`} className="block w-fit">
           <h3 className="w-fit cursor-pointer text-xl font-light">
-            {trackable?.settings.name || "unnamed"}
+            {settings?.name || "unnamed"}
           </h3>
         </Link>
 
@@ -57,11 +58,11 @@ const MiniTrackable = ({ className }: { className?: string }) => {
           size={"icon"}
           onClick={() =>
             void settingsUpdatePartial({
-              favorite: !trackable?.settings.favorite,
+              favorite: !settings?.favorite,
             })
           }
         >
-          {trackable?.settings.favorite ? <HeartFilledIcon /> : <HeartIcon />}
+          {settings?.favorite ? <HeartFilledIcon /> : <HeartIcon />}
         </Button>
       </div>
 

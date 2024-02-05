@@ -43,7 +43,6 @@ export const POST = async (request: NextRequest) => {
       );
     }
 
-    console.log("hashed", user.hashedPassword, "provided", password);
 
     const validPassword = await new Argon2id().verify(
       user.hashedPassword,
@@ -76,7 +75,6 @@ export const POST = async (request: NextRequest) => {
       },
     });
   } catch (e) {
-    console.log(e);
     return NextResponse.json(
       {
         error: "An unknown error occurred",

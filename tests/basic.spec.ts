@@ -11,8 +11,6 @@ const URL = process.env.TEST_URL as string;
 // ALL SETTINGS PROPERTIES CAN BE SET
 // SETTINGS ARE SAVED AND WORK OVERALL
 
-const CURRENT_DAY = new Date().getDate();
-
 const createTrackable = async ({
   page,
   type,
@@ -34,32 +32,63 @@ const createTrackable = async ({
   await page.waitForURL("**/trackables/**");
 };
 
-test("CRUD: Boolean", async ({ page }) => {
-  const BOOL_NAME = "test-bool";
+test("Basic CRUD", async ({ page }) => {
+  const TRACKABLE_NAME = "test-bool";
 
-  await createTrackable({ page, name: BOOL_NAME, type: "boolean" });
+  await createTrackable({ page, name: TRACKABLE_NAME, type: "boolean" });
 
   // Return to main page
   await page.goto(URL);
 
   // Check for link to trackable
-  const BOOL_BUTTON = page.getByRole("link", { name: BOOL_NAME, exact: true });
+  const BOOL_BUTTON = page.getByRole("link", {
+    name: TRACKABLE_NAME,
+    exact: true,
+  });
   await expect(BOOL_BUTTON).toBeVisible();
 
   // Go to trackable page
   await BOOL_BUTTON.click();
   await page.waitForURL("**/trackables/**");
 
+  // Click first day
+  const firstCall = page.waitForResponse((response) => {
+    return response.url().includes("trackables");
+  });
   const todayCell = page.getByRole("button", {
-    name: String(CURRENT_DAY),
+    name: String(1),
+    exact: true,
+  });
+  expect(await todayCell.getAttribute("data-value")).toBe("false");
+  await todayCell.click();
+  expect(await todayCell.getAttribute("data-value")).toBe("true");
+
+  // Go to previous month
+  await page.getByRole("button", { name: "previous month" }).click();
+
+  // Click random day(but not first)
+  const dayFromPreviousM = Math.round(Math.random() * 20) + 1;
+  const monthAgoCell = page.getByRole("button", {
+    name: String(dayFromPreviousM),
     exact: true,
   });
 
-  expect(await todayCell.getAttribute("data-value")).toBe("false");
+  await firstCall;
 
-  // Click today
-  await todayCell.click();
+  const secondCall = page.waitForResponse((response) => {
+    return response.url().includes("trackables");
+  });
 
+  expect(await monthAgoCell.getAttribute("data-value")).toBe("false");
+  await monthAgoCell.click();
+  expect(await monthAgoCell.getAttribute("data-value")).toBe("true");
+  await secondCall;
+
+  // Reload page. Verify that day we clicked on still true
+  await page.reload();
+  expect(await monthAgoCell.getAttribute("data-value")).toBe("true");
+  // For current month too
+  await page.getByRole("button", { name: "next month" }).click();
   expect(await todayCell.getAttribute("data-value")).toBe("true");
 
   // Delele trackable

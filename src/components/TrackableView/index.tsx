@@ -167,7 +167,7 @@ const ViewController = ({
       </div>
       <div className="flex w-fit gap-2 self-end">
         <Button
-          name="previous month"
+          aria-label="Previous month"
           onClick={() => increment(-1)}
           variant="outline"
           size="icon"
@@ -175,7 +175,7 @@ const ViewController = ({
           <ChevronLeftIcon className="h-4 w-4" />
         </Button>
         <Button
-          name="next month"
+          aria-label="Next month"
           onClick={() => increment(1)}
           variant="outline"
           size="icon"
@@ -183,7 +183,7 @@ const ViewController = ({
           <ChevronRightIcon className="h-4 w-4" />
         </Button>
         <Button
-          name="current month"
+          aria-label="Current month"
           variant="outline"
           onClick={openCurrentMonth}
           disabled={isCurrentMonth}

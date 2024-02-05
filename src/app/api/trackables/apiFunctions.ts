@@ -13,6 +13,8 @@ import { ApiFunctionError } from "src/app/api/helpers";
 import type { TGETLimits } from "src/app/api/trackables/apiHelpers";
 import {
   getDateBounds,
+  makeTrackableData,
+  makeTrackableSettings,
   prepareTrackable,
   trackableToCreate,
 } from "src/app/api/trackables/apiHelpers";
@@ -70,6 +72,49 @@ export const GetTrackable = async ({
   const returnedTrackable: ITrackable = prepareTrackable(tr);
   log(`API: Trackable GET ${tr.id}`);
   return returnedTrackable;
+};
+
+export const GetTrackableData = async ({
+  trackableId,
+  userId,
+  limits,
+}: {
+  trackableId: ITrackable["id"];
+  userId: string;
+  limits: TGETLimits;
+}) => {
+  const bounds = getDateBounds(limits);
+
+  const data = await db.query.trackableRecord.findMany({
+    where: and(
+      eq(trackableRecord.trackableId, trackableId),
+      eq(trackableRecord.userId, userId),
+      between(trackableRecord.date, bounds.from, bounds.to),
+    ),
+  });
+
+  log(`API: Trackable GET DATA ${trackableId}`);
+
+  return makeTrackableData(data);
+};
+
+export const GetTrackableSettings = async ({
+  trackableId,
+  userId,
+}: {
+  trackableId: ITrackable["id"];
+  userId: string;
+}) => {
+  const tr = await db.query.trackable.findFirst({
+    where: and(eq(trackable.id, trackableId), eq(trackable.userId, userId)),
+  });
+
+  if (!tr) {
+    throw new ApiFunctionError("Unable to find trackable", 400);
+  }
+  const settings: ITrackable["settings"] = makeTrackableSettings(tr);
+  log(`API: Trackable Settings GET  ${tr.id}`);
+  return settings;
 };
 
 export const CreateTrackable = async ({
