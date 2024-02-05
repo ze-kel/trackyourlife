@@ -243,11 +243,10 @@ const TrackableView = ({
     setYear(newYear);
     setMonth(newMonth);
 
-    // waiting for https://github.com/vercel/next.js/pull/58438
     window.history.replaceState(
       {},
       "",
-      window.location.origin + `/trackables/${id}/${newYear}/${newMonth + 1}`,
+      `/trackables/${id}/${newYear}/${newMonth + 1}`,
     );
   };
 
@@ -270,6 +269,7 @@ const TrackableView = ({
 
   return (
     <TrackableProvider id={id}>
+      {year} {month}
       <ViewController
         year={year}
         month={month}

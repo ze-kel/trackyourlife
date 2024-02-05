@@ -1,5 +1,5 @@
 "use client";
-import { isSameDay, isBefore, isAfter } from "date-fns";
+import { isSameDay, isBefore, isAfter, format } from "date-fns";
 import formatDateKey from "src/helpers/formatDateKey";
 import { DayCellBoolean } from "./DayCellBoolean";
 import { DayCellNumber } from "./DayCellNumber";
@@ -88,17 +88,6 @@ const DayCell = ({
     className,
   );
 
-  if (isLoading || !data) {
-    return (
-      <Skeleton
-        className={cn(
-          baseClasses,
-          "h-full cursor-default bg-neutral-100 dark:bg-neutral-900",
-        )}
-      />
-    );
-  }
-
   if (!inTrackRange)
     return (
       <div
@@ -110,6 +99,17 @@ const DayCell = ({
         <DayNumber day={day} isToday={isToday} />
       </div>
     );
+
+  if (isLoading || !data) {
+    return (
+      <Skeleton
+        className={cn(
+          baseClasses,
+          "h-full cursor-default bg-neutral-100 dark:bg-neutral-900",
+        )}
+      />
+    );
+  }
 
   if (trackable.type === "boolean") {
     return (
@@ -128,6 +128,7 @@ const DayCell = ({
       <DayCellNumber
         className={baseClasses}
         value={data[dateKey]}
+        dateString={format(new Date(year, month, day), "d MMMM yyyy")}
         onChange={updateHandler}
       >
         <DayNumber day={day} isToday={isToday} />

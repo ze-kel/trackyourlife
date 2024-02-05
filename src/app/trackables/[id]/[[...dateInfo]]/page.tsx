@@ -12,19 +12,19 @@ import {
 } from "@tanstack/react-query";
 import { validateRequest } from "src/auth/lucia";
 
-const verifyYear = (y: string | undefined) => {
-  if (!y || y.length !== 4) return;
+const getYearSafe = (y: string | undefined) => {
+  if (!y || y.length !== 4) return new Date().getFullYear();
 
   const n = Number(y);
-  if (n < 1900 || n > 2100) return;
+  if (n < 1970 || n > 2100) return new Date().getFullYear();
   return n;
 };
 
-const verifyMonth = (y: string | undefined) => {
-  if (!y) return;
+const getMonthSafe = (y: string | undefined) => {
+  if (!y) return new Date().getMonth();
 
   const n = Number(y);
-  if (n < 1 || n > 12) return;
+  if (n < 1 || n > 12) return new Date().getMonth();
   // JS months are zero indexed
   return n - 1;
 };
@@ -39,12 +39,8 @@ const Trackable = async ({
 
   const queryClient = new QueryClient();
 
-  const year =
-    (params.dateInfo && verifyYear(params.dateInfo[0])) ||
-    new Date().getFullYear();
-  const month =
-    (params.dateInfo && verifyMonth(params.dateInfo[1])) ||
-    new Date().getMonth();
+  const year = getYearSafe(params.dateInfo?.[0]);
+  const month = getMonthSafe(params.dateInfo?.[1]);
 
   const res = await RSAGetTrackable({
     trackableId: params.id,
