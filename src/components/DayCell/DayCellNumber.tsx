@@ -16,11 +16,6 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 
-const formatter = new Intl.NumberFormat(navigator.languages[0] || "en-IN", {
-  compactDisplay: "short",
-  notation: "compact",
-});
-
 const getNumberSafe = (v: string | undefined) => {
   if (!v) return 0;
   const n = Number(v);
@@ -54,6 +49,14 @@ export const DayCellNumber = ({
   const [isHover, setHover] = useState(false);
 
   const isBigNumber = internalNumber > 10000;
+
+  const formatter = new Intl.NumberFormat(
+    (typeof navigator !== "undefined" && navigator.languages[0]) || "en-IN",
+    {
+      compactDisplay: "short",
+      notation: "compact",
+    },
+  );
 
   const displayedValue = isBigNumber
     ? formatter.format(internalNumber)
