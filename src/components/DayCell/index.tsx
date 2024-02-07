@@ -84,7 +84,7 @@ const DayCell = ({
   };
 
   const baseClasses = cn(
-    "w-full relative select-none overflow-hidden border-transparent outline-none focus:outline-neutral-300 dark:focus:outline-neutral-600 border-2",
+    "w-full h-full relative select-none overflow-hidden border-transparent outline-none focus:outline-neutral-300 dark:focus:outline-neutral-600 border-2",
     className,
   );
 
@@ -93,7 +93,7 @@ const DayCell = ({
       <div
         className={cn(
           baseClasses,
-          "h-full cursor-default bg-neutral-100 dark:bg-neutral-900",
+          "cursor-default bg-neutral-100 dark:bg-neutral-900",
         )}
       >
         <DayNumber day={day} isToday={isToday} />
@@ -105,7 +105,7 @@ const DayCell = ({
       <Skeleton
         className={cn(
           baseClasses,
-          "h-full cursor-default bg-neutral-100 dark:bg-neutral-900",
+          "cursor-default bg-neutral-100 dark:bg-neutral-900",
         )}
       />
     );

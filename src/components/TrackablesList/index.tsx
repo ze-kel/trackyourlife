@@ -2,10 +2,16 @@
 import type { ITrackable, ITrackableSettings } from "src/types/trackable";
 import MiniTrackable from "./miniTrackable";
 import { m } from "framer-motion";
-import TrackableProvider from "@components/Providers/TrackableProvider";
+import TrackableProvider, {
+  useTrackableContextSafe,
+} from "@components/Providers/TrackableProvider";
 import type { QueryClient } from "@tanstack/react-query";
 import { QueriesObserver, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { generateDates } from "@components/TrackablesList/helper";
+import DayCell from "@components/DayCell";
+import Link from "next/link";
+import { format } from "date-fns";
 
 const sortList = (
   list: ITrackable["id"][],
@@ -51,6 +57,8 @@ const TrackablesList = ({ list }: { list: ITrackable["id"][] }) => {
     });
   });
 
+  const daysToRender = useMemo(() => generateDates(1), []);
+
   return (
     <div className="grid gap-5">
       {sorted.map((id, index) => (
@@ -61,9 +69,45 @@ const TrackablesList = ({ list }: { list: ITrackable["id"][] }) => {
           className="border-b border-neutral-200 py-2 last:border-0 dark:border-neutral-800"
         >
           <TrackableProvider id={id}>
-            <MiniTrackable className="my-4" />
+            <MiniTrackable daysToRender={daysToRender} className="my-4" />
           </TrackableProvider>
         </m.div>
+      ))}
+    </div>
+  );
+};
+
+const TrackableName = () => {
+  const { trackable, settings } = useTrackableContextSafe();
+
+  return (
+    <Link href={`/trackables/${trackable?.id}`} className="block w-fit pb-2">
+      <h3 className="text-md w-fit cursor-pointer">
+        {settings?.name || "unnamed"}
+      </h3>
+    </Link>
+  );
+};
+
+export const DailyList = ({ list }: { list: ITrackable["id"][] }) => {
+  const daysToRender = useMemo(() => generateDates(7).reverse(), []);
+
+  return (
+    <div className="flex flex-col gap-8">
+      {daysToRender.map((date, index) => (
+        <div key={index}>
+          <div className="text-2xl">
+            {format(new Date(date.year, date.month, date.day), "MMMM d")}
+          </div>
+          <div className="fr mt-2 grid gap-4">
+            {list.map((id, index) => (
+              <TrackableProvider key={index} id={id}>
+                <TrackableName />
+                <DayCell {...date} />
+              </TrackableProvider>
+            ))}
+          </div>
+        </div>
       ))}
     </div>
   );

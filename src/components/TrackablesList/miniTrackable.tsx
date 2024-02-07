@@ -4,43 +4,17 @@ import { cn } from "@/lib/utils";
 import DayCell from "@components/DayCell";
 import { useTrackableContextSafe } from "@components/Providers/TrackableProvider";
 import { HeartFilledIcon, HeartIcon } from "@radix-ui/react-icons";
-import { format, getDaysInMonth } from "date-fns";
+import { format } from "date-fns";
 import Link from "next/link";
-import { useMemo } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 
-const generateDates = (days: number) => {
-  const today = new Date();
-
-  let year = today.getFullYear();
-  let month = today.getMonth();
-  let day = today.getDate();
-
-  const dates: { year: number; month: number; day: number }[] = [];
-
-  for (; days > 0; days--) {
-    dates[days] = { year, month, day };
-
-    if (day === 1) {
-      if (month === 0) {
-        year--;
-        month = 11;
-      } else {
-        month--;
-      }
-      day = getDaysInMonth(new Date(year, month));
-    } else {
-      day--;
-    }
-  }
-  return dates;
-};
-
-const NUM_OF_DAYS = 6;
-
-const MiniTrackable = ({ className }: { className?: string }) => {
-  const daysToRender = useMemo(() => generateDates(NUM_OF_DAYS), []);
-
+const MiniTrackable = ({
+  className,
+  daysToRender,
+}: {
+  className?: string;
+  daysToRender: { year: number; month: number; day: number }[];
+}) => {
   const { trackable, settings, settingsUpdatePartial } =
     useTrackableContextSafe();
 

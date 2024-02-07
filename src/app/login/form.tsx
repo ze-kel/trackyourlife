@@ -28,6 +28,8 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { cn } from "@/lib/utils";
+import { Spinner } from "@/components/ui/spinner";
 
 // TODO:
 // indication of request in progress
@@ -139,6 +141,7 @@ const formSchemaLogin = z.object({
 
 const Login = () => {
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const router = useRouter();
 
@@ -151,6 +154,7 @@ const Login = () => {
   });
 
   const onSubmit = async (values: z.infer<typeof formSchemaLogin>) => {
+    setLoading(true);
     const res = await fetch("api/user/login", {
       method: "POST",
       body: JSON.stringify({
@@ -164,6 +168,10 @@ const Login = () => {
       if (j.error) {
         setError(j.error);
       }
+
+      setLoading(false);
+
+      return;
     }
 
     router.refresh();
@@ -199,8 +207,8 @@ const Login = () => {
               </FormItem>
             )}
           />
-          <Button type="submit" variant="outline" className="w-full">
-            Login
+          <Button type="submit" variant="outline" className={cn("w-full")}>
+            {loading ? <Spinner /> : "Login"}
           </Button>
         </form>
       </Form>

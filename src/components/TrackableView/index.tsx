@@ -269,7 +269,6 @@ const TrackableView = ({
 
   return (
     <TrackableProvider id={id}>
-      {year} {month}
       <ViewController
         year={year}
         month={month}
