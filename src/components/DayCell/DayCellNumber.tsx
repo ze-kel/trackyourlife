@@ -159,7 +159,6 @@ export const DayCellNumber = ({
         internalNumber === 0
           ? "border-neutral-200 dark:border-neutral-900"
           : "border-[var(--themeLight)] dark:border-[var(--themeDark)]",
-        "h-20",
       )}
       style={
         {

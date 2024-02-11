@@ -104,12 +104,7 @@ const TrackableProvider = ({
   const settings = useQuery({
     queryKey: ["trackable", id, "settings"],
     queryFn: async () => {
-      const data = queryClient.getQueryData<ITrackable>(["trackable", id]);
-      if (!data) {
-        const res = await RSAGetTrackableSettings({ trackableId: id });
-        return res;
-      }
-      return data.settings;
+      return await RSAGetTrackableSettings({ trackableId: id });
     },
   });
 
@@ -155,7 +150,6 @@ const TrackableProvider = ({
 
     if (!previous) throw new Error("settingsUpdatePartial: no present data");
 
-    console.log("call mutation");
     await settingsMutation.mutateAsync({
       data: { ...previous, ...update },
     });

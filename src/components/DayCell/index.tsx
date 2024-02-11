@@ -48,11 +48,13 @@ const DayCell = ({
   month,
   year,
   className,
+  hideDate,
 }: {
   day: number;
   month: number;
   year: number;
   className?: string;
+  hideDate?: boolean;
 }) => {
   const { id, trackable, settings, update } = useTrackableContextSafe();
 
@@ -118,7 +120,7 @@ const DayCell = ({
         value={data[dateKey]}
         onChange={updateHandler}
       >
-        <DayNumber day={day} isToday={isToday} />
+        {!hideDate && <DayNumber day={day} isToday={isToday} />}
       </DayCellBoolean>
     );
   }
@@ -131,7 +133,7 @@ const DayCell = ({
         dateString={format(new Date(year, month, day), "d MMMM yyyy")}
         onChange={updateHandler}
       >
-        <DayNumber day={day} isToday={isToday} />
+        {!hideDate && <DayNumber day={day} isToday={isToday} />}
       </DayCellNumber>
     );
   }
@@ -143,7 +145,7 @@ const DayCell = ({
         value={data[dateKey]}
         onChange={updateHandler}
       >
-        <DayNumber day={day} isToday={isToday} />
+        {!hideDate && <DayNumber day={day} isToday={isToday} />}
       </DayCellRange>
     );
   }

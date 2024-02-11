@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { DailyList } from "@components/TrackablesList";
+import TrackablesList from "@components/TrackablesList";
 import { Button } from "@/components/ui/button";
 import { RSAGetAllTrackables } from "src/app/api/trackables/serverActions";
 import {
@@ -64,7 +64,7 @@ const Page = async () => {
       </div>
       <HydrationBoundary state={dehydrate(queryClient)}>
         <div className="mt-2">
-          <DailyList list={ids} />
+          <TrackablesList list={ids}></TrackablesList>
         </div>
       </HydrationBoundary>
     </div>
