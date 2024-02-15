@@ -3,9 +3,9 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import DayCell from "@components/DayCell";
 import { useTrackableContextSafe } from "@components/Providers/TrackableProvider";
+import { TrackableName } from "@components/TrackablesList";
 import { HeartFilledIcon, HeartIcon } from "@radix-ui/react-icons";
 import { format } from "date-fns";
-import Link from "next/link";
 import { ErrorBoundary } from "react-error-boundary";
 
 const MiniTrackable = ({
@@ -15,17 +15,12 @@ const MiniTrackable = ({
   className?: string;
   daysToRender: { year: number; month: number; day: number }[];
 }) => {
-  const { trackable, settings, settingsUpdatePartial } =
-    useTrackableContextSafe();
+  const { settings, settingsUpdatePartial } = useTrackableContextSafe();
 
   return (
-    <>
-      <div className="flex justify-between">
-        <Link href={`/trackables/${trackable?.id}`} className="block w-fit">
-          <h3 className="w-fit cursor-pointer text-xl font-light">
-            {settings?.name || "unnamed"}
-          </h3>
-        </Link>
+    <div className={className}>
+      <div className="flex items-center justify-between">
+        <TrackableName className="text-xl font-light" />
 
         <Button
           variant={"ghost"}
@@ -47,12 +42,7 @@ const MiniTrackable = ({
           </div>
         }
       >
-        <div
-          className={cn(
-            "sm grid grid-cols-3 gap-x-1 gap-y-1 md:grid-cols-6",
-            className,
-          )}
-        >
+        <div className={"sm grid grid-cols-3 gap-x-1 gap-y-1 md:grid-cols-6"}>
           <>
             {daysToRender.map((day, index) => {
               const date = new Date(day.year, day.month, day.day);
@@ -65,19 +55,27 @@ const MiniTrackable = ({
                     index > 3 ? "flex-col-reverse md:flex-col" : "flex-col",
                   )}
                 >
-                  <div className="px-1 text-xs ">
-                    <span className="text-neutral-400 dark:text-neutral-700">
-                      {format(date, "EEEE")}
+                  <div className="flex justify-end gap-1 text-xs">
+                    <span className="text-neutral-300 dark:text-neutral-800">
+                      {format(date, "EEE")}
+                    </span>
+                    <span className="text-neutral-500 dark:text-neutral-600">
+                      {format(date, "d")}
                     </span>
                   </div>
-                  <DayCell {...day} key={index} className="h-16" />
+                  <DayCell
+                    {...day}
+                    customLabel=""
+                    key={index}
+                    className="h-16"
+                  />
                 </div>
               );
             })}
           </>
         </div>
       </ErrorBoundary>
-    </>
+    </div>
   );
 };
 

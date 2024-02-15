@@ -6,9 +6,10 @@ import {
 } from "@components/Dropdown";
 import Link from "next/link";
 import { ChevronDownIcon } from "@radix-ui/react-icons";
+import type { ButtonProps } from "@/components/ui/button";
 import { Button } from "@/components/ui/button";
 import type { User } from "lucia";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { RadioTabs, RadioTabItem } from "@/components/ui/radio-tabs";
 import { useTheme } from "next-themes";
 import {
@@ -54,6 +55,31 @@ const topLinks = [
   },
 ];
 
+const Links = ({
+  variant,
+  variantActive,
+}: {
+  variant: ButtonProps["variant"];
+  variantActive: ButtonProps["variant"];
+}) => {
+  const pathName = usePathname();
+
+  return (
+    <div className="flex w-full flex-col items-center gap-2 font-medium md:w-fit md:flex-row">
+      {topLinks.map((v) => (
+        <Link key={v.link} href={v.link} className="block w-full">
+          <Button
+            className="w-full"
+            variant={v.link === pathName ? variantActive : variant}
+          >
+            {v.name}
+          </Button>
+        </Link>
+      ))}
+    </div>
+  );
+};
+
 const ThemeSwitcher = () => {
   const { theme, setTheme } = useTheme();
 
@@ -89,42 +115,30 @@ const HeaderMenu = ({ username }: { username?: string }) => {
     </div>
   );
 
-  const Links = (
-    <div className="flex w-full flex-col items-center gap-2 font-medium md:w-fit md:flex-row">
-      {topLinks.map((v) => (
-        <Link key={v.link} href={v.link} className="block w-full">
-          <Button className="w-full" variant={isDesktop ? "ghost" : "outline"}>
-            {v.name}
-          </Button>
-        </Link>
-      ))}
-    </div>
-  );
-
-  if (!isDesktop)
-    return (
-      <Drawer>
-        <DrawerTrigger>{Trigger}</DrawerTrigger>
-        <DrawerContent className="flex flex-col items-center gap-2">
-          <DrawerHeader>
-            <DrawerTitle>{username || ""}</DrawerTitle>
-          </DrawerHeader>
-
-          <div className="m-auto flex w-full max-w-80 flex-col gap-2 px-4 pb-4">
-            {Links}
-            {Content}
-          </div>
-        </DrawerContent>
-      </Drawer>
-    );
-
   return (
     <>
-      {Links}
-      <Dropdown placement="bottom-end">
-        <DropdownTrigger>{Trigger}</DropdownTrigger>
-        <DropdownContent>{Content}</DropdownContent>
-      </Dropdown>
+      <Links variant={"ghost"} variantActive={"secondary"} />
+
+      {isDesktop ? (
+        <Dropdown placement="bottom-end">
+          <DropdownTrigger>{Trigger}</DropdownTrigger>
+          <DropdownContent>{Content}</DropdownContent>
+        </Dropdown>
+      ) : (
+        <Drawer>
+          <DrawerTrigger>{Trigger}</DrawerTrigger>
+          <DrawerContent className="flex flex-col items-center gap-2">
+            <DrawerHeader>
+              <DrawerTitle>{username || ""}</DrawerTitle>
+            </DrawerHeader>
+
+            <div className="m-auto flex w-full max-w-80 flex-col gap-2 px-4 pb-4">
+              <Links variant={"outline"} variantActive={"outline"} />
+              {Content}
+            </div>
+          </DrawerContent>
+        </Drawer>
+      )}
     </>
   );
 };

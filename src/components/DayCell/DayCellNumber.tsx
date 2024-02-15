@@ -149,6 +149,12 @@ export const DayCellNumber = ({
 
   const [drawerOpen, setDrawerOpen] = useState(false);
 
+  const focusHandler: React.FocusEventHandler<HTMLInputElement> = (e) => {
+    if (internalNumber === 0) {
+      e.target.setSelectionRange(0, rawInput.length);
+    }
+  };
+
   return (
     <div
       className={cn(
@@ -196,7 +202,9 @@ export const DayCellNumber = ({
               : "text-neutral-800 dark:text-neutral-300",
             "text-sm sm:text-xl",
             "focus:outline-neutral-300 dark:focus:outline-neutral-600",
+            "selection:bg-neutral-300 dark:selection:bg-neutral-600",
           )}
+          onFocus={focusHandler}
           onChange={handleInput}
           onBlur={handleInputBlur}
         />
@@ -236,6 +244,7 @@ export const DayCellNumber = ({
                   "text-2xl",
                   "h-20 focus:outline-neutral-300 dark:focus:outline-neutral-600",
                 )}
+                onFocus={focusHandler}
                 onChange={handleInput}
                 onBlur={handleInputBlur}
               />

@@ -5,8 +5,7 @@ import { DayCellBoolean } from "./DayCellBoolean";
 import { DayCellNumber } from "./DayCellNumber";
 import type { ITrackableSettings } from "src/types/trackable";
 import { DayCellRange } from "./DayCellRange";
-import { useMemo } from "react";
-import DayNumber from "@components/DayCell/dayNumber";
+import { ReactNode, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { useTrackableContextSafe } from "@components/Providers/TrackableProvider";
 import { useQuery } from "@tanstack/react-query";
@@ -48,13 +47,13 @@ const DayCell = ({
   month,
   year,
   className,
-  hideDate,
+  customLabel,
 }: {
   day: number;
   month: number;
   year: number;
   className?: string;
-  hideDate?: boolean;
+  customLabel?: ReactNode;
 }) => {
   const { id, trackable, settings, update } = useTrackableContextSafe();
 
@@ -86,8 +85,20 @@ const DayCell = ({
   };
 
   const baseClasses = cn(
-    "w-full h-full relative select-none overflow-hidden border-transparent outline-none focus:outline-neutral-300 dark:focus:outline-neutral-600 border-2",
+    "w-full h-full relative select-none overflow-hidden border-transparent outline-none focus:outline-neutral-300 dark:focus:outline-neutral-600 border-2 rounded-sm",
     className,
+  );
+
+  const Label = (
+    <div className="absolute left-0.5 top-0.5 select-none text-neutral-800 sm:left-1 sm:top-0 sm:text-base">
+      {customLabel !== undefined ? (
+        customLabel
+      ) : (
+        <span className={cn(isToday ? "font-normal underline" : "font-light")}>
+          {day}
+        </span>
+      )}
+    </div>
   );
 
   if (!inTrackRange)
@@ -98,7 +109,7 @@ const DayCell = ({
           "cursor-default bg-neutral-100 dark:bg-neutral-900",
         )}
       >
-        <DayNumber day={day} isToday={isToday} />
+        {Label}
       </div>
     );
 
@@ -120,7 +131,7 @@ const DayCell = ({
         value={data[dateKey]}
         onChange={updateHandler}
       >
-        {!hideDate && <DayNumber day={day} isToday={isToday} />}
+        {Label}
       </DayCellBoolean>
     );
   }
@@ -133,7 +144,7 @@ const DayCell = ({
         dateString={format(new Date(year, month, day), "d MMMM yyyy")}
         onChange={updateHandler}
       >
-        {!hideDate && <DayNumber day={day} isToday={isToday} />}
+        {Label}
       </DayCellNumber>
     );
   }
@@ -145,7 +156,7 @@ const DayCell = ({
         value={data[dateKey]}
         onChange={updateHandler}
       >
-        {!hideDate && <DayNumber day={day} isToday={isToday} />}
+        {Label}
       </DayCellRange>
     );
   }

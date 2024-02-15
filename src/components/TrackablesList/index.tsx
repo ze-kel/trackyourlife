@@ -7,7 +7,7 @@ import TrackableProvider, {
 } from "@components/Providers/TrackableProvider";
 import type { QueryClient } from "@tanstack/react-query";
 import { QueriesObserver, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import { generateDates } from "@components/TrackablesList/helper";
 import DayCell from "@components/DayCell";
 import Link from "next/link";
@@ -157,10 +157,10 @@ const TrackablesList = ({ list }: { list: ITrackable["id"][] }) => {
               layout
               layoutId={id}
               key={id}
-              className="border-b border-neutral-200 py-2 last:border-0 dark:border-neutral-800"
+              className="border-b border-neutral-200 pb-4 last:border-0 dark:border-neutral-800"
             >
               <TrackableProvider id={id}>
-                <MiniTrackable daysToRender={daysToRender} className="my-4" />
+                <MiniTrackable daysToRender={daysToRender} />
               </TrackableProvider>
             </m.div>
           ))}
@@ -176,7 +176,7 @@ export const TrackableName = ({ className }: { className?: string }) => {
   return (
     <Link
       href={`/trackables/${trackable?.id}`}
-      className={cn("block w-fit pb-1 text-xl", className)}
+      className={cn("block w-fit", className)}
     >
       {settings?.name || "unnamed"}
     </Link>
@@ -193,14 +193,14 @@ export const DailyList = ({ list }: { list: ITrackable["id"][] }) => {
   return (
     <div className="flex flex-col">
       {daysToRender.map((date, index) => (
-        <>
-          <div key={index} className="relative mt-4 flex h-fit flex-col">
-            <div className="flex w-full items-end justify-between gap-2">
-              <span className="flex w-full items-end gap-2">
+        <Fragment key={index}>
+          <div className="relative mt-4 flex h-fit flex-col">
+            <div className="flex w-full flex-col-reverse justify-between gap-2">
+              <span className="flex w-full items-end gap-3">
                 <span className="text-4xl">
                   {format(new Date(date.year, date.month, date.day), "d")}
                 </span>
-                <span className="text-xl opacity-60">
+                <span className="text-md opacity-60">
                   {format(new Date(date.year, date.month, date.day), "EEEE")}
                 </span>
               </span>
@@ -217,15 +217,17 @@ export const DailyList = ({ list }: { list: ITrackable["id"][] }) => {
                 <div key={index}>
                   <TrackableProvider id={id}>
                     <TrackableName
-                      className={"text-neutral-400 dark:text-neutral-700"}
+                      className={
+                        "text-xl text-neutral-400 dark:text-neutral-700"
+                      }
                     />
-                    <DayCell {...date} hideDate className="h-20" />
+                    <DayCell {...date} customLabel="" className="h-20" />
                   </TrackableProvider>
                 </div>
               ))}
             </div>
           </div>
-        </>
+        </Fragment>
       ))}
     </div>
   );
