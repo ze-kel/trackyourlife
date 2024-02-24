@@ -18,18 +18,21 @@ export interface IDayCellBooleanContext {
   themeInactiveLight: string;
   themeActiveDark: string;
   themeInactiveDark: string;
+  settings: IBooleanSettings;
 }
 
 export interface IDayCellNumberContext {
   type: "number";
   valueToColor: (v: number) => IColorValue;
   valueToProgressPercentage: (v: number | undefined) => number | null;
+  settings: INumberSettings;
 }
 
 export interface IDayCellRangeContext {
   type: "range";
   labelMapping: Record<string, string>;
   labels: IRangeSettings["labels"];
+  settings: IRangeSettings;
 }
 
 export type IDayCellContext =
@@ -80,6 +83,7 @@ const DayCellBooleanProvider = ({
           themeActiveLight,
           themeInactiveDark,
           themeInactiveLight,
+          settings,
         }}
       >
         {children}
@@ -134,6 +138,7 @@ const DayCellNumberProvider = ({
           type: "number",
           valueToColor,
           valueToProgressPercentage,
+          settings,
         }}
       >
         {children}
@@ -168,6 +173,7 @@ const DayCellRangeProvider = ({
           type: "range",
           labelMapping,
           labels: settings.labels,
+          settings,
         }}
       >
         {children}

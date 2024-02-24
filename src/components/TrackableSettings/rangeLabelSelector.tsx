@@ -2,8 +2,7 @@
 import type { IRangeSettings } from "@t/trackable";
 import cloneDeep from "lodash/cloneDeep";
 import { useState } from "react";
-import { AnimatePresence } from "framer-motion";
-import { Reorder, useDragControls } from "framer-motion";
+import { Reorder, useDragControls, AnimatePresence } from "framer-motion";
 import {
   Cross1Icon,
   DragHandleDots2Icon,

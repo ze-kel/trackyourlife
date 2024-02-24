@@ -5,7 +5,8 @@ import { DayCellBoolean } from "./DayCellBoolean";
 import { DayCellNumber } from "./DayCellNumber";
 import type { ITrackableSettings } from "src/types/trackable";
 import { DayCellRange } from "./DayCellRange";
-import { ReactNode, useMemo } from "react";
+import type { ReactNode } from "react";
+import { useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { useTrackableContextSafe } from "@components/Providers/TrackableProvider";
 import { useQuery } from "@tanstack/react-query";
@@ -155,6 +156,7 @@ const DayCell = ({
         className={baseClasses}
         value={data[dateKey]}
         onChange={updateHandler}
+        number={day}
       >
         {Label}
       </DayCellRange>

@@ -70,7 +70,6 @@ const DropdownContent = ({
   className,
   children,
 }: {
-  disableMobileAdaptation?: boolean;
   className?: string;
   children: ReactNode;
 }) => {

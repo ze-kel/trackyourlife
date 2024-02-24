@@ -77,6 +77,8 @@ export const ZTrackableSettingsRange = z.object({
       }),
     )
     .optional(),
+  isCycle: z.boolean().optional(),
+  cycleToEmpty: z.boolean().optional(),
 });
 
 export type IBooleanSettings = z.infer<typeof ZTrackableSettingsBoolean>;
