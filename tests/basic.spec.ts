@@ -32,7 +32,7 @@ const createTrackable = async ({
 };
 
 test("Basic CRUD", async ({ page }) => {
-  const TRACKABLE_NAME = "test-bool";
+  const TRACKABLE_NAME = "test-bool-" + Math.random();
 
   await createTrackable({ page, name: TRACKABLE_NAME, type: "boolean" });
 
