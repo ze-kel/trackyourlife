@@ -214,7 +214,7 @@ export const DayCellNumber = ({
           open={drawerOpen}
           onOpenChange={setDrawerOpen}
           shouldScaleBackground={false}
-          modal
+          disablePreventScroll
         >
           <DrawerTrigger
             className={cn(
