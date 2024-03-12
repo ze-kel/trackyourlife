@@ -22,9 +22,6 @@ const getNumberSafe = (v: string | undefined) => {
   return Number.isNaN(n) ? 0 : n;
 };
 
-// To enable when https://github.com/emilkowalski/vaul/pull/258 is merged
-const useDrawerEditor = false;
-
 export const DayCellNumber = ({
   value,
   onChange,
@@ -38,8 +35,12 @@ export const DayCellNumber = ({
   dateString: string;
   className?: string;
 }) => {
-  const isTouch = useMediaQuery("(hover: none)", {initializeWithValue: false});
-  const isDesktop = useMediaQuery("(min-width:768px)", {initializeWithValue: false});
+  const isTouch = useMediaQuery("(hover: none)", {
+    initializeWithValue: false,
+  });
+  const isDesktop = useMediaQuery("(min-width:768px)", {
+    initializeWithValue: false,
+  });
 
   const { valueToColor, valueToProgressPercentage } = useDayCellContextNumber();
 
@@ -190,7 +191,7 @@ export const DayCellNumber = ({
       )}
       {children}
 
-      {isDesktop || !useDrawerEditor ? (
+      {isDesktop ? (
         <input
           inputMode={"decimal"}
           type={"text"}
