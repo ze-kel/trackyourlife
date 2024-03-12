@@ -11,6 +11,7 @@ import type { ReactNode } from "react";
 import { createContext, useContext } from "react";
 import {
   RSAGetTrackable,
+  RSAGetTrackableSettings,
   RSAUpdateTrackable,
   RSAUpdateTrackableSettings,
 } from "src/app/api/trackables/serverActions";
@@ -38,10 +39,12 @@ type MutationSettings = UseMutationResult<
 >;
 
 interface ITrackableContext {
+  id: ITrackable["id"];
   trackable: UseQueryResult<ITrackable, Error>["data"];
   query: UseQueryResult<ITrackable, Error>;
   mutation: MutationTrackable;
   update: MutationTrackable["mutateAsync"];
+  settings: UseQueryResult<ITrackable["settings"], Error>["data"];
   settingsMutation: MutationSettings;
   settingsUpdate: MutationSettings["mutateAsync"];
   settingsUpdatePartial: (v: Partial<ITrackableSettings>) => Promise<void>;
@@ -72,30 +75,36 @@ const TrackableProvider = ({
   const updateMutation = useMutation({
     mutationFn: updateHandler,
     onMutate: async (upd) => {
-      await queryClient.cancelQueries({ queryKey: ["trackable", id] });
+      await queryClient.cancelQueries({
+        queryKey: ["trackable", id, upd.year, upd.month],
+      });
 
-      const previous = queryClient.getQueryData(["trackable", id]);
+      const previous = queryClient.getQueryData([
+        "trackable",
+        id,
+        upd.year,
+        upd.month,
+      ]);
 
-      queryClient.setQueryData(["trackable", id], (old: ITrackable) =>
-        updateData(old, upd),
+      queryClient.setQueryData(
+        ["trackable", id, upd.year, upd.month],
+        (old: ITrackable["data"]) => updateData(old, upd),
       );
       return { previous };
     },
-    onError: (_, update, context) => {
+    onError: (_, upd, context) => {
       if (!context) return;
-      queryClient.setQueryData(["trackable", id], context.previous);
+      queryClient.setQueryData(
+        ["trackable", id, upd.year, upd.month],
+        context.previous,
+      );
     },
   });
 
   const settings = useQuery({
     queryKey: ["trackable", id, "settings"],
     queryFn: async () => {
-      const data = queryClient.getQueryData<ITrackable>(["trackable", id]);
-      if (!data) {
-        const res = await RSAGetTrackable({ trackableId: id });
-        return res.settings;
-      }
-      return data.settings;
+      return await RSAGetTrackableSettings({ trackableId: id });
     },
   });
 
@@ -116,46 +125,45 @@ const TrackableProvider = ({
   const settingsMutation = useMutation({
     mutationFn: updateSettingsHandler,
     onMutate: async (upd) => {
-      if (upd.redirectToTrackablePage) return;
-      await queryClient.cancelQueries({ queryKey: ["trackable", id] });
-
-      const previous = queryClient.getQueryData(["trackable", id]);
-
-      queryClient.setQueryData(["trackable", id], (old: ITrackable) => {
-        old.settings = upd.data;
-        return old;
-      });
-      await queryClient.invalidateQueries({
+      await queryClient.cancelQueries({
         queryKey: ["trackable", id, "settings"],
       });
+
+      const previous = queryClient.getQueryData(["trackable", id, "settings"]);
+
+      queryClient.setQueryData(["trackable", id, "settings"], upd.data);
+
       return { previous };
     },
-    onError: async (_, update, context) => {
+    onError: (_, update, context) => {
       if (!context || update.redirectToTrackablePage) return;
-      queryClient.setQueryData(["trackable", id], context.previous);
-      await queryClient.invalidateQueries({
-        queryKey: ["trackable", id, "settings"],
-      });
+      queryClient.setQueryData(["trackable", id, "settings"], context.previous);
     },
   });
 
   const settingsUpdatePartial = async (update: Partial<ITrackableSettings>) => {
-    const previous = queryClient.getQueryData(["trackable", id]) as ITrackable;
+    const previous = queryClient.getQueryData([
+      "trackable",
+      id,
+      "settings",
+    ]) as ITrackable["settings"];
 
     if (!previous) throw new Error("settingsUpdatePartial: no present data");
 
     await settingsMutation.mutateAsync({
-      data: { ...previous.settings, ...update },
+      data: { ...previous, ...update },
     });
   };
 
   return (
     <TrackableContext.Provider
       value={{
+        id: id,
         trackable: query.data,
         query,
         mutation: updateMutation,
         update: updateMutation.mutateAsync,
+        settings: settings.data,
         settingsMutation,
         settingsUpdate: settingsMutation.mutateAsync,
         settingsUpdatePartial,

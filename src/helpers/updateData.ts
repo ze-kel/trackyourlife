@@ -4,24 +4,22 @@ import formatDateKey from "./formatDateKey";
 import type { Optional } from "@t/helpers";
 
 const updateData = (
-  trackable: ITrackable,
+  data: ITrackable["data"],
   { day, month, year, value }: Optional<Omit<ITrackableUpdate, "id">, "value">,
 ) => {
-  const nTrackable = trackable;
-
-  if (!trackable.data) {
-    nTrackable.data = {};
+  if (!data) {
+    data = {};
   }
 
   const key = formatDateKey({ day, month, year });
 
   if (value) {
-    nTrackable.data[key] = value;
+    data[key] = value;
   } else {
-    delete nTrackable.data[key];
+    delete data[key];
   }
 
-  return nTrackable;
+  return data;
 };
 
 export default updateData;

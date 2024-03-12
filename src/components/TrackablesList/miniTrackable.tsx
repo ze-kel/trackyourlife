@@ -3,65 +3,35 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import DayCell from "@components/DayCell";
 import { useTrackableContextSafe } from "@components/Providers/TrackableProvider";
+import { TrackableName } from "@components/TrackablesList";
 import { HeartFilledIcon, HeartIcon } from "@radix-ui/react-icons";
-import { format, getDaysInMonth } from "date-fns";
-import Link from "next/link";
-import { useMemo } from "react";
+import { format } from "date-fns";
 import { ErrorBoundary } from "react-error-boundary";
 
-const generateDates = (days: number) => {
-  const today = new Date();
-
-  let year = today.getFullYear();
-  let month = today.getMonth();
-  let day = today.getDate();
-
-  const dates: { year: number; month: number; day: number }[] = [];
-
-  for (; days > 0; days--) {
-    dates[days] = { year, month, day };
-
-    if (day === 1) {
-      if (month === 0) {
-        year--;
-        month = 11;
-      } else {
-        month--;
-      }
-      day = getDaysInMonth(new Date(year, month));
-    } else {
-      day--;
-    }
-  }
-  return dates;
-};
-
-const NUM_OF_DAYS = 6;
-
-const MiniTrackable = ({ className }: { className?: string }) => {
-  const daysToRender = useMemo(() => generateDates(NUM_OF_DAYS), []);
-
-  const { trackable, settingsUpdatePartial } = useTrackableContextSafe();
+const MiniTrackable = ({
+  className,
+  daysToRender,
+}: {
+  className?: string;
+  daysToRender: { year: number; month: number; day: number }[];
+}) => {
+  const { settings, settingsUpdatePartial } = useTrackableContextSafe();
 
   return (
-    <>
-      <div className="flex justify-between">
-        <Link href={`/trackables/${trackable?.id}`} className="block w-fit">
-          <h3 className="w-fit cursor-pointer text-xl font-light">
-            {trackable?.settings.name || "unnamed"}
-          </h3>
-        </Link>
+    <div className={className}>
+      <div className="flex items-center justify-between">
+        <TrackableName className="text-xl font-light" />
 
         <Button
           variant={"ghost"}
           size={"icon"}
           onClick={() =>
             void settingsUpdatePartial({
-              favorite: !trackable?.settings.favorite,
+              favorite: !settings?.favorite,
             })
           }
         >
-          {trackable?.settings.favorite ? <HeartFilledIcon /> : <HeartIcon />}
+          {settings?.favorite ? <HeartFilledIcon /> : <HeartIcon />}
         </Button>
       </div>
 
@@ -72,12 +42,7 @@ const MiniTrackable = ({ className }: { className?: string }) => {
           </div>
         }
       >
-        <div
-          className={cn(
-            "sm grid grid-cols-3 gap-x-1 gap-y-1 md:grid-cols-6",
-            className,
-          )}
-        >
+        <div className={"sm grid grid-cols-3 gap-x-1 gap-y-1 md:grid-cols-6"}>
           <>
             {daysToRender.map((day, index) => {
               const date = new Date(day.year, day.month, day.day);
@@ -90,19 +55,27 @@ const MiniTrackable = ({ className }: { className?: string }) => {
                     index > 3 ? "flex-col-reverse md:flex-col" : "flex-col",
                   )}
                 >
-                  <div className="px-1 text-xs ">
-                    <span className="text-neutral-400 dark:text-neutral-700">
-                      {format(date, "EEEE")}
+                  <div className="flex justify-end gap-1 text-xs">
+                    <span className="text-neutral-300 dark:text-neutral-800">
+                      {format(date, "EEE")}
+                    </span>
+                    <span className="text-neutral-500 dark:text-neutral-600">
+                      {format(date, "d")}
                     </span>
                   </div>
-                  <DayCell {...day} key={index} className="h-16" />
+                  <DayCell
+                    {...day}
+                    customLabel=""
+                    key={index}
+                    className="h-16"
+                  />
                 </div>
               );
             })}
           </>
         </div>
       </ErrorBoundary>
-    </>
+    </div>
   );
 };
 

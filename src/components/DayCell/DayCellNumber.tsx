@@ -9,26 +9,59 @@ import { makeColorString } from "src/helpers/colorTools";
 import { cn } from "@/lib/utils";
 import { useDayCellContextNumber } from "@components/Providers/DayCellProvider";
 import { useMediaQuery } from "usehooks-ts";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+
+const getNumberSafe = (v: string | undefined) => {
+  if (!v) return 0;
+  const n = Number(v);
+  return Number.isNaN(n) ? 0 : n;
+};
 
 export const DayCellNumber = ({
   value,
   onChange,
   children,
+  dateString,
   className,
 }: {
   value?: string;
   onChange?: (v: string) => Promise<void> | void;
   children: ReactNode;
+  dateString: string;
   className?: string;
 }) => {
-  const isTouch = useMediaQuery("(hover: none)");
+  const isTouch = useMediaQuery("(hover: none)", {
+    initializeWithValue: false,
+  });
+  const isDesktop = useMediaQuery("(min-width:768px)", {
+    initializeWithValue: false,
+  });
 
   const { valueToColor, valueToProgressPercentage } = useDayCellContextNumber();
 
-  const [internalNumber, setInternalNumber] = useState(Number(value || 0));
+  const [internalNumber, setInternalNumber] = useState(getNumberSafe(value));
   const [rawInput, setRawInput] = useState<string>(String(internalNumber));
   const [inInputEdit] = useState(false);
   const [isHover, setHover] = useState(false);
+
+  const isBigNumber = internalNumber > 10000;
+
+  const formatter = new Intl.NumberFormat(
+    (typeof navigator !== "undefined" && navigator.languages[0]) || "en-IN",
+    {
+      compactDisplay: "short",
+      notation: "compact",
+    },
+  );
+
+  const displayedValue = isBigNumber
+    ? formatter.format(internalNumber)
+    : internalNumber;
 
   const updateValue = async (value: number) => {
     if (onChange) {
@@ -60,6 +93,10 @@ export const DayCellNumber = ({
   const handleInputBlur = () => {
     if (String(internalNumber) !== rawInput) {
       setRawInput(String(internalNumber));
+    }
+
+    if (!isDesktop) {
+      setDrawerOpen(false);
     }
   };
 
@@ -111,6 +148,14 @@ export const DayCellNumber = ({
     }
   };
 
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const focusHandler: React.FocusEventHandler<HTMLInputElement> = (e) => {
+    if (internalNumber === 0) {
+      e.target.setSelectionRange(0, rawInput.length);
+    }
+  };
+
   return (
     <div
       className={cn(
@@ -121,7 +166,6 @@ export const DayCellNumber = ({
         internalNumber === 0
           ? "border-neutral-200 dark:border-neutral-900"
           : "border-[var(--themeLight)] dark:border-[var(--themeDark)]",
-        "h-20",
       )}
       style={
         {
@@ -147,21 +191,69 @@ export const DayCellNumber = ({
       )}
       {children}
 
-      <input
-        inputMode={"decimal"}
-        type={"text"}
-        value={rawInput}
-        className={cn(
-          "relative z-10 flex h-full w-full select-none items-center justify-center bg-inherit text-center font-semibold outline-none transition-all",
-          internalNumber === 0 && !inInputEdit
-            ? "text-neutral-200 dark:text-neutral-800"
-            : "text-neutral-800 dark:text-neutral-300",
-          "text-sm sm:text-xl",
-          "focus:outline-neutral-300 dark:focus:outline-neutral-600",
-        )}
-        onChange={handleInput}
-        onBlur={handleInputBlur}
-      />
+      {isDesktop ? (
+        <input
+          inputMode={"decimal"}
+          type={"text"}
+          value={rawInput}
+          className={cn(
+            "relative z-10 flex h-full w-full select-none items-center justify-center bg-inherit text-center font-semibold outline-none transition-all",
+            internalNumber === 0 && !inInputEdit
+              ? "text-neutral-200 dark:text-neutral-800"
+              : "text-neutral-800 dark:text-neutral-300",
+            "text-sm sm:text-xl",
+            "focus:outline-neutral-300 dark:focus:outline-neutral-600",
+            "selection:bg-neutral-300 dark:selection:bg-neutral-600",
+          )}
+          onFocus={focusHandler}
+          onChange={handleInput}
+          onBlur={handleInputBlur}
+        />
+      ) : (
+        <Drawer
+          open={drawerOpen}
+          onOpenChange={setDrawerOpen}
+          shouldScaleBackground={false}
+          disablePreventScroll
+        >
+          <DrawerTrigger
+            className={cn(
+              "relative z-10 flex h-full w-full select-none items-center justify-center bg-inherit text-center font-semibold transition-all",
+              internalNumber === 0 && !inInputEdit
+                ? "text-neutral-200 dark:text-neutral-800"
+                : "text-neutral-800 dark:text-neutral-300",
+              "text-sm sm:text-xl",
+              "overflow-hidden",
+              drawerOpen && "outline-neutral-300 dark:outline-neutral-600",
+            )}
+          >
+            {displayedValue}
+          </DrawerTrigger>
+          <DrawerContent>
+            <DrawerTitle className="m-auto mt-5">{dateString}</DrawerTitle>
+            <div className="p-6">
+              <input
+                autoFocus={true}
+                inputMode={"decimal"}
+                type={"text"}
+                value={rawInput}
+                className={cn(
+                  "relative z-10 flex h-full w-full select-none items-center justify-center bg-inherit text-center font-semibold outline-none transition-all",
+                  internalNumber === 0 && !inInputEdit
+                    ? "text-neutral-200 dark:text-neutral-800"
+                    : "text-neutral-800 dark:text-neutral-300",
+                  "text-2xl",
+                  "h-20 focus:outline-neutral-300 dark:focus:outline-neutral-600",
+                )}
+                onFocus={focusHandler}
+                onChange={handleInput}
+                onBlur={handleInputBlur}
+              />
+            </div>
+          </DrawerContent>
+        </Drawer>
+      )}
+
       <AnimatePresence>
         {!inInputEdit && isHover && (
           <>

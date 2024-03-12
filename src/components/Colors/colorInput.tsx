@@ -26,7 +26,7 @@ const ColorInput = ({
 }) => {
   const [color, setColor] = useState(value);
 
-  const isDesktop = useMediaQuery("(min-width:768px)");
+  const isDesktop = useMediaQuery("(min-width:768px)", {initializeWithValue: false});
 
   const mobileTitle = useContext(DrawerMobileTitleContext);
 

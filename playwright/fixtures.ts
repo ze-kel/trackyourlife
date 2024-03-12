@@ -41,11 +41,9 @@ export const test = baseTest.extend<object, { workerStorageState: string }>({
       // Important: make sure we authenticate in a clean environment by unsetting storage state.
       const context = await request.newContext({ storageState: undefined });
 
-      const r = await context.post(URL + "/api/user/create", {
+      await context.post(URL + "/api/user/create", {
         data: { ...account },
       });
-
-      console.log(r);
 
       await context.storageState({ path: fileName });
       await context.dispose();

@@ -17,6 +17,8 @@ import { presetsMap } from "@components/Colors/presets";
 import ColorInput from "@components/Colors/colorInput";
 import { Button } from "@/components/ui/button";
 import { DrawerMobileTitleProvider } from "@/components/ui/drawer";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 export const SettingsBoolean = ({
   settings,
@@ -87,11 +89,37 @@ export const SettingsRange = ({
 }) => {
   return (
     <>
-      <h3 className="mb-2 text-xl">Range Labels</h3>
-      <RangeLabelSelector
-        initialValue={settings.current.labels}
-        onChange={(v) => (settings.current.labels = v)}
-      />
+      <div>
+        <h3 className="mb-2 text-xl">States</h3>
+        <RangeLabelSelector
+          initialValue={settings.current.labels}
+          onChange={(v) => (settings.current.labels = v)}
+        />
+      </div>
+
+      <div>
+        <h3 className="mb-2 text-xl">Cycle values</h3>
+        <div className="mt-1 flex items-center space-x-2">
+          <Switch
+            id="is-cycle"
+            defaultChecked={settings.current.isCycle}
+            onCheckedChange={(v) => {
+              settings.current.isCycle = v;
+            }}
+          />
+          <Label htmlFor="is-cycle">Select next label on click</Label>
+        </div>
+        <div className="mt-2 flex items-center space-x-2">
+          <Switch
+            id="is-cycle"
+            defaultChecked={settings.current.cycleToEmpty}
+            onCheckedChange={(v) => {
+              settings.current.cycleToEmpty = v;
+            }}
+          />
+          <Label htmlFor="is-cycle">Cycle to empty</Label>
+        </div>
+      </div>
     </>
   );
 };

@@ -1,11 +1,20 @@
 "use client";
 import type { ITrackable, ITrackableSettings } from "src/types/trackable";
 import MiniTrackable from "./miniTrackable";
-import { m } from "framer-motion";
-import TrackableProvider from "@components/Providers/TrackableProvider";
+import { AnimatePresence, m } from "framer-motion";
+import TrackableProvider, {
+  useTrackableContextSafe,
+} from "@components/Providers/TrackableProvider";
 import type { QueryClient } from "@tanstack/react-query";
 import { QueriesObserver, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
+import { generateDates } from "@components/TrackablesList/helper";
+import DayCell from "@components/DayCell";
+import Link from "next/link";
+import { format, isLastDayOfMonth } from "date-fns";
+import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 
 const sortList = (
   list: ITrackable["id"][],
@@ -36,34 +45,189 @@ const sortList = (
   return newList.map((v) => v.id);
 };
 
+type TrackableTypeFilterState = Record<ITrackable["type"], boolean>;
+
+const filterTrackables = (
+  query: string,
+  types: TrackableTypeFilterState,
+  list: ITrackable["id"][],
+  queryClient: QueryClient,
+): ITrackable["id"][] => {
+  const filterByType = Object.values(types).some((v) => v);
+
+  if (!query && !filterByType) return list;
+
+  const newList = list.map((id) => {
+    return {
+      id,
+      type: queryClient.getQueryData<ITrackable>(["trackable", id])?.type,
+      settings: queryClient.getQueryData<ITrackableSettings>([
+        "trackable",
+        id,
+        "settings",
+      ]),
+    };
+  });
+
+  return newList
+    .filter((v) => {
+      return v.settings?.name && v.settings.name.includes(query);
+    })
+    .filter((v) => {
+      if (!filterByType) return true;
+
+      return types[v.type as keyof TrackableTypeFilterState];
+    })
+    .map((v) => v.id);
+};
+
 const TrackablesList = ({ list }: { list: ITrackable["id"][] }) => {
   const queryClient = useQueryClient();
 
-  const [sorted, setSorted] = useState(sortList(list, queryClient));
+  const [searchQ, setSearch] = useState("");
+  const [filterTypes, setFilterTypes] = useState<TrackableTypeFilterState>({
+    number: false,
+    range: false,
+    boolean: false,
+  });
+
+  const filtered = useMemo(
+    () => filterTrackables(searchQ, filterTypes, list, queryClient),
+    [list, queryClient, filterTypes, searchQ],
+  );
+
+  const [sortedVersion, setSortedVersion] = useState(0);
+
+  const sorted = useMemo(
+    () => sortList(filtered, queryClient),
+    [filtered, queryClient],
+  );
 
   useEffect(() => {
+    // Update sorted list when we change setting(add to favs)
     const m = list.map((v) => ({
       queryKey: ["trackable", v, "settings"],
     }));
     const obs = new QueriesObserver(queryClient, m);
     obs.subscribe(() => {
-      setSorted(sortList(list, queryClient));
+      setSortedVersion(sortedVersion + 1);
     });
   });
 
+  const daysToRender = useMemo(() => generateDates(6), []);
+
   return (
-    <div className="grid gap-5">
-      {sorted.map((id, index) => (
-        <m.div
-          layout
-          layoutId={String(index)}
-          key={id}
-          className="border-b border-neutral-200 py-2 last:border-0 dark:border-neutral-800"
-        >
-          <TrackableProvider id={id}>
-            <MiniTrackable className="my-4" />
-          </TrackableProvider>
-        </m.div>
+    <>
+      <Input
+        placeholder="Search by name"
+        className="mt-2"
+        value={searchQ}
+        onChange={(e) => setSearch(e.target.value)}
+      />
+      <div className="mt-2 flex gap-2">
+        {Object.keys(filterTypes).map((v) => (
+          <Badge
+            key={v}
+            variant={
+              filterTypes[v as keyof TrackableTypeFilterState]
+                ? "default"
+                : "outline"
+            }
+            className="cursor-pointer capitalize"
+            onClick={() => {
+              setFilterTypes({
+                ...filterTypes,
+                [v]: !filterTypes[v as keyof TrackableTypeFilterState],
+              });
+            }}
+          >
+            {v}
+          </Badge>
+        ))}
+      </div>
+
+      <div className="mt-3 grid gap-5">
+        <AnimatePresence initial={false}>
+          {sorted.map((id) => (
+            <m.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 1 }}
+              transition={{ duration: 0.2, ease: "circInOut" }}
+              layout
+              layoutId={id}
+              key={id}
+              className="border-b border-neutral-200 pb-4 last:border-0 dark:border-neutral-800"
+            >
+              <TrackableProvider id={id}>
+                <MiniTrackable daysToRender={daysToRender} />
+              </TrackableProvider>
+            </m.div>
+          ))}
+        </AnimatePresence>
+      </div>
+    </>
+  );
+};
+
+export const TrackableName = ({ className }: { className?: string }) => {
+  const { trackable, settings } = useTrackableContextSafe();
+
+  return (
+    <Link
+      href={`/trackables/${trackable?.id}`}
+      className={cn("block w-fit", className)}
+    >
+      {settings?.name || "unnamed"}
+    </Link>
+  );
+};
+
+export const DailyList = ({ list }: { list: ITrackable["id"][] }) => {
+  const daysToRender = useMemo(() => generateDates(40).reverse(), []);
+
+  const queryClient = useQueryClient();
+
+  const [sorted] = useState(sortList(list, queryClient));
+
+  return (
+    <div className="flex flex-col">
+      {daysToRender.map((date, index) => (
+        <Fragment key={index}>
+          <div className="relative mt-4 flex h-fit flex-col">
+            <div className="flex w-full flex-col justify-between gap-2">
+              {(isLastDayOfMonth(new Date(date.year, date.month, date.day)) ||
+                index === 0) && (
+                <div className="mb-2 text-xl font-semibold lg:text-4xl">
+                  {format(new Date(date.year, date.month, date.day), "MMMM")}
+                </div>
+              )}
+
+              <span className="flex w-full items-baseline gap-2">
+                <span className="text-xl opacity-30">
+                  {format(new Date(date.year, date.month, date.day), "EEEE")}
+                </span>{" "}
+                <span className="text-xl font-semibold opacity-80">
+                  {format(new Date(date.year, date.month, date.day), "d")}
+                </span>
+              </span>
+            </div>
+            <div className="mt-2 grid grid-cols-2 gap-2 border-b border-neutral-200 pb-4 dark:border-neutral-800 sm:grid-cols-4">
+              {sorted.map((id, index) => (
+                <div key={index}>
+                  <TrackableProvider id={id}>
+                    <TrackableName
+                      className={
+                        "mb-1 w-full text-right text-xl text-neutral-950 opacity-20 dark:text-neutral-50"
+                      }
+                    />
+                    <DayCell {...date} customLabel="" className="h-20" />
+                  </TrackableProvider>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Fragment>
       ))}
     </div>
   );
