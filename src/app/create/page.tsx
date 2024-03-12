@@ -49,7 +49,7 @@ const Create = () => {
       <TrackableSettings
         trackable={newOne}
         handleSave={createTrackable}
-        customSaveButtonText="Create"
+        customSaveButtonText="Create Trackable"
       />
     </div>
   );

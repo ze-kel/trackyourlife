@@ -22,12 +22,11 @@ const createTrackable = async ({
 }) => {
   await page.goto(URL + "/create");
   // Creating
-  await page.getByRole("button", { name: "Create" }).click();
   await page.getByRole("radio", { name: type }).click();
   if (name) {
     await page.getByPlaceholder("Name").fill(name);
   }
-  await page.getByRole("button", { name: "Create" }).click();
+  await page.getByRole("button", { name: "Create Trackable" }).click();
 
   await page.waitForURL("**/trackables/**");
 };
@@ -38,7 +37,7 @@ test("Basic CRUD", async ({ page }) => {
   await createTrackable({ page, name: TRACKABLE_NAME, type: "boolean" });
 
   // Return to main page
-  await page.goto(URL);
+  await page.goto(URL + "/trackables");
 
   // Check for link to trackable
   const BOOL_BUTTON = page.getByRole("link", {
