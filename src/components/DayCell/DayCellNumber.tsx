@@ -38,8 +38,8 @@ export const DayCellNumber = ({
   dateString: string;
   className?: string;
 }) => {
-  const isTouch = useMediaQuery("(hover: none)");
-  const isDesktop = useMediaQuery("(min-width:768px)");
+  const isTouch = useMediaQuery("(hover: none)", {initializeWithValue: false});
+  const isDesktop = useMediaQuery("(min-width:768px)", {initializeWithValue: false});
 
   const { valueToColor, valueToProgressPercentage } = useDayCellContextNumber();
 
