@@ -117,13 +117,16 @@ const HeaderMenu = ({ username }: { username?: string }) => {
 
   return (
     <>
-      <Links variant={"ghost"} variantActive={"secondary"} />
-
+      <div className="hidden md:block">
+        <Links variant={"ghost"} variantActive={"secondary"} />
+      </div>
       {isDesktop ? (
-        <Dropdown placement="bottom-end">
-          <DropdownTrigger>{Trigger}</DropdownTrigger>
-          <DropdownContent>{Content}</DropdownContent>
-        </Dropdown>
+        <>
+          <Dropdown placement="bottom-end">
+            <DropdownTrigger>{Trigger}</DropdownTrigger>
+            <DropdownContent>{Content}</DropdownContent>
+          </Dropdown>
+        </>
       ) : (
         <Drawer>
           <DrawerTrigger>{Trigger}</DrawerTrigger>

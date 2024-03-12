@@ -184,7 +184,7 @@ export const TrackableName = ({ className }: { className?: string }) => {
 };
 
 export const DailyList = ({ list }: { list: ITrackable["id"][] }) => {
-  const daysToRender = useMemo(() => generateDates(7).reverse(), []);
+  const daysToRender = useMemo(() => generateDates(40).reverse(), []);
 
   const queryClient = useQueryClient();
 
@@ -195,22 +195,22 @@ export const DailyList = ({ list }: { list: ITrackable["id"][] }) => {
       {daysToRender.map((date, index) => (
         <Fragment key={index}>
           <div className="relative mt-4 flex h-fit flex-col">
-            <div className="flex w-full flex-col-reverse justify-between gap-2">
-              <span className="flex w-full items-end gap-3">
-                <span className="text-4xl">
+            <div className="flex w-full flex-col justify-between gap-2">
+              {(isLastDayOfMonth(new Date(date.year, date.month, date.day)) ||
+                index === 0) && (
+                <div className="mb-2 text-xl font-semibold lg:text-4xl">
+                  {format(new Date(date.year, date.month, date.day), "MMMM")}
+                </div>
+              )}
+
+              <span className="flex w-full items-baseline gap-2">
+                <span className="text-xl opacity-30">
+                  {format(new Date(date.year, date.month, date.day), "EEEE")}
+                </span>{" "}
+                <span className="text-xl font-semibold opacity-80">
                   {format(new Date(date.year, date.month, date.day), "d")}
                 </span>
-                <span className="text-md opacity-60">
-                  {format(new Date(date.year, date.month, date.day), "EEEE")}
-                </span>
               </span>
-
-              {isLastDayOfMonth(new Date(date.year, date.month, date.day)) ||
-                (index === 0 && (
-                  <div className="text-xl font-extralight lg:text-2xl">
-                    {format(new Date(date.year, date.month, date.day), "MMMM")}
-                  </div>
-                ))}
             </div>
             <div className="mt-2 grid grid-cols-2 gap-2 border-b border-neutral-200 pb-4 dark:border-neutral-800 sm:grid-cols-4">
               {sorted.map((id, index) => (
@@ -218,7 +218,7 @@ export const DailyList = ({ list }: { list: ITrackable["id"][] }) => {
                   <TrackableProvider id={id}>
                     <TrackableName
                       className={
-                        "text-xl text-neutral-400 dark:text-neutral-700"
+                        "mb-1 w-full text-right text-xl text-neutral-950 opacity-20 dark:text-neutral-50"
                       }
                     />
                     <DayCell {...date} customLabel="" className="h-20" />

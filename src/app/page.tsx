@@ -54,13 +54,8 @@ const Page = async () => {
 
   return (
     <div className="content-container flex w-full flex-col">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-semibold md:text-3xl">Today</h2>
-      </div>
       <HydrationBoundary state={dehydrate(queryClient)}>
-        <div className="mt-2">
-          <DailyList list={ids} />
-        </div>
+        <DailyList list={ids} />
       </HydrationBoundary>
     </div>
   );

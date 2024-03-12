@@ -1,5 +1,5 @@
 "use client";
-import style from "./customScrollbar.module.css";
+import style from "./popupSelector.module.css";
 
 import type { IRangeSettings } from "@t/trackable";
 import { AnimatePresence, m } from "framer-motion";

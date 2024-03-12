@@ -10,7 +10,7 @@ import { useOptimistic } from "react";
 import { cn } from "@/lib/utils";
 import { useDayCellContextRange } from "@components/Providers/DayCellProvider";
 import { PopupSelector } from "@components/DayCell/PopupSelector";
-import { AnimatePresence, easeInOut, m } from "framer-motion";
+import { AnimatePresence, m } from "framer-motion";
 
 export const DayCellRange = ({
   value,
