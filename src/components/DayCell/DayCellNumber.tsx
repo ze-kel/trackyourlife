@@ -49,6 +49,11 @@ export const DayCellNumber = ({
   const [inInputEdit] = useState(false);
   const [isHover, setHover] = useState(false);
 
+  const internalUpdate = (val: number) => {
+    setInternalNumber(val);
+    void debouncedUpdateValue(val);
+  };
+
   const isBigNumber = internalNumber > 10000;
 
   const formatter = new Intl.NumberFormat(
@@ -85,8 +90,7 @@ export const DayCellNumber = ({
     const numeric = Number(replaced);
 
     if (!Number.isNaN(numeric)) {
-      setInternalNumber(numeric);
-      void debouncedUpdateValue(numeric);
+      internalUpdate(numeric);
     }
   };
 
@@ -120,7 +124,7 @@ export const DayCellNumber = ({
     e.preventDefault();
 
     const v = internalNumber + 1 * direction;
-    setInternalNumber(v);
+    internalUpdate(v);
     setRawInput(String(v));
 
     if (intervalRef.current) {
@@ -131,7 +135,7 @@ export const DayCellNumber = ({
     intervalRef.current = setInterval(() => {
       intervalCounter.current++;
       const v = internalNumber + 1 * intervalCounter.current * direction;
-      setInternalNumber(v);
+      internalUpdate(v);
       setRawInput(String(v));
     }, 100);
   };

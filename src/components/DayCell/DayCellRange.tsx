@@ -10,20 +10,18 @@ import { useOptimistic } from "react";
 import { cn } from "@/lib/utils";
 import { useDayCellContextRange } from "@components/Providers/DayCellProvider";
 import { PopupSelector } from "@components/DayCell/PopupSelector";
-import { AnimatePresence, m } from "framer-motion";
+import { m } from "framer-motion";
 
 export const DayCellRange = ({
   value,
   onChange,
   children,
   className,
-  number,
 }: {
   value?: string;
   onChange?: (v: string) => Promise<void> | void;
   children: ReactNode;
   className?: string;
-  number: number;
 }) => {
   const { labelMapping, labels, settings } = useDayCellContextRange();
 
@@ -60,10 +58,7 @@ export const DayCellRange = ({
     }
   };
 
-  if (number === 22) {
-    console.log(dayValue);
-  }
-
+  // m.div should be wrapped into AnimatePresence but it's currently bugged, waiting for some fix
   if (settings.isCycle) {
     return (
       <button
@@ -80,22 +75,14 @@ export const DayCellRange = ({
       >
         {children}
 
-        <AnimatePresence mode="popLayout" initial={false}>
-          <m.div
-            data-key={String(dayValue)}
-            key={String(dayValue)}
-            initial={{ y: 50, opacity: 0 }}
-            animate={{
-              y: 0,
-              opacity: 1,
-            }}
-            exit={{ y: -50, opacity: 0 }}
-            transition={{ duration: 0.2, ease: "circInOut" }}
-            className="text-xl"
-          >
-            {dayValue && em}
-          </m.div>
-        </AnimatePresence>
+        <m.div
+          data-key={String(dayValue)}
+          key={String(dayValue)}
+          transition={{ duration: 0.4, ease: "circOut" }}
+          className="text-xl"
+        >
+          {dayValue && em}
+        </m.div>
       </button>
     );
   }

@@ -43,6 +43,9 @@ export const computeDayCellHelpers = ({
   return { dateKey, inTrackRange, isToday };
 };
 
+export const DayCellBaseClasses =
+  "w-full h-full relative select-none overflow-hidden border-transparent outline-none focus:outline-neutral-300 dark:focus:outline-neutral-600 border-2 rounded-sm";
+
 const DayCell = ({
   day,
   month,
@@ -85,10 +88,7 @@ const DayCell = ({
     await update({ value, day, month, year });
   };
 
-  const baseClasses = cn(
-    "w-full h-full relative select-none overflow-hidden border-transparent outline-none focus:outline-neutral-300 dark:focus:outline-neutral-600 border-2 rounded-sm",
-    className,
-  );
+  const baseClasses = cn(DayCellBaseClasses, className);
 
   const Label = (
     <div className="absolute left-0.5 top-0.5 select-none text-neutral-800 sm:left-1 sm:top-0 sm:text-base">
@@ -156,7 +156,6 @@ const DayCell = ({
         className={baseClasses}
         value={data[dateKey]}
         onChange={updateHandler}
-        number={day}
       >
         {Label}
       </DayCellRange>

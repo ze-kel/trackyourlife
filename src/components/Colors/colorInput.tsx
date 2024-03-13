@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/drawer";
 import ColorPicker from "@components/Colors";
 import { ColorDisplay } from "@components/Colors/colorDisplay";
+import { presetsMap } from "@components/Colors/presets";
 import {
   Dropdown,
   DropdownTrigger,
@@ -18,15 +19,17 @@ import { useContext, useState } from "react";
 import { useMediaQuery } from "usehooks-ts";
 
 const ColorInput = ({
-  value,
+  value = presetsMap.neutral,
   onChange,
 }: {
-  value: IColorValue;
+  value?: IColorValue;
   onChange: (v: IColorValue) => void;
 }) => {
   const [color, setColor] = useState(value);
 
-  const isDesktop = useMediaQuery("(min-width:768px)", {initializeWithValue: false});
+  const isDesktop = useMediaQuery("(min-width:768px)", {
+    initializeWithValue: false,
+  });
 
   const mobileTitle = useContext(DrawerMobileTitleContext);
 

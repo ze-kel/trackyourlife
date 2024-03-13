@@ -184,21 +184,21 @@ export const TrackableName = ({ className }: { className?: string }) => {
 };
 
 export const DailyList = ({ list }: { list: ITrackable["id"][] }) => {
-  const daysToRender = useMemo(() => generateDates(40).reverse(), []);
+  const daysToRender = useMemo(() => generateDates(10).reverse(), []);
 
   const queryClient = useQueryClient();
 
   const [sorted] = useState(sortList(list, queryClient));
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col gap-6">
       {daysToRender.map((date, index) => (
         <Fragment key={index}>
-          <div className="relative mt-4 flex h-fit flex-col">
+          <div className="relative flex h-fit flex-col ">
             <div className="flex w-full flex-col justify-between gap-2">
               {(isLastDayOfMonth(new Date(date.year, date.month, date.day)) ||
                 index === 0) && (
-                <div className="mb-2 text-xl font-semibold lg:text-4xl">
+                <div className="mb-2 text-2xl font-semibold lg:text-4xl">
                   {format(new Date(date.year, date.month, date.day), "MMMM")}
                 </div>
               )}
@@ -212,7 +212,7 @@ export const DailyList = ({ list }: { list: ITrackable["id"][] }) => {
                 </span>
               </span>
             </div>
-            <div className="mt-2 grid grid-cols-2 gap-2 border-b border-neutral-200 pb-4 dark:border-neutral-800 sm:grid-cols-4">
+            <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
               {sorted.map((id, index) => (
                 <div key={index}>
                   <TrackableProvider id={id}>
@@ -227,6 +227,9 @@ export const DailyList = ({ list }: { list: ITrackable["id"][] }) => {
               ))}
             </div>
           </div>
+          {index !== daysToRender.length - 1 && (
+            <hr className="h-0 border-b border-neutral-200 dark:border-neutral-800" />
+          )}
         </Fragment>
       ))}
     </div>

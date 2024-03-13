@@ -9,7 +9,7 @@ export const generateDates = (days: number) => {
 
   const dates: { year: number; month: number; day: number }[] = [];
 
-  for (; days > 0; days--) {
+  for (; days >= 0; days--) {
     dates[days] = { year, month, day };
 
     if (day === 1) {
