@@ -1,7 +1,7 @@
 "use client";
 import { getDaysInMonth, getISODay, getMonth, getYear, format } from "date-fns";
-import { useState } from "react";
-import DayCell from "../DayCell";
+import { useEffect, useState } from "react";
+import DayCellWrapper from "../DayCell";
 import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
 import type { ITrackable } from "@t/trackable";
@@ -32,20 +32,21 @@ const Month = ({
   return (
     <div
       id={myId}
-      className={cn("grid grid-cols-7 grid-rows-6", mini ? "gap-1" : "gap-1")}
+      className={cn(
+        "grid gap-1",
+        mini ? "grid-cols-7 grid-rows-6" : "grid-cols-7 grid-rows-6",
+      )}
     >
-      {prepend.map((_, i) => (
-        <div key={i}> </div>
-      ))}
+      {!mini && prepend.map((_, i) => <div key={i}> </div>)}
       {dates.map((el) => (
-        <div key={`${month}-${el}`}>
-          <DayCell
-            year={year}
-            month={month}
-            day={el}
-            className={mini ? "aspect-square" : "aspect-square sm:h-16"}
-          />
-        </div>
+        <DayCellWrapper
+          key={`${month}-${el}`}
+          year={year}
+          month={month}
+          day={el}
+          labelType={mini ? "outside" : "auto"}
+          className={mini ? "h-12" : "h-12 sm:h-14 md:h-16"}
+        />
       ))}
     </div>
   );
@@ -77,7 +78,7 @@ const Year = ({
     .map((_, i) => i);
 
   return (
-    <div className="my-4 grid gap-x-3 gap-y-2 sm:grid-cols-2 md:grid-cols-3">
+    <div className="my-4 grid gap-x-3 gap-y-2 md:grid-cols-2">
       {months.map((m) => (
         <button
           disabled={m > active}
@@ -85,7 +86,7 @@ const Year = ({
           className="cursor-pointer rounded-md border border-transparent px-2 py-1 transition-colors hover:bg-neutral-200 disabled:pointer-events-none disabled:cursor-default disabled:bg-transparent dark:hover:bg-neutral-900 dark:disabled:bg-transparent"
           onClick={() => openMonth(m)}
         >
-          <h5 className={cn("mb-1 font-semibold transition-colors")}>
+          <h5 className={cn("mb-1 text-left font-semibold transition-colors")}>
             <span>{format(new Date(year, m, 1), "MMMM")}</span>
           </h5>
           <Month year={year} month={m} mini={true} />
@@ -130,6 +131,7 @@ const ViewController = ({
   year,
   month,
   increment,
+  view,
   setView,
   isCurrentMonth,
   openCurrentMonth,
@@ -137,6 +139,7 @@ const ViewController = ({
   year?: number;
   month?: number;
   isCurrentMonth: boolean;
+  view: TView;
   setView: (v: TView) => void;
   increment: (v: number) => void;
   openCurrentMonth: () => void;
@@ -144,26 +147,28 @@ const ViewController = ({
   return (
     <div className="mb-4 flex flex-col-reverse gap-2 md:flex-row md:items-center md:justify-between">
       <div className="flex items-baseline gap-2 self-center">
-        {typeof year === "number" && (
+        {view !== "years" && (
           <Button name="year" variant="ghost" onClick={() => setView("years")}>
             {year}
           </Button>
         )}
 
-        {typeof year === "number" && typeof month === "number" && (
-          <>
-            <div className="text-xl font-light text-neutral-200 dark:text-neutral-800">
-              /
-            </div>
-            <Button
-              name="months"
-              variant="ghost"
-              onClick={() => setView("months")}
-            >
-              {format(new Date(year, month, 1), "MMMM")}
-            </Button>
-          </>
-        )}
+        {view === "days" &&
+          typeof year === "number" &&
+          typeof month === "number" && (
+            <>
+              <div className="text-xl font-light text-neutral-200 dark:text-neutral-800">
+                /
+              </div>
+              <Button
+                name="months"
+                variant="ghost"
+                onClick={() => setView("months")}
+              >
+                {format(new Date(year, month, 1), "MMMM")}
+              </Button>
+            </>
+          )}
       </div>
       <div className="flex w-fit gap-2 self-end">
         <Button
@@ -242,12 +247,6 @@ const TrackableView = ({
     }
     setYear(newYear);
     setMonth(newMonth);
-
-    window.history.replaceState(
-      {},
-      "",
-      `/trackables/${id}/${newYear}/${newMonth + 1}`,
-    );
   };
 
   const openMonth = (m: number) => {
@@ -267,12 +266,31 @@ const TrackableView = ({
     setView("days");
   };
 
+  useEffect(() => {
+    let url;
+    switch (view) {
+      case "days":
+        url = `/trackables/${id}/${year}/${month + 1}`;
+        break;
+      case "months":
+        url = `/trackables/${id}/${year}`;
+        break;
+      case "years":
+        url = `/trackables/${id}`;
+        break;
+    }
+    if (url && url !== window.location.pathname) {
+      window.history.pushState({}, "", url);
+    }
+  }, [view, year, month, id]);
+
   return (
     <TrackableProvider id={id}>
       <ViewController
         year={year}
         month={month}
         isCurrentMonth={isCurrentMonth}
+        view={view}
         setView={setView}
         openCurrentMonth={openCurrentMonth}
         increment={increment}

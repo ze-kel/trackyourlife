@@ -9,7 +9,7 @@ import type { QueryClient } from "@tanstack/react-query";
 import { QueriesObserver, useQueryClient } from "@tanstack/react-query";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { generateDates } from "@components/TrackablesList/helper";
-import DayCell from "@components/DayCell";
+import DayCellWrapper from "@components/DayCell";
 import Link from "next/link";
 import { format, isLastDayOfMonth } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -221,7 +221,11 @@ export const DailyList = ({ list }: { list: ITrackable["id"][] }) => {
                         "mb-1 w-full text-right text-xl text-neutral-950 opacity-20 dark:text-neutral-50"
                       }
                     />
-                    <DayCell {...date} customLabel="" className="h-20" />
+                    <DayCellWrapper
+                      {...date}
+                      labelType="none"
+                      className="h-20"
+                    />
                   </TrackableProvider>
                 </div>
               ))}

@@ -4,7 +4,6 @@ import type { CSSProperties, ReactNode } from "react";
 import { useCallback, useMemo, useRef, useState } from "react";
 import debounce from "lodash/debounce";
 import { PlusIcon, MinusIcon } from "@radix-ui/react-icons";
-import { AnimatePresence, m } from "framer-motion";
 import { makeColorString } from "src/helpers/colorTools";
 import { cn } from "@/lib/utils";
 import { useDayCellContextNumber } from "@components/Providers/DayCellProvider";
@@ -15,6 +14,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
+import { format } from "date-fns";
 
 const getNumberSafe = (v: string | undefined) => {
   if (!v) return 0;
@@ -26,18 +26,15 @@ export const DayCellNumber = ({
   value,
   onChange,
   children,
-  dateString,
+  dateNow,
   className,
 }: {
   value?: string;
   onChange?: (v: string) => Promise<void> | void;
   children: ReactNode;
-  dateString: string;
+  dateNow: Date;
   className?: string;
 }) => {
-  const isTouch = useMediaQuery("(hover: none)", {
-    initializeWithValue: false,
-  });
   const isDesktop = useMediaQuery("(min-width:768px)", {
     initializeWithValue: false,
   });
@@ -47,7 +44,6 @@ export const DayCellNumber = ({
   const [internalNumber, setInternalNumber] = useState(getNumberSafe(value));
   const [rawInput, setRawInput] = useState<string>(String(internalNumber));
   const [inInputEdit] = useState(false);
-  const [isHover, setHover] = useState(false);
 
   const internalUpdate = (val: number) => {
     setInternalNumber(val);
@@ -164,7 +160,7 @@ export const DayCellNumber = ({
     <div
       className={cn(
         className,
-        "items-center justify-center overflow-visible",
+        "group items-center justify-center overflow-visible",
         "transition-all ease-in-out",
         "cursor-text",
         internalNumber === 0
@@ -177,11 +173,7 @@ export const DayCellNumber = ({
           "--themeDark": makeColorString(color.darkMode),
         } as CSSProperties
       }
-      onMouseEnter={() => {
-        if (!isTouch) setHover(true);
-      }}
       onMouseLeave={(e) => {
-        setHover(false);
         mouseUpSign(e);
       }}
     >
@@ -196,23 +188,25 @@ export const DayCellNumber = ({
       {children}
 
       {isDesktop ? (
-        <input
-          inputMode={"decimal"}
-          type={"text"}
-          value={rawInput}
-          className={cn(
-            "relative z-10 flex h-full w-full select-none items-center justify-center bg-inherit text-center font-semibold outline-none transition-all",
-            internalNumber === 0 && !inInputEdit
-              ? "text-neutral-200 dark:text-neutral-800"
-              : "text-neutral-800 dark:text-neutral-300",
-            "text-sm sm:text-xl",
-            "focus:outline-neutral-300 dark:focus:outline-neutral-600",
-            "selection:bg-neutral-300 dark:selection:bg-neutral-600",
-          )}
-          onFocus={focusHandler}
-          onChange={handleInput}
-          onBlur={handleInputBlur}
-        />
+        <>
+          <input
+            inputMode={"decimal"}
+            type={"text"}
+            value={rawInput}
+            className={cn(
+              "relative z-10 flex h-full w-full select-none items-center justify-center bg-inherit text-center font-semibold outline-none transition-all",
+              internalNumber === 0 && !inInputEdit
+                ? "text-neutral-200 dark:text-neutral-800"
+                : "text-neutral-800 dark:text-neutral-300",
+              "@[4rem]:text-xl text-xs",
+              "focus:outline-neutral-300 dark:focus:outline-neutral-600",
+              "selection:bg-neutral-300 dark:selection:bg-neutral-600",
+            )}
+            onFocus={focusHandler}
+            onChange={handleInput}
+            onBlur={handleInputBlur}
+          />
+        </>
       ) : (
         <Drawer
           open={drawerOpen}
@@ -226,7 +220,7 @@ export const DayCellNumber = ({
               internalNumber === 0 && !inInputEdit
                 ? "text-neutral-200 dark:text-neutral-800"
                 : "text-neutral-800 dark:text-neutral-300",
-              "text-sm sm:text-xl",
+              "@[4rem]:text-lg text-xs",
               "overflow-hidden",
               drawerOpen && "outline-neutral-300 dark:outline-neutral-600",
             )}
@@ -234,7 +228,9 @@ export const DayCellNumber = ({
             {displayedValue}
           </DrawerTrigger>
           <DrawerContent>
-            <DrawerTitle className="m-auto mt-5">{dateString}</DrawerTitle>
+            <DrawerTitle className="m-auto mt-5">
+              {format(dateNow, "d MMMM yyyy")}
+            </DrawerTitle>
             <div className="p-6">
               <input
                 autoFocus={true}
@@ -258,52 +254,24 @@ export const DayCellNumber = ({
         </Drawer>
       )}
 
-      <AnimatePresence>
-        {!inInputEdit && isHover && (
-          <>
-            <m.div
-              className="absolute left-[50%] top-0 z-20"
-              initial={{
-                opacity: 0,
-                translateY: "-25%",
-                translateX: "-50%",
-              }}
-              animate={{
-                opacity: 1,
-                translateY: "-50%",
-              }}
-              exit={{ opacity: 0, translateY: "-25%" }}
-              transition={{ duration: 0.2, opacity: { duration: 0.1 } }}
-            >
-              <PlusIcon
-                onMouseDown={(e) => mouseDownSign(e, 1)}
-                onMouseUp={mouseUpSign}
-                className="h-6 w-6 cursor-pointer border border-neutral-500 bg-neutral-50 p-1 dark:bg-neutral-900"
-              />
-            </m.div>
-            <m.div
-              className="absolute bottom-0 left-[50%] z-20"
-              initial={{
-                opacity: 0,
-                translateY: "25%",
-                translateX: "-50%",
-              }}
-              animate={{
-                opacity: 1,
-                translateY: "50%",
-              }}
-              exit={{ opacity: 0, translateY: "25%" }}
-              transition={{ duration: 0.2, opacity: { duration: 0.1 } }}
-            >
-              <MinusIcon
-                onMouseDown={(e) => mouseDownSign(e, -1)}
-                onMouseUp={mouseUpSign}
-                className=" h-6 w-6 cursor-pointer border border-neutral-500 bg-neutral-50 p-1 dark:bg-neutral-900"
-              />
-            </m.div>
-          </>
-        )}
-      </AnimatePresence>
+      {!inInputEdit && (
+        <>
+          <div className="absolute left-[50%] top-0 z-20 hidden -translate-x-1/2 -translate-y-1/2 group-hover:block">
+            <PlusIcon
+              onMouseDown={(e) => mouseDownSign(e, 1)}
+              onMouseUp={mouseUpSign}
+              className="h-6 w-6 cursor-pointer border border-neutral-500 bg-neutral-50 p-1 dark:bg-neutral-900"
+            />
+          </div>
+          <div className="absolute bottom-0 left-[50%] z-20 hidden -translate-x-1/2 translate-y-1/2 group-hover:block">
+            <MinusIcon
+              onMouseDown={(e) => mouseDownSign(e, -1)}
+              onMouseUp={mouseUpSign}
+              className=" h-6 w-6 cursor-pointer border border-neutral-500 bg-neutral-50 p-1 dark:bg-neutral-900"
+            />
+          </div>
+        </>
+      )}
     </div>
   );
 };

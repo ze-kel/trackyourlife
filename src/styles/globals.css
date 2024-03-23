@@ -4,7 +4,7 @@
 
 @layer components {
   .content-container {
-    @apply container mx-auto max-w-4xl px-4;
+    @apply container mx-auto max-w-4xl px-2 sm:px-4;
   }
 
   .customScrollBar::-webkit-scrollbar {
