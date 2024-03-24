@@ -39,7 +39,7 @@ export const GetAllTrackables = async ({
     },
   });
 
-  const trackables = raw.map(prepareTrackable);
+  const trackables = raw.map((v) => prepareTrackable(v, limits));
 
   log(`API: Get all trackables ${userId}`);
 
@@ -69,7 +69,7 @@ export const GetTrackable = async ({
   if (!tr) {
     throw new ApiFunctionError("Unable to find trackable", 400);
   }
-  const returnedTrackable: ITrackable = prepareTrackable(tr);
+  const returnedTrackable: ITrackable = prepareTrackable(tr, limits);
   log(`API: Trackable GET ${tr.id}`);
   return returnedTrackable;
 };
@@ -95,7 +95,7 @@ export const GetTrackableData = async ({
 
   log(`API: Trackable GET DATA ${trackableId}`);
 
-  return makeTrackableData(data);
+  return makeTrackableData(data, limits);
 };
 
 export const GetTrackableSettings = async ({

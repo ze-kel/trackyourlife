@@ -1,7 +1,7 @@
 "use client";
 import type { IUserSettings } from "@t/user";
 import type { ReactNode } from "react";
-import { createContext, useOptimistic } from "react";
+import { createContext, useContext, useOptimistic } from "react";
 
 interface ISettingsContext {
   settings?: IUserSettings;
@@ -25,6 +25,16 @@ const UserSettingsProvider = ({
       {children}
     </SettingsContext.Provider>
   );
+};
+
+export const useUserSettings = () => {
+  const { settings, updateSettings } = useContext(SettingsContext);
+
+  if (!settings || !updateSettings) {
+    throw new Error("UserSettingsContext error");
+  }
+
+  return { settings, updateSettings };
 };
 
 export default UserSettingsProvider;

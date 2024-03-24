@@ -1,6 +1,5 @@
 "use client";
 import { isSameDay, isBefore, isAfter } from "date-fns";
-import formatDateKey from "src/helpers/formatDateKey";
 import { DayCellBoolean } from "./DayCellBoolean";
 import { DayCellNumber } from "./DayCellNumber";
 import type { ITrackable, ITrackableSettings } from "src/types/trackable";
@@ -28,8 +27,6 @@ export const computeDayCellHelpers = ({
 }) => {
   const dateNow = new Date();
   const dateDay = new Date(year, month, day);
-
-  const dateKey = formatDateKey({ day, month, year });
   const beforeToday = isBefore(dateDay, dateNow);
 
   const startConvented = startDate ? new Date(startDate) : undefined;
@@ -40,7 +37,7 @@ export const computeDayCellHelpers = ({
   const inTrackRange = beforeToday && afterLimit;
   const isToday = isSameDay(dateNow, dateDay);
 
-  return { dateKey, inTrackRange, isToday, dateNow };
+  return { inTrackRange, isToday, dateDay };
 };
 
 export const DayCellBaseClasses =
@@ -53,7 +50,7 @@ const DayCellInner = ({
   isLoading = false,
   outOfRange = false,
   className,
-  dateNow,
+  dateDay,
   onChange,
 }: {
   children: ReactNode;
@@ -63,7 +60,7 @@ const DayCellInner = ({
   outOfRange?: boolean;
   disabled?: boolean;
   className?: string;
-  dateNow: Date;
+  dateDay: Date;
   onChange: (v: string) => void | Promise<void>;
 }) => {
   if (outOfRange)
@@ -103,7 +100,7 @@ const DayCellInner = ({
         className={className}
         value={value}
         onChange={onChange}
-        dateNow={dateNow}
+        dateDay={dateDay}
       >
         {children}
       </DayCellNumber>
@@ -140,14 +137,16 @@ const DayCellWrapper = ({
   const { data, isLoading } = useQuery({
     queryKey: ["trackable", trackable?.id, year, month],
     queryFn: async () => {
-      return await RSAGetTrackableData({
+      const data = await RSAGetTrackableData({
         trackableId: id,
         limits: { type: "month", month, year },
       });
+
+      return data[year]?.[month] || {};
     },
   });
 
-  const { dateKey, inTrackRange, isToday, dateNow } = useMemo(
+  const { inTrackRange, isToday, dateDay } = useMemo(
     () =>
       computeDayCellHelpers({
         day,
@@ -182,8 +181,8 @@ const DayCellWrapper = ({
         type={trackable.type}
         isLoading={isLoading}
         outOfRange={!inTrackRange}
-        dateNow={dateNow}
-        value={data?.[dateKey]}
+        dateDay={dateDay}
+        value={data?.[day]}
         onChange={updateHandler}
       >
         {labelType !== "none" && (

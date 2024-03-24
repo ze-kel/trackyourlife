@@ -197,7 +197,7 @@ const TrackableMock = ({
         {type === "number" && (
           <DayCellNumber
             className={classes}
-            dateString="Preview"
+            dateDay={new Date()}
             value={value}
             onChange={onChange}
           >

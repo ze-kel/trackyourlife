@@ -32,7 +32,7 @@ export const useRefSize = (ref: RefObject<HTMLDivElement>) => {
 
     setData(data);
     dataRef.current = data;
-  }, []);
+  }, [ref]);
 
   useEffect(() => {
     calculate();

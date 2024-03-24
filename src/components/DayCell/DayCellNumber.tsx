@@ -1,9 +1,8 @@
 "use client";
 import type React from "react";
 import type { CSSProperties, ReactNode } from "react";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import debounce from "lodash/debounce";
-import { PlusIcon, MinusIcon } from "@radix-ui/react-icons";
 import { makeColorString } from "src/helpers/colorTools";
 import { cn } from "@/lib/utils";
 import { useDayCellContextNumber } from "@components/Providers/DayCellProvider";
@@ -26,13 +25,13 @@ export const DayCellNumber = ({
   value,
   onChange,
   children,
-  dateNow,
+  dateDay,
   className,
 }: {
   value?: string;
   onChange?: (v: string) => Promise<void> | void;
   children: ReactNode;
-  dateNow: Date;
+  dateDay: Date;
   className?: string;
 }) => {
   const isDesktop = useMediaQuery("(min-width:768px)", {
@@ -43,7 +42,8 @@ export const DayCellNumber = ({
 
   const [internalNumber, setInternalNumber] = useState(getNumberSafe(value));
   const [rawInput, setRawInput] = useState<string>(String(internalNumber));
-  const [inInputEdit] = useState(false);
+
+  const [isEditing, setIsEditing] = useState(false);
 
   const internalUpdate = (val: number) => {
     setInternalNumber(val);
@@ -52,13 +52,10 @@ export const DayCellNumber = ({
 
   const isBigNumber = internalNumber > 10000;
 
-  const formatter = new Intl.NumberFormat(
-    (typeof navigator !== "undefined" && navigator.languages[0]) || "en-IN",
-    {
-      compactDisplay: "short",
-      notation: "compact",
-    },
-  );
+  const formatter = new Intl.NumberFormat("en-US", {
+    compactDisplay: "short",
+    notation: "compact",
+  });
 
   const displayedValue = isBigNumber
     ? formatter.format(internalNumber)
@@ -94,10 +91,8 @@ export const DayCellNumber = ({
     if (String(internalNumber) !== rawInput) {
       setRawInput(String(internalNumber));
     }
-
-    if (!isDesktop) {
-      setDrawerOpen(false);
-    }
+    setDrawerOpen(false);
+    setIsEditing(false);
   };
 
   const progress = valueToProgressPercentage(internalNumber);
@@ -112,45 +107,10 @@ export const DayCellNumber = ({
     updateValue,
   ]);
 
-  const intervalRef = useRef<ReturnType<typeof setTimeout>>();
-  const intervalCounter = useRef(0);
-
-  const mouseDownSign = (e: React.MouseEvent, direction: number) => {
-    e.stopPropagation();
-    e.preventDefault();
-
-    const v = internalNumber + 1 * direction;
-    internalUpdate(v);
-    setRawInput(String(v));
-
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = undefined;
-    }
-
-    intervalRef.current = setInterval(() => {
-      intervalCounter.current++;
-      const v = internalNumber + 1 * intervalCounter.current * direction;
-      internalUpdate(v);
-      setRawInput(String(v));
-    }, 100);
-  };
-
-  const mouseUpSign = (e: React.MouseEvent) => {
-    if (e) {
-      e.stopPropagation();
-      e.preventDefault();
-    }
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = undefined;
-      intervalCounter.current = 0;
-    }
-  };
-
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const focusHandler: React.FocusEventHandler<HTMLInputElement> = (e) => {
+    setIsEditing(true);
     if (internalNumber === 0) {
       e.target.setSelectionRange(0, rawInput.length);
     }
@@ -162,10 +122,11 @@ export const DayCellNumber = ({
         className,
         "group items-center justify-center overflow-visible",
         "transition-all ease-in-out",
-        "cursor-text",
+        "cursor-pointer",
         internalNumber === 0
           ? "border-neutral-200 dark:border-neutral-900"
           : "border-[var(--themeLight)] dark:border-[var(--themeDark)]",
+        isEditing && "relative z-20",
       )}
       style={
         {
@@ -173,10 +134,8 @@ export const DayCellNumber = ({
           "--themeDark": makeColorString(color.darkMode),
         } as CSSProperties
       }
-      onMouseLeave={(e) => {
-        mouseUpSign(e);
-      }}
     >
+      {children}
       {progress !== null && (
         <div
           className={
@@ -185,28 +144,47 @@ export const DayCellNumber = ({
           style={{ height: `${progress}%` }}
         ></div>
       )}
-      {children}
 
       {isDesktop ? (
-        <>
+        !isEditing ? (
+          <div
+            className={cn(
+              "relative z-10 flex h-full w-full select-none items-center justify-center bg-inherit text-center font-semibold transition-all",
+              internalNumber === 0
+                ? "text-neutral-200 dark:text-neutral-800"
+                : "text-neutral-800 dark:text-neutral-300",
+              "@[4rem]:text-lg text-xs",
+              "overflow-hidden",
+              drawerOpen &&
+                "outline outline-neutral-300 dark:outline-neutral-600",
+            )}
+            onClick={() => {
+              setIsEditing(true);
+            }}
+          >
+            {displayedValue}
+          </div>
+        ) : (
           <input
+            autoFocus
             inputMode={"decimal"}
             type={"text"}
             value={rawInput}
             className={cn(
-              "relative z-10 flex h-full w-full select-none items-center justify-center bg-inherit text-center font-semibold outline-none transition-all",
-              internalNumber === 0 && !inInputEdit
+              "absolute left-1/2 z-10 flex h-full w-full -translate-x-1/2 select-none items-center justify-center bg-inherit text-center font-semibold outline-none transition-all",
+              internalNumber === 0
                 ? "text-neutral-200 dark:text-neutral-800"
                 : "text-neutral-800 dark:text-neutral-300",
               "@[4rem]:text-xl text-xs",
-              "focus:outline-neutral-300 dark:focus:outline-neutral-600",
+              "focus:absolute focus:w-[110%]  focus:bg-neutral-50 focus:dark:bg-neutral-950",
+              "focus:outline-neutral-300 dark:focus:outline-neutral-400",
               "selection:bg-neutral-300 dark:selection:bg-neutral-600",
             )}
             onFocus={focusHandler}
             onChange={handleInput}
             onBlur={handleInputBlur}
           />
-        </>
+        )
       ) : (
         <Drawer
           open={drawerOpen}
@@ -217,19 +195,20 @@ export const DayCellNumber = ({
           <DrawerTrigger
             className={cn(
               "relative z-10 flex h-full w-full select-none items-center justify-center bg-inherit text-center font-semibold transition-all",
-              internalNumber === 0 && !inInputEdit
+              internalNumber === 0
                 ? "text-neutral-200 dark:text-neutral-800"
                 : "text-neutral-800 dark:text-neutral-300",
               "@[4rem]:text-lg text-xs",
               "overflow-hidden",
-              drawerOpen && "outline-neutral-300 dark:outline-neutral-600",
+              drawerOpen &&
+                "outline outline-neutral-300 dark:outline-neutral-600",
             )}
           >
             {displayedValue}
           </DrawerTrigger>
           <DrawerContent>
             <DrawerTitle className="m-auto mt-5">
-              {format(dateNow, "d MMMM yyyy")}
+              {format(dateDay, "d MMMM yyyy")}
             </DrawerTitle>
             <div className="p-6">
               <input
@@ -239,7 +218,7 @@ export const DayCellNumber = ({
                 value={rawInput}
                 className={cn(
                   "relative z-10 flex h-full w-full select-none items-center justify-center bg-inherit text-center font-semibold outline-none transition-all",
-                  internalNumber === 0 && !inInputEdit
+                  internalNumber === 0
                     ? "text-neutral-200 dark:text-neutral-800"
                     : "text-neutral-800 dark:text-neutral-300",
                   "text-2xl",
@@ -252,25 +231,6 @@ export const DayCellNumber = ({
             </div>
           </DrawerContent>
         </Drawer>
-      )}
-
-      {!inInputEdit && (
-        <>
-          <div className="absolute left-[50%] top-0 z-20 hidden -translate-x-1/2 -translate-y-1/2 group-hover:block">
-            <PlusIcon
-              onMouseDown={(e) => mouseDownSign(e, 1)}
-              onMouseUp={mouseUpSign}
-              className="h-6 w-6 cursor-pointer border border-neutral-500 bg-neutral-50 p-1 dark:bg-neutral-900"
-            />
-          </div>
-          <div className="absolute bottom-0 left-[50%] z-20 hidden -translate-x-1/2 translate-y-1/2 group-hover:block">
-            <MinusIcon
-              onMouseDown={(e) => mouseDownSign(e, -1)}
-              onMouseUp={mouseUpSign}
-              className=" h-6 w-6 cursor-pointer border border-neutral-500 bg-neutral-50 p-1 dark:bg-neutral-900"
-            />
-          </div>
-        </>
       )}
     </div>
   );

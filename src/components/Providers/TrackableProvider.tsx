@@ -2,6 +2,7 @@
 import { MemoDayCellProvider } from "@components/Providers/DayCellProvider";
 import type {
   ITrackable,
+  ITrackableDataMonth,
   ITrackableSettings,
   ITrackableUpdate,
 } from "@t/trackable";
@@ -15,7 +16,6 @@ import {
   RSAUpdateTrackable,
   RSAUpdateTrackableSettings,
 } from "src/app/api/trackables/serverActions";
-import updateData from "src/helpers/updateData";
 
 type MutationTrackable = UseMutationResult<
   ITrackableUpdate,
@@ -88,7 +88,10 @@ const TrackableProvider = ({
 
       queryClient.setQueryData(
         ["trackable", id, upd.year, upd.month],
-        (old: ITrackable["data"]) => updateData(old, upd),
+        (old: ITrackableDataMonth) => {
+          old[upd.day] = upd.value;
+          return old;
+        },
       );
       return { previous };
     },

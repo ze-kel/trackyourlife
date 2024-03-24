@@ -1,7 +1,9 @@
 import { DrizzlePostgreSQLAdapter } from "@lucia-auth/adapter-drizzle";
 import { db } from "../app/api/db";
-import { Lucia, Session, User } from "lucia";
-import { user_session, auth_user, DbUserSelect } from "../schema";
+import type { Session, User } from "lucia";
+import { Lucia } from "lucia";
+import type { DbUserSelect } from "../schema";
+import { user_session, auth_user } from "../schema";
 
 import { webcrypto } from "node:crypto";
 import { cache } from "react";

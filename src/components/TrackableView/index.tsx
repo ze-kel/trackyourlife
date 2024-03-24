@@ -37,7 +37,9 @@ const Month = ({
         mini ? "grid-cols-7 grid-rows-6" : "grid-cols-7 grid-rows-6",
       )}
     >
-      {!mini && prepend.map((_, i) => <div key={i}> </div>)}
+      {prepend.map((_, i) => (
+        <div key={i}> </div>
+      ))}
       {dates.map((el) => (
         <DayCellWrapper
           key={`${month}-${el}`}
@@ -80,17 +82,17 @@ const Year = ({
   return (
     <div className="my-4 grid gap-x-3 gap-y-2 md:grid-cols-2">
       {months.map((m) => (
-        <button
-          disabled={m > active}
+        <div
+          data-upcoming={m > active}
           key={`${year}-${m}`}
-          className="cursor-pointer rounded-md border border-transparent px-2 py-1 transition-colors hover:bg-neutral-200 disabled:pointer-events-none disabled:cursor-default disabled:bg-transparent dark:hover:bg-neutral-900 dark:disabled:bg-transparent"
+          className="cursor-pointer rounded-md border border-transparent px-2 py-1 transition-colors  disabled:pointer-events-none disabled:cursor-default data-[upcoming=true]:opacity-50"
           onClick={() => openMonth(m)}
         >
           <h5 className={cn("mb-1 text-left font-semibold transition-colors")}>
             <span>{format(new Date(year, m, 1), "MMMM")}</span>
           </h5>
           <Month year={year} month={m} mini={true} />
-        </button>
+        </div>
       ))}
     </div>
   );

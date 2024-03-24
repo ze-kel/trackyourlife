@@ -81,7 +81,13 @@ const filterTrackables = (
     .map((v) => v.id);
 };
 
-const TrackablesList = ({ list }: { list: ITrackable["id"][] }) => {
+const TrackablesList = ({
+  list,
+  daysToShow,
+}: {
+  list: ITrackable["id"][];
+  daysToShow: number;
+}) => {
   const queryClient = useQueryClient();
 
   const [searchQ, setSearch] = useState("");
@@ -114,7 +120,7 @@ const TrackablesList = ({ list }: { list: ITrackable["id"][] }) => {
     });
   });
 
-  const daysToRender = useMemo(() => generateDates(6), []);
+  const daysToRender = useMemo(() => generateDates(daysToShow), []);
 
   return (
     <>
@@ -183,8 +189,14 @@ export const TrackableName = ({ className }: { className?: string }) => {
   );
 };
 
-export const DailyList = ({ list }: { list: ITrackable["id"][] }) => {
-  const daysToRender = useMemo(() => generateDates(10).reverse(), []);
+export const DailyList = ({
+  list,
+  daysToShow,
+}: {
+  list: ITrackable["id"][];
+  daysToShow: number;
+}) => {
+  const daysToRender = useMemo(() => generateDates(daysToShow).reverse(), []);
 
   const queryClient = useQueryClient();
 

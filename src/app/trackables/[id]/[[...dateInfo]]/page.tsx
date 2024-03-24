@@ -11,6 +11,7 @@ import {
   dehydrate,
 } from "@tanstack/react-query";
 import { validateRequest } from "src/auth/lucia";
+import { fillPrefetchedData } from "src/app/trackables/helpers";
 
 const getYearSafe = (y: string | undefined) => {
   if (!y || y.length !== 4) return new Date().getFullYear();
@@ -29,6 +30,56 @@ const getMonthSafe = (y: string | undefined) => {
   return n - 1;
 };
 
+const getDataForTrackable = async (
+  id: string,
+  yearParam?: string,
+  monthParam?: string,
+) => {
+  const queryClient = new QueryClient();
+
+  const safeYear = getYearSafe(yearParam);
+  const safeMonth = getMonthSafe(monthParam);
+
+  const yearValid = Number(yearParam) === safeYear;
+  const monthValid = Number(monthParam) === safeMonth;
+
+  // Year view, prefetch full year
+  if (yearValid && !monthValid) {
+    const trackable = await RSAGetTrackable({
+      trackableId: id,
+      limits: {
+        type: "year",
+        year: safeYear,
+      },
+    });
+    return { trackable, queryClient, year: safeYear };
+  }
+
+  // Either both are valid, or we use special link that always gets us to current month
+  if ((monthValid && yearValid) || yearParam === "today") {
+    const trackable = await RSAGetTrackable({
+      trackableId: id,
+      limits: {
+        type: "month",
+        year: safeYear,
+        month: safeMonth,
+      },
+    });
+    return { trackable, queryClient, year: safeYear, month: safeMonth };
+  }
+
+  // Nothing is valid. Show year view. We still prefetch current month, just to get trackable settings and info.
+  const trackable = await RSAGetTrackable({
+    trackableId: id,
+    limits: {
+      type: "month",
+      year: safeYear,
+      month: safeMonth,
+    },
+  });
+  return { trackable, queryClient };
+};
+
 const Trackable = async ({
   params,
 }: {
@@ -37,34 +88,20 @@ const Trackable = async ({
   const { session } = await validateRequest();
   if (!session) redirect("/login");
 
-  const queryClient = new QueryClient();
+  const { trackable, queryClient, month, year } = await getDataForTrackable(
+    params.id,
+    params.dateInfo?.[0],
+    params.dateInfo?.[1],
+  );
 
-  const year = getYearSafe(params.dateInfo?.[0]);
-  const month = getMonthSafe(params.dateInfo?.[1]);
-
-  const res = await RSAGetTrackable({
-    trackableId: params.id,
-    limits: {
-      type: "month",
-      year,
-      month,
-    },
-  });
-
-  queryClient.setQueryData(["trackable", params.id], {
-    type: res.type,
-    id: res.id,
-  });
-  queryClient.setQueryData(["trackable", params.id, "settings"], res.settings);
-
-  queryClient.setQueryData(["trackable", params.id, year, month], res.data);
+  fillPrefetchedData(queryClient, trackable);
 
   try {
     return (
       <div className="content-container flex h-full max-h-full w-full flex-col">
         <div className="mb-4 flex w-full items-center justify-between">
           <h2 className="w-full bg-inherit text-xl font-semibold md:text-2xl">
-            {res.settings.name}
+            {trackable.settings.name}
           </h2>
           <Link href={`/trackables/${params.id}/settings`} className="mr-2">
             <Button name="settings" variant="outline" size="icon">
