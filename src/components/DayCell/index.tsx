@@ -11,6 +11,8 @@ import { useTrackableContextSafe } from "@components/Providers/TrackableProvider
 import { useQuery } from "@tanstack/react-query";
 import { RSAGetTrackableData } from "src/app/api/trackables/serverActions";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getDateInTimezone } from "src/helpers/timezone";
+import { useUserSettings } from "@components/Providers/UserSettingsProvider";
 
 export interface IDayProps {}
 
@@ -19,13 +21,14 @@ export const computeDayCellHelpers = ({
   month,
   year,
   startDate,
+  dateNow,
 }: {
   day: number;
   month: number;
   year: number;
   startDate: ITrackableSettings["startDate"];
+  dateNow: Date;
 }) => {
-  const dateNow = new Date();
   const dateDay = new Date(year, month, day);
   const beforeToday = isBefore(dateDay, dateNow);
 
@@ -146,6 +149,8 @@ const DayCellWrapper = ({
     },
   });
 
+  const u = useUserSettings();
+
   const { inTrackRange, isToday, dateDay } = useMemo(
     () =>
       computeDayCellHelpers({
@@ -153,6 +158,7 @@ const DayCellWrapper = ({
         month,
         year,
         startDate: settings?.startDate,
+        dateNow: getDateInTimezone(u.settings.timezone),
       }),
     [day, month, year, settings?.startDate],
   );

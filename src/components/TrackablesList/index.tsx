@@ -15,6 +15,8 @@ import { format, isLastDayOfMonth } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { useUserSettings } from "@components/Providers/UserSettingsProvider";
+import { getDateInTimezone } from "src/helpers/timezone";
 
 const sortList = (
   list: ITrackable["id"][],
@@ -120,7 +122,12 @@ const TrackablesList = ({
     });
   });
 
-  const daysToRender = useMemo(() => generateDates(daysToShow), []);
+  const { settings } = useUserSettings();
+
+  const daysToRender = useMemo(
+    () => generateDates(daysToShow, getDateInTimezone(settings.timezone)),
+    [],
+  );
 
   return (
     <>
@@ -196,7 +203,13 @@ export const DailyList = ({
   list: ITrackable["id"][];
   daysToShow: number;
 }) => {
-  const daysToRender = useMemo(() => generateDates(daysToShow).reverse(), []);
+  const { settings } = useUserSettings();
+
+  const daysToRender = useMemo(
+    () =>
+      generateDates(daysToShow, getDateInTimezone(settings.timezone)).reverse(),
+    [],
+  );
 
   const queryClient = useQueryClient();
 
@@ -210,7 +223,7 @@ export const DailyList = ({
             <div className="flex w-full flex-col justify-between gap-2">
               {(isLastDayOfMonth(new Date(date.year, date.month, date.day)) ||
                 index === 0) && (
-                <div className="mb-2 text-2xl font-semibold lg:text-4xl">
+                <div className="mb-2 text-2xl font-semibold lg:text-3xl">
                   {format(new Date(date.year, date.month, date.day), "MMMM")}
                 </div>
               )}

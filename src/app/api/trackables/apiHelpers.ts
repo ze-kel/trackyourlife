@@ -10,6 +10,7 @@ import {
 } from "@t/trackable";
 import { startOfMonth, sub, subDays } from "date-fns";
 import type { DbTrackableRecordSelect, DbTrackableSelect } from "src/schema";
+
 import { z } from "zod";
 
 export const trackableToCreate = z.discriminatedUnion("type", [
@@ -148,7 +149,10 @@ export type TGETLimits = z.infer<typeof ZGETLimits>;
 const PG_MINUS_INFINITY = "-infinity";
 const PG_INFINITY = "infinity";
 
-export const getDateBounds = (limits: TGETLimits | undefined) => {
+export const getDateBounds = (
+  limits: TGETLimits | undefined,
+  dateNow: Date,
+) => {
   if (!limits) {
     return { from: PG_MINUS_INFINITY, to: PG_INFINITY };
   }
@@ -172,7 +176,7 @@ export const getDateBounds = (limits: TGETLimits | undefined) => {
     // This is intentional to not ensure that any month stored on a client has all its data fetched.
     return {
       from: startOfMonth(sub(new Date(), { days: limits.days })).toDateString(),
-      to: new Date().toDateString(),
+      to: dateNow.toDateString(),
     };
   }
 

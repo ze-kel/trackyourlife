@@ -8,6 +8,8 @@ import type { ITrackable } from "@t/trackable";
 import TrackableProvider from "@components/Providers/TrackableProvider";
 import { ErrorBoundary } from "react-error-boundary";
 import { cn } from "@/lib/utils";
+import { useUserSettings } from "@components/Providers/UserSettingsProvider";
+import { getDateInTimezone } from "src/helpers/timezone";
 
 const Month = ({
   month,
@@ -54,8 +56,7 @@ const Month = ({
   );
 };
 
-const activeMonths = (year: number) => {
-  const now = new Date();
+const activeMonths = (year: number, now: Date) => {
   if (year < getYear(now)) {
     return 12;
   }
@@ -72,7 +73,9 @@ const Year = ({
   year: number;
   openMonth: (n: number) => void;
 }) => {
-  const active = activeMonths(year);
+  const { settings } = useUserSettings();
+
+  const active = activeMonths(year, getDateInTimezone(settings.timezone));
   const toRender = 12;
 
   const months = Array(toRender)
@@ -213,12 +216,14 @@ const TrackableView = ({
   m?: number;
   id: ITrackable["id"];
 }) => {
-  const now = new Date();
+  const { settings } = useUserSettings();
+
+  const now = getDateInTimezone(settings.timezone);
   const [year, setYear] = useState(
-    typeof y === "number" ? y : new Date().getFullYear(),
+    typeof y === "number" ? y : now.getFullYear(),
   );
   const [month, setMonth] = useState(
-    typeof m === "number" ? m : new Date().getMonth(),
+    typeof m === "number" ? m : now.getMonth(),
   );
   const [view, setView] = useState<TView>("days");
 
@@ -262,7 +267,7 @@ const TrackableView = ({
   };
 
   const openCurrentMonth = () => {
-    const now = new Date();
+    const now = getDateInTimezone(settings.timezone);
     setYear(now.getFullYear());
     setMonth(now.getMonth());
     setView("days");

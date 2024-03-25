@@ -1,6 +1,4 @@
-import Link from "next/link";
 import TrackablesList from "@components/TrackablesList";
-import { Button } from "@/components/ui/button";
 import { RSAGetAllTrackables } from "src/app/api/trackables/serverActions";
 import {
   HydrationBoundary,
@@ -31,10 +29,7 @@ const Page = async () => {
   return (
     <div className="content-container flex w-full flex-col">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-semibold md:text-3xl">Your Trackables</h2>
-        <Link href={"/create"}>
-          <Button variant="outline">Create</Button>
-        </Link>
+        <h2 className="text-2xl font-semibold lg:text-3xl">Your Trackables</h2>
       </div>
       <HydrationBoundary state={dehydrate(queryClient)}>
         <div className="mt-2">

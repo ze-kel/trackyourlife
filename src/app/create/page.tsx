@@ -28,7 +28,7 @@ const Create = () => {
 
   return (
     <div className="content-container flex flex-col gap-2">
-      <h3 className="w-full bg-inherit text-2xl font-semibold">
+      <h3 className="w-full bg-inherit text-2xl font-semibold lg:text-3xl">
         Create new Trackable
       </h3>
       <RadioTabs

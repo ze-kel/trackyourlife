@@ -1,7 +1,7 @@
 import { getDaysInMonth } from "date-fns";
 
-export const generateDates = (days: number) => {
-  const today = new Date();
+export const generateDates = (days: number, nowDate: Date) => {
+  const today = nowDate;
 
   let year = today.getFullYear();
   let month = today.getMonth();

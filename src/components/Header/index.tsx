@@ -53,6 +53,10 @@ const topLinks = [
     name: "Create",
     link: "/create",
   },
+  {
+    name: "Settings",
+    link: "/settings",
+  },
 ];
 
 const Links = ({
@@ -99,7 +103,9 @@ const ThemeSwitcher = () => {
 };
 
 const HeaderMenu = ({ username }: { username?: string }) => {
-  const isDesktop = useMediaQuery("(min-width:768px)", {initializeWithValue: false});
+  const isDesktop = useMediaQuery("(min-width:768px)", {
+    initializeWithValue: false,
+  });
 
   const Trigger = (
     <div className="relative flex cursor-pointer items-center transition-colors hover:text-neutral-600 dark:hover:text-neutral-50">

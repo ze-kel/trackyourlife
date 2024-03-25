@@ -31,6 +31,8 @@ import {
 } from "@/components/ui/drawer";
 import { cn } from "@/lib/utils";
 import { useMediaQuery } from "usehooks-ts";
+import { getDateInTimezone } from "src/helpers/timezone";
+import { useUserSettings } from "@components/Providers/UserSettingsProvider";
 
 const DatePicker = ({
   date,
@@ -49,12 +51,15 @@ const DatePicker = ({
   };
   className?: string;
 }) => {
+  const { settings } = useUserSettings();
+  const dateNow = getDateInTimezone(settings.timezone);
+
   const [innerDate, setInnerDate] = useState(date);
 
   const calRef = useRef<HTMLDivElement>(null);
   const [isOpened, setIsOpened] = useState(false);
 
-  const [cursor, setCursor] = useState(startOfMonth(innerDate || new Date()));
+  const [cursor, setCursor] = useState(startOfMonth(innerDate || dateNow));
   const [ref, bounds] = useMeasure();
 
   const toRender = getDaysInMonth(cursor);
@@ -179,7 +184,7 @@ const DatePicker = ({
           <Button
             variant="ghost"
             size="icon"
-            disabled={isSameMonth(new Date(), cursor)}
+            disabled={isSameMonth(dateNow, cursor)}
             onClick={() => moveCursorMonths(1)}
           >
             <ChevronRightIcon className="w-7" />
@@ -188,7 +193,7 @@ const DatePicker = ({
           <Button
             variant="ghost"
             size="icon"
-            disabled={isSameMonth(new Date(), cursor)}
+            disabled={isSameMonth(dateNow, cursor)}
             onClick={() => moveCursorMonths(12)}
           >
             <DoubleArrowRightIcon className="w-7" />
@@ -230,7 +235,9 @@ const DatePicker = ({
     </m.div>
   );
 
-  const isDesktop = useMediaQuery("(min-width:768px)", {initializeWithValue: false});
+  const isDesktop = useMediaQuery("(min-width:768px)", {
+    initializeWithValue: false,
+  });
 
   const mobileTitle = useContext(DrawerMobileTitleContext);
 

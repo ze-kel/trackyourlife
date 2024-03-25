@@ -26,6 +26,8 @@ import { DayCellRange } from "@components/DayCell/DayCellRange";
 import { DayCellBaseClasses } from "@components/DayCell";
 import { cn } from "@/lib/utils";
 import { v4 as uuidv4 } from "uuid";
+import { getDateInTimezone } from "src/helpers/timezone";
+import { useUserSettings } from "@components/Providers/UserSettingsProvider";
 
 export const SettingsBoolean = ({
   settings,
@@ -250,6 +252,8 @@ const TrackableSettings = ({
   const signal = useRef(new TinySignal());
   const settings = useRef(trackable.settings);
 
+  const u = useUserSettings();
+
   return (
     <div className="flex flex-col gap-4">
       <h3 className="text-xl">Preview</h3>
@@ -288,7 +292,10 @@ const TrackableSettings = ({
                 : undefined
             }
             onChange={(v) => (settings.current.startDate = String(v))}
-            limits={{ start: new Date(1990, 0, 1), end: new Date() }}
+            limits={{
+              start: new Date(1990, 0, 1),
+              end: getDateInTimezone(u.settings.timezone),
+            }}
             className="mt-2"
           />
         </DrawerMobileTitleProvider>

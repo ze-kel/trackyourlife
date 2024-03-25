@@ -21,6 +21,14 @@ export type ILogin = z.infer<typeof ZLogin>;
 
 export const ZUserSettings = z.object({
   colorPresets: z.array(ZColorValue).optional(),
+  timezone: z
+    .object({
+      name: z.string(),
+      label: z.string(),
+      tzCode: z.string(),
+      utc: z.string(),
+    })
+    .optional(),
 });
 
 export type IUserSettings = z.infer<typeof ZUserSettings>;
