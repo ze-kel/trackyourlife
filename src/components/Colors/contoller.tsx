@@ -32,7 +32,7 @@ export const useRefSize = (ref: RefObject<HTMLDivElement>) => {
 
     setData(data);
     dataRef.current = data;
-  }, []);
+  }, [ref]);
 
   useEffect(() => {
     calculate();
@@ -42,7 +42,7 @@ export const useRefSize = (ref: RefObject<HTMLDivElement>) => {
       removeEventListener("resize", calculate);
       removeEventListener("scroll", calculate);
     };
-  }, []);
+  }, [calculate]);
 
   // Force refresh is useful when initial rendering position will be inaccurate later(i.e. modal that animate when appearing)
   return { ...data, dataRef, forceRefresh: calculate };
@@ -160,7 +160,7 @@ export const Controller2D = ({
   const starMouseDrag: MouseEventHandler = (e) => {
     // Left click only
     if (e.nativeEvent.button !== 0) return;
-      forceRefresh();
+    forceRefresh();
 
     const moveHandler = (e: MouseEvent) => {
       move(e.clientX - dataRef.current.left, e.clientY - dataRef.current.top);

@@ -18,7 +18,6 @@ import {
 } from "@radix-ui/react-icons";
 import { Dropdown, DropdownContent, DropdownTrigger } from "../Dropdown";
 import { AnimatePresence, m } from "framer-motion";
-import useMeasure from "react-use-measure";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { CalendarIcon } from "@radix-ui/react-icons";
 import {
@@ -30,7 +29,9 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { cn } from "@/lib/utils";
-import { useMediaQuery } from "usehooks-ts";
+import { useMediaQuery, useResizeObserver } from "usehooks-ts";
+import { getDateInTimezone } from "src/helpers/timezone";
+import { useUserSettings } from "@components/Providers/UserSettingsProvider";
 
 const DatePicker = ({
   date,
@@ -49,13 +50,19 @@ const DatePicker = ({
   };
   className?: string;
 }) => {
+  const { settings } = useUserSettings();
+  const dateNow = getDateInTimezone(settings.timezone);
+
   const [innerDate, setInnerDate] = useState(date);
 
   const calRef = useRef<HTMLDivElement>(null);
   const [isOpened, setIsOpened] = useState(false);
 
-  const [cursor, setCursor] = useState(startOfMonth(innerDate || new Date()));
-  const [ref, bounds] = useMeasure();
+  const [cursor, setCursor] = useState(startOfMonth(innerDate || dateNow));
+
+  const wrapRef = useRef(null);
+
+  const { height } = useResizeObserver({ ref: wrapRef });
 
   const toRender = getDaysInMonth(cursor);
   const dates = Array(toRender)
@@ -133,104 +140,107 @@ const DatePicker = ({
 
   const Content = (
     <m.div
-      ref={ref}
-      animate={{ height: bounds.height > 0 ? bounds.height : undefined }}
+      animate={{ height: height }}
       transition={{ duration: 0.15, ease: "easeInOut" }}
       className="flex w-full flex-col items-center overflow-hidden md:w-fit"
     >
-      <div className="flex w-full items-center justify-between py-2">
-        <div className="flex">
-          <Button
-            variant="ghost"
-            size="icon"
-            disabled={isSameMonth(limits.start, cursor)}
-            onClick={() => moveCursorMonths(-12)}
+      <div ref={wrapRef}>
+        <div className="flex w-full items-center justify-between py-2">
+          <div className="flex">
+            <Button
+              variant="ghost"
+              size="icon"
+              disabled={isSameMonth(limits.start, cursor)}
+              onClick={() => moveCursorMonths(-12)}
+            >
+              <DoubleArrowLeftIcon className="w-7" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              disabled={isSameMonth(limits.start, cursor)}
+              onClick={() => moveCursorMonths(-1)}
+            >
+              <ChevronLeftIcon className="w-7" />
+            </Button>
+          </div>
+          <AnimatePresence
+            mode="popLayout"
+            initial={false}
+            custom={moveDirection * 0.1}
           >
-            <DoubleArrowLeftIcon className="w-7" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            disabled={isSameMonth(limits.start, cursor)}
-            onClick={() => moveCursorMonths(-1)}
-          >
-            <ChevronLeftIcon className="w-7" />
-          </Button>
+            <m.div
+              initial="enter"
+              animate="middle"
+              exit="exit"
+              transition={{ duration: 0.15, ease: "easeInOut" }}
+              variants={variants}
+              custom={moveDirection * 0.1}
+              key={cursor.toString()}
+              className="pointer-events-none select-none whitespace-nowrap"
+            >
+              {format(cursor, "MMMM yyyy")}
+            </m.div>
+          </AnimatePresence>
+          <div className="flex">
+            <Button
+              variant="ghost"
+              size="icon"
+              disabled={isSameMonth(dateNow, cursor)}
+              onClick={() => moveCursorMonths(1)}
+            >
+              <ChevronRightIcon className="w-7" />
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="icon"
+              disabled={isSameMonth(dateNow, cursor)}
+              onClick={() => moveCursorMonths(12)}
+            >
+              <DoubleArrowRightIcon className="w-7" />
+            </Button>
+          </div>
         </div>
+
         <AnimatePresence
           mode="popLayout"
           initial={false}
-          custom={moveDirection * 0.1}
+          custom={moveDirection * 0.5}
         >
           <m.div
             initial="enter"
             animate="middle"
             exit="exit"
+            custom={moveDirection * 0.5}
+            className={"grid w-fit grid-cols-7 gap-1"}
             transition={{ duration: 0.15, ease: "easeInOut" }}
             variants={variants}
-            custom={moveDirection * 0.1}
             key={cursor.toString()}
-            className="pointer-events-none select-none whitespace-nowrap"
           >
-            {format(cursor, "MMMM yyyy")}
+            {prepend.map((_, i) => (
+              <div key={`${cursor.getMonth()}—prep—${i}`}></div>
+            ))}
+            {dates.map((el) => (
+              <Button
+                className="h-9 sm:w-9"
+                disabled={!inLimit(el)}
+                variant={el === highlightSelected ? "default" : "ghost"}
+                key={`${cursor.getMonth()}-${el}`}
+                onClick={() => recordDate(el)}
+              >
+                {el}
+              </Button>
+            ))}
           </m.div>
         </AnimatePresence>
-        <div className="flex">
-          <Button
-            variant="ghost"
-            size="icon"
-            disabled={isSameMonth(new Date(), cursor)}
-            onClick={() => moveCursorMonths(1)}
-          >
-            <ChevronRightIcon className="w-7" />
-          </Button>
-
-          <Button
-            variant="ghost"
-            size="icon"
-            disabled={isSameMonth(new Date(), cursor)}
-            onClick={() => moveCursorMonths(12)}
-          >
-            <DoubleArrowRightIcon className="w-7" />
-          </Button>
-        </div>
       </div>
-
-      <AnimatePresence
-        mode="popLayout"
-        initial={false}
-        custom={moveDirection * 0.5}
-      >
-        <m.div
-          initial="enter"
-          animate="middle"
-          exit="exit"
-          custom={moveDirection * 0.5}
-          className={"grid w-fit grid-cols-7 gap-1"}
-          transition={{ duration: 0.15, ease: "easeInOut" }}
-          variants={variants}
-          key={cursor.toString()}
-        >
-          {prepend.map((_, i) => (
-            <div key={`${cursor.getMonth()}—prep—${i}`}></div>
-          ))}
-          {dates.map((el) => (
-            <Button
-              className="h-9 sm:w-9"
-              disabled={!inLimit(el)}
-              variant={el === highlightSelected ? "default" : "ghost"}
-              key={`${cursor.getMonth()}-${el}`}
-              onClick={() => recordDate(el)}
-            >
-              {el}
-            </Button>
-          ))}
-        </m.div>
-      </AnimatePresence>
     </m.div>
   );
 
-  const isDesktop = useMediaQuery("(min-width:768px)", {initializeWithValue: false});
+  const isDesktop = useMediaQuery("(min-width:768px)", {
+    initializeWithValue: false,
+  });
 
   const mobileTitle = useContext(DrawerMobileTitleContext);
 

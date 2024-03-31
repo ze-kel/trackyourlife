@@ -151,7 +151,7 @@ const getRangeLabelMapping = (settings: IRangeSettings) => {
   const map: Record<string, string> = {};
   if (!settings.labels) return map;
   settings.labels.forEach((v) => {
-    map[v.internalKey] = v.emoji;
+    map[v.internalKey] = v.emoji || "";
   });
 
   return map;

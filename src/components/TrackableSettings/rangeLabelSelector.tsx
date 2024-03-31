@@ -1,5 +1,5 @@
 "use client";
-import type { IRangeSettings } from "@t/trackable";
+import type { IColorValue, IRangeSettings } from "@t/trackable";
 import cloneDeep from "lodash/cloneDeep";
 import { useState } from "react";
 import { Reorder, useDragControls, AnimatePresence } from "framer-motion";
@@ -18,6 +18,7 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { Input } from "@/components/ui/input";
+import ColorInput from "@components/Colors/colorInput";
 
 export interface IRangeLabelSelector {
   initialValue: IRangeSettings["labels"];
@@ -28,7 +29,7 @@ type IRangeLabel = ArrayElement<NonNullable<IRangeSettings["labels"]>>;
 
 const regex = emojiRegex();
 
-const Pair = ({
+const Entry = ({
   value,
   update,
   duplicate,
@@ -42,8 +43,12 @@ const Pair = ({
 }) => {
   const controls = useDragControls();
 
-  const updateKey = (val: string) => {
-    update({ ...value, internalKey: val });
+  const updateKey = (internalKey: string) => {
+    update({ ...value, internalKey });
+  };
+
+  const updateColor = (color: IColorValue) => {
+    update({ ...value, color });
   };
 
   const selectEmoji = (val: string) => {
@@ -98,6 +103,8 @@ const Pair = ({
           </div>
         </HoverCardContent>
       </HoverCard>
+
+      <ColorInput value={value.color} onChange={updateColor}></ColorInput>
 
       <div className="cursor-grab" onPointerDown={(e) => controls.start(e)}>
         <DragHandleDots2Icon className="text-neutral-300 transition-colors hover:text-neutral-800 dark:text-neutral-700 dark:hover:text-neutral-100" />
@@ -214,7 +221,7 @@ const RangeLabelSelector = ({
           <AnimatePresence initial={false}>
             {value.map((el, index) => {
               return (
-                <Pair
+                <Entry
                   key={el.id}
                   value={el}
                   duplicate={checkDuplicates(index)}

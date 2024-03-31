@@ -9,6 +9,7 @@ import UserSettingsProvider from "@components/Providers/UserSettingsProvider";
 import { RSAGetUserSettings } from "src/app/api/user/settings/serverActions";
 import QueryProvider from "@components/Providers/QueryProvider";
 import { validateRequest } from "src/auth/lucia";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 export default async function RootLayout({
   children,
@@ -23,6 +24,7 @@ export default async function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body>
         <QueryProvider>
+          <ReactQueryDevtools />
           <UserSettingsProvider initialSettings={userSettigns}>
             <LazyMotionProvider>
               <ThemeProvider

@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import DayCell from "@components/DayCell";
+import DayCellWrapper from "@components/DayCell";
 import { useTrackableContextSafe } from "@components/Providers/TrackableProvider";
 import { TrackableName } from "@components/TrackablesList";
 import { HeartFilledIcon, HeartIcon } from "@radix-ui/react-icons";
@@ -63,9 +63,9 @@ const MiniTrackable = ({
                       {format(date, "d")}
                     </span>
                   </div>
-                  <DayCell
+                  <DayCellWrapper
                     {...day}
-                    customLabel=""
+                    labelType="none"
                     key={index}
                     className="h-16"
                   />

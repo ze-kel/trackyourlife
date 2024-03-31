@@ -23,12 +23,16 @@ const Create = () => {
     setNewOne(update);
   };
   const createTrackable = async (settings: ITrackableSettings) => {
+    setIsLoading(true);
     await RSACreateTrackable({ ...newOne, settings });
+    setIsLoading(false);
   };
+
+  const [isLoading, setIsLoading] = useState(false);
 
   return (
     <div className="content-container flex flex-col gap-2">
-      <h3 className="w-full bg-inherit text-2xl font-semibold">
+      <h3 className="w-full bg-inherit text-2xl font-semibold lg:text-3xl">
         Create new Trackable
       </h3>
       <RadioTabs
@@ -47,6 +51,7 @@ const Create = () => {
         </RadioTabItem>
       </RadioTabs>
       <TrackableSettings
+        isLoadingButton={isLoading}
         trackable={newOne}
         handleSave={createTrackable}
         customSaveButtonText="Create Trackable"

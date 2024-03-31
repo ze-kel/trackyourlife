@@ -9,12 +9,29 @@ import type { QueryClient } from "@tanstack/react-query";
 import { QueriesObserver, useQueryClient } from "@tanstack/react-query";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { generateDates } from "@components/TrackablesList/helper";
-import DayCell from "@components/DayCell";
+import DayCellWrapper from "@components/DayCell";
 import Link from "next/link";
 import { format, isLastDayOfMonth } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { useUserSettings } from "@components/Providers/UserSettingsProvider";
+import { getDateInTimezone } from "src/helpers/timezone";
+import { Button } from "@/components/ui/button";
+
+const EmptyList = () => {
+  return (
+    <div className="flex flex-col items-center justify-center py-20">
+      <h2 className="text-2xl font-light">
+        You do not have any trackables yet.
+      </h2>
+
+      <Link className="mt-4" href={"/create"}>
+        <Button variant="outline">Create Trackable</Button>
+      </Link>
+    </div>
+  );
+};
 
 const sortList = (
   list: ITrackable["id"][],
@@ -81,7 +98,13 @@ const filterTrackables = (
     .map((v) => v.id);
 };
 
-const TrackablesList = ({ list }: { list: ITrackable["id"][] }) => {
+const TrackablesList = ({
+  list,
+  daysToShow,
+}: {
+  list: ITrackable["id"][];
+  daysToShow: number;
+}) => {
   const queryClient = useQueryClient();
 
   const [searchQ, setSearch] = useState("");
@@ -114,7 +137,14 @@ const TrackablesList = ({ list }: { list: ITrackable["id"][] }) => {
     });
   });
 
-  const daysToRender = useMemo(() => generateDates(6), []);
+  const { settings } = useUserSettings();
+
+  const daysToRender = useMemo(
+    () => generateDates(daysToShow, getDateInTimezone(settings.timezone)),
+    [daysToShow, settings.timezone],
+  );
+
+  if (list.length === 0) return <EmptyList />;
 
   return (
     <>
@@ -183,22 +213,36 @@ export const TrackableName = ({ className }: { className?: string }) => {
   );
 };
 
-export const DailyList = ({ list }: { list: ITrackable["id"][] }) => {
-  const daysToRender = useMemo(() => generateDates(40).reverse(), []);
+export const DailyList = ({
+  list,
+  daysToShow,
+}: {
+  list: ITrackable["id"][];
+  daysToShow: number;
+}) => {
+  const { settings } = useUserSettings();
+
+  const daysToRender = useMemo(
+    () =>
+      generateDates(daysToShow, getDateInTimezone(settings.timezone)).reverse(),
+    [daysToShow, settings.timezone],
+  );
 
   const queryClient = useQueryClient();
 
   const [sorted] = useState(sortList(list, queryClient));
 
+  if (list.length === 0) return <EmptyList />;
+
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col gap-6">
       {daysToRender.map((date, index) => (
         <Fragment key={index}>
-          <div className="relative mt-4 flex h-fit flex-col">
+          <div className="relative flex h-fit flex-col ">
             <div className="flex w-full flex-col justify-between gap-2">
               {(isLastDayOfMonth(new Date(date.year, date.month, date.day)) ||
                 index === 0) && (
-                <div className="mb-2 text-xl font-semibold lg:text-4xl">
+                <div className="mb-2 text-2xl font-semibold lg:text-3xl">
                   {format(new Date(date.year, date.month, date.day), "MMMM")}
                 </div>
               )}
@@ -212,7 +256,7 @@ export const DailyList = ({ list }: { list: ITrackable["id"][] }) => {
                 </span>
               </span>
             </div>
-            <div className="mt-2 grid grid-cols-2 gap-2 border-b border-neutral-200 pb-4 dark:border-neutral-800 sm:grid-cols-4">
+            <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
               {sorted.map((id, index) => (
                 <div key={index}>
                   <TrackableProvider id={id}>
@@ -221,12 +265,19 @@ export const DailyList = ({ list }: { list: ITrackable["id"][] }) => {
                         "mb-1 w-full text-right text-xl text-neutral-950 opacity-20 dark:text-neutral-50"
                       }
                     />
-                    <DayCell {...date} customLabel="" className="h-20" />
+                    <DayCellWrapper
+                      {...date}
+                      labelType="none"
+                      className="h-20"
+                    />
                   </TrackableProvider>
                 </div>
               ))}
             </div>
           </div>
+          {index !== daysToRender.length - 1 && (
+            <hr className="h-0 border-b border-neutral-200 dark:border-neutral-800" />
+          )}
         </Fragment>
       ))}
     </div>

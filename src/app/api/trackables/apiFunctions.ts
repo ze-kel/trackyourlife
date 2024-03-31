@@ -18,6 +18,8 @@ import {
   prepareTrackable,
   trackableToCreate,
 } from "src/app/api/trackables/apiHelpers";
+import { GetUserSettings } from "src/app/api/user/settings/apiFunctions";
+import { getDateInTimezone } from "src/helpers/timezone";
 import type { DbTrackableRecordInsert } from "src/schema";
 import { trackable, trackableRecord } from "src/schema";
 
@@ -28,7 +30,12 @@ export const GetAllTrackables = async ({
   userId: string;
   limits?: TGETLimits;
 }) => {
-  const bounds = getDateBounds(limits || { type: "last", days: 31 });
+  const settings = await GetUserSettings({ userId });
+
+  const bounds = getDateBounds(
+    limits || { type: "last", days: 31 },
+    getDateInTimezone(settings.timezone),
+  );
 
   const raw = await db.query.trackable.findMany({
     where: eq(trackable.userId, userId),
@@ -39,7 +46,7 @@ export const GetAllTrackables = async ({
     },
   });
 
-  const trackables = raw.map(prepareTrackable);
+  const trackables = raw.map((v) => prepareTrackable(v, limits));
 
   log(`API: Get all trackables ${userId}`);
 
@@ -55,7 +62,8 @@ export const GetTrackable = async ({
   userId: string;
   limits?: TGETLimits;
 }) => {
-  const bounds = getDateBounds(limits);
+  const settings = await GetUserSettings({ userId });
+  const bounds = getDateBounds(limits, getDateInTimezone(settings.timezone));
 
   const tr = await db.query.trackable.findFirst({
     where: and(eq(trackable.id, trackableId), eq(trackable.userId, userId)),
@@ -69,7 +77,7 @@ export const GetTrackable = async ({
   if (!tr) {
     throw new ApiFunctionError("Unable to find trackable", 400);
   }
-  const returnedTrackable: ITrackable = prepareTrackable(tr);
+  const returnedTrackable: ITrackable = prepareTrackable(tr, limits);
   log(`API: Trackable GET ${tr.id}`);
   return returnedTrackable;
 };
@@ -83,7 +91,8 @@ export const GetTrackableData = async ({
   userId: string;
   limits: TGETLimits;
 }) => {
-  const bounds = getDateBounds(limits);
+  const settings = await GetUserSettings({ userId });
+  const bounds = getDateBounds(limits, getDateInTimezone(settings.timezone));
 
   const data = await db.query.trackableRecord.findMany({
     where: and(
@@ -95,7 +104,7 @@ export const GetTrackableData = async ({
 
   log(`API: Trackable GET DATA ${trackableId}`);
 
-  return makeTrackableData(data);
+  return makeTrackableData(data, limits);
 };
 
 export const GetTrackableSettings = async ({

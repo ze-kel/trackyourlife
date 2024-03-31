@@ -71,7 +71,8 @@ export const ZTrackableSettingsRange = z.object({
     .array(
       z.object({
         internalKey: z.string().min(1),
-        emoji: z.string().emoji(),
+        emoji: z.string().emoji().optional(),
+        color: ZColorValue.optional(),
         // used to key inputs when editing, can be changed voluntarily
         id: z.string().uuid().default(uuidv4),
       }),
@@ -94,23 +95,25 @@ export type ITrackableSettings =
 //
 // Trackable
 //
-export type IFullData = Record<string, string>;
+export type ITrackableDataMonth = Record<number, string>;
+export type ITrackableDataYear = Record<number, ITrackableDataMonth>;
+export type ITrackableData = Record<number, ITrackableDataYear>;
 
 export type ITrackableUnsaved =
   | {
       type: "boolean";
       settings: IBooleanSettings;
-      data: Record<string, string>;
+      data: ITrackableData;
     }
   | {
       type: "number";
       settings: INumberSettings;
-      data: Record<string, string>;
+      data: ITrackableData;
     }
   | {
       type: "range";
       settings: IRangeSettings;
-      data: Record<string, string>;
+      data: ITrackableData;
     };
 
 export type ITrackable = ITrackableUnsaved & { id: string };

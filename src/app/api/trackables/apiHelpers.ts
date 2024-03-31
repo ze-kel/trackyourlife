@@ -1,11 +1,16 @@
-import type { ITrackable, ITrackableSettings } from "@t/trackable";
+import type {
+  ITrackable,
+  ITrackableData,
+  ITrackableSettings,
+} from "@t/trackable";
 import {
   ZTrackableSettingsBoolean,
   ZTrackableSettingsNumber,
   ZTrackableSettingsRange,
 } from "@t/trackable";
-import { format, sub } from "date-fns";
+import { startOfMonth, sub, subDays } from "date-fns";
 import type { DbTrackableRecordSelect, DbTrackableSelect } from "src/schema";
+
 import { z } from "zod";
 
 export const trackableToCreate = z.discriminatedUnion("type", [
@@ -23,12 +28,67 @@ export const trackableToCreate = z.discriminatedUnion("type", [
   }),
 ]);
 
-export const makeTrackableData = (trackableData: DbTrackableRecordSelect[]) => {
-  const result: ITrackable["data"] = {};
+export const makeTrackableData = (
+  trackableData: DbTrackableRecordSelect[],
+  limits: TGETLimits,
+) => {
+  const result: ITrackableData = {};
+
+  // We have to set months that are in the range of request.
+  // This way client can know what months got fetched even if there is no data at all
+  if (limits) {
+    if (limits.type === "year") {
+      result[limits.year] = {};
+
+      for (let i = 0; i < 12; i++) {
+        //@ts-expect-error ts please
+        result[limits.year][i] = [];
+      }
+    }
+
+    if (limits.type === "month") {
+      result[limits.year] = { [limits.month]: {} };
+    }
+
+    if (limits.type === "last") {
+      const today = new Date();
+      const start = subDays(today, limits.days);
+      const [year, month, year2, month2] = [
+        today.getFullYear(),
+        today.getMonth(),
+        start.getFullYear(),
+        start.getMonth(),
+      ];
+
+      result[year] = { [month]: {} };
+      if (!result[year2]) {
+        result[year2] = { [month2]: [] };
+      } else {
+        //@ts-expect-error ts please
+        result[year2][month2] = {};
+      }
+    }
+  }
 
   trackableData.forEach((el) => {
-    result[format(new Date(el.date), "yyyy-MM-dd")] = el.value;
+    const rawDate = new Date(el.date);
+    const [y, m, d] = [
+      rawDate.getFullYear(),
+      rawDate.getMonth(),
+      rawDate.getDate(),
+    ];
+    if (!result[y]) {
+      result[y] = {};
+    }
+    if (!result[y]?.[m]) {
+      //@ts-expect-error ts please
+      result[y][m] = {};
+    }
+
+    //@ts-expect-error ts please
+    result[y][m][d] = el.value;
   });
+
   return result;
 };
 
@@ -62,10 +122,11 @@ export const makeTrackableSettings = (
 
 export const prepareTrackable = (
   trackable: DbTrackableSelect & { data: DbTrackableRecordSelect[] },
+  limits: TGETLimits,
 ): ITrackable => {
   return {
     ...trackable,
-    data: makeTrackableData(trackable.data),
+    data: makeTrackableData(trackable.data, limits),
     settings: makeTrackableSettings(trackable),
   };
 };
@@ -88,7 +149,10 @@ export type TGETLimits = z.infer<typeof ZGETLimits>;
 const PG_MINUS_INFINITY = "-infinity";
 const PG_INFINITY = "infinity";
 
-export const getDateBounds = (limits: TGETLimits | undefined) => {
+export const getDateBounds = (
+  limits: TGETLimits | undefined,
+  dateNow: Date,
+) => {
   if (!limits) {
     return { from: PG_MINUS_INFINITY, to: PG_INFINITY };
   }
@@ -108,9 +172,11 @@ export const getDateBounds = (limits: TGETLimits | undefined) => {
   }
 
   if (limits.type === "last") {
+    // Note that this will return "full december and full january" for "last 7 days" on jan 3.
+    // This is intentional to not ensure that any month stored on a client has all its data fetched.
     return {
-      from: sub(new Date(), { days: limits.days }).toDateString(),
-      to: PG_INFINITY,
+      from: startOfMonth(sub(new Date(), { days: limits.days })).toDateString(),
+      to: dateNow.toDateString(),
     };
   }
 
