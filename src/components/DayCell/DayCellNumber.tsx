@@ -173,7 +173,6 @@ export const DayCellNumber = ({
             {displayedValue}
           </div>
           <input
-            autoFocus
             inputMode={"decimal"}
             type={"text"}
             value={rawInput}
