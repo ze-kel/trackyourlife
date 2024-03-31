@@ -141,7 +141,7 @@ const TrackablesList = ({
 
   const daysToRender = useMemo(
     () => generateDates(daysToShow, getDateInTimezone(settings.timezone)),
-    [],
+    [daysToShow, settings.timezone],
   );
 
   if (list.length === 0) return <EmptyList />;
@@ -225,7 +225,7 @@ export const DailyList = ({
   const daysToRender = useMemo(
     () =>
       generateDates(daysToShow, getDateInTimezone(settings.timezone)).reverse(),
-    [],
+    [daysToShow, settings.timezone],
   );
 
   const queryClient = useQueryClient();

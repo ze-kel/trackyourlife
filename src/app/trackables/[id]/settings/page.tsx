@@ -1,16 +1,13 @@
 import { redirect } from "next/navigation";
 import DeleteButton from "@components/DeleteButton";
-import TrackableSettings from "@components/TrackableSettings";
 import { Button } from "@/components/ui/button";
 import { CalendarIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
 import {
   RSAGetTrackable,
-  RSAUpdateTrackableSettings,
 } from "src/app/api/trackables/serverActions";
-import type { ITrackableSettings } from "@t/trackable";
 import { validateRequest } from "src/auth/lucia";
-import { useState } from "react";
+import SettingWrapper from "src/app/trackables/[id]/settings/settingsWrapper";
 
 const TrackableSettingsPage = async ({
   params,
@@ -26,18 +23,6 @@ const TrackableSettingsPage = async ({
     limits: { type: "last", days: 1 },
   });
 
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleSave = async (settings: ITrackableSettings) => {
-    setIsLoading(true);
-    await RSAUpdateTrackableSettings({
-      trackableId: trackable.id,
-      data: settings,
-      redirectToTrackablePage: true,
-    });
-    setIsLoading(false);
-  };
-
   return (
     <div className="content-container flex h-full max-h-full w-full flex-col pb-6">
       <div className=" mb-4 flex w-full items-center justify-between">
@@ -49,11 +34,8 @@ const TrackableSettingsPage = async ({
         </Link>
         <DeleteButton id={trackable.id} />
       </div>
-      <TrackableSettings
-        isLoadingButton={isLoading}
-        trackable={trackable}
-        handleSave={handleSave}
-      />
+
+      <SettingWrapper trackable={trackable} />
     </div>
   );
 };

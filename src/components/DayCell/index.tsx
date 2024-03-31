@@ -160,7 +160,7 @@ const DayCellWrapper = ({
         startDate: settings?.startDate,
         dateNow: getDateInTimezone(u.settings.timezone),
       }),
-    [day, month, year, settings?.startDate],
+    [day, month, year, settings?.startDate, u.settings.timezone],
   );
 
   if (!trackable) return <></>;

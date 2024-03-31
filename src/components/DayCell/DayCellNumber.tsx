@@ -50,6 +50,7 @@ export const DayCellNumber = ({
       setInternalNumber(getNumberSafe(value));
       setRawInput(String(internalNumber));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
   const internalUpdate = (val: number) => {

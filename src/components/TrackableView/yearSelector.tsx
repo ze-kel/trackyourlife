@@ -29,6 +29,7 @@ export const YearSelector = ({
     if (String(value) !== valueInternal) {
       setValueInternal(String(value));
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
   const blurHandler = () => {
