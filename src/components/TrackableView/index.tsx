@@ -10,6 +10,7 @@ import { ErrorBoundary } from "react-error-boundary";
 import { cn } from "@/lib/utils";
 import { useUserSettings } from "@components/Providers/UserSettingsProvider";
 import { getDateInTimezone } from "src/helpers/timezone";
+import { YearSelector } from "@components/TrackableView/yearSelector";
 
 const Month = ({
   month,
@@ -101,39 +102,9 @@ const Year = ({
   );
 };
 
-const YEARS_ON_YEAR_VIEW = 12;
-
-const Decade = ({
-  yearOffset,
-  openYear,
-}: {
-  yearOffset: number;
-  openYear: (y: number) => void;
-}) => {
-  const currentYear = new Date().getFullYear();
-  const startAt = currentYear - YEARS_ON_YEAR_VIEW + yearOffset + 1;
-
-  const years = Array(YEARS_ON_YEAR_VIEW)
-    .fill(0)
-    .map((_, i) => startAt + i);
-
-  return (
-    <div className="my-4 grid gap-x-3 gap-y-2 sm:grid-cols-2 md:grid-cols-4">
-      {years.map((y) => (
-        <div
-          onClick={() => openYear(y)}
-          className="flex cursor-pointer items-center justify-center border border-neutral-100 p-5 transition-colors hover:border-neutral-200 dark:border-neutral-800 dark:hover:border-neutral-500"
-          key={y}
-        >
-          {y}
-        </div>
-      ))}
-    </div>
-  );
-};
-
 const ViewController = ({
   year,
+  setYear,
   month,
   increment,
   view,
@@ -141,6 +112,7 @@ const ViewController = ({
   isCurrentMonth,
   openCurrentMonth,
 }: {
+  setYear: (v: number) => void;
   year?: number;
   month?: number;
   isCurrentMonth: boolean;
@@ -150,19 +122,15 @@ const ViewController = ({
   openCurrentMonth: () => void;
 }) => {
   return (
-    <div className="mb-4 flex flex-col-reverse gap-2 md:flex-row md:items-center md:justify-between">
+    <div className="mb-4 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
       <div className="flex items-baseline gap-2 self-center">
-        {view !== "years" && (
-          <Button name="year" variant="ghost" onClick={() => setView("years")}>
-            {year}
-          </Button>
-        )}
+        <YearSelector value={year} onChange={(v) => setYear(v)} />
 
         {view === "days" &&
           typeof year === "number" &&
           typeof month === "number" && (
             <>
-              <div className="text-xl font-light text-neutral-200 dark:text-neutral-800">
+              <div className="pl-4 text-xl font-light text-neutral-200 dark:text-neutral-800">
                 /
               </div>
               <Button
@@ -205,7 +173,7 @@ const ViewController = ({
   );
 };
 
-type TView = "days" | "months" | "years";
+type TView = "days" | "months";
 
 const TrackableView = ({
   y,
@@ -225,18 +193,13 @@ const TrackableView = ({
   const [month, setMonth] = useState(
     typeof m === "number" ? m : now.getMonth(),
   );
-  const [view, setView] = useState<TView>("days");
-
-  const [yearOffset, setyearOffset] = useState(0);
+  const [view, setView] = useState<TView>(
+    typeof m !== "number" && typeof y === "number" ? "months" : "days",
+  );
 
   const isCurrentMonth = now.getMonth() === month && now.getFullYear() === year;
 
   const increment = (add: number) => {
-    if (view === "years") {
-      setyearOffset(yearOffset + add * YEARS_ON_YEAR_VIEW);
-      return;
-    }
-
     if (view === "months") {
       setYear(year + add);
       return;
@@ -261,11 +224,6 @@ const TrackableView = ({
     setView("days");
   };
 
-  const openYear = (y: number) => {
-    setYear(y);
-    setView("months");
-  };
-
   const openCurrentMonth = () => {
     const now = getDateInTimezone(settings.timezone);
     setYear(now.getFullYear());
@@ -282,9 +240,6 @@ const TrackableView = ({
       case "months":
         url = `/trackables/${id}/${year}`;
         break;
-      case "years":
-        url = `/trackables/${id}`;
-        break;
     }
     if (url && url !== window.location.pathname) {
       window.history.pushState({}, "", url);
@@ -300,6 +255,7 @@ const TrackableView = ({
         view={view}
         setView={setView}
         openCurrentMonth={openCurrentMonth}
+        setYear={setYear}
         increment={increment}
       />
       <ErrorBoundary
@@ -309,9 +265,6 @@ const TrackableView = ({
       >
         {view === "days" && <Month year={year} month={month} />}
         {view === "months" && <Year year={year} openMonth={openMonth} />}
-        {view === "years" && (
-          <Decade yearOffset={yearOffset} openYear={openYear} />
-        )}
       </ErrorBoundary>
     </TrackableProvider>
   );

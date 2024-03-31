@@ -1,7 +1,7 @@
 "use client";
 import type React from "react";
 import type { CSSProperties, ReactNode } from "react";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useLayoutEffect, useMemo, useState } from "react";
 import debounce from "lodash/debounce";
 import { makeColorString } from "src/helpers/colorTools";
 import { cn } from "@/lib/utils";
@@ -44,6 +44,13 @@ export const DayCellNumber = ({
   const [rawInput, setRawInput] = useState<string>(String(internalNumber));
 
   const [isEditing, setIsEditing] = useState(false);
+
+  useLayoutEffect(() => {
+    if (internalNumber !== getNumberSafe(value)) {
+      setInternalNumber(getNumberSafe(value));
+      setRawInput(String(internalNumber));
+    }
+  }, [value]);
 
   const internalUpdate = (val: number) => {
     setInternalNumber(val);
@@ -146,14 +153,14 @@ export const DayCellNumber = ({
       )}
 
       {isDesktop ? (
-        !isEditing ? (
+        <>
           <div
             className={cn(
               "relative z-10 flex h-full w-full select-none items-center justify-center bg-inherit text-center font-semibold transition-all",
               internalNumber === 0
                 ? "text-neutral-200 dark:text-neutral-800"
                 : "text-neutral-800 dark:text-neutral-300",
-              "@[4rem]:text-lg text-xs",
+              "text-xs @[4rem]:text-lg",
               "overflow-hidden",
               drawerOpen &&
                 "outline outline-neutral-300 dark:outline-neutral-600",
@@ -164,27 +171,33 @@ export const DayCellNumber = ({
           >
             {displayedValue}
           </div>
-        ) : (
           <input
             autoFocus
             inputMode={"decimal"}
             type={"text"}
             value={rawInput}
             className={cn(
-              "absolute left-1/2 z-10 flex h-full w-full -translate-x-1/2 select-none items-center justify-center bg-inherit text-center font-semibold outline-none transition-all",
+              "absolute left-1/2 top-0 z-10 flex h-full w-full -translate-x-1/2 select-none items-center justify-center bg-inherit text-center font-semibold opacity-0 outline-none transition-all group-hover:opacity-100",
               internalNumber === 0
                 ? "text-neutral-200 dark:text-neutral-800"
                 : "text-neutral-800 dark:text-neutral-300",
-              "@[4rem]:text-xl text-xs",
-              "focus:absolute focus:w-[110%]  focus:bg-neutral-50 focus:dark:bg-neutral-950",
-              "focus:outline-neutral-300 dark:focus:outline-neutral-400",
+              "text-xs @[4rem]:text-xl",
+              "focus:absolute focus:w-[110%]  group-hover:bg-neutral-50 group-hover:dark:bg-neutral-950",
+              "group-hover:outline-neutral-100  dark:group-hover:outline-neutral-600",
+              "focus:outline-neutral-300 group-hover:focus:outline-neutral-300 dark:focus:outline-neutral-400 group-hover:dark:focus:outline-neutral-400",
               "selection:bg-neutral-300 dark:selection:bg-neutral-600",
             )}
+            onKeyUp={(e) => {
+              if (e.key === "Enter") {
+                const target = e.target as HTMLElement;
+                target.blur();
+              }
+            }}
             onFocus={focusHandler}
             onChange={handleInput}
             onBlur={handleInputBlur}
           />
-        )
+        </>
       ) : (
         <Drawer
           open={drawerOpen}
@@ -198,7 +211,7 @@ export const DayCellNumber = ({
               internalNumber === 0
                 ? "text-neutral-200 dark:text-neutral-800"
                 : "text-neutral-800 dark:text-neutral-300",
-              "@[4rem]:text-lg text-xs",
+              "text-xs @[4rem]:text-lg",
               "overflow-hidden",
               drawerOpen &&
                 "outline outline-neutral-300 dark:outline-neutral-600",
@@ -217,7 +230,7 @@ export const DayCellNumber = ({
                 type={"text"}
                 value={rawInput}
                 className={cn(
-                  "relative z-10 flex h-full w-full select-none items-center justify-center bg-inherit text-center font-semibold outline-none transition-all",
+                  "relative z-10 flex h-full w-full select-none items-center justify-center rounded bg-inherit text-center font-semibold outline-none transition-all",
                   internalNumber === 0
                     ? "text-neutral-200 dark:text-neutral-800"
                     : "text-neutral-800 dark:text-neutral-300",

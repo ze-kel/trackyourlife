@@ -41,7 +41,7 @@ const getDataForTrackable = async (
   const safeMonth = getMonthSafe(monthParam);
 
   const yearValid = Number(yearParam) === safeYear;
-  const monthValid = Number(monthParam) === safeMonth;
+  const monthValid = Number(monthParam) === safeMonth + 1;
 
   // Year view, prefetch full year
   if (yearValid && !monthValid) {
@@ -88,18 +88,22 @@ const Trackable = async ({
   const { session } = await validateRequest();
   if (!session) redirect("/login");
 
+  console.log("hello", params.dateInfo?.[0], params.dateInfo?.[1]);
+
   const { trackable, queryClient, month, year } = await getDataForTrackable(
     params.id,
     params.dateInfo?.[0],
     params.dateInfo?.[1],
   );
 
+  console.log(year, month);
+
   fillPrefetchedData(queryClient, trackable);
 
   try {
     return (
       <div className="content-container flex h-full max-h-full w-full flex-col">
-        <div className="mb-4 flex w-full items-center justify-between">
+        <div className="flex w-full items-center justify-between">
           <h2 className="w-full bg-inherit text-xl font-semibold md:text-2xl">
             {trackable.settings.name}
           </h2>
@@ -110,6 +114,8 @@ const Trackable = async ({
           </Link>
           <DeleteButton id={params.id} />
         </div>
+
+        <hr className="my-4 opacity-10" />
 
         <HydrationBoundary state={dehydrate(queryClient)}>
           <TrackableView id={params.id} m={month} y={year} />
