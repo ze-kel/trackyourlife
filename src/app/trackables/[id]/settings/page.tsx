@@ -10,6 +10,7 @@ import {
 } from "src/app/api/trackables/serverActions";
 import type { ITrackableSettings } from "@t/trackable";
 import { validateRequest } from "src/auth/lucia";
+import { useState } from "react";
 
 const TrackableSettingsPage = async ({
   params,
@@ -25,13 +26,16 @@ const TrackableSettingsPage = async ({
     limits: { type: "last", days: 1 },
   });
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleSave = async (settings: ITrackableSettings) => {
-    "use server";
+    setIsLoading(true);
     await RSAUpdateTrackableSettings({
       trackableId: trackable.id,
       data: settings,
       redirectToTrackablePage: true,
     });
+    setIsLoading(false);
   };
 
   return (
@@ -45,7 +49,11 @@ const TrackableSettingsPage = async ({
         </Link>
         <DeleteButton id={trackable.id} />
       </div>
-      <TrackableSettings trackable={trackable} handleSave={handleSave} />
+      <TrackableSettings
+        isLoadingButton={isLoading}
+        trackable={trackable}
+        handleSave={handleSave}
+      />
     </div>
   );
 };

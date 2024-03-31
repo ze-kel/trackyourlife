@@ -18,7 +18,9 @@ export const POST = async (request: NextRequest) => {
     if (!results.success) {
       return NextResponse.json(
         {
-          error: results.error.message,
+          error:
+            results.error.errors[0]?.message ||
+            "Validation error. Please check all fields",
         },
         {
           status: 400,
@@ -35,7 +37,7 @@ export const POST = async (request: NextRequest) => {
       .insert(auth_user)
       .values({
         id: userId,
-        username,
+        username: username || "unknown user",
         email: email.toLowerCase(),
         hashedPassword,
         settings: {},

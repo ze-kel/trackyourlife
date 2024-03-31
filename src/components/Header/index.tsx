@@ -20,18 +20,24 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { useMediaQuery } from "usehooks-ts";
+import { useState } from "react";
 
 const SigOutButton = () => {
   const router = useRouter();
 
+  const [isLoading, setLoading] = useState(false);
+
   const signOut = async () => {
+    setLoading(true);
     await fetch("/api/user/logout", { method: "POST", credentials: "include" });
     router.refresh();
+    setLoading(false);
   };
 
   return (
     <Button
       variant="outline"
+      isLoading={isLoading}
       onClick={() => void signOut()}
       className="w-full text-center"
     >

@@ -1,8 +1,6 @@
-/* eslint-disable @typescript-eslint/no-misused-promises */
 "use client";
 
 import { useState } from "react";
-import { z } from "zod";
 import { Input } from "@/components/ui/input";
 
 import { Button } from "@/components/ui/button";
@@ -17,160 +15,42 @@ import {
 } from "@/components/ui/card";
 import { RadioTabs, RadioTabItem } from "@/components/ui/radio-tabs";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
 import { cn } from "@/lib/utils";
-import { Spinner } from "@/components/ui/spinner";
-
-// TODO:
-// indication of request in progress
-// error handling
-// motion?
 
 type ActionState = "login" | "register";
 
-const formSchemaRegister = z.object({
-  email: z.string().email(),
-  password: z.string().min(10).max(50),
-  username: z.string().min(1),
-});
-
 const Register = () => {
-  const [error, setError] = useState("");
-
-  const router = useRouter();
-
-  const form = useForm<z.infer<typeof formSchemaRegister>>({
-    resolver: zodResolver(formSchemaRegister),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
-  });
-
-  const onSubmit = async (values: z.infer<typeof formSchemaRegister>) => {
-    const res = await fetch("api/user/create", {
-      method: "POST",
-      body: JSON.stringify({
-        ...values,
-      }),
-      credentials: "include",
-    });
-
-    if (!res.ok) {
-      const j = (await res.json()) as Record<string, string>;
-      if (j.error) {
-        setError(j.error);
-      }
-    }
-
-    router.refresh();
-  };
-
-  return (
-    <>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input type="email" placeholder="you@gmail.com" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="username"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Name</FormLabel>
-                <FormControl>
-                  <Input type="text" placeholder="Good Person" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Password</FormLabel>
-                <FormControl>
-                  <Input type="password" placeholder="" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <Button type="submit" variant="outline" className="w-full">
-            Register
-          </Button>
-        </form>
-      </Form>
-      {error && (
-        <Alert variant="destructive" className="mt-4">
-          <AlertTitle className="font-bold">Something is wrong</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-    </>
-  );
-};
-
-const formSchemaLogin = z.object({
-  email: z.string().email(),
-  password: z.string().min(2).max(50),
-});
-
-const Login = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const router = useRouter();
 
-  const form = useForm<z.infer<typeof formSchemaLogin>>({
-    resolver: zodResolver(formSchemaLogin),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
-  });
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
 
-  const onSubmit = async (values: z.infer<typeof formSchemaLogin>) => {
+  const onSubmit = async () => {
     setLoading(true);
-    const res = await fetch("api/user/login", {
+    const res = await fetch("api/user/create", {
       method: "POST",
       body: JSON.stringify({
-        ...values,
+        email,
+        password,
+        username,
       }),
       credentials: "include",
     });
 
+    console.log(res);
+
     if (!res.ok) {
       const j = (await res.json()) as Record<string, string>;
+      console.log(j);
       if (j.error) {
         setError(j.error);
       }
-
       setLoading(false);
-
       return;
     }
 
@@ -178,47 +58,120 @@ const Login = () => {
   };
 
   return (
-    <>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input type="email" placeholder="you@gmail.com" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Password</FormLabel>
-                <FormControl>
-                  <Input type="password" placeholder="" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <Button type="submit" variant="outline" className={cn("w-full")}>
-            {loading ? <Spinner /> : "Login"}
-          </Button>
-        </form>
-      </Form>
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        void onSubmit();
+      }}
+    >
+      <h4 className="mb-2">Email</h4>
+      <Input
+        type="email"
+        value={email}
+        placeholder="person@somemail.com"
+        onChange={(e) => setEmail(e.target.value)}
+      />
+
+      <h4 className="mb-2 mt-4">Name</h4>
+      <Input
+        type="text"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+      />
+
+      <h4 className="mb-2 mt-4">Password</h4>
+      <Input
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      />
+
+      <Button
+        isLoading={loading}
+        type="submit"
+        variant="outline"
+        className={cn("mt-6 w-full")}
+      >
+        Create Account
+      </Button>
       {error && (
         <Alert variant="destructive" className="mt-4">
           <AlertTitle className="font-bold">Something is wrong</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
-    </>
+    </form>
+  );
+};
+
+const Login = () => {
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const router = useRouter();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const onSubmit = async () => {
+    setLoading(true);
+    const res = await fetch("api/user/login", {
+      method: "POST",
+      body: JSON.stringify({
+        email,
+        password,
+      }),
+      credentials: "include",
+    });
+
+    if (!res.ok) {
+      const j = (await res.json()) as Record<string, string>;
+      if (j.error) {
+        setError(j.error);
+      }
+      setLoading(false);
+      return;
+    }
+
+    router.refresh();
+  };
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        void onSubmit();
+      }}
+    >
+      <h4 className="mb-2">Email</h4>
+      <Input
+        type="email"
+        value={email}
+        placeholder="person@somemail.com"
+        onChange={(e) => setEmail(e.target.value)}
+      />
+      <h4 className="mb-2 mt-4">Password</h4>
+      <Input
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      />
+
+      <Button
+        isLoading={loading}
+        type="submit"
+        variant="outline"
+        className={cn("mt-6 w-full")}
+      >
+        Login
+      </Button>
+      {error && (
+        <Alert variant="destructive" className="mt-4">
+          <AlertTitle className="font-bold">Something is wrong</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+    </form>
   );
 };
 

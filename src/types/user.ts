@@ -5,8 +5,11 @@ const email = z.string().email("Email is invalid");
 
 export const ZRegister = z.object({
   email,
-  password: z.string().min(6).max(255),
-  username: z.string().min(1),
+  password: z
+    .string()
+    .min(6, "Password must be at least 6 symbols")
+    .max(50, "Password can be at most 50 symbols"),
+  username: z.string().min(1, "Username must contain at least 1 symbol"),
   role: z.string().optional(),
 });
 

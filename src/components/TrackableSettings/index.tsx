@@ -242,10 +242,12 @@ const TrackableSettings = ({
   trackable,
   handleSave,
   customSaveButtonText,
+  isLoadingButton,
 }: {
   trackable: ITrackable | ITrackableUnsaved;
   handleSave: (v: ITrackable["settings"]) => void | Promise<void>;
   customSaveButtonText?: string;
+  isLoadingButton?: boolean;
 }) => {
   // Settings is a ref to avoid rerendering everything on every change(problematic with color inputs where you drag to change)
   // However we do need to update preview trackable, so with changing ref we also trigger signal update
@@ -322,6 +324,7 @@ const TrackableSettings = ({
 
       {handleSave && (
         <Button
+          isLoading={isLoadingButton}
           className="mt-2"
           variant={"outline"}
           onClick={() => void handleSave(settings.current)}

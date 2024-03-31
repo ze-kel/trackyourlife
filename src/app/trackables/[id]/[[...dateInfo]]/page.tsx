@@ -88,15 +88,11 @@ const Trackable = async ({
   const { session } = await validateRequest();
   if (!session) redirect("/login");
 
-  console.log("hello", params.dateInfo?.[0], params.dateInfo?.[1]);
-
   const { trackable, queryClient, month, year } = await getDataForTrackable(
     params.id,
     params.dateInfo?.[0],
     params.dateInfo?.[1],
   );
-
-  console.log(year, month);
 
   fillPrefetchedData(queryClient, trackable);
 

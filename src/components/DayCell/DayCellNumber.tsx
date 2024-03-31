@@ -177,15 +177,16 @@ export const DayCellNumber = ({
             type={"text"}
             value={rawInput}
             className={cn(
-              "absolute left-1/2 top-0 z-10 flex h-full w-full -translate-x-1/2 select-none items-center justify-center bg-inherit text-center font-semibold opacity-0 outline-none transition-all group-hover:opacity-100",
+              "absolute left-1/2 top-0 z-10 flex h-full w-full -translate-x-1/2 select-none items-center justify-center bg-inherit text-center font-semibold outline-none transition-all group-hover:opacity-100",
               internalNumber === 0
                 ? "text-neutral-200 dark:text-neutral-800"
                 : "text-neutral-800 dark:text-neutral-300",
               "text-xs @[4rem]:text-xl",
-              "focus:absolute focus:w-[110%]  group-hover:bg-neutral-50 group-hover:dark:bg-neutral-950",
+              "focus:absolute focus:w-[110%]  focus:bg-neutral-50 group-hover:bg-neutral-50 focus:dark:bg-neutral-950 group-hover:dark:bg-neutral-950",
               "group-hover:outline-neutral-100  dark:group-hover:outline-neutral-600",
               "focus:outline-neutral-300 group-hover:focus:outline-neutral-300 dark:focus:outline-neutral-400 group-hover:dark:focus:outline-neutral-400",
               "selection:bg-neutral-300 dark:selection:bg-neutral-600",
+              !isEditing ? "opacity-0" : "",
             )}
             onKeyUp={(e) => {
               if (e.key === "Enter") {

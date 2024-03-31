@@ -17,6 +17,21 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useUserSettings } from "@components/Providers/UserSettingsProvider";
 import { getDateInTimezone } from "src/helpers/timezone";
+import { Button } from "@/components/ui/button";
+
+const EmptyList = () => {
+  return (
+    <div className="flex flex-col items-center justify-center py-20">
+      <h2 className="text-2xl font-light">
+        You do not have any trackables yet.
+      </h2>
+
+      <Link className="mt-4" href={"/create"}>
+        <Button variant="outline">Create Trackable</Button>
+      </Link>
+    </div>
+  );
+};
 
 const sortList = (
   list: ITrackable["id"][],
@@ -129,6 +144,8 @@ const TrackablesList = ({
     [],
   );
 
+  if (list.length === 0) return <EmptyList />;
+
   return (
     <>
       <Input
@@ -214,6 +231,8 @@ export const DailyList = ({
   const queryClient = useQueryClient();
 
   const [sorted] = useState(sortList(list, queryClient));
+
+  if (list.length === 0) return <EmptyList />;
 
   return (
     <div className="flex flex-col gap-6">
