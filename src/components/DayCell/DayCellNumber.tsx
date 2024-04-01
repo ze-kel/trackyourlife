@@ -46,7 +46,7 @@ export const DayCellNumber = ({
   const [isEditing, setIsEditing] = useState(false);
 
   useLayoutEffect(() => {
-    if (internalNumber !== getNumberSafe(value)) {
+    if (internalNumber !== getNumberSafe(value) && !isEditing) {
       setInternalNumber(getNumberSafe(value));
       setRawInput(String(internalNumber));
     }

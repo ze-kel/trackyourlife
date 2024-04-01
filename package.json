@@ -36,6 +36,7 @@
     "@tailwindcss/container-queries": "^0.1.1",
     "@tanstack/react-query": "^5.28.9",
     "@types/chroma-js": "^2.4.4",
+    "@visx/visx": "^3.10.2",
     "chroma-js": "^2.4.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",

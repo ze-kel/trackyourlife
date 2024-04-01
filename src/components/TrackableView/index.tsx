@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { useUserSettings } from "@components/Providers/UserSettingsProvider";
 import { getDateInTimezone } from "src/helpers/timezone";
 import { YearSelector } from "@components/TrackableView/yearSelector";
+import { Graph } from "@components/Graphs";
 
 const Month = ({
   month,
@@ -265,6 +266,10 @@ const TrackableView = ({
       >
         {view === "days" && <Month year={year} month={month} />}
         {view === "months" && <Year year={year} openMonth={openMonth} />}
+      </ErrorBoundary>
+
+      <ErrorBoundary fallback={<div></div>}>
+        <Graph year={year} month={month} id={id} />
       </ErrorBoundary>
     </TrackableProvider>
   );

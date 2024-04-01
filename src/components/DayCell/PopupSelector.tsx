@@ -93,10 +93,10 @@ export const PopupSelector = ({
 
   const getYAnimation = makeIndexGetter({
     center: "0",
-    oneOff: "100%",
-    twoOff: "150%",
-    oneOffR: "-100%",
-    twoOffR: "-150%",
+    oneOff: `${EMOJI_H / 2}px`,
+    twoOff: `${EMOJI_H * 1.5}px`,
+    oneOffR: `-${EMOJI_H / 2}px`,
+    twoOffR: `-${EMOJI_H * 1.5}px`,
     len: rangeMapping.length,
   });
 
