@@ -1,14 +1,17 @@
 import type { ITrackable } from "@t/trackable";
 import type { QueryClient } from "@tanstack/react-query";
+import { ITrackableFromList } from "src/app/api/trackables/apiFunctions";
 
-export const fillPrefetchedData = (
+export const fillPrefetchedTrackable = (
   queryClient: QueryClient,
   trackable: ITrackable,
 ) => {
-  queryClient.setQueryData(["trackable", trackable.id], {
+  queryClient.setQueryData<ITrackableFromList>(["trackable", trackable.id], {
     type: trackable.type,
     id: trackable.id,
+    name: trackable.name,
   });
+
   queryClient.setQueryData(
     ["trackable", trackable.id, "settings"],
     trackable.settings,
@@ -21,5 +24,21 @@ export const fillPrefetchedData = (
         monthData,
       );
     }
+  }
+};
+
+export const fillPrefetchedTrackablesList = (
+  queryClient: QueryClient,
+  trackables: ITrackable[],
+) => {
+  queryClient.setQueryData(
+    ["trackables", "list"],
+    trackables.map(
+      (v) => ({ name: v.name, id: v.id, type: v.type }) as ITrackableFromList,
+    ),
+  );
+
+  for (const trackable of trackables) {
+    fillPrefetchedTrackable(queryClient, trackable);
   }
 };

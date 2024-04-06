@@ -3,9 +3,12 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import DayCellWrapper from "@components/DayCell";
 import { useTrackableContextSafe } from "@components/Providers/TrackableProvider";
-import { TrackableName } from "@components/TrackablesList";
+import { useUserSettings } from "@components/Providers/UserSettingsProvider";
+import { TrackableNameText } from "@components/TrackableName";
 import { HeartFilledIcon, HeartIcon } from "@radix-ui/react-icons";
 import { format } from "date-fns";
+import Link from "next/link";
+import { useMemo } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 
 const MiniTrackable = ({
@@ -15,23 +18,45 @@ const MiniTrackable = ({
   className?: string;
   daysToRender: { year: number; month: number; day: number }[];
 }) => {
-  const { settings, settingsUpdatePartial } = useTrackableContextSafe();
+  const { trackable } = useTrackableContextSafe();
+  const { settings, updateSettingsPartial } = useUserSettings();
+
+  const settingsSet = useMemo(() => {
+    return new Set(settings.favorites);
+  }, [settings]);
+
+  const inFavs = trackable ? settingsSet.has(trackable.id) : false;
+
+  const favHandler = async () => {
+    if (!trackable) return;
+    if (inFavs) {
+      settingsSet.delete(trackable.id);
+    } else {
+      settingsSet.add(trackable.id);
+    }
+    await updateSettingsPartial({
+      favorites: Array.from(settingsSet),
+    });
+  };
 
   return (
     <div className={className}>
       <div className="flex items-center justify-between">
-        <TrackableName className="text-xl font-light" />
+        <Link
+          href={`/trackables/${trackable?.id}/today`}
+          className={cn(
+            "mb-1 block w-full text-xl font-light text-neutral-950 dark:text-neutral-50",
+          )}
+        >
+          <TrackableNameText />
+        </Link>
 
         <Button
           variant={"ghost"}
           size={"icon"}
-          onClick={() =>
-            void settingsUpdatePartial({
-              favorite: !settings?.favorite,
-            })
-          }
+          onClick={() => void favHandler()}
         >
-          {settings?.favorite ? <HeartFilledIcon /> : <HeartIcon />}
+          {inFavs ? <HeartFilledIcon /> : <HeartIcon />}
         </Button>
       </div>
 

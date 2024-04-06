@@ -5,7 +5,13 @@ import {
   DropdownTrigger,
 } from "@components/Dropdown";
 import Link from "next/link";
-import { ChevronDownIcon } from "@radix-ui/react-icons";
+import {
+  ActivityLogIcon,
+  CalendarIcon,
+  ChevronDownIcon,
+  GearIcon,
+  PlusCircledIcon,
+} from "@radix-ui/react-icons";
 import type { ButtonProps } from "@/components/ui/button";
 import { Button } from "@/components/ui/button";
 import type { User } from "lucia";
@@ -46,20 +52,24 @@ const SigOutButton = () => {
   );
 };
 
-const topLinks = [
+export const CoreLinks = [
   {
+    icon: CalendarIcon,
     name: "Today",
     link: "/",
   },
   {
+    icon: ActivityLogIcon,
     name: "Trackables",
     link: "/trackables",
   },
   {
+    icon: PlusCircledIcon,
     name: "Create",
     link: "/create",
   },
   {
+    icon: GearIcon,
     name: "Settings",
     link: "/settings",
   },
@@ -76,7 +86,7 @@ const Links = ({
 
   return (
     <div className="flex w-full flex-col items-center gap-2 font-medium md:w-fit md:flex-row">
-      {topLinks.map((v) => (
+      {CoreLinks.map((v) => (
         <Link key={v.link} href={v.link} className="block w-full">
           <Button
             className="w-full"
@@ -129,7 +139,7 @@ const HeaderMenu = ({ username }: { username?: string }) => {
 
   return (
     <>
-      <div className="hidden md:block">
+      <div className="hidden md:block xl:hidden">
         <Links variant={"ghost"} variantActive={"secondary"} />
       </div>
       {isDesktop ? (
@@ -160,17 +170,15 @@ const HeaderMenu = ({ username }: { username?: string }) => {
 
 const Header = ({ user }: { user?: User }) => {
   return (
-    <div className="flex h-14 flex-shrink-0 justify-center border-b-2 border-neutral-300 bg-neutral-50 font-bold text-neutral-800 dark:border-neutral-900 dark:bg-neutral-950 dark:text-neutral-100">
-      <div className="content-container flex h-full w-full items-center justify-between px-0">
-        <Link
-          href={"/"}
-          className="flex h-full items-center justify-center px-4"
-        >
-          <h2 className="text-lg font-bold tracking-wider">TYL</h2>
-        </Link>
+    <div className="flex h-full w-full items-center justify-between px-0">
+      <Link
+        href={"/"}
+        className="flex h-full items-center justify-center px-4 xl:px-6"
+      >
+        <h2 className="text-2xl font-bold tracking-wider">TYL</h2>
+      </Link>
 
-        {user && <HeaderMenu username={user.username}></HeaderMenu>}
-      </div>
+      {user && <HeaderMenu username={user.username}></HeaderMenu>}
     </div>
   );
 };

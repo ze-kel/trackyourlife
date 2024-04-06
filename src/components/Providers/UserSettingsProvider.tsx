@@ -1,5 +1,5 @@
 "use client";
-import type { IUserSettings } from "@t/user";
+import { UserSettingsFallback, type IUserSettings } from "@t/user";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { createContext, useContext } from "react";
@@ -62,6 +62,7 @@ const UserSettingsProvider = ({
     const previous = queryClient.getQueryData([QUERY_KEY]) || {};
 
     await settingsMutation.mutateAsync({
+      ...UserSettingsFallback,
       ...previous,
       ...update,
     });

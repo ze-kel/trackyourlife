@@ -11,7 +11,9 @@ import {
   dehydrate,
 } from "@tanstack/react-query";
 import { validateRequest } from "src/auth/lucia";
-import { fillPrefetchedData } from "src/app/trackables/helpers";
+import { fillPrefetchedTrackable } from "src/app/trackables/helpers";
+import { TrackableNameEditable } from "@components/TrackableName";
+import TrackableProvider from "@components/Providers/TrackableProvider";
 
 const getYearSafe = (y: string | undefined) => {
   if (!y || y.length !== 4) return new Date().getFullYear();
@@ -94,29 +96,34 @@ const Trackable = async ({
     params.dateInfo?.[1],
   );
 
-  fillPrefetchedData(queryClient, trackable);
+  fillPrefetchedTrackable(queryClient, trackable);
 
   try {
     return (
-      <div className="content-container flex h-full max-h-full w-full flex-col">
-        <div className="flex w-full items-center justify-between">
-          <h2 className="w-full bg-inherit text-xl font-semibold md:text-2xl">
-            {trackable.settings.name}
-          </h2>
-          <Link href={`/trackables/${params.id}/settings`} className="mr-2">
-            <Button name="settings" variant="outline" size="icon">
-              <GearIcon className="h-4 w-4" />
-            </Button>
-          </Link>
-          <DeleteButton id={params.id} />
-        </div>
+      <HydrationBoundary state={dehydrate(queryClient)}>
+        <TrackableProvider id={params.id}>
+          <div className="content-container flex h-full max-h-full w-full flex-col">
+            <div className="flex w-full items-center justify-between">
+              <TrackableNameEditable />
+              <div className="flex gap-2">
+                <Link
+                  href={`/trackables/${params.id}/settings`}
+                  className="mr-2"
+                >
+                  <Button name="settings" variant="outline" size="icon">
+                    <GearIcon className="h-4 w-4" />
+                  </Button>
+                </Link>
+                <DeleteButton id={params.id} />
+              </div>
+            </div>
 
-        <hr className="my-4 opacity-10" />
+            <hr className="my-4 opacity-10" />
 
-        <HydrationBoundary state={dehydrate(queryClient)}>
-          <TrackableView id={params.id} m={month} y={year} />
-        </HydrationBoundary>
-      </div>
+            <TrackableView m={month} y={year} />
+          </div>
+        </TrackableProvider>
+      </HydrationBoundary>
     );
   } catch (e) {
     redirect("/");

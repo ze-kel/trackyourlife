@@ -1,6 +1,6 @@
 "use server";
 
-import type { IUserSettings } from "@t/user";
+import { UserSettingsFallback, type IUserSettings } from "@t/user";
 import { RSAGetUserIdAndRedirect, checkForSession } from "src/app/api/helpers";
 import {
   GetUserSettings,
@@ -9,7 +9,7 @@ import {
 
 export const RSAGetUserSettings = async () => {
   const { userId } = await checkForSession();
-  if (!userId) return {};
+  if (!userId) return UserSettingsFallback;
   const result = await GetUserSettings({ userId });
   return result;
 };

@@ -12,7 +12,6 @@ import { useEffect, useRef, useState } from "react";
 import NumberColorSelector from "../Colors/numberColorSelector";
 import NumberLimitsSelector from "./numberLimitsSelector";
 import RangeLabelSelector from "./rangeLabelSelector";
-import { Input } from "@/components/ui/input";
 import { presetsMap } from "@components/Colors/presets";
 import ColorInput from "@components/Colors/colorInput";
 import { Button } from "@/components/ui/button";
@@ -36,6 +35,9 @@ export const SettingsBoolean = ({
   settings: MutableRefObject<IBooleanSettings>;
   notifyAboutChange: () => void;
 }) => {
+
+  
+
   return (
     <>
       <div>
@@ -273,15 +275,6 @@ const TrackableSettings = ({
               />
             );
           })}
-      </div>
-      <div>
-        <h3 className="text-xl">Name</h3>
-        <Input
-          placeholder="name"
-          className="mt-2 w-fit"
-          defaultValue={settings.current.name}
-          onChange={(e) => (settings.current.name = e.target.value)}
-        />
       </div>
 
       <div>

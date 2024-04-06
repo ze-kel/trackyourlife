@@ -23,6 +23,27 @@ import { getDateInTimezone } from "src/helpers/timezone";
 import type { DbTrackableRecordInsert } from "src/schema";
 import { trackable, trackableRecord } from "src/schema";
 
+export type ITrackableFromList = {
+  id: ITrackable["id"];
+  name: ITrackable["name"];
+  type: ITrackable["type"];
+};
+
+export const GetTrackablesIdList = async ({ userId }: { userId: string }) => {
+  const raw = await db.query.trackable.findMany({
+    where: eq(trackable.userId, userId),
+    columns: {
+      id: true,
+      name: true,
+      type: true,
+    },
+  });
+
+  log(`API: Get all trackables id list ${userId}`, raw);
+
+  return raw as ITrackableFromList[];
+};
+
 export const GetAllTrackables = async ({
   userId,
   limits,
@@ -114,6 +135,7 @@ export const GetTrackableSettings = async ({
   trackableId: ITrackable["id"];
   userId: string;
 }) => {
+  log(`API: Trackable Settings GET  ${trackableId}`);
   const tr = await db.query.trackable.findFirst({
     where: and(eq(trackable.id, trackableId), eq(trackable.userId, userId)),
   });
@@ -122,7 +144,6 @@ export const GetTrackableSettings = async ({
     throw new ApiFunctionError("Unable to find trackable", 400);
   }
   const settings: ITrackable["settings"] = makeTrackableSettings(tr);
-  log(`API: Trackable Settings GET  ${tr.id}`);
   return settings;
 };
 
@@ -206,6 +227,23 @@ export const UpdateTrackable = async ({
   log(`API: Trackable Update ${parsed.data.id} ${date}`);
 
   return parsed.data;
+};
+
+export const UpdateTrackableName = async ({
+  name,
+  trackableId,
+  userId,
+}: {
+  name: string;
+  trackableId: ITrackable["id"];
+  userId: string;
+}) => {
+  await db
+    .update(trackable)
+    .set({ name: name })
+    .where(and(eq(trackable.id, trackableId), eq(trackable.userId, userId)));
+
+  return name;
 };
 
 export const UpdateTrackableSettings = async ({

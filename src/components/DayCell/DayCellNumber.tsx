@@ -21,6 +21,11 @@ const getNumberSafe = (v: string | undefined) => {
   return Number.isNaN(n) ? 0 : n;
 };
 
+export const NumberFormatter = new Intl.NumberFormat("en-US", {
+  compactDisplay: "short",
+  notation: "compact",
+});
+
 export const DayCellNumber = ({
   value,
   onChange,
@@ -58,15 +63,10 @@ export const DayCellNumber = ({
     void debouncedUpdateValue(val);
   };
 
-  const isBigNumber = internalNumber > 10000;
-
-  const formatter = new Intl.NumberFormat("en-US", {
-    compactDisplay: "short",
-    notation: "compact",
-  });
+  const isBigNumber = internalNumber >= 10000;
 
   const displayedValue = isBigNumber
-    ? formatter.format(internalNumber)
+    ? NumberFormatter.format(internalNumber)
     : internalNumber;
 
   const updateValue = async (value: number) => {

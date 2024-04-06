@@ -23,6 +23,7 @@ export const ZLogin = z.object({
 export type ILogin = z.infer<typeof ZLogin>;
 
 export const ZUserSettings = z.object({
+  favorites: z.array(z.string()).default([]),
   colorPresets: z.array(ZColorValue).optional(),
   timezone: z
     .object({
@@ -35,3 +36,7 @@ export const ZUserSettings = z.object({
 });
 
 export type IUserSettings = z.infer<typeof ZUserSettings>;
+
+export const UserSettingsFallback: IUserSettings = {
+  favorites: [],
+};

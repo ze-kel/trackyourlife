@@ -14,6 +14,7 @@ import {
   RSAGetTrackable,
   RSAGetTrackableSettings,
   RSAUpdateTrackable,
+  RSAUpdateTrackableName,
   RSAUpdateTrackableSettings,
 } from "src/app/api/trackables/serverActions";
 
@@ -38,12 +39,22 @@ type MutationSettings = UseMutationResult<
   }
 >;
 
+type MutationName = UseMutationResult<
+  void,
+  Error,
+  string,
+  {
+    previous: unknown;
+  }
+>;
+
 interface ITrackableContext {
   id: ITrackable["id"];
   trackable: UseQueryResult<ITrackable, Error>["data"];
   query: UseQueryResult<ITrackable, Error>;
   mutation: MutationTrackable;
   update: MutationTrackable["mutateAsync"];
+  updateName: MutationName["mutateAsync"];
   settings: UseQueryResult<ITrackable["settings"], Error>["data"];
   settingsMutation: MutationSettings;
   settingsUpdate: MutationSettings["mutateAsync"];
@@ -158,6 +169,29 @@ const TrackableProvider = ({
     });
   };
 
+  const nameMutation = useMutation({
+    mutationFn: async (name: string) => {
+      await RSAUpdateTrackableName(id, name);
+    },
+    onMutate: (upd) => {
+      const previous = queryClient.getQueryData([
+        "trackable",
+        id,
+      ]) as ITrackable;
+
+      queryClient.setQueryData(["trackable", id], { ...previous, name: upd });
+
+      return { previous };
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["trackables", "list"] });
+    },
+    onError: (_, update, context) => {
+      if (!context) return;
+      queryClient.setQueryData(["trackable", id], context.previous);
+    },
+  });
+
   return (
     <TrackableContext.Provider
       value={{
@@ -166,6 +200,7 @@ const TrackableProvider = ({
         query,
         mutation: updateMutation,
         update: updateMutation.mutateAsync,
+        updateName: nameMutation.mutateAsync,
         settings: settings.data,
         settingsMutation,
         settingsUpdate: settingsMutation.mutateAsync,

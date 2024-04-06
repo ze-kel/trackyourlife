@@ -29,9 +29,7 @@ export const ZColorValue = z.object({
 export type IColorValue = z.infer<typeof ZColorValue>;
 
 const basics = {
-  name: z.string().default("Unnamed Trackable").optional(),
   startDate: z.string().datetime().optional(),
-  favorite: z.boolean().optional(),
 };
 
 export const ZTrackableSettingsBase = z.object(basics);
@@ -101,17 +99,20 @@ export type ITrackableData = Record<number, ITrackableDataYear>;
 
 export type ITrackableUnsaved =
   | {
+      name: string;
       type: "boolean";
       settings: IBooleanSettings;
       data: ITrackableData;
     }
   | {
       type: "number";
+      name: string;
       settings: INumberSettings;
       data: ITrackableData;
     }
   | {
       type: "range";
+      name: string;
       settings: IRangeSettings;
       data: ITrackableData;
     };

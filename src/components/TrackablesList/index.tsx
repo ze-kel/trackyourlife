@@ -1,14 +1,14 @@
 "use client";
-import type { ITrackable, ITrackableSettings } from "src/types/trackable";
+import type { ITrackable } from "src/types/trackable";
 import MiniTrackable from "./miniTrackable";
 import { AnimatePresence, m } from "framer-motion";
-import TrackableProvider, {
-  useTrackableContextSafe,
-} from "@components/Providers/TrackableProvider";
-import type { QueryClient } from "@tanstack/react-query";
-import { QueriesObserver, useQueryClient } from "@tanstack/react-query";
-import { Fragment, useEffect, useMemo, useState } from "react";
-import { generateDates } from "@components/TrackablesList/helper";
+import TrackableProvider from "@components/Providers/TrackableProvider";
+import { useQuery } from "@tanstack/react-query";
+import { Fragment, useMemo, useState } from "react";
+import {
+  generateDates,
+  sortTrackableList,
+} from "@components/TrackablesList/helper";
 import DayCellWrapper from "@components/DayCell";
 import Link from "next/link";
 import { format, isLastDayOfMonth } from "date-fns";
@@ -18,6 +18,10 @@ import { Badge } from "@/components/ui/badge";
 import { useUserSettings } from "@components/Providers/UserSettingsProvider";
 import { getDateInTimezone } from "src/helpers/timezone";
 import { Button } from "@/components/ui/button";
+import { RSAGetTrackablesIdList } from "src/app/api/trackables/serverActions";
+import { Spinner } from "@/components/ui/spinner";
+import type { ITrackableFromList } from "src/app/api/trackables/apiFunctions";
+import { TrackableNameText } from "@components/TrackableName";
 
 const EmptyList = () => {
   return (
@@ -33,79 +37,40 @@ const EmptyList = () => {
   );
 };
 
-const sortList = (
-  list: ITrackable["id"][],
-  queryClient: QueryClient,
-): ITrackable["id"][] => {
-  const newList = list.map((id) => {
-    return {
-      id,
-      settings: queryClient.getQueryData<ITrackableSettings>([
-        "trackable",
-        id,
-        "settings",
-      ]),
-    };
-  });
-
-  newList.sort((a, b) => {
-    if (!a.settings || !b.settings) return 0;
-    if (a.settings.favorite && !b.settings.favorite) return -1;
-    if (!a.settings.favorite && b.settings.favorite) return 1;
-
-    const aName = a.settings.name || "";
-    const bName = b.settings.name || "";
-
-    return aName.localeCompare(bName);
-  });
-
-  return newList.map((v) => v.id);
-};
-
 type TrackableTypeFilterState = Record<ITrackable["type"], boolean>;
 
 const filterTrackables = (
   query: string,
   types: TrackableTypeFilterState,
-  list: ITrackable["id"][],
-  queryClient: QueryClient,
-): ITrackable["id"][] => {
+  list: ITrackableFromList[],
+) => {
   const filterByType = Object.values(types).some((v) => v);
 
   if (!query && !filterByType) return list;
 
-  const newList = list.map((id) => {
-    return {
-      id,
-      type: queryClient.getQueryData<ITrackable>(["trackable", id])?.type,
-      settings: queryClient.getQueryData<ITrackableSettings>([
-        "trackable",
-        id,
-        "settings",
-      ]),
-    };
-  });
-
-  return newList
+  return list
     .filter((v) => {
-      return v.settings?.name && v.settings.name.includes(query);
+      return (v.name || "").includes(query);
     })
     .filter((v) => {
       if (!filterByType) return true;
 
-      return types[v.type as keyof TrackableTypeFilterState];
-    })
-    .map((v) => v.id);
+      console.log("filtering", types, "target", v.type);
+
+      return types[v.type];
+    });
 };
 
-const TrackablesList = ({
-  list,
-  daysToShow,
-}: {
-  list: ITrackable["id"][];
-  daysToShow: number;
-}) => {
-  const queryClient = useQueryClient();
+const TrackablesList = ({ daysToShow }: { daysToShow: number }) => {
+  const { settings } = useUserSettings();
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["trackables", "list"],
+    queryFn: async () => {
+      const res = await RSAGetTrackablesIdList();
+      return res;
+    },
+  });
 
   const [searchQ, setSearch] = useState("");
   const [filterTypes, setFilterTypes] = useState<TrackableTypeFilterState>({
@@ -115,36 +80,29 @@ const TrackablesList = ({
   });
 
   const filtered = useMemo(
-    () => filterTrackables(searchQ, filterTypes, list, queryClient),
-    [list, queryClient, filterTypes, searchQ],
+    () => filterTrackables(searchQ, filterTypes, data || []),
+    [data, filterTypes, searchQ],
   );
-
-  const [sortedVersion, setSortedVersion] = useState(0);
 
   const sorted = useMemo(
-    () => sortList(filtered, queryClient),
-    [filtered, queryClient],
+    () => sortTrackableList(filtered, settings.favorites),
+    [filtered, settings],
   );
-
-  useEffect(() => {
-    // Update sorted list when we change setting(add to favs)
-    const m = list.map((v) => ({
-      queryKey: ["trackable", v, "settings"],
-    }));
-    const obs = new QueriesObserver(queryClient, m);
-    obs.subscribe(() => {
-      setSortedVersion(sortedVersion + 1);
-    });
-  });
-
-  const { settings } = useUserSettings();
 
   const daysToRender = useMemo(
     () => generateDates(daysToShow, getDateInTimezone(settings.timezone)),
     [daysToShow, settings.timezone],
   );
 
-  if (list.length === 0) return <EmptyList />;
+  if (!data || isLoading) {
+    return (
+      <div className="flex h-64 w-full items-center justify-center">
+        <Spinner />
+      </div>
+    );
+  }
+
+  if (data.length === 0) return <EmptyList />;
 
   return (
     <>
@@ -178,18 +136,18 @@ const TrackablesList = ({
 
       <div className="mt-3 grid gap-5">
         <AnimatePresence initial={false}>
-          {sorted.map((id) => (
+          {sorted.map((tr) => (
             <m.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 1 }}
               transition={{ duration: 0.2, ease: "circInOut" }}
               layout
-              layoutId={id}
-              key={id}
+              layoutId={tr.id}
+              key={tr.id}
               className="border-b border-neutral-200 pb-4 last:border-0 dark:border-neutral-800"
             >
-              <TrackableProvider id={id}>
+              <TrackableProvider id={tr.id}>
                 <MiniTrackable daysToRender={daysToRender} />
               </TrackableProvider>
             </m.div>
@@ -200,26 +158,15 @@ const TrackablesList = ({
   );
 };
 
-export const TrackableName = ({ className }: { className?: string }) => {
-  const { trackable, settings } = useTrackableContextSafe();
+export const DailyList = ({ daysToShow }: { daysToShow: number }) => {
+  const { data, isLoading } = useQuery({
+    queryKey: ["trackables", "list"],
+    queryFn: async () => {
+      const res = await RSAGetTrackablesIdList();
+      return res;
+    },
+  });
 
-  return (
-    <Link
-      href={`/trackables/${trackable?.id}`}
-      className={cn("block w-fit", className)}
-    >
-      {settings?.name || "unnamed"}
-    </Link>
-  );
-};
-
-export const DailyList = ({
-  list,
-  daysToShow,
-}: {
-  list: ITrackable["id"][];
-  daysToShow: number;
-}) => {
   const { settings } = useUserSettings();
 
   const daysToRender = useMemo(
@@ -228,11 +175,17 @@ export const DailyList = ({
     [daysToShow, settings.timezone],
   );
 
-  const queryClient = useQueryClient();
+  if (!data || isLoading) {
+    return (
+      <div className="flex h-64 w-full items-center justify-center">
+        <Spinner />
+      </div>
+    );
+  }
 
-  const [sorted] = useState(sortList(list, queryClient));
+  if (data.length === 0) return <EmptyList />;
 
-  if (list.length === 0) return <EmptyList />;
+  const sorted = sortTrackableList(data, settings.favorites);
 
   return (
     <div className="flex flex-col gap-6">
@@ -257,14 +210,18 @@ export const DailyList = ({
               </span>
             </div>
             <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
-              {sorted.map((id, index) => (
+              {sorted.map((tr, index) => (
                 <div key={index}>
-                  <TrackableProvider id={id}>
-                    <TrackableName
-                      className={
-                        "mb-1 w-full text-right text-xl text-neutral-950 opacity-20 dark:text-neutral-50"
-                      }
-                    />
+                  <TrackableProvider id={tr.id}>
+                    <Link
+                      href={`/trackables/${tr.id}/${date.year}/${date.month}`}
+                      className={cn(
+                        "mb-1 block w-full text-right text-xl text-neutral-950 opacity-20 dark:text-neutral-50",
+                      )}
+                    >
+                      <TrackableNameText />
+                    </Link>
+
                     <DayCellWrapper
                       {...date}
                       labelType="none"

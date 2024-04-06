@@ -4,8 +4,7 @@ import { useEffect, useState } from "react";
 import DayCellWrapper from "../DayCell";
 import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
-import type { ITrackable } from "@t/trackable";
-import TrackableProvider from "@components/Providers/TrackableProvider";
+import { useTrackableContextSafe } from "@components/Providers/TrackableProvider";
 import { ErrorBoundary } from "react-error-boundary";
 import { cn } from "@/lib/utils";
 import { useUserSettings } from "@components/Providers/UserSettingsProvider";
@@ -176,15 +175,7 @@ const ViewController = ({
 
 type TView = "days" | "months";
 
-const TrackableView = ({
-  y,
-  m,
-  id,
-}: {
-  y?: number;
-  m?: number;
-  id: ITrackable["id"];
-}) => {
+const TrackableView = ({ y, m }: { y?: number; m?: number }) => {
   const { settings } = useUserSettings();
 
   const now = getDateInTimezone(settings.timezone);
@@ -231,24 +222,36 @@ const TrackableView = ({
     setMonth(now.getMonth());
     setView("days");
   };
+  const { trackable } = useTrackableContextSafe();
+
+  const [appliedInitialTrasform, setAppliedInitialTrasform] = useState(false);
 
   useEffect(() => {
     let url;
     switch (view) {
       case "days":
-        url = `/trackables/${id}/${year}/${month + 1}`;
+        url = `/trackables/${trackable?.id || ""}/${year}/${month + 1}`;
         break;
       case "months":
-        url = `/trackables/${id}/${year}`;
+        url = `/trackables/${trackable?.id || ""}/${year}`;
         break;
     }
     if (url && url !== window.location.pathname) {
-      window.history.pushState({}, "", url);
+      if (appliedInitialTrasform) {
+        window.history.pushState({}, "", url);
+      } else {
+        window.history.replaceState({}, "", url);
+      }
     }
-  }, [view, year, month, id]);
+    setAppliedInitialTrasform(true);
+  }, [view, year, month, trackable]);
+
+  if (!trackable) {
+    return <div></div>;
+  }
 
   return (
-    <TrackableProvider id={id}>
+    <>
       <ViewController
         year={year}
         month={month}
@@ -269,10 +272,19 @@ const TrackableView = ({
       </ErrorBoundary>
 
       <ErrorBoundary fallback={<div></div>}>
-        <Graph year={year} month={month} id={id} />
+        <StatsRouter year={year} month={month} />
       </ErrorBoundary>
-    </TrackableProvider>
+    </>
   );
+};
+
+const StatsRouter = ({ year, month }: { year: number; month: number }) => {
+  const { trackable } = useTrackableContextSafe();
+
+  if (trackable?.type === "number")
+    return <Graph year={year} month={month} id={trackable.id} />;
+
+  return <></>;
 };
 
 export default TrackableView;

@@ -1,4 +1,4 @@
-import { ZUserSettings } from "@t/user";
+import { UserSettingsFallback, ZUserSettings } from "@t/user";
 import { eq } from "drizzle-orm";
 import { db } from "src/app/api/db";
 import { ApiFunctionError } from "src/app/api/helpers";
@@ -9,12 +9,12 @@ export const GetUserSettings = async ({ userId }: { userId: string }) => {
     where: eq(auth_user.id, userId),
   });
 
-  if (!user) return {};
+  if (!user) return UserSettingsFallback;
 
   const parsed = ZUserSettings.safeParse(user.settings);
 
   if (!parsed.success) {
-    return {};
+    return UserSettingsFallback;
   }
   return parsed.data;
 };

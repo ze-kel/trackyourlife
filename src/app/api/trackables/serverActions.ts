@@ -13,7 +13,9 @@ import {
   GetTrackable,
   GetTrackableData,
   GetTrackableSettings,
+  GetTrackablesIdList,
   UpdateTrackable,
+  UpdateTrackableName,
   UpdateTrackableSettings,
 } from "src/app/api/trackables/apiFunctions";
 import { redirect } from "next/navigation";
@@ -27,6 +29,11 @@ export const RSAGetAllTrackables = async ({
 }) => {
   const userId = await RSAGetUserIdAndRedirect();
   return await GetAllTrackables({ userId, limits });
+};
+
+export const RSAGetTrackablesIdList = async () => {
+  const userId = await RSAGetUserIdAndRedirect();
+  return await GetTrackablesIdList({ userId });
 };
 
 export const RSAGetTrackable = async ({
@@ -79,6 +86,14 @@ export const RSADeleteTrackable = async (trackableId: ITrackable["id"]) => {
   await DeleteTrackable({ trackableId, userId });
 
   redirect("/");
+};
+
+export const RSAUpdateTrackableName = async (
+  trackableId: ITrackable["id"],
+  name: string,
+) => {
+  const userId = await RSAGetUserIdAndRedirect();
+  return await UpdateTrackableName({ trackableId, userId, name });
 };
 
 export const RSAUpdateTrackableSettings = async ({

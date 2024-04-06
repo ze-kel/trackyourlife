@@ -5,7 +5,7 @@ import {
   QueryClient,
   dehydrate,
 } from "@tanstack/react-query";
-import { fillPrefetchedData } from "src/app/trackables/helpers";
+import { fillPrefetchedTrackablesList } from "src/app/trackables/helpers";
 
 const SHOW_DAYS = 7;
 
@@ -19,17 +19,12 @@ const Page = async () => {
 
   const queryClient = new QueryClient();
 
-  const ids: string[] = [];
-
-  for (const tr of trackables) {
-    ids.push(tr.id);
-    fillPrefetchedData(queryClient, tr);
-  }
+  fillPrefetchedTrackablesList(queryClient, trackables);
 
   return (
     <div className="content-container flex w-full flex-col">
       <HydrationBoundary state={dehydrate(queryClient)}>
-        <DailyList list={ids} daysToShow={SHOW_DAYS} />
+        <DailyList daysToShow={SHOW_DAYS} />
       </HydrationBoundary>
     </div>
   );

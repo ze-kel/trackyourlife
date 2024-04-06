@@ -117,7 +117,7 @@ export const makeTrackableSettings = (
     return parseRes.data;
   }
 
-  return { name: "Error parsing settings" };
+  return {};
 };
 
 export const prepareTrackable = (
@@ -128,7 +128,7 @@ export const prepareTrackable = (
     ...trackable,
     data: makeTrackableData(trackable.data, limits),
     settings: makeTrackableSettings(trackable),
-  };
+  } as ITrackable;
 };
 
 export const ZGETLimits = z

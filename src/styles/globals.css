@@ -20,6 +20,11 @@
   }
 }
 
+body {
+  scrollbar-gutter: stable;
+  overflow-y: scroll;
+}
+
 /* Removes arrows from input number */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {

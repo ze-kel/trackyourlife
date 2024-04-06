@@ -3,9 +3,7 @@ import DeleteButton from "@components/DeleteButton";
 import { Button } from "@/components/ui/button";
 import { CalendarIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
-import {
-  RSAGetTrackable,
-} from "src/app/api/trackables/serverActions";
+import { RSAGetTrackable } from "src/app/api/trackables/serverActions";
 import { validateRequest } from "src/auth/lucia";
 import SettingWrapper from "src/app/trackables/[id]/settings/settingsWrapper";
 

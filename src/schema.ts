@@ -7,6 +7,7 @@ import {
   date,
   primaryKey,
   timestamp,
+  unique,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
@@ -40,6 +41,7 @@ export const trackableTypeEnum = pgEnum("type", ["boolean", "number", "range"]);
 
 export const trackable = pgTable("trackable", {
   id: uuid("id").defaultRandom().primaryKey(),
+  name: varchar("name"),
   userId: varchar("user_id")
     .notNull()
     .references(() => auth_user.id, { onDelete: "cascade" }),
@@ -66,8 +68,8 @@ export const trackableRecord = pgTable(
       .references(() => auth_user.id, { onDelete: "cascade" }),
   },
   (t) => ({
-    pk: primaryKey(t.trackableId, t.date),
-    //unq: unique().on(t.trackableId, t.date).nullsNotDistinct(),
+    pk: primaryKey({ columns: [t.trackableId, t.date] }),
+    unq: unique().on(t.trackableId, t.date).nullsNotDistinct(),
   }),
 );
 
