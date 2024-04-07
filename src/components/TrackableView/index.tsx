@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 import { useUserSettings } from "@components/Providers/UserSettingsProvider";
 import { getDateInTimezone } from "src/helpers/timezone";
 import { YearSelector } from "@components/TrackableView/yearSelector";
-import { Graph } from "@components/Graphs";
+import { GraphWrapper } from "@components/Graphs";
 
 const Month = ({
   month,
@@ -282,7 +282,7 @@ const StatsRouter = ({ year, month }: { year: number; month: number }) => {
   const { trackable } = useTrackableContextSafe();
 
   if (trackable?.type === "number")
-    return <Graph year={year} month={month} id={trackable.id} />;
+    return <GraphWrapper year={year} month={month} />;
 
   return <></>;
 };

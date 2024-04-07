@@ -89,11 +89,11 @@ export const Sidebar = () => {
         {CoreLinks.map((v) => (
           <Link key={v.link} href={v.link} className="block w-full">
             <Button
-              className="h-12 w-full justify-start gap-4  px-3 text-lg"
+              className=" w-full justify-start gap-4  px-3 "
               size={"lg"}
               variant={v.link === pathName ? "secondary" : "ghost"}
             >
-              <v.icon className="h-5 w-5" />
+              <v.icon className="" />
               <div>{v.name}</div>
             </Button>
           </Link>
