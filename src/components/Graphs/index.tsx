@@ -1,9 +1,16 @@
 "use client";
 import { BarRounded } from "@visx/shape";
-import { scaleLinear, scaleBand, scaleUtc } from "@visx/scale";
+import { scaleLinear, scaleBand } from "@visx/scale";
 import { useQueries, useQuery } from "@tanstack/react-query";
 import { RSAGetTrackableData } from "src/app/api/trackables/serverActions";
-import { add, format, getDaysInMonth } from "date-fns";
+import {
+  eachDayOfInterval,
+  format,
+  getDaysInMonth,
+  isFirstDayOfMonth,
+  isLastDayOfMonth,
+  isSameMonth,
+} from "date-fns";
 import { useMemo, useRef, useState } from "react";
 import { useResizeObserver } from "usehooks-ts";
 import { AxisBottom, AxisLeft } from "@visx/axis";
@@ -23,8 +30,6 @@ export type CurveProps = {
   height: number;
   showControls?: boolean;
 };
-
-const graphHeight = 300;
 
 export const GraphWrapper = ({
   year,
@@ -153,7 +158,7 @@ export const GraphMonths = ({
 
   const start = new Date(Date.UTC(year, month, 1));
   const daysInMonth = getDaysInMonth(start);
-  const end = add(start, { months: 1 });
+  const end = new Date(Date.UTC(year, month, daysInMonth));
 
   const datapoints = Array(daysInMonth)
     .fill(null)
@@ -171,13 +176,13 @@ export const GraphMonths = ({
 
 const LEFT_OFFSET = 50;
 const TOP_OFFSET = 10;
+const GRAPH_HEIGHT = 300;
 
 export const Graph = ({
   datapoints,
+  isLoading,
   start,
   end,
-  isLoading,
-  year,
 }: {
   datapoints: number[];
   start: Date;
@@ -185,6 +190,10 @@ export const Graph = ({
   isLoading?: boolean;
   year?: boolean;
 }) => {
+  const { settings } = useDayCellContextNumber();
+
+  const limits = settings.progressEnabled && settings.progress;
+
   const { resolvedTheme } = useTheme();
 
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -198,53 +207,91 @@ export const Graph = ({
       <div
         ref={wrapperRef}
         className="flex w-full items-center justify-center"
-        style={{ height: graphHeight + 40 }}
+        style={{ height: GRAPH_HEIGHT + 50 }}
       >
         <Spinner />
       </div>
     );
 
-  const daysArray = Array(datapoints.length)
-    .fill(null)
-    .map((_, i) => i + 1);
+  const multiMonth = !isSameMonth(start, end);
 
-  const maxY = Math.max(...datapoints);
-  const minY = Math.min(...datapoints);
+  const days = eachDayOfInterval({ start, end });
+
+  const daysIndexes = Array(datapoints.length)
+    .fill(null)
+    .map((_, i) => i);
+
+  const ticksAt = multiMonth
+    ? daysIndexes
+        .map((v) => {
+          const date = days[v];
+          if (!date) return -1;
+          const daysInMonth = getDaysInMonth(date);
+          if (
+            isFirstDayOfMonth(date) ||
+            Math.round(daysInMonth / 2) === date.getDate()
+          )
+            return v;
+          return -1;
+        })
+        .filter((v) => v >= 0)
+    : daysIndexes;
+
+  const tickLabels = ticksAt.reduce(
+    (acc, v) => {
+      if (!multiMonth) {
+        acc[v] = String(v + 1);
+        return acc;
+      }
+
+      const date = days[v];
+      if (!date) return acc;
+
+      const daysInMonth = getDaysInMonth(date);
+      if (Math.round(daysInMonth / 2) === date.getDate()) {
+        acc[v] = format(date, "MMM");
+      }
+
+      if (isFirstDayOfMonth(date) || isLastDayOfMonth(date)) {
+        acc[v] = "|";
+      }
+
+      return acc;
+    },
+    {} as Record<string, string>,
+  );
+
+  const maxY = (limits && limits.max) || Math.max(...datapoints);
+  const minY = (limits && limits.min) || Math.min(...datapoints);
 
   // scales
   const xScale = scaleBand<number>({
     range: [LEFT_OFFSET, width || 600],
     padding: 0.2,
     round: true,
-    domain: daysArray,
-  });
-
-  const timeScale = scaleUtc({
-    range: [LEFT_OFFSET, width || 600],
-    domain: [start, end],
+    domain: daysIndexes,
   });
 
   const yScale = scaleLinear<number>({
-    domain: [minY, maxY],
-    range: [graphHeight - TOP_OFFSET, 0],
+    domain: minY === maxY ? [0, 1] : [minY, maxY],
+    range: [GRAPH_HEIGHT - TOP_OFFSET, 0],
     round: true,
   });
 
-  const detailsColor = resolvedTheme === "dark" ? "#ffffff" : "black";
+  const detailsColor = resolvedTheme === "dark" ? "#525252" : "black";
+  const textColor = resolvedTheme === "dark" ? "#e5e5e5" : "black";
 
   return (
     <div ref={wrapperRef}>
-      {JSON.stringify(start)}
-      {JSON.stringify(end)}
-      <svg width={width} height={graphHeight + 50} className="">
+      <svg width={width} height={GRAPH_HEIGHT + 50} className="">
         {datapoints.map((ent, i) => {
           const barHeight = yScale(Number(ent) || 0);
           const barWidth = xScale.bandwidth();
-          const barX = xScale(i + 1) || 0;
+          const barX = xScale(i) || 0;
 
           const color = valueToColor(ent);
 
-          const h = graphHeight - TOP_OFFSET - barHeight;
+          const h = GRAPH_HEIGHT - TOP_OFFSET - barHeight;
 
           return (
             <BarRounded
@@ -259,11 +306,10 @@ export const Graph = ({
               width={barWidth}
               key={i}
               height={h}
-              y={graphHeight - h}
+              y={GRAPH_HEIGHT - h}
             />
           );
         })}
-
         <AxisLeft
           top={TOP_OFFSET}
           left={LEFT_OFFSET}
@@ -274,50 +320,31 @@ export const Graph = ({
           tickFormat={(v) => {
             return NumberFormatter.format(Number(v));
           }}
+          hideZero
           tickLabelProps={{
-            fill: detailsColor,
+            fill: textColor,
             fontSize: 14,
             fontFamily: "system-ui",
           }}
         />
-
-        {year ? (
-          <AxisBottom
-            top={graphHeight}
-            scale={timeScale}
-            stroke={detailsColor}
-            tickStroke={detailsColor}
-            numTicks={4}
-            tickFormat={(v) => {
-              return datapoints.length > 31
-                ? format(v as Date, "MMM d")
-                : format(v as Date, "d");
-            }}
-            tickLabelProps={{
-              fill: detailsColor,
-              fontSize: 14,
-              fontFamily: "system-ui",
-            }}
-          />
-        ) : (
-          <AxisBottom
-            top={graphHeight}
-            scale={timeScale}
-            stroke={detailsColor}
-            tickStroke={detailsColor}
-            numTicks={31}
-            tickFormat={(v) => {
-              return datapoints.length > 31
-                ? format(v as Date, "MMM d")
-                : format(v as Date, "d");
-            }}
-            tickLabelProps={{
-              fill: detailsColor,
-              fontSize: 14,
-              fontFamily: "system-ui",
-            }}
-          />
-        )}
+        <AxisBottom
+          top={GRAPH_HEIGHT}
+          tickLength={4}
+          scale={xScale}
+          tickValues={ticksAt}
+          stroke={detailsColor}
+          tickStroke={detailsColor}
+          numTicks={31}
+          hideTicks
+          tickFormat={(i) => {
+            return tickLabels[i];
+          }}
+          tickLabelProps={{
+            fill: textColor,
+            fontSize: 14,
+            fontFamily: "system-ui",
+          }}
+        />
       </svg>
     </div>
   );

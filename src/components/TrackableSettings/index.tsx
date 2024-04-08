@@ -35,9 +35,6 @@ export const SettingsBoolean = ({
   settings: MutableRefObject<IBooleanSettings>;
   notifyAboutChange: () => void;
 }) => {
-
-  
-
   return (
     <>
       <div>

@@ -55,8 +55,6 @@ const filterTrackables = (
     .filter((v) => {
       if (!filterByType) return true;
 
-      console.log("filtering", types, "target", v.type);
-
       return types[v.type];
     });
 };
@@ -214,9 +212,9 @@ export const DailyList = ({ daysToShow }: { daysToShow: number }) => {
                 <div key={index}>
                   <TrackableProvider id={tr.id}>
                     <Link
-                      href={`/trackables/${tr.id}/${date.year}/${date.month}`}
+                      href={`/trackables/${tr.id}/${date.year}/${date.month + 1}`}
                       className={cn(
-                        "mb-1 block w-full text-right text-xl text-neutral-950 opacity-20 dark:text-neutral-50",
+                        "mb-1 block w-full text-xl text-neutral-950 opacity-20 dark:text-neutral-50",
                       )}
                     >
                       <TrackableNameText />

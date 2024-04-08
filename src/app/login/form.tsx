@@ -42,11 +42,8 @@ const Register = () => {
       credentials: "include",
     });
 
-    console.log(res);
-
     if (!res.ok) {
       const j = (await res.json()) as Record<string, string>;
-      console.log(j);
       if (j.error) {
         setError(j.error);
       }

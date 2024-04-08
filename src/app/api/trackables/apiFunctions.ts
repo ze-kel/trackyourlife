@@ -39,7 +39,7 @@ export const GetTrackablesIdList = async ({ userId }: { userId: string }) => {
     },
   });
 
-  log(`API: Get all trackables id list ${userId}`, raw);
+  log(`API: Get all trackables id list ${userId}`);
 
   return raw as ITrackableFromList[];
 };

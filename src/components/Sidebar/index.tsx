@@ -67,7 +67,7 @@ const TrackablesMiniList = () => {
             >
               <div className="justify-baseline flex items-center gap-2">
                 <div className="opacity-70">{iconsMap[tr.type]}</div>
-                <div>{tr.name || "unnamed"}</div>
+                <div>{tr.name || "Unnamed"}</div>
               </div>
               <div>{favsSet.has(tr.id) && <HeartFilledIcon />}</div>
             </Button>

@@ -3,18 +3,22 @@ import type {
   ITrackableSettings,
   ITrackableUnsaved,
 } from "src/types/trackable";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import cloneDeep from "lodash/cloneDeep";
 import TrackableSettings from "@components/TrackableSettings";
 import { RadioTabItem, RadioTabs } from "@/components/ui/radio-tabs";
 import { RSACreateTrackable } from "src/app/api/trackables/serverActions";
+import { Input } from "@/components/ui/input";
 
 const Create = () => {
   const [newOne, setNewOne] = useState<ITrackableUnsaved>({
     type: "boolean",
     data: {},
-    settings: { name: "" },
+    name: "",
+    settings: {},
   });
+
+  const nameRef = useRef("");
 
   const setType = (type: ITrackableUnsaved["type"]) => {
     // This assumes that all settings fields are optional
@@ -24,7 +28,11 @@ const Create = () => {
   };
   const createTrackable = async (settings: ITrackableSettings) => {
     setIsLoading(true);
-    await RSACreateTrackable({ ...newOne, settings });
+    await RSACreateTrackable({
+      ...newOne,
+      name: nameRef.current || "",
+      settings,
+    });
     setIsLoading(false);
   };
 
@@ -35,6 +43,13 @@ const Create = () => {
       <h3 className="w-full bg-inherit text-2xl font-semibold lg:text-3xl">
         Create new Trackable
       </h3>
+
+      <Input
+        placeholder="Unnamed Trackable"
+        className="mt-2"
+        onChange={(e) => (nameRef.current = e.target.value)}
+      />
+
       <RadioTabs
         value={newOne.type}
         onValueChange={(v) => setType(v as ITrackableUnsaved["type"])}

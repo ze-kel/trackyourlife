@@ -14,6 +14,7 @@ import { validateRequest } from "src/auth/lucia";
 import { fillPrefetchedTrackable } from "src/app/trackables/helpers";
 import { TrackableNameEditable } from "@components/TrackableName";
 import TrackableProvider from "@components/Providers/TrackableProvider";
+import { FavoriteButton } from "@components/FavoriteButton";
 
 const getYearSafe = (y: string | undefined) => {
   if (!y || y.length !== 4) return new Date().getFullYear();
@@ -106,10 +107,8 @@ const Trackable = async ({
             <div className="flex w-full items-center justify-between">
               <TrackableNameEditable />
               <div className="flex gap-2">
-                <Link
-                  href={`/trackables/${params.id}/settings`}
-                  className="mr-2"
-                >
+                <FavoriteButton variant={"outline"} />
+                <Link href={`/trackables/${params.id}/settings`} className="">
                   <Button name="settings" variant="outline" size="icon">
                     <GearIcon className="h-4 w-4" />
                   </Button>

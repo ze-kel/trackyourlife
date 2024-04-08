@@ -1,14 +1,11 @@
 "use client";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import DayCellWrapper from "@components/DayCell";
+import { FavoriteButton } from "@components/FavoriteButton";
 import { useTrackableContextSafe } from "@components/Providers/TrackableProvider";
-import { useUserSettings } from "@components/Providers/UserSettingsProvider";
 import { TrackableNameText } from "@components/TrackableName";
-import { HeartFilledIcon, HeartIcon } from "@radix-ui/react-icons";
 import { format } from "date-fns";
 import Link from "next/link";
-import { useMemo } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 
 const MiniTrackable = ({
@@ -19,25 +16,6 @@ const MiniTrackable = ({
   daysToRender: { year: number; month: number; day: number }[];
 }) => {
   const { trackable } = useTrackableContextSafe();
-  const { settings, updateSettingsPartial } = useUserSettings();
-
-  const settingsSet = useMemo(() => {
-    return new Set(settings.favorites);
-  }, [settings]);
-
-  const inFavs = trackable ? settingsSet.has(trackable.id) : false;
-
-  const favHandler = async () => {
-    if (!trackable) return;
-    if (inFavs) {
-      settingsSet.delete(trackable.id);
-    } else {
-      settingsSet.add(trackable.id);
-    }
-    await updateSettingsPartial({
-      favorites: Array.from(settingsSet),
-    });
-  };
 
   return (
     <div className={className}>
@@ -51,13 +29,7 @@ const MiniTrackable = ({
           <TrackableNameText />
         </Link>
 
-        <Button
-          variant={"ghost"}
-          size={"icon"}
-          onClick={() => void favHandler()}
-        >
-          {inFavs ? <HeartFilledIcon /> : <HeartIcon />}
-        </Button>
+        <FavoriteButton />
       </div>
 
       <ErrorBoundary
