@@ -43,7 +43,7 @@ const SigOutButton = () => {
   return (
     <Button
       variant="outline"
-      isLoading={isLoading}
+      loading={isLoading}
       onClick={() => void signOut()}
       className="w-full text-center"
     >

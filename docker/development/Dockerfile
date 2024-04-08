@@ -1,9 +1,9 @@
-FROM node:18
+FROM node:20-alpine
 WORKDIR /app
 COPY package.json .
 COPY package-lock.json .
 ARG NODE_ENV
-RUN npm install
+RUN npm ci
 COPY ./ ./
 EXPOSE 1337
-CMD [ "npm", "run", "docker:push:dev"]
+CMD [ "npm", "run", "migrate:dev"]

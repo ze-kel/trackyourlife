@@ -45,9 +45,7 @@ export default async function RootLayout({
                     <Header user={user || undefined} />
                   </div>
                   <div className="sidebar hidden h-full border-r-2 border-neutral-300 bg-neutral-100 px-3 py-6 dark:border-neutral-800 dark:bg-neutral-900 xl:block">
-                    <div className="sticky top-20">
-                      <Sidebar />
-                    </div>
+                    <div className="sticky top-20">{user && <Sidebar />}</div>
                   </div>
                   <div className="mx-auto box-border w-full pt-6 max-xl:col-span-2">
                     {children}

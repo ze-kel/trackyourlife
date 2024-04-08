@@ -5,7 +5,6 @@ import { Lucia } from "lucia";
 import type { DbUserSelect } from "../schema";
 import { user_session, auth_user } from "../schema";
 
-import { webcrypto } from "node:crypto";
 import { cache } from "react";
 import { cookies } from "next/headers";
 
@@ -37,8 +36,6 @@ declare module "lucia" {
     DatabaseUserAttributes: DbUserSelect;
   }
 }
-
-globalThis.crypto = webcrypto as Crypto;
 
 export const validateRequest = cache(
   async (): Promise<
