@@ -1,9 +1,9 @@
 import { DrizzlePostgreSQLAdapter } from "@lucia-auth/adapter-drizzle";
-import { db } from "../app/api/db";
+import { db } from "../db/db";
 import type { Session, User } from "lucia";
 import { Lucia } from "lucia";
-import type { DbUserSelect } from "../schema";
-import { user_session, auth_user } from "../schema";
+import type { DbUserSelect } from "../db/schema";
+import { user_session, auth_user } from "../db/schema";
 
 import { cache } from "react";
 import { cookies } from "next/headers";

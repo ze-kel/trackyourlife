@@ -1,8 +1,8 @@
 import { UserSettingsFallback, ZUserSettings } from "@t/user";
 import { eq } from "drizzle-orm";
-import { db } from "src/app/api/db";
+import { db } from "src/db/db";
 import { ApiFunctionError } from "src/app/api/helpers";
-import { auth_user } from "src/schema";
+import { auth_user } from "src/db/schema";
 
 export const GetUserSettings = async ({ userId }: { userId: string }) => {
   const user = await db.query.auth_user.findFirst({

@@ -9,7 +9,7 @@ import {
   ZTrackableSettingsRange,
 } from "@t/trackable";
 import { startOfMonth, sub, subDays } from "date-fns";
-import type { DbTrackableRecordSelect, DbTrackableSelect } from "src/schema";
+import type { DbTrackableRecordSelect, DbTrackableSelect } from "src/db/schema";
 
 import { z } from "zod";
 

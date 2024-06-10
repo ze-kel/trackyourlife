@@ -1,6 +1,5 @@
 import {
   pgEnum,
-  pgTable,
   varchar,
   json,
   uuid,
@@ -8,8 +7,11 @@ import {
   primaryKey,
   timestamp,
   unique,
+  pgTableCreator,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
+
+const pgTable = pgTableCreator((name) => `TYL_${name}`);
 
 export const auth_user = pgTable("auth_user", {
   id: varchar("id").primaryKey(),

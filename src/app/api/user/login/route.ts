@@ -3,8 +3,8 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { ZLogin } from "@t/user";
 import { log } from "console";
-import { db } from "src/app/api/db";
-import { auth_user } from "src/schema";
+import { db } from "src/db/db";
+import { auth_user } from "src/db/schema";
 import { eq } from "drizzle-orm";
 import { Argon2id } from "oslo/password";
 import { cookies } from "next/headers";
@@ -42,7 +42,6 @@ export const POST = async (request: NextRequest) => {
         },
       );
     }
-
 
     const validPassword = await new Argon2id().verify(
       user.hashedPassword,

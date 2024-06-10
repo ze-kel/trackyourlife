@@ -8,7 +8,7 @@ import {
 import { log } from "console";
 import { format } from "date-fns";
 import { and, between, eq } from "drizzle-orm";
-import { db } from "src/app/api/db";
+import { db } from "src/db/db";
 import { ApiFunctionError } from "src/app/api/helpers";
 import type { TGETLimits } from "src/app/api/trackables/apiHelpers";
 import {
@@ -20,8 +20,8 @@ import {
 } from "src/app/api/trackables/apiHelpers";
 import { GetUserSettings } from "src/app/api/user/settings/apiFunctions";
 import { getDateInTimezone } from "src/helpers/timezone";
-import type { DbTrackableRecordInsert } from "src/schema";
-import { trackable, trackableRecord } from "src/schema";
+import type { DbTrackableRecordInsert } from "src/db/schema";
+import { trackable, trackableRecord } from "src/db/schema";
 
 export type ITrackableFromList = {
   id: ITrackable["id"];

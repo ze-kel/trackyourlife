@@ -5,8 +5,8 @@ import { cookies } from "next/headers";
 import type { NextRequest } from "next/server";
 import { ZRegister } from "@t/user";
 import { log } from "console";
-import { db } from "src/app/api/db";
-import { auth_user } from "src/schema";
+import { db } from "src/db/db";
+import { auth_user } from "src/db/schema";
 import { generateId } from "lucia";
 import { lucia } from "src/auth/lucia";
 
