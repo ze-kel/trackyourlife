@@ -1,5 +1,6 @@
 "use client";
-import { Button, ButtonProps } from "@/components/ui/button";
+import type { ButtonProps } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { useTrackableContextSafe } from "@components/Providers/TrackableProvider";
 import { useUserSettings } from "@components/Providers/UserSettingsProvider";
 import { HeartFilledIcon, HeartIcon } from "@radix-ui/react-icons";

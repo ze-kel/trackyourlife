@@ -1,5 +1,5 @@
 import { getDaysInMonth } from "date-fns";
-import { ITrackableFromList } from "src/app/api/trackables/apiFunctions";
+import type { ITrackableFromList } from "src/app/api/trackables/apiFunctions";
 
 export const generateDates = (days: number, nowDate: Date) => {
   const today = nowDate;

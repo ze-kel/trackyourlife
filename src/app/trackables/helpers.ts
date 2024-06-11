@@ -1,6 +1,6 @@
 import type { ITrackable } from "@t/trackable";
 import type { QueryClient } from "@tanstack/react-query";
-import { ITrackableFromList } from "src/app/api/trackables/apiFunctions";
+import type { ITrackableFromList } from "src/app/api/trackables/apiFunctions";
 
 export const fillPrefetchedTrackable = (
   queryClient: QueryClient,

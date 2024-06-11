@@ -89,7 +89,7 @@ const Year = ({
         <div
           data-upcoming={m > active}
           key={`${year}-${m}`}
-          className="cursor-pointer rounded-md border border-transparent px-2 py-1 transition-colors  disabled:pointer-events-none disabled:cursor-default data-[upcoming=true]:opacity-50"
+          className="cursor-pointer rounded-md border border-transparent px-2 py-1 transition-colors disabled:pointer-events-none disabled:cursor-default data-[upcoming=true]:opacity-50"
           onClick={() => openMonth(m)}
         >
           <h5 className={cn("mb-1 text-left font-semibold transition-colors")}>
@@ -244,6 +244,7 @@ const TrackableView = ({ y, m }: { y?: number; m?: number }) => {
       }
     }
     setAppliedInitialTrasform(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [view, year, month, trackable]);
 
   if (!trackable) {
