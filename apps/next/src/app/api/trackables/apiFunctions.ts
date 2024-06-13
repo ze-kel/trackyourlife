@@ -1,16 +1,8 @@
-import {
-  ZTrackableUpdate,
-  type ITrackable,
-  ZTrackableSettingsBoolean,
-  ZTrackableSettingsNumber,
-  ZTrackableSettingsRange,
-} from "@tyl/validators/trackable";
 import { log } from "console";
+import type { TGETLimits } from "src/app/api/trackables/apiHelpers";
 import { format } from "date-fns";
 import { and, between, eq } from "drizzle-orm";
-import { db } from "@tyl/db";
 import { ApiFunctionError } from "src/app/api/helpers";
-import type { TGETLimits } from "src/app/api/trackables/apiHelpers";
 import {
   getDateBounds,
   makeTrackableData,
@@ -20,8 +12,17 @@ import {
 } from "src/app/api/trackables/apiHelpers";
 import { GetUserSettings } from "src/app/api/user/settings/apiFunctions";
 import { getDateInTimezone } from "src/helpers/timezone";
+
 import type { DbTrackableRecordInsert } from "@tyl/db/schema";
+import type { ITrackable } from "@tyl/validators/trackable";
+import { db } from "@tyl/db";
 import { trackable, trackableRecord } from "@tyl/db/schema";
+import {
+  ZTrackableSettingsBoolean,
+  ZTrackableSettingsNumber,
+  ZTrackableSettingsRange,
+  ZTrackableUpdate,
+} from "@tyl/validators/trackable";
 
 export type ITrackableFromList = {
   id: ITrackable["id"];
@@ -165,6 +166,7 @@ export const CreateTrackable = async ({
       type: parsed.data.type,
       settings: parsed.data.settings,
       userId,
+      name: parsed.data.name,
     })
     .returning();
 

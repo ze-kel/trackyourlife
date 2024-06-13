@@ -1,3 +1,10 @@
+import { startOfMonth, sub, subDays } from "date-fns";
+import { z } from "zod";
+
+import type {
+  DbTrackableRecordSelect,
+  DbTrackableSelect,
+} from "@tyl/db/schema";
 import type {
   ITrackable,
   ITrackableData,
@@ -8,23 +15,22 @@ import {
   ZTrackableSettingsNumber,
   ZTrackableSettingsRange,
 } from "@tyl/validators/trackable";
-import { startOfMonth, sub, subDays } from "date-fns";
-import type { DbTrackableRecordSelect, DbTrackableSelect } from "@tyl/db/schema";
-
-import { z } from "zod";
 
 export const trackableToCreate = z.discriminatedUnion("type", [
   z.object({
     settings: ZTrackableSettingsBoolean,
     type: z.literal("boolean"),
+    name: z.string(),
   }),
   z.object({
     settings: ZTrackableSettingsNumber,
     type: z.literal("number"),
+    name: z.string(),
   }),
   z.object({
     settings: ZTrackableSettingsRange,
     type: z.literal("range"),
+    name: z.string(),
   }),
 ]);
 

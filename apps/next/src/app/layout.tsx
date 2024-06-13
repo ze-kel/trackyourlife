@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import "../styles/globals.css";
 
 import type { ReactNode } from "react";
+import { usePathname } from "next/navigation";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { RSAGetUserSettings } from "src/app/api/user/settings/serverActions";
 

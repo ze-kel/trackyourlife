@@ -1,10 +1,13 @@
 "use client";
+
+import { useState } from "react";
+import { useMediaQuery } from "usehooks-ts";
+
 import { Button } from "@tyl/ui/button";
 import { Drawer, DrawerContent } from "@tyl/ui/drawer";
 import { Input } from "@tyl/ui/input";
+
 import { useTrackableContextSafe } from "~/components/Providers/TrackableProvider";
-import { useState } from "react";
-import { useMediaQuery } from "usehooks-ts";
 
 export const TrackableNameEditable = () => {
   const { trackable, updateName } = useTrackableContextSafe();

@@ -68,7 +68,7 @@ const TrackablesMiniList = () => {
               size={"lg"}
               className="w-full justify-between px-3"
             >
-              <div className="justify-baseline flex items-center gap-2">
+              <div className="justify-baseline flex items-center gap-2 truncate">
                 <div className="opacity-70">{iconsMap[tr.type]}</div>
                 <div>{tr.name || "Unnamed"}</div>
               </div>
@@ -97,7 +97,7 @@ export const Sidebar = () => {
               variant={v.link === pathName ? "secondary" : "ghost"}
             >
               <v.icon className="" />
-              <div>{v.name}</div>
+              <div className="">{v.name}</div>
             </Button>
           </Link>
         ))}

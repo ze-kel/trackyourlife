@@ -1,14 +1,17 @@
 "use client";
+
+import { useRef, useState } from "react";
+import cloneDeep from "lodash/cloneDeep";
+import { RSACreateTrackable } from "src/app/api/trackables/serverActions";
+
+import { Input } from "@tyl/ui/input";
+import { RadioTabItem, RadioTabs } from "@tyl/ui/radio-tabs";
+
 import type {
   ITrackableSettings,
   ITrackableUnsaved,
 } from "../../../../../packages/validators/src/trackable";
-import { useRef, useState } from "react";
-import cloneDeep from "lodash/cloneDeep";
 import TrackableSettings from "~/components/TrackableSettings";
-import { RadioTabItem, RadioTabs } from "@tyl/ui/radio-tabs";
-import { RSACreateTrackable } from "src/app/api/trackables/serverActions";
-import { Input } from "@tyl/ui/input";
 
 const Create = () => {
   const [newOne, setNewOne] = useState<ITrackableUnsaved>({
@@ -28,6 +31,7 @@ const Create = () => {
   };
   const createTrackable = async (settings: ITrackableSettings) => {
     setIsLoading(true);
+    console.log(nameRef.current);
     await RSACreateTrackable({
       ...newOne,
       name: nameRef.current || "",

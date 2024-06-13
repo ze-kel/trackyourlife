@@ -1,27 +1,30 @@
 "use client";
-import type { ITrackable } from "../../../../../packages/validators/src/trackable";
-import MiniTrackable from "./miniTrackable";
-import { AnimatePresence, m } from "framer-motion";
-import TrackableProvider from "~/components/Providers/TrackableProvider";
-import { useQuery } from "@tanstack/react-query";
+
+import type { ITrackableFromList } from "src/app/api/trackables/apiFunctions";
 import { Fragment, useMemo, useState } from "react";
+import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
+import { format, isLastDayOfMonth } from "date-fns";
+import { AnimatePresence, m } from "framer-motion";
+import { RSAGetTrackablesIdList } from "src/app/api/trackables/serverActions";
+import { getDateInTimezone } from "src/helpers/timezone";
+
+import { cn } from "@tyl/ui";
+import { Badge } from "@tyl/ui/badge";
+import { Button } from "@tyl/ui/button";
+import { Input } from "@tyl/ui/input";
+import { Spinner } from "@tyl/ui/spinner";
+
+import type { ITrackable } from "../../../../../packages/validators/src/trackable";
+import DayCellWrapper from "~/components/DayCell";
+import TrackableProvider from "~/components/Providers/TrackableProvider";
+import { useUserSettings } from "~/components/Providers/UserSettingsProvider";
+import { TrackableNameText } from "~/components/TrackableName";
 import {
   generateDates,
   sortTrackableList,
 } from "~/components/TrackablesList/helper";
-import DayCellWrapper from "~/components/DayCell";
-import Link from "next/link";
-import { format, isLastDayOfMonth } from "date-fns";
-import { cn } from "@tyl/ui"
-import { Input } from "@tyl/ui/input";
-import { Badge } from "@tyl/ui/badge";
-import { useUserSettings } from "~/components/Providers/UserSettingsProvider";
-import { getDateInTimezone } from "src/helpers/timezone";
-import { Button } from "@tyl/ui/button";
-import { RSAGetTrackablesIdList } from "src/app/api/trackables/serverActions";
-import { Spinner } from "@tyl/ui/spinner";
-import type { ITrackableFromList } from "src/app/api/trackables/apiFunctions";
-import { TrackableNameText } from "~/components/TrackableName";
+import MiniTrackable from "./miniTrackable";
 
 const EmptyList = () => {
   return (
@@ -189,7 +192,7 @@ export const DailyList = ({ daysToShow }: { daysToShow: number }) => {
     <div className="flex flex-col gap-6">
       {daysToRender.map((date, index) => (
         <Fragment key={index}>
-          <div className="relative flex h-fit flex-col ">
+          <div className="relative flex h-fit flex-col">
             <div className="flex w-full flex-col justify-between gap-2">
               {(isLastDayOfMonth(new Date(date.year, date.month, date.day)) ||
                 index === 0) && (
@@ -214,7 +217,7 @@ export const DailyList = ({ daysToShow }: { daysToShow: number }) => {
                     <Link
                       href={`/trackables/${tr.id}/${date.year}/${date.month + 1}`}
                       className={cn(
-                        "mb-1 block w-full text-xl text-neutral-950 opacity-20 dark:text-neutral-50",
+                        "mb-1 block w-full truncate text-xl text-neutral-950 opacity-20 dark:text-neutral-50",
                       )}
                     >
                       <TrackableNameText />

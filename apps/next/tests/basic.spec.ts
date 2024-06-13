@@ -1,6 +1,7 @@
 import type { ITrackable } from "@tyl/validators/trackable";
+
 import type { Page } from "../playwright/fixtures";
-import { test, expect } from "../playwright/fixtures";
+import { expect, test } from "../playwright/fixtures";
 
 const URL = process.env.TEST_URL as string;
 
@@ -17,7 +18,7 @@ const createTrackable = async ({
   name,
 }: {
   type: ITrackable["type"];
-  name: ITrackable["settings"]["name"];
+  name: ITrackable["name"];
   page: Page;
 }) => {
   await page.goto(URL + "/create");
