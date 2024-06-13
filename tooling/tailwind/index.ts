@@ -1,11 +1,16 @@
 import type { Config } from "tailwindcss";
+import cq from "@tailwindcss/container-queries";
 import animate from "tailwindcss-animate";
 
-import base from "./base";
-
 export default {
-  content: base.content,
-  presets: [base],
+  darkMode: ["class"],
+  content: [
+    "./pages/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./app/**/*.{ts,tsx}",
+    "./src/**/*.{ts,tsx}",
+    "./@/**/*.{ts,tsx}",
+  ],
   theme: {
     container: {
       center: true,
@@ -15,11 +20,6 @@ export default {
       },
     },
     extend: {
-      borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
-      },
       keyframes: {
         "accordion-down": {
           from: { height: "0" },
@@ -36,5 +36,5 @@ export default {
       },
     },
   },
-  plugins: [animate],
+  plugins: [animate, cq],
 } satisfies Config;

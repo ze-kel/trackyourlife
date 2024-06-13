@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 
-//import "../styles/globals.css";
-import "./test.css";
+import "../styles/globals.css";
 
 import type { ReactNode } from "react";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
@@ -10,14 +9,13 @@ import { RSAGetUserSettings } from "src/app/api/user/settings/serverActions";
 import { validateRequest } from "@tyl/auth";
 import { cn } from "@tyl/ui";
 
-//import m from "./layout.module.css";
-
 import Header from "~/components/Header";
 import QueryProvider from "~/components/Providers/QueryProvider";
 import { ThemeProvider } from "~/components/Providers/ThemeProvider";
 import UserSettingsProvider from "~/components/Providers/UserSettingsProvider";
 import { Sidebar } from "~/components/Sidebar";
 import { LazyMotionProvider } from "../components/Providers/lazyFramerMotionProvider";
+import m from "./layout.module.css";
 
 export default async function RootLayout({
   children,
@@ -43,14 +41,14 @@ export default async function RootLayout({
                 <div
                   className={cn(
                     "h-full max-h-full min-h-screen bg-neutral-50 text-neutral-900 dark:bg-neutral-950 dark:text-neutral-50",
-                    //m.wrapperGrid,
+                    m.wrapperGrid,
                   )}
                 >
                   <div className="bg sticky top-0 z-[999] col-span-2 flex h-14 justify-center border-b-2 border-neutral-300 bg-neutral-100 font-bold text-neutral-800 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-100">
                     <Header user={user || undefined} />
                   </div>
-                  <div className="sidebar hidden h-full border-r-2 border-neutral-300 bg-neutral-100 px-3 py-6 dark:border-neutral-800 dark:bg-neutral-900 xl:block">
-                    <div className="sticky top-20">{user && <Sidebar />}</div>
+                  <div className="sidebar sticky top-14 hidden h-full max-h-[calc(100vh-3.5rem)] overflow-hidden overflow-scroll border-r-2 border-neutral-300 bg-neutral-100 px-3 py-6 dark:border-neutral-800 dark:bg-neutral-900 xl:block">
+                    {user && <Sidebar />}
                   </div>
                   <div className="mx-auto box-border w-full pt-6 max-xl:col-span-2">
                     {children}

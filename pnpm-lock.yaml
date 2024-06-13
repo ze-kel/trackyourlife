@@ -195,9 +195,6 @@ importers:
       dotenv-cli:
         specifier: ^7.4.2
         version: 7.4.2
-      eslint:
-        specifier: ^8.57.0
-        version: 8.57.0
       jest:
         specifier: ^29.7.0
         version: 29.7.0(@types/node@20.14.2)
@@ -213,9 +210,6 @@ importers:
       prettier:
         specifier: ^3.3.2
         version: 3.3.2
-      prettier-plugin-tailwindcss:
-        specifier: ^0.6.3
-        version: 0.6.3(@ianvs/prettier-plugin-sort-imports@4.2.1)(prettier@3.3.2)
       tailwindcss:
         specifier: ^3.4.4
         version: 3.4.4
@@ -553,6 +547,9 @@ importers:
 
   tooling/tailwind:
     dependencies:
+      '@tailwindcss/container-queries':
+        specifier: ^0.1.1
+        version: 0.1.1(tailwindcss@3.4.4)
       postcss:
         specifier: ^8.4.38
         version: 8.4.38
@@ -1985,6 +1982,7 @@ packages:
       semver: 7.6.2
     transitivePeerDependencies:
       - supports-color
+    dev: false
 
   /@isaacs/cliui@8.0.2:
     resolution: {integrity: sha512-O8jcjabXaleOG9DQ0+ARXWZBTfnP4WNAqzuiJK7ll44AmxGKv/J2M4TPjxjY3znBCfvBXFzucm1twdyFybFqEA==}
@@ -9409,6 +9407,7 @@ packages:
     dependencies:
       '@ianvs/prettier-plugin-sort-imports': 4.2.1(prettier@3.3.2)
       prettier: 3.3.2
+    dev: false
 
   /prettier@3.3.2:
     resolution: {integrity: sha512-rAVeHYMcv8ATV5d508CFdn+8/pHPpXeIid1DdrPwXnaAdH7cqjVbpJaT5eq4yRAFU/lsbwYwSF/n5iNrdJHPQA==}

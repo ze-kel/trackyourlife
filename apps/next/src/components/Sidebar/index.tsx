@@ -1,23 +1,26 @@
 "use client";
+
+import type { ReactNode } from "react";
+import { useMemo } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import {
+  BarChartIcon,
+  HeartFilledIcon,
+  MixIcon,
+  ValueIcon,
+} from "@radix-ui/react-icons";
+import { useQuery } from "@tanstack/react-query";
+import { RSAGetTrackablesIdList } from "src/app/api/trackables/serverActions";
+import { useIsClient } from "usehooks-ts";
+
+import type { ITrackable } from "@tyl/validators/trackable";
 import { Button } from "@tyl/ui/button";
 import { Spinner } from "@tyl/ui/spinner";
+
 import { CoreLinks } from "~/components/Header";
 import { useUserSettings } from "~/components/Providers/UserSettingsProvider";
 import { sortTrackableList } from "~/components/TrackablesList/helper";
-import {
-  HeartFilledIcon,
-  BarChartIcon,
-  ValueIcon,
-  MixIcon,
-} from "@radix-ui/react-icons";
-import type { ITrackable } from "@tyl/validators/trackable";
-import { useQuery } from "@tanstack/react-query";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import type { ReactNode } from "react";
-import { useMemo } from "react";
-import { RSAGetTrackablesIdList } from "src/app/api/trackables/serverActions";
-import { useIsClient } from "usehooks-ts";
 
 const iconsMap: Record<ITrackable["type"], ReactNode> = {
   boolean: <ValueIcon />,
@@ -63,7 +66,7 @@ const TrackablesMiniList = () => {
             <Button
               variant={pathname.includes(tr.id) ? "secondary" : "ghost"}
               size={"lg"}
-              className="w-full justify-between px-3 "
+              className="w-full justify-between px-3"
             >
               <div className="justify-baseline flex items-center gap-2">
                 <div className="opacity-70">{iconsMap[tr.type]}</div>
@@ -89,7 +92,7 @@ export const Sidebar = () => {
         {CoreLinks.map((v) => (
           <Link key={v.link} href={v.link} className="block w-full">
             <Button
-              className=" w-full justify-start gap-4  px-3 "
+              className="w-full justify-start gap-4 px-3"
               size={"lg"}
               variant={v.link === pathName ? "secondary" : "ghost"}
             >
@@ -100,7 +103,7 @@ export const Sidebar = () => {
         ))}
       </div>
 
-      <hr className="my-6 h-[1px]  border-none bg-neutral-200 outline-none dark:bg-neutral-800" />
+      <hr className="my-6 h-[1px] border-none bg-neutral-200 outline-none dark:bg-neutral-800" />
 
       <div>{isClient && <TrackablesMiniList />}</div>
     </div>
