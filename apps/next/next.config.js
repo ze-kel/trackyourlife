@@ -1,4 +1,5 @@
 import { fileURLToPath } from "url";
+
 //import createJiti from "jiti";
 
 // Import env files to validate at build time. Use jiti so we can load .ts files in here.
@@ -8,7 +9,7 @@ import { fileURLToPath } from "url";
 const config = {
   reactStrictMode: true,
   swcMinify: true,
-  output: "standalone",  
+  //output: "standalone",
   webpack: (config) => {
     config.externals.push("@node-rs/argon2", "@node-rs/bcrypt");
     return config;

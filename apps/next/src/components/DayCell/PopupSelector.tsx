@@ -1,9 +1,10 @@
 "use client";
-import style from "./popupSelector.module.css";
+
+//import style from "./popupSelector.module.css";
+import { AnimatePresence, m } from "framer-motion";
 
 import type { IRangeSettings } from "@tyl/validators/trackable";
-import { AnimatePresence, m } from "framer-motion";
-import { cn } from "@tyl/ui"
+import { cn } from "@tyl/ui";
 
 interface PopupSelectorProps {
   rangeMapping: IRangeSettings["labels"];
@@ -113,7 +114,7 @@ export const PopupSelector = ({
   return (
     <m.div
       className={cn(
-        style.miniScrollbar,
+        //  style.miniScrollbar,
         "relative flex cursor-pointer flex-col overflow-hidden rounded-full border border-neutral-200 bg-neutral-50 dark:border-transparent dark:bg-neutral-800",
       )}
       initial={{ height: 0 }}
@@ -151,7 +152,7 @@ export const PopupSelector = ({
                   void onSelect(v.internalKey);
                 }}
                 className={cn(
-                  "w-11  rounded-full px-2 text-center transition-colors hover:bg-lime-500",
+                  "w-11 rounded-full px-2 text-center transition-colors hover:bg-lime-500",
                 )}
                 style={{
                   zIndex: getZIndex(index),

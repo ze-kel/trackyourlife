@@ -16,10 +16,8 @@ const pool = new Pool({
 
 const db: NodePgDatabase<typeof schema> = drizzle(pool, { schema });
 
-const test = { hello: "" };
-
 if (process.env.MIGRATE === "true") {
   void migrate(db, { migrationsFolder: "./drizzle" });
 }
 
-export { test, db, pool };
+export { db, pool };

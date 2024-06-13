@@ -1,18 +1,23 @@
 import type { Metadata } from "next";
-import "../styles/globals.css";
-import { ThemeProvider } from "~/components/Providers/ThemeProvider";
-import m from "./layout.module.css";
+
+//import "../styles/globals.css";
+import "./test.css";
+
+import type { ReactNode } from "react";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { RSAGetUserSettings } from "src/app/api/user/settings/serverActions";
+
+import { validateRequest } from "@tyl/auth";
+import { cn } from "@tyl/ui";
+
+//import m from "./layout.module.css";
 
 import Header from "~/components/Header";
-import { LazyMotionProvider } from "../components/Providers/lazyFramerMotionProvider";
-import type { ReactNode } from "react";
-import UserSettingsProvider from "~/components/Providers/UserSettingsProvider";
-import { RSAGetUserSettings } from "src/app/api/user/settings/serverActions";
 import QueryProvider from "~/components/Providers/QueryProvider";
-import { validateRequest } from "@tyl/auth";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { cn } from "@tyl/ui"
+import { ThemeProvider } from "~/components/Providers/ThemeProvider";
+import UserSettingsProvider from "~/components/Providers/UserSettingsProvider";
 import { Sidebar } from "~/components/Sidebar";
+import { LazyMotionProvider } from "../components/Providers/lazyFramerMotionProvider";
 
 export default async function RootLayout({
   children,
@@ -38,7 +43,7 @@ export default async function RootLayout({
                 <div
                   className={cn(
                     "h-full max-h-full min-h-screen bg-neutral-50 text-neutral-900 dark:bg-neutral-950 dark:text-neutral-50",
-                    m.wrapperGrid,
+                    //m.wrapperGrid,
                   )}
                 >
                   <div className="bg sticky top-0 z-[999] col-span-2 flex h-14 justify-center border-b-2 border-neutral-300 bg-neutral-100 font-bold text-neutral-800 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-100">
