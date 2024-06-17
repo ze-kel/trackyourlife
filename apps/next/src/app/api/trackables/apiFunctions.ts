@@ -1,5 +1,4 @@
 import { log } from "console";
-import type { TGETLimits } from "src/app/api/trackables/apiHelpers";
 import { format } from "date-fns";
 import { and, between, eq } from "drizzle-orm";
 import { ApiFunctionError } from "src/app/api/helpers";
@@ -14,6 +13,7 @@ import { GetUserSettings } from "src/app/api/user/settings/apiFunctions";
 import { getDateInTimezone } from "src/helpers/timezone";
 
 import type { DbTrackableRecordInsert } from "@tyl/db/schema";
+import type { TGETLimits } from "@tyl/validators/api";
 import type { ITrackable } from "@tyl/validators/trackable";
 import { db } from "@tyl/db";
 import { trackable, trackableRecord } from "@tyl/db/schema";

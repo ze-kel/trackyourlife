@@ -1,15 +1,15 @@
+import { relations } from "drizzle-orm";
 import {
-  pgEnum,
-  varchar,
-  json,
-  uuid,
   date,
+  json,
+  pgEnum,
+  pgTableCreator,
   primaryKey,
   timestamp,
   unique,
-  pgTableCreator,
+  uuid,
+  varchar,
 } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
 
 const pgTable = pgTableCreator((name) => `TYL_${name}`);
 

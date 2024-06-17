@@ -1,14 +1,12 @@
-import { NextResponse } from "next/server";
-import { Argon2id } from "oslo/password";
-
-import { cookies } from "next/headers";
-import type { NextRequest } from "next/server";
-import { ZRegister } from "@tyl/validators/user";
 import { log } from "console";
+import type { NextRequest } from "next/server";
+import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
+
+import { Argon2id, generateId, lucia } from "@tyl/auth";
 import { db } from "@tyl/db";
 import { auth_user } from "@tyl/db/schema";
-import { generateId } from "lucia";
-import { lucia } from "@tyl/auth";
+import { ZRegister } from "@tyl/validators/user";
 
 export const POST = async (request: NextRequest) => {
   const data = (await request.json()) as unknown;

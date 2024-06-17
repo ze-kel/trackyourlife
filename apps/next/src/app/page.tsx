@@ -1,11 +1,13 @@
-import { DailyList } from "~/components/TrackablesList";
-import { RSAGetAllTrackables } from "src/app/api/trackables/serverActions";
 import {
+  dehydrate,
   HydrationBoundary,
   QueryClient,
-  dehydrate,
 } from "@tanstack/react-query";
+import { RSAGetAllTrackables } from "src/app/api/trackables/serverActions";
 import { fillPrefetchedTrackablesList } from "src/app/trackables/helpers";
+
+import { DailyList } from "~/components/TrackablesList";
+import { api } from "~/trpc/server";
 
 const SHOW_DAYS = 7;
 

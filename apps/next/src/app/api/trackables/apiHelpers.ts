@@ -10,6 +10,7 @@ import type {
   ITrackableData,
   ITrackableSettings,
 } from "@tyl/validators/trackable";
+import { TGETLimits } from "@tyl/validators/api";
 import {
   ZTrackableSettingsBoolean,
   ZTrackableSettingsNumber,
@@ -136,20 +137,6 @@ export const prepareTrackable = (
     settings: makeTrackableSettings(trackable),
   } as ITrackable;
 };
-
-export const ZGETLimits = z
-  .union([
-    z.object({ type: z.literal("year"), year: z.number() }),
-    z.object({
-      type: z.literal("month"),
-      year: z.number(),
-      month: z.number().min(0).max(11),
-    }),
-    z.object({ type: z.literal("last"), days: z.number().min(7).max(31) }),
-  ])
-  .optional();
-
-export type TGETLimits = z.infer<typeof ZGETLimits>;
 
 // This goes into postgres Between, where 'infinity'\'-infinity' is a valid date boundary
 const PG_MINUS_INFINITY = "-infinity";

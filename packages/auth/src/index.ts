@@ -2,7 +2,8 @@ import type { Session, User } from "lucia";
 import { cache } from "react";
 import { cookies } from "next/headers";
 import { DrizzlePostgreSQLAdapter } from "@lucia-auth/adapter-drizzle";
-import { Lucia } from "lucia";
+import { generateId, Lucia } from "lucia";
+import { Argon2id } from "oslo/password";
 
 import type { DbUserSelect } from "@tyl/db/schema";
 import { db } from "@tyl/db";
@@ -52,7 +53,7 @@ export const validateRequest = cache(
     const result = await lucia.validateSession(sessionId);
     // next.js throws when you attempt to set cookie when rendering page
     try {
-      if (result.session && result.session.fresh) {
+      if (result.session?.fresh) {
         const sessionCookie = lucia.createSessionCookie(result.session.id);
         cookies().set(
           sessionCookie.name,
@@ -73,4 +74,4 @@ export const validateRequest = cache(
   },
 );
 
-export { Session, User };
+export { Session, User, generateId, Argon2id };

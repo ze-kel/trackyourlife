@@ -1,14 +1,13 @@
-import { NextResponse } from "next/server";
-
-import type { NextRequest } from "next/server";
-import { ZLogin } from "@tyl/validators/user";
 import { log } from "console";
+import type { NextRequest } from "next/server";
+import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
+import { eq } from "drizzle-orm";
+
+import { Argon2id, lucia } from "@tyl/auth";
 import { db } from "@tyl/db";
 import { auth_user } from "@tyl/db/schema";
-import { eq } from "drizzle-orm";
-import { Argon2id } from "oslo/password";
-import { cookies } from "next/headers";
-import { lucia } from "@tyl/auth";
+import { ZLogin } from "@tyl/validators/user";
 
 export const POST = async (request: NextRequest) => {
   const data = (await request.json()) as unknown;

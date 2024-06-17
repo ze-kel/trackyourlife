@@ -25,10 +25,10 @@ import { db } from "@tyl/db";
  *
  * @see https://trpc.io/docs/server/context
  */
-export const createTRPCContext = async (opts: {
+export const createTRPCContext = (opts: {
   headers: Headers;
   session: Session | null;
-  user: User;
+  user: User | null;
 }) => {
   const source = opts.headers.get("x-trpc-source") ?? "unknown";
 
@@ -100,8 +100,9 @@ export const protectedProcedure = t.procedure.use(({ ctx, next }) => {
   }
   return next({
     ctx: {
-      // infers the `session` as non-nullable
-      session: { ...ctx.session, user: ctx.user },
+      // infers session\user as non-nullable
+      session: { ...ctx.session },
+      user: { ...ctx.user },
     },
   });
 });
