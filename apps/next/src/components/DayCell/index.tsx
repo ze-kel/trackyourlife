@@ -1,18 +1,21 @@
 "use client";
-import { isSameDay, isBefore, isAfter } from "date-fns";
-import { DayCellBoolean } from "./DayCellBoolean";
-import { DayCellNumber } from "./DayCellNumber";
-import type { ITrackable, ITrackableSettings } from "../../../../../packages/validators/src/trackable";
-import { DayCellRange } from "./DayCellRange";
+
 import type { ReactNode } from "react";
 import { useMemo } from "react";
-import { cn } from "@tyl/ui"
-import { useTrackableContextSafe } from "~/components/Providers/TrackableProvider";
 import { useQuery } from "@tanstack/react-query";
-import { RSAGetTrackableData } from "src/app/api/trackables/serverActions";
-import { Skeleton } from "@tyl/ui/skeleton";
+import { isAfter, isBefore, isSameDay } from "date-fns";
 import { getDateInTimezone } from "src/helpers/timezone";
+
+import type { ITrackable, ITrackableSettings } from "@tyl/validators/trackable";
+import { cn } from "@tyl/ui";
+import { Skeleton } from "@tyl/ui/skeleton";
+
+import { useTrackableContextSafe } from "~/components/Providers/TrackableProvider";
 import { useUserSettings } from "~/components/Providers/UserSettingsProvider";
+import { api } from "~/trpc/react";
+import { DayCellBoolean } from "./DayCellBoolean";
+import { DayCellNumber } from "./DayCellNumber";
+import { DayCellRange } from "./DayCellRange";
 
 export interface IDayProps {}
 
@@ -140,8 +143,8 @@ const DayCellWrapper = ({
   const { data, isLoading } = useQuery({
     queryKey: ["trackable", trackable?.id, year, month],
     queryFn: async () => {
-      const data = await RSAGetTrackableData({
-        trackableId: id,
+      const data = await api.trackablesRouter.getTrackableData.query({
+        id,
         limits: { type: "month", month, year },
       });
 
@@ -174,7 +177,7 @@ const DayCellWrapper = ({
       {labelType !== "none" && (
         <div
           className={cn(
-            "mr-1 text-right text-xs text-neutral-800 ",
+            "mr-1 text-right text-xs text-neutral-800",
             labelType === "outside" ? "" : "md:hidden",
             isToday ? "font-normal underline" : "font-light",
           )}
@@ -194,7 +197,7 @@ const DayCellWrapper = ({
         {labelType !== "none" && (
           <div
             className={cn(
-              "absolute left-1 top-0 select-none text-base text-neutral-800 ",
+              "absolute left-1 top-0 select-none text-base text-neutral-800",
               labelType === "outside" ? "hidden" : "max-md:hidden",
               isToday ? "font-normal underline" : "font-light",
             )}

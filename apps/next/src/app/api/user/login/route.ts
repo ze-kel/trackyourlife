@@ -58,6 +58,7 @@ export const POST = async (request: NextRequest) => {
       );
     }
     const session = await lucia.createSession(user.id, {});
+
     const sessionCookie = lucia.createSessionCookie(session.id);
     cookies().set(
       sessionCookie.name,

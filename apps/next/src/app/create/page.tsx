@@ -1,19 +1,23 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useMutation } from "@tanstack/react-query";
 import cloneDeep from "lodash/cloneDeep";
-import { RSACreateTrackable } from "src/app/api/trackables/serverActions";
-
-import { Input } from "@tyl/ui/input";
-import { RadioTabItem, RadioTabs } from "@tyl/ui/radio-tabs";
 
 import type {
   ITrackableSettings,
   ITrackableUnsaved,
-} from "../../../../../packages/validators/src/trackable";
+} from "@tyl/validators/trackable";
+import { Input } from "@tyl/ui/input";
+import { RadioTabItem, RadioTabs } from "@tyl/ui/radio-tabs";
+
 import TrackableSettings from "~/components/TrackableSettings";
+import { api } from "~/trpc/react";
 
 const Create = () => {
+  const router = useRouter();
+
   const [newOne, setNewOne] = useState<ITrackableUnsaved>({
     type: "boolean",
     data: {},
@@ -29,15 +33,20 @@ const Create = () => {
     update.type = type;
     setNewOne(update);
   };
+
+  const mutation = useMutation({
+    mutationFn: api.trackablesRouter.createTrackable.mutate,
+    onSuccess: (data) => {
+      router.push(`/trackables/${data.id}`);
+    },
+  });
+
   const createTrackable = async (settings: ITrackableSettings) => {
-    setIsLoading(true);
-    console.log(nameRef.current);
-    await RSACreateTrackable({
+    await mutation.mutate({
       ...newOne,
       name: nameRef.current || "",
       settings,
     });
-    setIsLoading(false);
   };
 
   const [isLoading, setIsLoading] = useState(false);
@@ -70,8 +79,9 @@ const Create = () => {
         </RadioTabItem>
       </RadioTabs>
       <TrackableSettings
-        isLoadingButton={isLoading}
-        trackable={newOne}
+        isLoadingButton={mutation.isPending}
+        trackableType={newOne.type}
+        trackableSettings={newOne.settings}
         handleSave={createTrackable}
         customSaveButtonText="Create Trackable"
       />

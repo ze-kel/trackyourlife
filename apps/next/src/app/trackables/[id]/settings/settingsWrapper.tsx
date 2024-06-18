@@ -1,30 +1,57 @@
 "use client";
-import type { ITrackable } from "@tyl/validators/trackable";
-import { RSAUpdateTrackableSettings } from "src/app/api/trackables/serverActions";
-import type { ITrackableSettings } from "@tyl/validators/trackable";
-import { useState } from "react";
+
+import { useRouter } from "next/navigation";
+
+import type { ITrackable, ITrackableSettings } from "@tyl/validators/trackable";
+import { Spinner } from "@tyl/ui/spinner";
+
+import TrackableProvider, {
+  useTrackableContextSafe,
+} from "~/components/Providers/TrackableProvider";
 import TrackableSettings from "~/components/TrackableSettings";
 
-const SettingWrapper = ({ trackable }: { trackable: ITrackable }) => {
-  const [isLoading, setIsLoading] = useState(false);
+const SettingWrapperContext = ({ id }: { id: ITrackable["id"] }) => {
+  return (
+    <TrackableProvider id={id}>
+      <SettingsWrapper></SettingsWrapper>
+    </TrackableProvider>
+  );
+};
 
-  const handleSave = async (settings: ITrackableSettings) => {
-    setIsLoading(true);
-    await RSAUpdateTrackableSettings({
-      trackableId: trackable.id,
-      data: settings,
-      redirectToTrackablePage: true,
-    });
-    setIsLoading(false);
-  };
+const SettingsWrapper = () => {
+  const {
+    settingsMutation,
+    trackable,
+    settings,
+    trackableQuery,
+    settingsQuery,
+  } = useTrackableContextSafe();
+
+  const router = useRouter();
+
+  if (
+    !trackable ||
+    !settings ||
+    trackableQuery.isPending ||
+    settingsQuery.isPending
+  ) {
+    return <Spinner />;
+  }
 
   return (
     <TrackableSettings
-      isLoadingButton={isLoading}
-      trackable={trackable}
-      handleSave={handleSave}
+      isLoadingButton={settingsMutation.isPending}
+      trackableType={trackable.type}
+      trackableSettings={settings}
+      handleSave={async (v: ITrackableSettings) => {
+        await settingsMutation.mutateAsync(v, {
+          onSuccess: () => {
+            router.push(`/trackables/${trackable.id}`);
+          },
+        });
+      }}
     />
   );
 };
 
-export default SettingWrapper;
+export default SettingWrapperContext;

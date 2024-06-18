@@ -6,16 +6,15 @@ import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { format, isLastDayOfMonth } from "date-fns";
 import { AnimatePresence, m } from "framer-motion";
-import { RSAGetTrackablesIdList } from "src/app/api/trackables/serverActions";
 import { getDateInTimezone } from "src/helpers/timezone";
 
+import type { ITrackable } from "@tyl/validators/trackable";
 import { cn } from "@tyl/ui";
 import { Badge } from "@tyl/ui/badge";
 import { Button } from "@tyl/ui/button";
 import { Input } from "@tyl/ui/input";
 import { Spinner } from "@tyl/ui/spinner";
 
-import type { ITrackable } from "../../../../../packages/validators/src/trackable";
 import DayCellWrapper from "~/components/DayCell";
 import TrackableProvider from "~/components/Providers/TrackableProvider";
 import { useUserSettings } from "~/components/Providers/UserSettingsProvider";
@@ -24,6 +23,7 @@ import {
   generateDates,
   sortTrackableList,
 } from "~/components/TrackablesList/helper";
+import { api } from "~/trpc/react";
 import MiniTrackable from "./miniTrackable";
 
 const EmptyList = () => {
@@ -68,8 +68,7 @@ const TrackablesList = ({ daysToShow }: { daysToShow: number }) => {
   const { data, isLoading } = useQuery({
     queryKey: ["trackables", "list"],
     queryFn: async () => {
-      const res = await RSAGetTrackablesIdList();
-      return res;
+      return await api.trackablesRouter.getTrackableIdList.query();
     },
   });
 
@@ -163,8 +162,7 @@ export const DailyList = ({ daysToShow }: { daysToShow: number }) => {
   const { data, isLoading } = useQuery({
     queryKey: ["trackables", "list"],
     queryFn: async () => {
-      const res = await RSAGetTrackablesIdList();
-      return res;
+      return await api.trackablesRouter.getTrackableIdList.query();
     },
   });
 

@@ -1,5 +1,10 @@
 "use client";
-import DatePicker from "~/components/DatePicker";
+
+import type { MutableRefObject } from "react";
+import { useEffect, useRef, useState } from "react";
+import { getDateInTimezone } from "src/helpers/timezone";
+import { v4 as uuidv4 } from "uuid";
+
 import type {
   IBooleanSettings,
   INumberSettings,
@@ -7,26 +12,24 @@ import type {
   ITrackable,
   ITrackableUnsaved,
 } from "@tyl/validators/trackable";
-import type { MutableRefObject } from "react";
-import { useEffect, useRef, useState } from "react";
-import NumberColorSelector from "../Colors/numberColorSelector";
-import NumberLimitsSelector from "./numberLimitsSelector";
-import RangeLabelSelector from "./rangeLabelSelector";
-import { presetsMap } from "~/components/Colors/presets";
-import ColorInput from "~/components/Colors/colorInput";
+import { cn } from "@tyl/ui";
 import { Button } from "@tyl/ui/button";
 import { DrawerMobileTitleProvider } from "@tyl/ui/drawer";
-import { Switch } from "@tyl/ui/switch";
 import { Label } from "@tyl/ui/label";
-import { DayCellProvider } from "~/components/Providers/DayCellProvider";
+import { Switch } from "@tyl/ui/switch";
+
+import ColorInput from "~/components/Colors/colorInput";
+import { presetsMap } from "~/components/Colors/presets";
+import DatePicker from "~/components/DatePicker";
+import { DayCellBaseClasses } from "~/components/DayCell";
 import { DayCellBoolean } from "~/components/DayCell/DayCellBoolean";
 import { DayCellNumber } from "~/components/DayCell/DayCellNumber";
 import { DayCellRange } from "~/components/DayCell/DayCellRange";
-import { DayCellBaseClasses } from "~/components/DayCell";
-import { cn } from "@tyl/ui"
-import { v4 as uuidv4 } from "uuid";
-import { getDateInTimezone } from "src/helpers/timezone";
+import { DayCellProvider } from "~/components/Providers/DayCellProvider";
 import { useUserSettings } from "~/components/Providers/UserSettingsProvider";
+import NumberColorSelector from "../Colors/numberColorSelector";
+import NumberLimitsSelector from "./numberLimitsSelector";
+import RangeLabelSelector from "./rangeLabelSelector";
 
 export const SettingsBoolean = ({
   settings,
@@ -238,12 +241,14 @@ export class TinySignal {
 }
 
 const TrackableSettings = ({
-  trackable,
+  trackableType,
+  trackableSettings,
   handleSave,
   customSaveButtonText,
   isLoadingButton,
 }: {
-  trackable: ITrackable | ITrackableUnsaved;
+  trackableType: ITrackable["type"];
+  trackableSettings: ITrackable["settings"];
   handleSave: (v: ITrackable["settings"]) => void | Promise<void>;
   customSaveButtonText?: string;
   isLoadingButton?: boolean;
@@ -251,14 +256,14 @@ const TrackableSettings = ({
   // Settings is a ref to avoid rerendering everything on every change(problematic with color inputs where you drag to change)
   // However we do need to update preview trackable, so with changing ref we also trigger signal update
   const signal = useRef(new TinySignal());
-  const settings = useRef(trackable.settings);
+  const settings = useRef(trackableSettings);
 
   const u = useUserSettings();
 
   return (
     <div className="flex flex-col gap-4">
       <h3 className="text-xl">Preview</h3>
-      <div className="grid h-20  grid-cols-3 gap-1 md:grid-cols-6">
+      <div className="grid h-20 grid-cols-3 gap-1 md:grid-cols-6">
         {Array(6)
           .fill("")
           .map((_, i) => {
@@ -267,7 +272,7 @@ const TrackableSettings = ({
                 key={i}
                 mockLabel={String(i + 1)}
                 signal={signal.current}
-                type={trackable.type}
+                type={trackableType}
                 settings={settings.current}
               />
             );
@@ -293,19 +298,19 @@ const TrackableSettings = ({
         </DrawerMobileTitleProvider>
       </div>
 
-      {trackable.type === "boolean" && (
+      {trackableType === "boolean" && (
         <SettingsBoolean
           notifyAboutChange={() => signal.current.notifyAboutChange()}
           settings={settings}
         />
       )}
-      {trackable.type === "number" && (
+      {trackableType === "number" && (
         <SettingsNumber
           settings={settings}
           notifyAboutChange={() => signal.current.notifyAboutChange()}
         />
       )}
-      {trackable.type === "range" && (
+      {trackableType === "range" && (
         <SettingsRange
           settings={settings}
           notifyAboutChange={() => signal.current.notifyAboutChange()}

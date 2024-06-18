@@ -1,20 +1,18 @@
-import TrackablesList from "~/components/TrackablesList";
-import { RSAGetAllTrackables } from "src/app/api/trackables/serverActions";
 import {
+  dehydrate,
   HydrationBoundary,
   QueryClient,
-  dehydrate,
 } from "@tanstack/react-query";
 import { fillPrefetchedTrackablesList } from "src/app/trackables/helpers";
+
+import TrackablesList from "~/components/TrackablesList";
+import { api } from "~/trpc/server";
 
 const SHOW_DAYS = 6;
 
 const Page = async () => {
-  const trackables = await RSAGetAllTrackables({
-    limits: {
-      type: "last",
-      days: SHOW_DAYS,
-    },
+  const trackables = await api.trackablesRouter.getAllTrackables({
+    limits: { type: "last", days: SHOW_DAYS },
   });
 
   const queryClient = new QueryClient();

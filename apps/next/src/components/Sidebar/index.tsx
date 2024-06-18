@@ -11,7 +11,6 @@ import {
   ValueIcon,
 } from "@radix-ui/react-icons";
 import { useQuery } from "@tanstack/react-query";
-import { RSAGetTrackablesIdList } from "src/app/api/trackables/serverActions";
 import { useIsClient } from "usehooks-ts";
 
 import type { ITrackable } from "@tyl/validators/trackable";
@@ -21,6 +20,7 @@ import { Spinner } from "@tyl/ui/spinner";
 import { CoreLinks } from "~/components/Header";
 import { useUserSettings } from "~/components/Providers/UserSettingsProvider";
 import { sortTrackableList } from "~/components/TrackablesList/helper";
+import { api } from "~/trpc/react";
 
 const iconsMap: Record<ITrackable["type"], ReactNode> = {
   boolean: <ValueIcon />,
@@ -32,9 +32,7 @@ const TrackablesMiniList = () => {
   const { data, isLoading } = useQuery({
     queryKey: ["trackables", "list"],
     queryFn: async () => {
-      const res = await RSAGetTrackablesIdList();
-
-      return res;
+      return await api.trackablesRouter.getTrackableIdList.query();
     },
   });
 

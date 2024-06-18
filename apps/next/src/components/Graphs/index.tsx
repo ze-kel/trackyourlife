@@ -1,8 +1,11 @@
 "use client";
-import { BarRounded } from "@visx/shape";
-import { scaleLinear, scaleBand } from "@visx/scale";
+
+import { useMemo, useRef, useState } from "react";
 import { useQueries, useQuery } from "@tanstack/react-query";
-import { RSAGetTrackableData } from "src/app/api/trackables/serverActions";
+import { AxisBottom, AxisLeft } from "@visx/axis";
+import { scaleBand, scaleLinear } from "@visx/scale";
+import { BarRounded } from "@visx/shape";
+import { create, windowScheduler } from "@yornaath/batshit";
 import {
   eachDayOfInterval,
   format,
@@ -11,19 +14,19 @@ import {
   isLastDayOfMonth,
   isSameMonth,
 } from "date-fns";
-import { useMemo, useRef, useState } from "react";
-import { useResizeObserver } from "usehooks-ts";
-import { AxisBottom, AxisLeft } from "@visx/axis";
-import { Spinner } from "@tyl/ui/spinner";
-import { useDayCellContextNumber } from "~/components/Providers/DayCellProvider";
-import { makeColorString } from "src/helpers/colorTools";
 import { useTheme } from "next-themes";
-import { useTrackableContextSafe } from "~/components/Providers/TrackableProvider";
-import { NumberFormatter } from "~/components/DayCell/DayCellNumber";
+import { makeColorString } from "src/helpers/colorTools";
 import { getDateInTimezone } from "src/helpers/timezone";
-import { useUserSettings } from "~/components/Providers/UserSettingsProvider";
-import { create, windowScheduler } from "@yornaath/batshit";
+import { useResizeObserver } from "usehooks-ts";
+
 import { RadioTabItem, RadioTabs } from "@tyl/ui/radio-tabs";
+import { Spinner } from "@tyl/ui/spinner";
+
+import { NumberFormatter } from "~/components/DayCell/DayCellNumber";
+import { useDayCellContextNumber } from "~/components/Providers/DayCellProvider";
+import { useTrackableContextSafe } from "~/components/Providers/TrackableProvider";
+import { useUserSettings } from "~/components/Providers/UserSettingsProvider";
+import { api } from "~/trpc/react";
 
 export type CurveProps = {
   width: number;
@@ -78,8 +81,8 @@ export const GraphYear = ({ year }: { year: number }) => {
       create({
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         fetcher: async (_: number[]) => {
-          const res = await RSAGetTrackableData({
-            trackableId: trackable.id,
+          const res = await api.trackablesRouter.getTrackableData.query({
+            id: trackable.id,
             limits: {
               type: "year",
               year,
@@ -148,8 +151,8 @@ export const GraphMonths = ({
   const { data, isLoading } = useQuery({
     queryKey: ["trackable", trackable.id, year, month],
     queryFn: async () => {
-      const data = await RSAGetTrackableData({
-        trackableId: trackable.id,
+      const data = await api.trackablesRouter.getTrackableData.query({
+        id: trackable.id,
         limits: { type: "month", month, year },
       });
       return data[year]?.[month] || {};

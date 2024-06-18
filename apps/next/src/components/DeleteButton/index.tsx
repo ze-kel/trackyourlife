@@ -1,6 +1,10 @@
 "use client";
-import { TrashIcon } from "@radix-ui/react-icons";
 
+import { useRouter } from "next/navigation";
+import { TrashIcon } from "@radix-ui/react-icons";
+import { useMutation } from "@tanstack/react-query";
+
+import { cn } from "@tyl/ui";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,13 +17,18 @@ import {
   AlertDialogTrigger,
 } from "@tyl/ui/alert-dialog";
 import { buttonVariants } from "@tyl/ui/button";
-import { RSADeleteTrackable } from "src/app/api/trackables/serverActions";
-import { cn } from "@tyl/ui"
+
+import { api } from "~/trpc/react";
 
 const DeleteButton = ({ id }: { id: string }) => {
-  const performDelete = async () => {
-    await RSADeleteTrackable(id);
-  };
+  const router = useRouter();
+
+  const mutation = useMutation({
+    mutationFn: api.trackablesRouter.deleteTrackable.mutate,
+    onSuccess: () => {
+      router.push("/trackables/");
+    },
+  });
 
   return (
     <AlertDialog>
@@ -44,7 +53,7 @@ const DeleteButton = ({ id }: { id: string }) => {
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
             name="confirm delete"
-            onClick={() => void performDelete()}
+            onClick={() => void mutation.mutateAsync({ id })}
           >
             Delete
           </AlertDialogAction>

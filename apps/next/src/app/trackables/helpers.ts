@@ -1,6 +1,9 @@
-import type { ITrackable } from "@tyl/validators/trackable";
 import type { QueryClient } from "@tanstack/react-query";
 import type { ITrackableFromList } from "src/app/api/trackables/apiFunctions";
+import { getQueryKey } from "@trpc/react-query";
+
+import type { ITrackable } from "@tyl/validators/trackable";
+import { appRouter } from "@tyl/api";
 
 export const fillPrefetchedTrackable = (
   queryClient: QueryClient,

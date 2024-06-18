@@ -1,5 +1,5 @@
-import { z } from "zod";
 import { v4 as uuidv4 } from "uuid";
+import { z } from "zod";
 
 //
 // Settings
@@ -80,8 +80,24 @@ export const ZTrackableSettingsRange = z.object({
   cycleToEmpty: z.boolean().optional(),
 });
 
-export type IBooleanSettings = z.infer<typeof ZTrackableSettingsBoolean>;
+export const ZTrackableSettings = z
+  .discriminatedUnion("type", [
+    z.object({
+      settings: ZTrackableSettingsBoolean,
+      type: z.literal("boolean"),
+    }),
+    z.object({
+      settings: ZTrackableSettingsNumber,
+      type: z.literal("number"),
+    }),
+    z.object({
+      settings: ZTrackableSettingsRange,
+      type: z.literal("range"),
+    }),
+  ])
+  .transform((v) => v.settings);
 
+export type IBooleanSettings = z.infer<typeof ZTrackableSettingsBoolean>;
 export type INumberSettings = z.infer<typeof ZTrackableSettingsNumber>;
 export type IRangeSettings = z.infer<typeof ZTrackableSettingsRange>;
 
@@ -131,3 +147,25 @@ export const ZTrackableUpdate = z.object({
 });
 
 export type ITrackableUpdate = z.infer<typeof ZTrackableUpdate>;
+
+//
+// Create
+//
+
+export const trackableToCreate = z.discriminatedUnion("type", [
+  z.object({
+    settings: ZTrackableSettingsBoolean,
+    type: z.literal("boolean"),
+    name: z.string(),
+  }),
+  z.object({
+    settings: ZTrackableSettingsNumber,
+    type: z.literal("number"),
+    name: z.string(),
+  }),
+  z.object({
+    settings: ZTrackableSettingsRange,
+    type: z.literal("range"),
+    name: z.string(),
+  }),
+]);

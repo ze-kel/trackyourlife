@@ -1,12 +1,13 @@
 "use client";
-import { UserSettingsFallback, type IUserSettings } from "@tyl/validators/user";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
 import type { ReactNode } from "react";
 import { createContext, useContext } from "react";
-import {
-  RSAGetUserSettings,
-  RSAUpdateUserSettings,
-} from "src/app/api/user/settings/serverActions";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
+import type { IUserSettings } from "@tyl/validators/user";
+import { UserSettingsFallback } from "@tyl/validators/user";
+
+import { api } from "~/trpc/react";
 
 interface ISettingsContext {
   settings?: IUserSettings;
@@ -30,17 +31,14 @@ const UserSettingsProvider = ({
   const { data } = useQuery({
     queryKey: QUERY_KEY,
     queryFn: async () => {
-      return await RSAGetUserSettings();
+      return await api.userRouter.getUserSettings.query();
     },
     initialData: initialSettings,
+    refetchOnWindowFocus: false,
   });
 
-  const updateSettingsHandler = async (v: IUserSettings) => {
-    return await RSAUpdateUserSettings(v);
-  };
-
   const settingsMutation = useMutation({
-    mutationFn: updateSettingsHandler,
+    mutationFn: api.userRouter.updateUserSettings.mutate,
     onMutate: async (upd) => {
       await queryClient.cancelQueries({
         queryKey: QUERY_KEY,

@@ -3,7 +3,6 @@ import {
   HydrationBoundary,
   QueryClient,
 } from "@tanstack/react-query";
-import { RSAGetAllTrackables } from "src/app/api/trackables/serverActions";
 import { fillPrefetchedTrackablesList } from "src/app/trackables/helpers";
 
 import { DailyList } from "~/components/TrackablesList";
@@ -12,7 +11,7 @@ import { api } from "~/trpc/server";
 const SHOW_DAYS = 7;
 
 const Page = async () => {
-  const trackables = await RSAGetAllTrackables({
+  const trackables = await api.trackablesRouter.getAllTrackables({
     limits: {
       type: "last",
       days: SHOW_DAYS,

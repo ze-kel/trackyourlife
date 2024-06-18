@@ -8,7 +8,7 @@ export const ZGETLimits = z
       year: z.number(),
       month: z.number().min(0).max(11),
     }),
-    z.object({ type: z.literal("last"), days: z.number().min(7).max(31) }),
+    z.object({ type: z.literal("last"), days: z.number().min(1).max(31) }),
   ])
   .optional();
 

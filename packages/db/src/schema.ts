@@ -43,7 +43,7 @@ export const trackableTypeEnum = pgEnum("type", ["boolean", "number", "range"]);
 
 export const trackable = pgTable("trackable", {
   id: uuid("id").defaultRandom().primaryKey(),
-  name: varchar("name"),
+  name: varchar("name").notNull(),
   userId: varchar("user_id")
     .notNull()
     .references(() => auth_user.id, { onDelete: "cascade" }),

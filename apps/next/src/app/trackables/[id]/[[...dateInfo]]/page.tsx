@@ -1,20 +1,22 @@
-import DeleteButton from "~/components/DeleteButton";
-import TrackableView from "~/components/TrackableView";
-import { Button } from "@tyl/ui/button";
-import { GearIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { RSAGetTrackable } from "src/app/api/trackables/serverActions";
+import { GearIcon } from "@radix-ui/react-icons";
 import {
-  QueryClient,
-  HydrationBoundary,
   dehydrate,
+  HydrationBoundary,
+  QueryClient,
 } from "@tanstack/react-query";
-import { validateRequest } from "@tyl/auth";
 import { fillPrefetchedTrackable } from "src/app/trackables/helpers";
-import { TrackableNameEditable } from "~/components/TrackableName";
-import TrackableProvider from "~/components/Providers/TrackableProvider";
+
+import { validateRequest } from "@tyl/auth";
+import { Button } from "@tyl/ui/button";
+
+import DeleteButton from "~/components/DeleteButton";
 import { FavoriteButton } from "~/components/FavoriteButton";
+import TrackableProvider from "~/components/Providers/TrackableProvider";
+import { TrackableNameEditable } from "~/components/TrackableName";
+import TrackableView from "~/components/TrackableView";
+import { api } from "~/trpc/server";
 
 const getYearSafe = (y: string | undefined) => {
   if (!y || y.length !== 4) return new Date().getFullYear();
@@ -48,20 +50,21 @@ const getDataForTrackable = async (
 
   // Year view, prefetch full year
   if (yearValid && !monthValid) {
-    const trackable = await RSAGetTrackable({
-      trackableId: id,
+    const trackable = await api.trackablesRouter.getTrackableById({
+      id,
       limits: {
         type: "year",
         year: safeYear,
       },
     });
+
     return { trackable, queryClient, year: safeYear };
   }
 
   // Either both are valid, or we use special link that always gets us to current month
   if ((monthValid && yearValid) || yearParam === "today") {
-    const trackable = await RSAGetTrackable({
-      trackableId: id,
+    const trackable = await api.trackablesRouter.getTrackableById({
+      id,
       limits: {
         type: "month",
         year: safeYear,
@@ -72,14 +75,15 @@ const getDataForTrackable = async (
   }
 
   // Nothing is valid. Show year view. We still prefetch current month, just to get trackable settings and info.
-  const trackable = await RSAGetTrackable({
-    trackableId: id,
+  const trackable = await api.trackablesRouter.getTrackableById({
+    id,
     limits: {
       type: "month",
       year: safeYear,
       month: safeMonth,
     },
   });
+
   return { trackable, queryClient };
 };
 
