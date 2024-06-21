@@ -319,7 +319,7 @@ const TrackableSettings = ({
 
       {handleSave && (
         <Button
-          loading={isLoadingButton}
+          isLoading={isLoadingButton}
           className="mt-2"
           variant={"outline"}
           onClick={() => void handleSave(settings.current)}

@@ -84,7 +84,7 @@ const Register = () => {
       />
 
       <Button
-        loading={loading}
+        isLoading={loading}
         type="submit"
         variant="outline"
         className={cn("mt-6 w-full")}
@@ -155,7 +155,7 @@ const Login = () => {
       />
 
       <Button
-        loading={loading}
+        isLoading={loading}
         type="submit"
         variant="outline"
         className={cn("mt-6 w-full")}

@@ -144,20 +144,11 @@ export const GraphMonths = ({
   year: number;
   month: number;
 }) => {
-  const { trackable } = useTrackableContextSafe();
+  const { trackable, useTrackableQueryByMonth } = useTrackableContextSafe();
 
   if (!trackable) throw new Error("no trackable in context");
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["trackable", trackable.id, year, month],
-    queryFn: async () => {
-      const data = await api.trackablesRouter.getTrackableData.query({
-        id: trackable.id,
-        limits: { type: "month", month, year },
-      });
-      return data[year]?.[month] || {};
-    },
-  });
+  const { data, isLoading } = useTrackableQueryByMonth({ month, year });
 
   const start = new Date(Date.UTC(year, month, 1));
   const daysInMonth = getDaysInMonth(start);

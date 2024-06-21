@@ -1,5 +1,6 @@
 import { getDaysInMonth } from "date-fns";
-import type { ITrackableFromList } from "src/app/api/trackables/apiFunctions";
+
+import { ITrackableBasic } from "@tyl/validators/trackable";
 
 export const generateDates = (days: number, nowDate: Date) => {
   const today = nowDate;
@@ -29,7 +30,7 @@ export const generateDates = (days: number, nowDate: Date) => {
 };
 
 export const sortTrackableList = (
-  list: ITrackableFromList[],
+  list: ITrackableBasic[],
   favorites: string[],
 ) => {
   const favSet = new Set(favorites);

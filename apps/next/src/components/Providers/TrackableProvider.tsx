@@ -1,6 +1,10 @@
 "use client";
 
-import type { UseMutationResult, UseQueryResult } from "@tanstack/react-query";
+import type {
+  QueryClient,
+  UseMutationResult,
+  UseQueryResult,
+} from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { createContext, useContext } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -54,9 +58,61 @@ interface ITrackableContext {
   settingsMutation: MutationSettings;
   settingsUpdate: MutationSettings["mutateAsync"];
   settingsUpdatePartial: (v: Partial<ITrackableSettings>) => Promise<void>;
+  useTrackableQueryByMonth: ({
+    month,
+    year,
+  }: {
+    month: number;
+    year: number;
+  }) => UseQueryResult<ITrackableDataMonth, Error>;
 }
 
 const TrackableContext = createContext<ITrackableContext | null>(null);
+
+/*
+  !--Storing & refetching trackable data--!
+  For convenience in navigation we store info(id, name, type), settings and each months data separately.
+  This means that when user navigates from trackables list to individual trackable we can reuse data that already was fetched.
+
+  This introduces a problem of too much refetching. Because for each trackable we get 3 queries that become stale and want to refetch.
+  To prevent that by default refetching is only enabled on month's query.
+  When we fetch month we also get fresh info and settings, which are being updated explicitly.
+
+  
+
+*/
+
+const makeUseTrackableQueryByMonth = ({
+  id,
+  queryClient,
+}: {
+  id: string;
+  queryClient: QueryClient;
+}) => {
+  return ({ month, year }: { month: number; year: number }) => {
+    return useQuery({
+      queryKey: ["trackable", id, year, month],
+      queryFn: async () => {
+        const trackable = await api.trackablesRouter.getTrackableById.query({
+          id,
+          limits: { type: "month", month, year },
+        });
+
+        queryClient.setQueryData(["trackable", id], {
+          ...trackable,
+          data: {},
+          settings: {},
+        });
+        queryClient.setQueryData(
+          ["trackable", id, "settings"],
+          trackable.settings,
+        );
+
+        return trackable.data[year]?.[month] || {};
+      },
+    });
+  };
+};
 
 const TrackableProvider = ({
   id,
@@ -67,6 +123,12 @@ const TrackableProvider = ({
 }) => {
   const queryClient = useQueryClient();
 
+  const useTrackableQueryByMonth = makeUseTrackableQueryByMonth({
+    id,
+    queryClient,
+  });
+
+  // This only contains trackable basic info(right now only the name)
   const query = useQuery({
     queryKey: ["trackable", id],
     queryFn: async () => {
@@ -75,6 +137,22 @@ const TrackableProvider = ({
         limits: { type: "last", days: 7 },
       });
     },
+    refetchOnReconnect: false,
+    staleTime: Infinity,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+  });
+
+  // This contains settings
+  const settings = useQuery({
+    queryKey: ["trackable", id, "settings"],
+    queryFn: async () => {
+      return await api.trackablesRouter.getTrackableSettings.query({ id: id });
+    },
+    refetchOnReconnect: false,
+    staleTime: Infinity,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
   });
 
   const updateHandler = async (update: Omit<ITrackableUpdate, "id">) => {
@@ -116,13 +194,6 @@ const TrackableProvider = ({
     },
   });
 
-  const settings = useQuery({
-    queryKey: ["trackable", id, "settings"],
-    queryFn: async () => {
-      return await api.trackablesRouter.getTrackableSettings.query({ id: id });
-    },
-  });
-
   const updateSettingsHandler = async (data: ITrackableSettings) => {
     await api.trackablesRouter.updateTrackableSettings.mutate({
       id,
@@ -142,9 +213,7 @@ const TrackableProvider = ({
         id,
         "settings",
       ]) as ITrackableSettings;
-
       queryClient.setQueryData(["trackable", id, "settings"], upd);
-
       return { previous };
     },
     onError: (_, update, context) => {
@@ -209,6 +278,7 @@ const TrackableProvider = ({
         settingsMutation,
         settingsUpdate: settingsMutation.mutateAsync,
         settingsUpdatePartial,
+        useTrackableQueryByMonth,
       }}
     >
       <MemoDayCellProvider type={query.data?.type} settings={settings.data}>

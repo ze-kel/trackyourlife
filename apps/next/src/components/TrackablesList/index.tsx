@@ -1,6 +1,5 @@
 "use client";
 
-import type { ITrackableFromList } from "src/app/api/trackables/apiFunctions";
 import { Fragment, useMemo, useState } from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
@@ -8,7 +7,7 @@ import { format, isLastDayOfMonth } from "date-fns";
 import { AnimatePresence, m } from "framer-motion";
 import { getDateInTimezone } from "src/helpers/timezone";
 
-import type { ITrackable } from "@tyl/validators/trackable";
+import type { ITrackable, ITrackableBasic } from "@tyl/validators/trackable";
 import { cn } from "@tyl/ui";
 import { Badge } from "@tyl/ui/badge";
 import { Button } from "@tyl/ui/button";
@@ -45,7 +44,7 @@ type TrackableTypeFilterState = Record<ITrackable["type"], boolean>;
 const filterTrackables = (
   query: string,
   types: TrackableTypeFilterState,
-  list: ITrackableFromList[],
+  list: ITrackableBasic[],
 ) => {
   const filterByType = Object.values(types).some((v) => v);
 
@@ -57,8 +56,7 @@ const filterTrackables = (
     })
     .filter((v) => {
       if (!filterByType) return true;
-
-      return types[v.type];
+      return types[v.type as keyof TrackableTypeFilterState];
     });
 };
 

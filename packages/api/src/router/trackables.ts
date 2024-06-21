@@ -3,7 +3,7 @@ import { format } from "date-fns";
 import { z } from "zod";
 
 import type { DbTrackableRecordInsert } from "@tyl/db/schema";
-import { and, between, eq } from "@tyl/db";
+import { and, between, eq, inArray } from "@tyl/db";
 import { trackable, trackableRecord } from "@tyl/db/schema";
 import { ZGETLimits } from "@tyl/validators/api";
 import {
@@ -80,6 +80,29 @@ export const trackablesRouter = {
       }
 
       return prepareTrackable(tr, input.limits);
+    }),
+
+  getTrackablesById: protectedProcedure
+    .input(z.object({ ids: z.array(z.string()), limits: ZGETLimits }))
+    .query(async ({ ctx, input }) => {
+      const settings = await GetUserSettings({ userId: ctx.user.id });
+      const bounds = getDateBounds(
+        input.limits ?? { type: "last", days: 31 },
+        getDateInTimezone(settings.timezone),
+      );
+      const tr = await ctx.db.query.trackable.findMany({
+        where: and(
+          inArray(trackable.id, input.ids),
+          eq(trackable.userId, ctx.user.id),
+        ),
+        with: {
+          data: {
+            where: between(trackableRecord.date, bounds.from, bounds.to),
+          },
+        },
+      });
+
+      return tr.map((t) => prepareTrackable(t, input.limits));
     }),
 
   getTrackableData: protectedProcedure

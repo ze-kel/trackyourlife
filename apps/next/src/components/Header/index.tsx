@@ -1,10 +1,8 @@
 "use client";
-import {
-  Dropdown,
-  DropdownContent,
-  DropdownTrigger,
-} from "~/components/Dropdown";
+
+import { useState } from "react";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import {
   ActivityLogIcon,
   CalendarIcon,
@@ -12,12 +10,11 @@ import {
   GearIcon,
   PlusCircledIcon,
 } from "@radix-ui/react-icons";
+import { useTheme } from "next-themes";
+import { useMediaQuery } from "usehooks-ts";
+
 import type { ButtonProps } from "@tyl/ui/button";
 import { Button } from "@tyl/ui/button";
-import type { User } from "lucia";
-import { usePathname, useRouter } from "next/navigation";
-import { RadioTabs, RadioTabItem } from "@tyl/ui/radio-tabs";
-import { useTheme } from "next-themes";
 import {
   Drawer,
   DrawerContent,
@@ -25,8 +22,14 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@tyl/ui/drawer";
-import { useMediaQuery } from "usehooks-ts";
-import { useState } from "react";
+import { RadioTabItem, RadioTabs } from "@tyl/ui/radio-tabs";
+
+import {
+  Dropdown,
+  DropdownContent,
+  DropdownTrigger,
+} from "~/components/Dropdown";
+import { User } from "@tyl/auth";
 
 const SigOutButton = () => {
   const router = useRouter();
@@ -43,7 +46,7 @@ const SigOutButton = () => {
   return (
     <Button
       variant="outline"
-      loading={isLoading}
+      isLoading={isLoading}
       onClick={() => void signOut()}
       className="w-full text-center"
     >

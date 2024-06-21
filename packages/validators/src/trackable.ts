@@ -134,6 +134,7 @@ export type ITrackableUnsaved =
     };
 
 export type ITrackable = ITrackableUnsaved & { id: string };
+export type ITrackableBasic = Omit<Omit<ITrackable, "data">, "settings">;
 
 //
 // Update

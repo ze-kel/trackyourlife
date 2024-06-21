@@ -138,19 +138,10 @@ const DayCellWrapper = ({
   noLabel?: boolean;
   labelType?: "auto" | "outside" | "none";
 }) => {
-  const { id, trackable, settings, update } = useTrackableContextSafe();
+  const { trackable, settings, update, useTrackableQueryByMonth } =
+    useTrackableContextSafe();
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["trackable", trackable?.id, year, month],
-    queryFn: async () => {
-      const data = await api.trackablesRouter.getTrackableData.query({
-        id,
-        limits: { type: "month", month, year },
-      });
-
-      return data[year]?.[month] || {};
-    },
-  });
+  const { data, isLoading } = useTrackableQueryByMonth({ month, year });
 
   const u = useUserSettings();
 
