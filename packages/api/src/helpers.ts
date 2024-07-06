@@ -1,5 +1,5 @@
 import type { TimeZone } from "timezones-list";
-import { startOfMonth, sub, subDays } from "date-fns";
+import { add, startOfMonth, sub, subDays } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 
 import type {
@@ -54,7 +54,18 @@ export const getDateBounds = (
   if (limits.type === "month") {
     return {
       from: new Date(limits.year, limits.month, 1).toDateString(),
-      to: new Date(limits.year, limits.month + 1, 1).toDateString(),
+      to: add(new Date(limits.year, limits.month, 1), {
+        months: 1,
+      }).toDateString(),
+    };
+  }
+
+  if (limits.type === "range") {
+    return {
+      from: new Date(limits.from.year, limits.from.month, 1).toDateString(),
+      to: add(new Date(limits.to.year, limits.to.month, 1), {
+        months: 1,
+      }).toDateString(),
     };
   }
 

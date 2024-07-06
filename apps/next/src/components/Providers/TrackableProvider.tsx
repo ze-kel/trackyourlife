@@ -6,8 +6,9 @@ import type {
   UseQueryResult,
 } from "@tanstack/react-query";
 import type { ReactNode } from "react";
-import { createContext, useContext } from "react";
+import { createContext, useContext, useMemo } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { create, windowScheduler } from "@yornaath/batshit";
 
 import type {
   ITrackable,
@@ -77,10 +78,8 @@ const TrackableContext = createContext<ITrackableContext | null>(null);
   This introduces a problem of too much refetching. Because for each trackable we get 3 queries that become stale and want to refetch.
   To prevent that by default refetching is only enabled on month's query.
   When we fetch month we also get fresh info and settings, which are being updated explicitly.
-
-  
-
 */
+type Inp = { year: number; month: number };
 
 const makeUseTrackableQueryByMonth = ({
   id,
@@ -89,6 +88,45 @@ const makeUseTrackableQueryByMonth = ({
   id: string;
   queryClient: QueryClient;
 }) => {
+  // This batches requests for multiple months(i.e when we show graph for a year) into a single request
+  const batcher = create({
+    fetcher: async (dates: Inp[]) => {
+      if (dates.length === 1) {
+        const { year, month } = dates[0] as Inp;
+        return await api.trackablesRouter.getTrackableById.query({
+          id,
+          limits: {
+            type: "month",
+            year,
+            month,
+          },
+        });
+      }
+      dates.sort((a, b) => {
+        const r = a.year - b.year;
+        if (r !== 0) {
+          return r;
+        }
+        return a.month - b.month;
+      });
+
+      const from = dates[0] as Inp;
+      const to = dates[dates.length - 1] as Inp;
+      return await api.trackablesRouter.getTrackableById.query({
+        id,
+        limits: {
+          type: "range",
+          from,
+          to,
+        },
+      });
+    },
+    resolver: (data, req) => {
+      return data.data?.[req.year]?.[req.month] || {};
+    },
+    scheduler: windowScheduler(30),
+  });
+
   return ({ month, year }: { month: number; year: number }) => {
     return useQuery({
       queryKey: ["trackable", id, year, month],
