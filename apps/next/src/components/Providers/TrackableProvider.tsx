@@ -121,8 +121,8 @@ const makeUseTrackableQueryByMonth = ({
         },
       });
     },
-    resolver: (data, req) => {
-      return data.data?.[req.year]?.[req.month] || {};
+    resolver: (data) => {
+      return data;
     },
     scheduler: windowScheduler(30),
   });
@@ -131,10 +131,7 @@ const makeUseTrackableQueryByMonth = ({
     return useQuery({
       queryKey: ["trackable", id, year, month],
       queryFn: async () => {
-        const trackable = await api.trackablesRouter.getTrackableById.query({
-          id,
-          limits: { type: "month", month, year },
-        });
+        const trackable = await batcher.fetch({ year, month });
 
         queryClient.setQueryData(["trackable", id], {
           ...trackable,
