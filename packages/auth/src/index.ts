@@ -1,9 +1,13 @@
 import type { Session, User } from "lucia";
-import { cache } from "react";
-import { cookies } from "next/headers";
 import { DrizzlePostgreSQLAdapter } from "@lucia-auth/adapter-drizzle";
-import { generateId, Lucia } from "lucia";
+import { generateId, Lucia, verifyRequestOrigin } from "lucia";
 import { Argon2id } from "oslo/password";
+import {
+  appendHeader,
+  defineMiddleware,
+  getCookie,
+  getHeader,
+} from "vinxi/server";
 
 import type { DbUserSelect } from "@tyl/db/schema";
 import { db } from "@tyl/db";
@@ -38,40 +42,47 @@ declare module "lucia" {
   }
 }
 
-export const validateRequest = cache(
-  async (): Promise<
-    { user: User; session: Session } | { user: null; session: null }
-  > => {
-    const sessionId = cookies().get(lucia.sessionCookieName)?.value ?? null;
-    if (!sessionId) {
-      return {
-        user: null,
-        session: null,
-      };
+export const middleware = defineMiddleware({
+  onRequest: async (event) => {
+    console.log("ON REQUEST", event);
+    if (event.node.req.method !== "GET") {
+      const originHeader = getHeader(event, "Origin") ?? null;
+      const hostHeader = getHeader(event, "Host") ?? null;
+      if (
+        !originHeader ||
+        !hostHeader ||
+        !verifyRequestOrigin(originHeader, [hostHeader])
+      ) {
+        event.node.res.writeHead(403).end();
+        return;
+      }
     }
 
-    const result = await lucia.validateSession(sessionId);
-    // next.js throws when you attempt to set cookie when rendering page
-    try {
-      if (result.session?.fresh) {
-        const sessionCookie = lucia.createSessionCookie(result.session.id);
-        cookies().set(
-          sessionCookie.name,
-          sessionCookie.value,
-          sessionCookie.attributes,
-        );
-      }
-      if (!result.session) {
-        const sessionCookie = lucia.createBlankSessionCookie();
-        cookies().set(
-          sessionCookie.name,
-          sessionCookie.value,
-          sessionCookie.attributes,
-        );
-      }
-    } catch {}
-    return result;
+    const sessionId = getCookie(event, lucia.sessionCookieName) ?? null;
+    if (!sessionId) {
+      event.context.session = null;
+      event.context.user = null;
+      return;
+    }
+
+    const { session, user } = await lucia.validateSession(sessionId);
+    if (session?.fresh) {
+      appendHeader(
+        event,
+        "Set-Cookie",
+        lucia.createSessionCookie(session.id).serialize(),
+      );
+    }
+    if (!session) {
+      appendHeader(
+        event,
+        "Set-Cookie",
+        lucia.createBlankSessionCookie().serialize(),
+      );
+    }
+    event.context.session = session;
+    event.context.user = user;
   },
-);
+});
 
 export { Session, User, generateId, Argon2id };

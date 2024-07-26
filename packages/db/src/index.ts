@@ -1,7 +1,7 @@
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
-import { Pool } from "pg";
+import pg from "pg";
 
 import * as schema from "./schema";
 
@@ -10,7 +10,7 @@ export { alias } from "drizzle-orm/pg-core";
 
 const connectionString = process.env.DATABASE_URL || "";
 
-const pool = new Pool({
+const pool = new pg.Pool({
   connectionString: connectionString,
 });
 

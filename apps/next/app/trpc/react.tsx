@@ -24,12 +24,7 @@ export const api = createTRPCClient<AppRouter>({
     }),
     unstable_httpBatchStreamLink({
       transformer: SuperJSON,
-      url: getBaseUrl() + "/api/trpc",
-      headers() {
-        const headers = new Headers();
-        headers.set("x-trpc-source", "nextjs-react");
-        return headers;
-      },
+      url: getBaseUrl() + "/trpc",
     }),
   ],
 });

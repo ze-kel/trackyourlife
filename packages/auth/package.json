@@ -14,16 +14,16 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@tyl/db": "workspace:*",
     "@auth/core": "0.32.0",
     "@auth/drizzle-adapter": "^1.2.0",
-    "@t3-oss/env-nextjs": "^0.10.1",
     "@lucia-auth/adapter-drizzle": "^1.0.7",
+    "@t3-oss/env-nextjs": "^0.10.1",
+    "@tyl/db": "workspace:*",
     "lucia": "^3.2.0",
     "oslo": "^1.2.0",
-    "next": "^14.2.4",
     "react": "18.3.1",
     "react-dom": "18.3.1",
+    "vinxi": "0.4.1",
     "zod": "^3.23.8"
   },
   "devDependencies": {

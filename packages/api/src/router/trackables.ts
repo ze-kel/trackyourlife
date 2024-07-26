@@ -20,9 +20,17 @@ import {
   makeTrackableSettings,
   prepareTrackable,
 } from "../helpers";
-import { protectedProcedure } from "../trpc";
+import { protectedProcedure, publicProcedure } from "../trpc";
 
 export const trackablesRouter = {
+  hello: publicProcedure.query(() => {
+    return "this is trpc";
+  }),
+
+  dbReadTest: publicProcedure.query(({ ctx }) => {
+    return ctx.db.query.trackable.findMany();
+  }),
+
   getTrackableIdList: protectedProcedure.query(async ({ ctx }) => {
     return ctx.db.query.trackable.findMany({
       where: eq(trackable.userId, ctx.user.id),

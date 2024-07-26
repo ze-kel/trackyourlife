@@ -2,15 +2,14 @@
   "extends": "@tyl/tsconfig/base.json",
   "compilerOptions": {
     "lib": ["es2022", "dom", "dom.iterable"],
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
-      "~/*": ["./src/*"]
+      "~/*": ["./app/*"]
     },
-    "plugins": [{ "name": "next" }],
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
-    "module": "esnext"
+    "module": "ESNext",
+    "types": ["vinxi/types/client"]
   },
-  "include": [".", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]
 }
