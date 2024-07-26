@@ -44,7 +44,6 @@ declare module "lucia" {
 
 export const middleware = defineMiddleware({
   onRequest: async (event) => {
-    console.log("ON REQUEST", event);
     if (event.node.req.method !== "GET") {
       const originHeader = getHeader(event, "Origin") ?? null;
       const hostHeader = getHeader(event, "Host") ?? null;
@@ -82,6 +81,9 @@ export const middleware = defineMiddleware({
     }
     event.context.session = session;
     event.context.user = user;
+
+    console.log("SESSION", session);
+    console.log("USER", user);
   },
 });
 

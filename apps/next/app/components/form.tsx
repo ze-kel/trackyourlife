@@ -1,11 +1,9 @@
-"use client";
-
 import { useState } from "react";
-import { Input } from "@tyl/ui/input";
+import { useNavigate } from "@tanstack/react-router";
 
+import { cn } from "@tyl/ui";
+import { Alert, AlertDescription, AlertTitle } from "@tyl/ui/alert";
 import { Button } from "@tyl/ui/button";
-
-import { useRouter } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -13,10 +11,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@tyl/ui/card";
-import { RadioTabs, RadioTabItem } from "@tyl/ui/radio-tabs";
-import { Alert, AlertDescription, AlertTitle } from "@tyl/ui/alert";
-
-import { cn } from "@tyl/ui"
+import { Input } from "@tyl/ui/input";
+import { RadioTabItem, RadioTabs } from "@tyl/ui/radio-tabs";
 
 type ActionState = "login" | "register";
 
@@ -24,7 +20,7 @@ const Register = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const router = useRouter();
+  const navigate = useNavigate({ from: "/login/" });
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -51,7 +47,7 @@ const Register = () => {
       return;
     }
 
-    router.refresh();
+    navigate({ to: "/" });
   };
 
   return (
@@ -105,10 +101,10 @@ const Login = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const router = useRouter();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const navigate = useNavigate({ from: "/login/" });
 
   const onSubmit = async () => {
     setLoading(true);
@@ -130,7 +126,7 @@ const Login = () => {
       return;
     }
 
-    router.refresh();
+    navigate({ to: "/" });
   };
 
   return (

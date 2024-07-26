@@ -13,6 +13,7 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
 import { Route as TrackableIndexImport } from './routes/trackable/index'
+import { Route as LoginIndexImport } from './routes/login/index'
 
 // Create/Update Routes
 
@@ -26,6 +27,11 @@ const TrackableIndexRoute = TrackableIndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const LoginIndexRoute = LoginIndexImport.update({
+  path: '/login/',
+  getParentRoute: () => rootRoute,
+} as any)
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -35,6 +41,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/login/': {
+      id: '/login/'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginIndexImport
       parentRoute: typeof rootRoute
     }
     '/trackable/': {
@@ -51,6 +64,7 @@ declare module '@tanstack/react-router' {
 
 export const routeTree = rootRoute.addChildren({
   IndexRoute,
+  LoginIndexRoute,
   TrackableIndexRoute,
 })
 
@@ -63,11 +77,15 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/login/",
         "/trackable/"
       ]
     },
     "/": {
       "filePath": "index.tsx"
+    },
+    "/login/": {
+      "filePath": "login/index.tsx"
     },
     "/trackable/": {
       "filePath": "trackable/index.tsx"

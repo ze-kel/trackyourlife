@@ -4,9 +4,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vinxi dev",
-    "build": "vinxi build",
-    "start": "vinxi start"
+    "dev": "pnpm with-env vinxi dev",
+    "build": "pnpm with-env vinxi build",
+    "start": "pnpm with-env vinxi start",
+    "with-env": "dotenv -e ../../.env --"
   },
   "dependencies": {
     "@floating-ui/react": "^0.26.16",

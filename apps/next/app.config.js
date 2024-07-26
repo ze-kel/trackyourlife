@@ -1,12 +1,6 @@
 import { fileURLToPath } from "url";
 import { defineConfig } from "@tanstack/start/config";
 import { input } from "vinxi/plugins/config";
-import {
-  appendHeader,
-  defineMiddleware,
-  getCookie,
-  getHeader,
-} from "vinxi/server";
 
 //import middleware from "./app/middleware";
 
@@ -18,7 +12,6 @@ function trpcRouter({ plugins = () => [] } = {}) {
     type: "http",
     handler: fileURLToPath(new URL("./handler.js", import.meta.url)),
     target: "server",
-    //    middleware: "./app/middleware.ts",
     plugins: () => [
       input(
         "$vinxi/trpc/router",
@@ -28,20 +21,8 @@ function trpcRouter({ plugins = () => [] } = {}) {
   };
 }
 
-const base = defineConfig({
-  routers: {
-    server: {},
-    ssr: {},
-  },
-});
+const base = defineConfig({});
 
 base.addRouter(trpcRouter());
-base.hooks.addHooks(
-  defineMiddleware({
-    onRequest() {
-      console.log("onRequest");
-    },
-  }),
-);
 
 export default base;

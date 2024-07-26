@@ -18,7 +18,7 @@ function Home() {
 
   useEffect(() => {
     f();
-  });
+  }, []);
 
   return (
     <div className="p-2">

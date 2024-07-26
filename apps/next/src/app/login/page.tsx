@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
-import LoginForm from "./form";
+
 import { validateRequest } from "@tyl/auth";
+
+import LoginForm from "../../../app/components/form";
 
 const LoginPage = async () => {
   const { session } = await validateRequest();
