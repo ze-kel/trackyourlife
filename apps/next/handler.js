@@ -3,9 +3,11 @@ import { fromNodeMiddleware } from "vinxi/http";
 
 import { appRouter, createTRPCContext } from "@tyl/api";
 
-const createContext = async (req) => {
+const createContext = async (ctx) => {
+  console.log("TRPC REQ", ctx.context);
+
   return createTRPCContext({
-    headers: req.req.headers,
+    headers: ctx.req.headers,
     session: null,
     user: null,
   });
@@ -13,14 +15,17 @@ const createContext = async (req) => {
 
 const handler = createHTTPHandler({
   router: appRouter,
-  createContext: (req) => createContext(req),
+  createContext: (ctx) => {
+    return createContext(ctx);
+  },
   onError({ error, path }) {
     console.error(`>>> tRPC Error on '${path}'`, error);
   },
 });
 
 export default fromNodeMiddleware((req, res) => {
-  console.log(req.url);
+  req.context = { hello: "hello" };
+
   req.url = req.url.replace(import.meta.env.BASE_URL, "");
   return handler(req, res);
 });

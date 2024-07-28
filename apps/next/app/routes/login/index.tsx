@@ -8,6 +8,21 @@ import { ZLogin } from "@tyl/validators/user";
 
 import Form from "../../components/form.js";
 
+const getAuthUser = createServerFn("GET", (_, ctx) => {
+  console.log(ctx);
+
+  return "aa";
+});
+
+export const getAuthenticatedUser = async () => {
+  "use server";
+  const event = getRequestEvent()!;
+  if (!event.context.user) {
+    throw redirect("/login");
+  }
+  return event.context.user;
+};
+
 const login = createServerFn(
   "POST",
   async (data: { login: string; password: string }, ctx) => {
@@ -55,9 +70,17 @@ const login = createServerFn(
 
 export const Route = createFileRoute("/login/")({
   component: Home,
+  beforeLoad(ctx) {
+    console.log("login before loader", ctx);
+  },
+  loader: (ctx) => {
+    console.log("login  loader", ctx);
+  },
 });
 
 function Home() {
+  const state = Route.useLoaderData();
+
   return (
     <div className="p-2">
       <Form />

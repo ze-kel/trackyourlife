@@ -5,8 +5,12 @@ import { Argon2id } from "oslo/password";
 import {
   appendHeader,
   defineMiddleware,
+  EventHandlerRequest,
   getCookie,
   getHeader,
+  H3Event,
+  NodeListener,
+  setCookie,
 } from "vinxi/server";
 
 import type { DbUserSelect } from "@tyl/db/schema";
@@ -34,6 +38,44 @@ export const lucia = new Lucia(adapter, {
   },
 });
 
+export const validateRequest = async (
+  event: H3Event<EventHandlerRequest>,
+): Promise<
+  { user: User; session: Session } | { user: null; session: null }
+> => {
+  const sessionId = getCookie(event, lucia.sessionCookieName) ?? null;
+  if (!sessionId) {
+    return {
+      user: null,
+      session: null,
+    };
+  }
+
+  const result = await lucia.validateSession(sessionId);
+  // next.js throws when you attempt to set cookie when rendering page
+  try {
+    if (result.session?.fresh) {
+      const sessionCookie = lucia.createSessionCookie(result.session.id);
+      setCookie(
+        event,
+        sessionCookie.name,
+        sessionCookie.value,
+        sessionCookie.attributes,
+      );
+    }
+    if (!result.session) {
+      const sessionCookie = lucia.createBlankSessionCookie();
+      setCookie(
+        event,
+        sessionCookie.name,
+        sessionCookie.value,
+        sessionCookie.attributes,
+      );
+    }
+  } catch {}
+  return result;
+};
+
 // IMPORTANT!
 declare module "lucia" {
   interface Register {
@@ -42,8 +84,12 @@ declare module "lucia" {
   }
 }
 
+const a: NodeListener = (req, res) => {};
+
 export const middleware = defineMiddleware({
   onRequest: async (event) => {
+    console.log("AUTH MIDDLE", event._path);
+
     if (event.node.req.method !== "GET") {
       const originHeader = getHeader(event, "Origin") ?? null;
       const hostHeader = getHeader(event, "Host") ?? null;
@@ -82,8 +128,7 @@ export const middleware = defineMiddleware({
     event.context.session = session;
     event.context.user = user;
 
-    console.log("SESSION", session);
-    console.log("USER", user);
+    console.log("event context after middleware", event.context);
   },
 });
 

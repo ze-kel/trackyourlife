@@ -7,16 +7,15 @@ import { input } from "vinxi/plugins/config";
 /** @returns {import('vinxi').RouterSchemaInput} */
 function trpcRouter({ plugins = () => [] } = {}) {
   return {
-    name: "server",
+    name: "trpc",
     base: "/trpc",
     type: "http",
     handler: fileURLToPath(new URL("./handler.js", import.meta.url)),
     target: "server",
-    plugins: () => [
-      input(
-        "$vinxi/trpc/router",
-        fileURLToPath(new URL("./app/trpc.ts", import.meta.url)),
-      ),
+    plugins: [
+      (v) => {
+        console.log("PLUG", v);
+      },
     ],
   };
 }
@@ -24,5 +23,13 @@ function trpcRouter({ plugins = () => [] } = {}) {
 const base = defineConfig({});
 
 base.addRouter(trpcRouter());
+
+base.config.routers.forEach((v) => {
+  if ("middleware" in v) {
+    v.middleware = "./app/middleware.ts";
+  }
+});
+
+console.log(base.config.routers);
 
 export default base;
