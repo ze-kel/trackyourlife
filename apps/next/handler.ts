@@ -7,7 +7,7 @@ const createContext = async (ctx) => {
   console.log("TRPC REQ", ctx.context);
 
   return createTRPCContext({
-    headers: ctx.req.headers,
+    source: "unknown",
     session: null,
     user: null,
   });

@@ -12,11 +12,6 @@ function trpcRouter({ plugins = () => [] } = {}) {
     type: "http",
     handler: fileURLToPath(new URL("./handler.js", import.meta.url)),
     target: "server",
-    plugins: [
-      (v) => {
-        console.log("PLUG", v);
-      },
-    ],
   };
 }
 

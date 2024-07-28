@@ -17,14 +17,19 @@ function Home() {
   };
 
   useEffect(() => {
+    console.log("hello");
     f();
   }, []);
 
+  const [n, setN] = useState(0);
+
   return (
     <div className="p-2">
-      <h3>Welcome Home!!!</h3>
+      <h3>Welcome Hoasdsasd12321sdme!!!</h3>
 
       {JSON.stringify(a)}
+
+      <button onClick={() => setN((v) => v + 1)}>{n}</button>
     </div>
   );
 }
