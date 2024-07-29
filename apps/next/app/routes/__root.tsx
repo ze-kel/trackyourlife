@@ -1,14 +1,24 @@
 import * as React from "react";
+import { QueryClient } from "@tanstack/react-query";
 import {
   createRootRoute,
+  createRootRouteWithContext,
   Outlet,
   ScrollRestoration,
 } from "@tanstack/react-router";
 import { Body, Head, Html, Meta, Scripts } from "@tanstack/start";
 
+import { Session, User } from "@tyl/auth";
+
 import appCss from "../styles/globals.css?url";
 
-export const Route = createRootRoute({
+type RouterContext = {
+  queryClient: QueryClient;
+  user?: User | null;
+  session?: Session | null;
+};
+
+export const Route = createRootRouteWithContext<RouterContext>()({
   meta: () => [
     {
       charSet: "utf-8",

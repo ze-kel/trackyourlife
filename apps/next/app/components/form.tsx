@@ -20,7 +20,7 @@ const Register = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const navigate = useNavigate({ from: "/login/" });
+  const navigate = useNavigate({ from: "/login" });
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -28,7 +28,7 @@ const Register = () => {
 
   const onSubmit = async () => {
     setLoading(true);
-    const res = await fetch("api/user/create", {
+    const res = await fetch("auth/create", {
       method: "POST",
       body: JSON.stringify({
         email,
@@ -104,11 +104,11 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const navigate = useNavigate({ from: "/login/" });
+  const navigate = useNavigate({ from: "/login" });
 
   const onSubmit = async () => {
     setLoading(true);
-    const res = await fetch("api/user/login", {
+    const res = await fetch("auth/login", {
       method: "POST",
       body: JSON.stringify({
         email,

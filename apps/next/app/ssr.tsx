@@ -1,3 +1,4 @@
+import type { AnyRouter } from "@tanstack/react-router";
 import { getRouterManifest } from "@tanstack/start/router-manifest";
 import {
   createStartHandler,
@@ -6,11 +7,11 @@ import {
 
 import { createRouter } from "./router";
 
-const a = createStartHandler({
+const startHandler = createStartHandler({
   createRouter,
   getRouterManifest,
 });
 
-const b = a(defaultStreamHandler);
+const handler = startHandler(defaultStreamHandler);
 
-export default b;
+export default handler;

@@ -10,7 +10,17 @@ function trpcRouter({ plugins = () => [] } = {}) {
     name: "trpc",
     base: "/trpc",
     type: "http",
-    handler: fileURLToPath(new URL("./handler.js", import.meta.url)),
+    handler: "./handler.ts",
+    target: "server",
+  };
+}
+
+function authRouter({ plugins = () => [] } = {}) {
+  return {
+    name: "auth",
+    base: "/auth",
+    type: "http",
+    handler: "./auth.ts",
     target: "server",
   };
 }
@@ -25,6 +35,6 @@ base.config.routers.forEach((v) => {
   }
 });
 
-console.log(base.config.routers);
+base.addRouter(authRouter());
 
 export default base;

@@ -7,6 +7,9 @@ import { UserSettingsFallback, ZUserSettings } from "@tyl/validators/user";
 import { protectedProcedure } from "../trpc";
 
 export const userRouter = {
+  getMe: protectedProcedure.query(({ ctx }) => {
+    return ctx.user;
+  }),
   getUserSettings: protectedProcedure.query(async ({ ctx }) => {
     const user = await ctx.db.query.auth_user.findFirst({
       where: eq(auth_user.id, ctx.user.id),

@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "pnpm with-env vinxi dev",
+    "dev": "pnpm with-env vinxi dev --force",
     "build": "pnpm with-env vinxi build",
     "start": "pnpm with-env vinxi start",
     "with-env": "dotenv -e ../../.env --"

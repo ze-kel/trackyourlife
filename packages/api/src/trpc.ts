@@ -26,13 +26,11 @@ import { db } from "@tyl/db";
  * @see https://trpc.io/docs/server/context
  */
 export const createTRPCContext = (opts: {
-  headers: Headers;
+  source: string;
   session: Session | null;
   user: User | null;
 }) => {
-  const source = opts.headers["x-trpc-source"] ?? "unknown";
-
-  console.log(">>> tRPC Request from", source, "by", opts.user);
+  console.log(">>> tRPC Request from", opts.source, "by", opts.user);
 
   return {
     session: opts.session,

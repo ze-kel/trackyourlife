@@ -1,3 +1,4 @@
+import { IncomingMessage } from "http";
 import type { Session, User } from "lucia";
 import { DrizzlePostgreSQLAdapter } from "@lucia-auth/adapter-drizzle";
 import { generateId, Lucia, verifyRequestOrigin } from "lucia";
@@ -52,7 +53,7 @@ export const validateRequest = async (
   }
 
   const result = await lucia.validateSession(sessionId);
-  // next.js throws when you attempt to set cookie when rendering page
+
   try {
     if (result.session?.fresh) {
       const sessionCookie = lucia.createSessionCookie(result.session.id);
@@ -84,12 +85,8 @@ declare module "lucia" {
   }
 }
 
-const a: NodeListener = (req, res) => {};
-
 export const middleware = defineMiddleware({
   onRequest: async (event) => {
-    console.log("AUTH MIDDLE", event._path);
-
     if (event.node.req.method !== "GET") {
       const originHeader = getHeader(event, "Origin") ?? null;
       const hostHeader = getHeader(event, "Host") ?? null;
@@ -127,8 +124,6 @@ export const middleware = defineMiddleware({
     }
     event.context.session = session;
     event.context.user = user;
-
-    console.log("event context after middleware", event.context);
   },
 });
 

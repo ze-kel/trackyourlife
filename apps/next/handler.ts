@@ -1,31 +1,29 @@
+import { IncomingMessage } from "http";
 import { createHTTPHandler } from "@trpc/server/adapters/standalone";
-import { fromNodeMiddleware } from "vinxi/http";
+import { eventHandler } from "vinxi/http";
 
 import { appRouter, createTRPCContext } from "@tyl/api";
 
-const createContext = async (ctx) => {
-  console.log("TRPC REQ", ctx.context);
-
+const createContext = async (ctx: IncomingMessage) => {
   return createTRPCContext({
     source: "unknown",
-    session: null,
-    user: null,
+    session: ctx.context.session,
+    user: ctx.context.user,
   });
 };
 
 const handler = createHTTPHandler({
   router: appRouter,
   createContext: (ctx) => {
-    return createContext(ctx);
+    return createContext(ctx.req);
   },
   onError({ error, path }) {
     console.error(`>>> tRPC Error on '${path}'`, error);
   },
 });
 
-export default fromNodeMiddleware((req, res) => {
-  req.context = { hello: "hello" };
+export default eventHandler(async (event) => {
+  event.node.req.context = event.context;
 
-  req.url = req.url.replace(import.meta.env.BASE_URL, "");
-  return handler(req, res);
+  return handler(event.node.req, event.node.res);
 });
