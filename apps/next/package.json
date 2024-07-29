@@ -29,6 +29,7 @@
     "@tanstack/react-query": "^5.44.0",
     "@visx/visx": "^3.11.0",
     "@yornaath/batshit": "^0.10.1",
+    "lucia": "^3.2.0",
     "arctic": "^1.9.1",
     "chroma-js": "^2.4.2",
     "class-variance-authority": "^0.7.0",
@@ -50,7 +51,6 @@
     "usehooks-ts": "^3.1.0",
     "superjson": "2.2.1",
     "uuid": "^10.0.0",
-    "vaul": "^0.9.1",
     "zod": "^3.23.8"
   },
   "devDependencies": {

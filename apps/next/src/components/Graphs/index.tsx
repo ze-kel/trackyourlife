@@ -1,3 +1,4 @@
+/*
 "use client";
 
 import { useMemo, useRef, useState } from "react";
@@ -343,3 +344,4 @@ export const Graph = ({
     </div>
   );
 };
+*/

@@ -1,16 +1,18 @@
 "use client";
-import { getDaysInMonth, getISODay, getMonth, getYear, format } from "date-fns";
+
 import { useEffect, useState } from "react";
-import DayCellWrapper from "../DayCell";
 import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
-import { Button } from "@tyl/ui/button";
-import { useTrackableContextSafe } from "~/components/Providers/TrackableProvider";
+import { format, getDaysInMonth, getISODay, getMonth, getYear } from "date-fns";
 import { ErrorBoundary } from "react-error-boundary";
-import { cn } from "@tyl/ui"
-import { useUserSettings } from "~/components/Providers/UserSettingsProvider";
 import { getDateInTimezone } from "src/helpers/timezone";
+
+import { cn } from "@tyl/ui";
+import { Button } from "@tyl/ui/button";
+
+import { useTrackableContextSafe } from "~/components/Providers/TrackableProvider";
+import { useUserSettings } from "~/components/Providers/UserSettingsProvider";
 import { YearSelector } from "~/components/TrackableView/yearSelector";
-import { GraphWrapper } from "~/components/Graphs";
+import DayCellWrapper from "../DayCell";
 
 const Month = ({
   month,
@@ -272,13 +274,11 @@ const TrackableView = ({ y, m }: { y?: number; m?: number }) => {
         {view === "months" && <Year year={year} openMonth={openMonth} />}
       </ErrorBoundary>
 
-      <ErrorBoundary fallback={<div></div>}>
-        <StatsRouter year={year} month={month} />
-      </ErrorBoundary>
+      <ErrorBoundary fallback={<div></div>}></ErrorBoundary>
     </>
   );
 };
-
+/*
 const StatsRouter = ({ year, month }: { year: number; month: number }) => {
   const { trackable } = useTrackableContextSafe();
 
@@ -287,5 +287,6 @@ const StatsRouter = ({ year, month }: { year: number; month: number }) => {
 
   return <></>;
 };
+*/
 
 export default TrackableView;
