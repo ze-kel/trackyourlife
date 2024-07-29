@@ -2,7 +2,7 @@
 const config = {
   reactStrictMode: true,
   swcMinify: true,
-  output: "standalone",
+  //output: "standalone",
 
   webpack: (config) => {
     config.externals.push("@node-rs/argon2", "@node-rs/bcrypt");
