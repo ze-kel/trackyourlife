@@ -1,5 +1,7 @@
 import { cache } from "react";
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+import { TRPCError } from "@trpc/server";
 
 import { createCaller, createTRPCContext } from "@tyl/api";
 import { validateRequest } from "@tyl/auth";
@@ -21,4 +23,10 @@ const createContext = cache(async () => {
   });
 });
 
-export const api = createCaller(createContext);
+export const api = createCaller(createContext, {
+  onError: (e) => {
+    if (e.error instanceof TRPCError && e.error.code === "UNAUTHORIZED") {
+      return redirect("/login");
+    }
+  },
+});
