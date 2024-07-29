@@ -4,7 +4,7 @@ import type {
   UseQueryResult,
 } from "@tanstack/react-query";
 import type { ReactNode } from "react";
-import { createContext, useContext } from "react";
+import { createContext, useCallback, useContext } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { create, windowScheduler } from "@yornaath/batshit";
 
@@ -86,8 +86,6 @@ const makeUseTrackableQueryByMonth = ({
   id: string;
   queryClient: QueryClient;
 }) => {
-  return "";
-
   // This batches requests for multiple months(i.e when we show graph for a year) into a single request
   const batcher = create({
     fetcher: async (dates: Inp[]) => {
@@ -124,6 +122,7 @@ const makeUseTrackableQueryByMonth = ({
     resolver: (data) => {
       return data;
     },
+    scheduler: windowScheduler(30),
   });
 
   return ({ month, year }: { month: number; year: number }) => {

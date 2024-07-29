@@ -27,6 +27,7 @@ function authRouter({ plugins = () => [] } = {}) {
 }
 
 const base = defineConfig({
+  deployment: { preset: "node" },
   vite: {
     plugins: () => [tsconfigPaths()],
   },
