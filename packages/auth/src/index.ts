@@ -10,7 +10,6 @@ import {
   getCookie,
   getHeader,
   H3Event,
-  NodeListener,
   setCookie,
 } from "vinxi/server";
 

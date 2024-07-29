@@ -26,7 +26,8 @@ router.post(
   defineEventHandler(async (event) => {
     const body = await readBody(event);
 
-    const results = ZLogin.safeParse(body);
+    const results = ZLogin.safeParse(JSON.parse(body));
+
     if (!results.success) {
       throw new Error("Incorrect username or password");
     }
@@ -38,6 +39,7 @@ router.post(
     });
 
     if (!user) {
+      console.log("no user");
       throw new Error("Incorrect username or password");
     }
 
@@ -58,6 +60,8 @@ router.post(
     );
 
     console.log(`API: User login ${email}`);
+
+    return { ok: true };
   }),
 );
 

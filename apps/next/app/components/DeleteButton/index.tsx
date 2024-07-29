@@ -1,8 +1,8 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { TrashIcon } from "@radix-ui/react-icons";
 import { useMutation } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 
 import { cn } from "@tyl/ui";
 import {
@@ -21,12 +21,12 @@ import { buttonVariants } from "@tyl/ui/button";
 import { api } from "~/trpc/react";
 
 const DeleteButton = ({ id }: { id: string }) => {
-  const router = useRouter();
+  const nav = useNavigate();
 
   const mutation = useMutation({
     mutationFn: api.trackablesRouter.deleteTrackable.mutate,
     onSuccess: () => {
-      router.push("/trackables/");
+      nav({ to: "/trackables" });
     },
   });
 

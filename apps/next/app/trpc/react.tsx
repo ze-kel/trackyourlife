@@ -6,8 +6,10 @@ import {
   unstable_httpBatchStreamLink,
 } from "@trpc/client";
 import SuperJSON from "superjson";
+import { H3EventContext } from "vinxi/server";
 
 import type { AppRouter } from "@tyl/api";
+import { lucia } from "@tyl/auth";
 
 const getBaseUrl = () => {
   if (typeof window !== "undefined") return window.location.origin;
@@ -28,3 +30,22 @@ export const api = createTRPCClient<AppRouter>({
     }),
   ],
 });
+
+const getApiClient = (event?: H3EventContext) => {
+  const headers = {};
+
+  return createTRPCClient<AppRouter>({
+    links: [
+      loggerLink({
+        enabled: (op) =>
+          process.env.NODE_ENV === "development" ||
+          (op.direction === "down" && op.result instanceof Error),
+      }),
+      unstable_httpBatchStreamLink({
+        transformer: SuperJSON,
+        url: getBaseUrl() + "/trpc",
+        headers,
+      }),
+    ],
+  });
+};

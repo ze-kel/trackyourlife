@@ -14,7 +14,7 @@ import { ThemeProvider } from "~/components/Providers/ThemeProvider";
 import UserSettingsProvider from "~/components/Providers/UserSettingsProvider";
 import { Sidebar } from "~/components/Sidebar";
 import { api } from "~/trpc/server";
-import { LazyMotionProvider } from "../components/Providers/lazyFramerMotionProvider";
+import { LazyMotionProvider } from "../../app/components/Providers/lazyFramerMotionProvider";
 import m from "./layout.module.css";
 
 export default async function RootLayout({

@@ -2,8 +2,6 @@
 
 import type { ReactNode } from "react";
 import { useMemo } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import {
   BarChartIcon,
   HeartFilledIcon,
@@ -11,6 +9,7 @@ import {
   ValueIcon,
 } from "@radix-ui/react-icons";
 import { useQuery } from "@tanstack/react-query";
+import { Link, useLocation } from "@tanstack/react-router";
 import { useIsClient } from "usehooks-ts";
 
 import type { ITrackable } from "@tyl/validators/trackable";
@@ -36,7 +35,7 @@ const TrackablesMiniList = () => {
     },
   });
 
-  const pathname = usePathname();
+  const { pathname } = useLocation();
 
   const { settings } = useUserSettings();
 
@@ -60,7 +59,7 @@ const TrackablesMiniList = () => {
     <div className="flex flex-col gap-2">
       {sorted.map((tr) => {
         return (
-          <Link key={tr.id} href={`/trackables/${tr.id}/today`}>
+          <Link key={tr.id} to={`/trackables/${tr.id}/today`}>
             <Button
               variant={pathname.includes(tr.id) ? "secondary" : "ghost"}
               size={"lg"}
@@ -80,7 +79,7 @@ const TrackablesMiniList = () => {
 };
 
 export const Sidebar = () => {
-  const pathName = usePathname();
+  const { pathname } = useLocation();
 
   const isClient = useIsClient();
 
@@ -88,11 +87,11 @@ export const Sidebar = () => {
     <div>
       <div className="flex flex-col gap-2">
         {CoreLinks.map((v) => (
-          <Link key={v.link} href={v.link} className="block w-full">
+          <Link key={v.link} to={v.link} className="block w-full">
             <Button
               className="w-full justify-start gap-4 px-3"
               size={"lg"}
-              variant={v.link === pathName ? "secondary" : "ghost"}
+              variant={v.link === pathname ? "secondary" : "ghost"}
             >
               <v.icon className="" />
               <div className="">{v.name}</div>

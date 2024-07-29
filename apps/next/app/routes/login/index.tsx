@@ -6,7 +6,7 @@ import { db, eq } from "@tyl/db";
 import { auth_user } from "@tyl/db/schema";
 import { ZLogin } from "@tyl/validators/user";
 
-import Form from "../../components/form.js";
+import Form from "~/components2/form.js";
 
 const login = createServerFn(
   "POST",

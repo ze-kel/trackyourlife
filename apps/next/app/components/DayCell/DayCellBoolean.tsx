@@ -1,9 +1,12 @@
 "use client";
+
 import type { MouseEvent, ReactNode } from "react";
 import { useRef, useState } from "react";
-import { AnimatePresence, m } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import clamp from "lodash/clamp";
-import { cn } from "@tyl/ui"
+
+import { cn } from "@tyl/ui";
+
 import { useDayCellContextBoolean } from "~/components/Providers/DayCellProvider";
 
 const ANIMATION_TIME = 0.3;
@@ -85,7 +88,7 @@ export const DayCellBoolean = ({
       ></div>
       {/* This is animating layer with with active color */}
       <AnimatePresence initial={false}>
-        <m.div
+        <motion.div
           key={String(isActive)}
           initial={{
             scaleX: 0,
@@ -104,7 +107,7 @@ export const DayCellBoolean = ({
             },
           }}
           className={cn(
-            "absolute left-0 top-0 h-full  w-full",
+            "absolute left-0 top-0 h-full w-full",
             isActive
               ? "bg-[var(--themeActiveLight)] dark:bg-[var(--themeActiveDark)]"
               : "bg-[var(--themeInactiveLight)] dark:bg-[var(--themeInactiveDark)]",

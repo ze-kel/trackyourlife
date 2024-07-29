@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, m } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 
 import type { IRangeSettings } from "@tyl/validators/trackable";
 import { cn } from "@tyl/ui";
@@ -113,7 +113,7 @@ export const PopupSelector = ({
   const scrollBar = rangeMapping.length > 5;
 
   return (
-    <m.div
+    <motion.div
       className={cn(
         style.miniScrollbar,
         "relative flex cursor-pointer flex-col overflow-hidden rounded-full border border-neutral-200 bg-neutral-50 dark:border-transparent dark:bg-neutral-800",
@@ -122,7 +122,7 @@ export const PopupSelector = ({
       animate={{ height: `${panelH}px` }}
       transition={{ duration: 0.3 * AF, ease: [0, 0, 0, 1.1] }}
     >
-      <m.div
+      <motion.div
         initial={{
           marginTop: `${panelH * -0.5}px`,
         }}
@@ -134,7 +134,7 @@ export const PopupSelector = ({
         <AnimatePresence>
           {rangeMapping.map((v, index) => {
             return (
-              <m.div
+              <motion.div
                 initial={{
                   translateY: getYAnimation(index),
                   scale: 0,
@@ -162,11 +162,11 @@ export const PopupSelector = ({
                 }}
               >
                 <div className="">{v.emoji}</div>
-              </m.div>
+              </motion.div>
             );
           })}
         </AnimatePresence>
-      </m.div>
-    </m.div>
+      </motion.div>
+    </motion.div>
   );
 };

@@ -1,13 +1,18 @@
-import { Input } from "@tyl/ui/input";
-import { Tabs } from "@tyl/ui/tabs";
-import { TabsContent, TabsList, TabsTrigger } from "@tyl/ui/tabs";
-import type { IColorHSL, IColorRGB, IColorValue } from "@tyl/validators/trackable";
 import { Fragment, useEffect, useState } from "react";
 import { clamp } from "src/helpers/animation";
-import { useTheme } from "next-themes";
-import { HSLToRGB, RGBToHSL, makeColorString } from "src/helpers/colorTools";
+import { HSLToRGB, makeColorString, RGBToHSL } from "src/helpers/colorTools";
+
+import type {
+  IColorHSL,
+  IColorRGB,
+  IColorValue,
+} from "@tyl/validators/trackable";
+import { Input } from "@tyl/ui/input";
 import { RadioTabItem, RadioTabs } from "@tyl/ui/radio-tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@tyl/ui/tabs";
+
 import { Controller, Controller2D } from "./contoller";
+import { useTheme } from "~/components/Providers/ThemeProvider";
 
 export const BetterNumberInput = ({
   value,
@@ -325,7 +330,7 @@ export const ColorPicker = ({
   return (
     <Tabs value={mode} onValueChange={setMode} className={className}>
       <TabsList className="w-full p-2">
-        <TabsTrigger className="w-full " value="universal">
+        <TabsTrigger className="w-full" value="universal">
           Universal
         </TabsTrigger>
         <div className="mx-2 h-full w-2 bg-neutral-300 dark:bg-neutral-600"></div>

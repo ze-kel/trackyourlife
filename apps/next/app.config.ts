@@ -1,11 +1,12 @@
 import { fileURLToPath } from "url";
 import { defineConfig } from "@tanstack/start/config";
 import { input } from "vinxi/plugins/config";
+import tsconfigPaths from "vite-tsconfig-paths";
 
 //import middleware from "./app/middleware";
 
 /** @returns {import('vinxi').RouterSchemaInput} */
-function trpcRouter({ plugins = () => [] } = {}) {
+function trpcRouter() {
   return {
     name: "trpc",
     base: "/trpc",
@@ -25,7 +26,11 @@ function authRouter({ plugins = () => [] } = {}) {
   };
 }
 
-const base = defineConfig({});
+const base = defineConfig({
+  vite: {
+    plugins: () => [tsconfigPaths()],
+  },
+});
 
 base.addRouter(trpcRouter());
 

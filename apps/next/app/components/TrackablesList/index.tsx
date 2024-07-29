@@ -1,10 +1,8 @@
-"use client";
-
 import { Fragment, useMemo, useState } from "react";
-import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import { format, isLastDayOfMonth } from "date-fns";
-import { AnimatePresence, m } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { getDateInTimezone } from "src/helpers/timezone";
 
 import type { ITrackable, ITrackableBasic } from "@tyl/validators/trackable";
@@ -135,7 +133,7 @@ const TrackablesList = ({ daysToShow }: { daysToShow: number }) => {
       <div className="mt-3 grid gap-5">
         <AnimatePresence initial={false}>
           {sorted.map((tr) => (
-            <m.div
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 1 }}
@@ -148,7 +146,7 @@ const TrackablesList = ({ daysToShow }: { daysToShow: number }) => {
               <TrackableProvider id={tr.id}>
                 <MiniTrackable daysToRender={daysToRender} />
               </TrackableProvider>
-            </m.div>
+            </motion.div>
           ))}
         </AnimatePresence>
       </div>
@@ -211,7 +209,7 @@ export const DailyList = ({ daysToShow }: { daysToShow: number }) => {
                 <div key={index}>
                   <TrackableProvider id={tr.id}>
                     <Link
-                      href={`/trackables/${tr.id}/${date.year}/${date.month + 1}`}
+                      to={`/trackables/${tr.id}/${date.year}/${date.month + 1}`}
                       className={cn(
                         "mb-1 block w-full truncate text-xl text-neutral-950 opacity-20 dark:text-neutral-50",
                       )}

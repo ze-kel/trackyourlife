@@ -1,8 +1,4 @@
-"use client";
-
 import { useState } from "react";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
 import {
   ActivityLogIcon,
   CalendarIcon,
@@ -10,10 +6,11 @@ import {
   GearIcon,
   PlusCircledIcon,
 } from "@radix-ui/react-icons";
-import { useTheme } from "next-themes";
+import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { useMediaQuery } from "usehooks-ts";
 
 import type { ButtonProps } from "@tyl/ui/button";
+import { User } from "@tyl/auth";
 import { Button } from "@tyl/ui/button";
 import {
   Drawer,
@@ -29,17 +26,16 @@ import {
   DropdownContent,
   DropdownTrigger,
 } from "~/components/Dropdown";
-import { User } from "@tyl/auth";
 
 const SigOutButton = () => {
-  const router = useRouter();
+  const navigate = useNavigate();
 
   const [isLoading, setLoading] = useState(false);
 
   const signOut = async () => {
     setLoading(true);
-    await fetch("/api/user/logout", { method: "POST", credentials: "include" });
-    router.refresh();
+    await fetch("/user/logout", { method: "POST", credentials: "include" });
+    navigate({ to: "/login" });
     setLoading(false);
   };
 
@@ -85,15 +81,15 @@ const Links = ({
   variant: ButtonProps["variant"];
   variantActive: ButtonProps["variant"];
 }) => {
-  const pathName = usePathname();
+  const location = useLocation();
 
   return (
     <div className="flex w-full flex-col items-center gap-2 font-medium md:w-fit md:flex-row">
       {CoreLinks.map((v) => (
-        <Link key={v.link} href={v.link} className="block w-full">
+        <Link key={v.link} to={v.link} className="block w-full">
           <Button
             className="w-full"
-            variant={v.link === pathName ? variantActive : variant}
+            variant={v.link === location.pathname ? variantActive : variant}
           >
             {v.name}
           </Button>
@@ -104,6 +100,9 @@ const Links = ({
 };
 
 const ThemeSwitcher = () => {
+  return <div>themes</div>;
+
+  /*
   const { theme, setTheme } = useTheme();
 
   return (
@@ -119,6 +118,7 @@ const ThemeSwitcher = () => {
       </RadioTabItem>
     </RadioTabs>
   );
+  */
 };
 
 const HeaderMenu = ({ username }: { username?: string }) => {

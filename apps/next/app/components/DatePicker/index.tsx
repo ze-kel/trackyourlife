@@ -1,25 +1,28 @@
-import {
-  addMonths,
-  format,
-  getDaysInMonth,
-  getISODay,
-  isSameMonth,
-  startOfMonth,
-  clamp,
-  isBefore,
-  isAfter,
-} from "date-fns";
 import { useContext, useEffect, useRef, useState } from "react";
 import {
+  CalendarIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   DoubleArrowLeftIcon,
   DoubleArrowRightIcon,
 } from "@radix-ui/react-icons";
-import { Dropdown, DropdownContent, DropdownTrigger } from "../Dropdown";
-import { AnimatePresence, m } from "framer-motion";
+import {
+  addMonths,
+  clamp,
+  format,
+  getDaysInMonth,
+  getISODay,
+  isAfter,
+  isBefore,
+  isSameMonth,
+  startOfMonth,
+} from "date-fns";
+import { AnimatePresence, motion } from "framer-motion";
+import { getDateInTimezone } from "src/helpers/timezone";
+import { useMediaQuery, useResizeObserver } from "usehooks-ts";
+
+import { cn } from "@tyl/ui";
 import { Button, buttonVariants } from "@tyl/ui/button";
-import { CalendarIcon } from "@radix-ui/react-icons";
 import {
   Drawer,
   DrawerContent,
@@ -28,10 +31,9 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@tyl/ui/drawer";
-import { cn } from "@tyl/ui"
-import { useMediaQuery, useResizeObserver } from "usehooks-ts";
-import { getDateInTimezone } from "src/helpers/timezone";
+
 import { useUserSettings } from "~/components/Providers/UserSettingsProvider";
+import { Dropdown, DropdownContent, DropdownTrigger } from "../Dropdown";
 
 const DatePicker = ({
   date,
@@ -134,12 +136,12 @@ const DatePicker = ({
       <span className="">
         {innerDate ? format(innerDate, "d MMMM yyyy") : "No date set"}
       </span>
-      <CalendarIcon className="ml-auto h-4 w-4 " />
+      <CalendarIcon className="ml-auto h-4 w-4" />
     </div>
   );
 
   const Content = (
-    <m.div
+    <motion.div
       animate={{ height: height }}
       transition={{ duration: 0.15, ease: "easeInOut" }}
       className="flex w-full flex-col items-center overflow-hidden md:w-fit"
@@ -169,7 +171,7 @@ const DatePicker = ({
             initial={false}
             custom={moveDirection * 0.1}
           >
-            <m.div
+            <motion.div
               initial="enter"
               animate="middle"
               exit="exit"
@@ -180,7 +182,7 @@ const DatePicker = ({
               className="pointer-events-none select-none whitespace-nowrap"
             >
               {format(cursor, "MMMM yyyy")}
-            </m.div>
+            </motion.div>
           </AnimatePresence>
           <div className="flex">
             <Button
@@ -208,7 +210,7 @@ const DatePicker = ({
           initial={false}
           custom={moveDirection * 0.5}
         >
-          <m.div
+          <motion.div
             initial="enter"
             animate="middle"
             exit="exit"
@@ -232,10 +234,10 @@ const DatePicker = ({
                 {el}
               </Button>
             ))}
-          </m.div>
+          </motion.div>
         </AnimatePresence>
       </div>
-    </m.div>
+    </motion.div>
   );
 
   const isDesktop = useMediaQuery("(min-width:768px)", {

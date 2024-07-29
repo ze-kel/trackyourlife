@@ -1,5 +1,3 @@
-"use client";
-
 import type { ReactNode } from "react";
 import { createContext, useContext } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -7,7 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { IUserSettings } from "@tyl/validators/user";
 import { UserSettingsFallback } from "@tyl/validators/user";
 
-import { api } from "~/trpc/react";
+import { api } from "../../trpc/react";
 
 interface ISettingsContext {
   settings?: IUserSettings;
@@ -19,13 +17,7 @@ const SettingsContext = createContext<ISettingsContext>({});
 
 const QUERY_KEY = ["user", "settings"];
 
-const UserSettingsProvider = ({
-  initialSettings,
-  children,
-}: {
-  children: ReactNode;
-  initialSettings: IUserSettings;
-}) => {
+const UserSettingsProvider = ({ children }: { children: ReactNode }) => {
   const queryClient = useQueryClient();
 
   const { data } = useQuery({
@@ -33,7 +25,6 @@ const UserSettingsProvider = ({
     queryFn: async () => {
       return await api.userRouter.getUserSettings.query();
     },
-    initialData: initialSettings,
     refetchOnWindowFocus: false,
   });
 
@@ -69,7 +60,7 @@ const UserSettingsProvider = ({
   return (
     <SettingsContext.Provider
       value={{
-        settings: data,
+        settings: data || UserSettingsFallback,
         updateSettings: settingsMutation.mutateAsync,
         updateSettingsPartial,
       }}

@@ -1,12 +1,15 @@
 "use client";
-import { cn } from "@tyl/ui"
+
+import { format } from "date-fns";
+import { ErrorBoundary } from "react-error-boundary";
+
+import { cn } from "@tyl/ui";
+
 import DayCellWrapper from "~/components/DayCell";
 import { FavoriteButton } from "~/components/FavoriteButton";
 import { useTrackableContextSafe } from "~/components/Providers/TrackableProvider";
 import { TrackableNameText } from "~/components/TrackableName";
-import { format } from "date-fns";
-import Link from "next/link";
-import { ErrorBoundary } from "react-error-boundary";
+import { Link } from "@tanstack/react-router";
 
 const MiniTrackable = ({
   className,

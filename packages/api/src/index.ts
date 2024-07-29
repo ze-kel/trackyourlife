@@ -13,6 +13,8 @@ import { createCallerFactory, createTRPCContext } from "./trpc";
  */
 const createCaller = createCallerFactory(appRouter);
 
+type ServerCallerType = ReturnType<typeof createCaller>;
+
 /**
  * Inference helpers for input types
  * @example
@@ -30,4 +32,4 @@ type RouterInputs = inferRouterInputs<AppRouter>;
 type RouterOutputs = inferRouterOutputs<AppRouter>;
 
 export { createTRPCContext, appRouter, createCaller };
-export type { AppRouter, RouterInputs, RouterOutputs };
+export type { AppRouter, RouterInputs, RouterOutputs, ServerCallerType };

@@ -14,7 +14,6 @@ import {
   isLastDayOfMonth,
   isSameMonth,
 } from "date-fns";
-import { useTheme } from "next-themes";
 import { makeColorString } from "src/helpers/colorTools";
 import { getDateInTimezone } from "src/helpers/timezone";
 import { useResizeObserver } from "usehooks-ts";
@@ -24,6 +23,7 @@ import { Spinner } from "@tyl/ui/spinner";
 
 import { NumberFormatter } from "~/components/DayCell/DayCellNumber";
 import { useDayCellContextNumber } from "~/components/Providers/DayCellProvider";
+import { useTheme } from "~/components/Providers/ThemeProvider";
 import { useTrackableContextSafe } from "~/components/Providers/TrackableProvider";
 import { useUserSettings } from "~/components/Providers/UserSettingsProvider";
 import { api } from "~/trpc/react";

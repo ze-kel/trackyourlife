@@ -1,4 +1,3 @@
-import { createContext } from "react";
 import {
   dehydrate,
   hydrate,
@@ -8,9 +7,9 @@ import {
 import { createRouter as createTanStackRouter } from "@tanstack/react-router";
 import { H3EventContext } from "vinxi/server";
 
-
-import { DefaultCatchBoundary } from "./components/DefaultCatchBoundary";
-import { NotFound } from "./components/NotFound";
+import UserSettingsProvider from "~/components/Providers/UserSettingsProvider";
+import { DefaultCatchBoundary } from "~/components2/DefaultCatchBoundary";
+import { NotFound } from "~/components2/NotFound";
 import { routeTree } from "./routeTree.gen";
 
 export function createRouter(event?: H3EventContext) {
@@ -27,6 +26,7 @@ export function createRouter(event?: H3EventContext) {
       user: event?.user,
       session: event?.session,
     },
+
     defaultPreload: "intent",
     defaultErrorComponent: DefaultCatchBoundary,
     defaultNotFoundComponent: () => <NotFound />,
@@ -38,7 +38,7 @@ export function createRouter(event?: H3EventContext) {
     Wrap: ({ children }) => {
       return (
         <QueryClientProvider client={queryClient}>
-          {children}
+          <UserSettingsProvider>{children}</UserSettingsProvider>
         </QueryClientProvider>
       );
     },

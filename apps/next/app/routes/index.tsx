@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/start";
+import { AnimatePresence, motion } from "framer-motion";
 
 import { lucia } from "@tyl/auth";
 import { Button } from "@tyl/ui/button";
@@ -65,6 +66,10 @@ function Home() {
       <Link to={"/login"}>LOGIN</Link>
 
       <SigOutButton />
+
+      <AnimatePresence>
+        <motion.div>aaa</motion.div>
+      </AnimatePresence>
 
       <button onClick={() => setN((v) => v + 1)}>{n}</button>
     </div>

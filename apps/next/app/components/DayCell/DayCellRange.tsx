@@ -1,16 +1,18 @@
 "use client";
+
+import type { ReactNode } from "react";
+import { useState } from "react";
+import { motion } from "framer-motion";
+
+import { cn } from "@tyl/ui";
+
+import { PopupSelector } from "~/components/DayCell/PopupSelector";
 import {
   Dropdown,
   DropdownContent,
   DropdownTrigger,
 } from "~/components/Dropdown";
-import type { ReactNode } from "react";
-import { useState } from "react";
-import { useOptimistic } from "react";
-import { cn } from "@tyl/ui"
 import { useDayCellContextRange } from "~/components/Providers/DayCellProvider";
-import { PopupSelector } from "~/components/DayCell/PopupSelector";
-import { m } from "framer-motion";
 
 export const DayCellRange = ({
   value,
@@ -27,9 +29,7 @@ export const DayCellRange = ({
 
   const [isSelecting, setIsSelecting] = useState(false);
 
-  const [dayValue, setIsActive] = useOptimistic(value, (_, value: string) => {
-    return value;
-  });
+  const [dayValue, setIsActive] = useState(value);
 
   const em = dayValue ? (labelMapping[dayValue] as string) : "❓";
 
@@ -69,20 +69,20 @@ export const DayCellRange = ({
           "transition-colors",
           "relative",
           "cursor-pointer border-neutral-200 dark:border-neutral-900",
-          "text-neutral-500  dark:text-neutral-700",
+          "text-neutral-500 dark:text-neutral-700",
         )}
         onClick={() => void cycleNext()}
       >
         {children}
 
-        <m.div
+        <motion.div
           data-key={String(dayValue)}
           key={String(dayValue)}
           transition={{ duration: 0.4, ease: "circOut" }}
           className="text-xl"
         >
           {dayValue && em}
-        </m.div>
+        </motion.div>
       </button>
     );
   }
@@ -102,7 +102,7 @@ export const DayCellRange = ({
               "flex items-center justify-center",
               "transition-colors",
               "cursor-pointer border-neutral-200 dark:border-neutral-900",
-              "text-neutral-500  dark:text-neutral-700",
+              "text-neutral-500 dark:text-neutral-700",
             )}
           >
             {children}
