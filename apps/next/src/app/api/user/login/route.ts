@@ -74,6 +74,7 @@ export const POST = async (request: NextRequest) => {
       },
     });
   } catch (e) {
+    log(`API: Fail to login, UNKNOWN`, e);
     return NextResponse.json(
       {
         error: "An unknown error occurred",
