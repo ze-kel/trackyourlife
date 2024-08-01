@@ -8,3 +8,5 @@ docker
 .git
 .env.development
 .env.production
+.env
+.turbo

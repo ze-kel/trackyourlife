@@ -1,9 +1,9 @@
 version: "3"
 services:
-  node-next:
+  tyl-node-next:
     build:
-      context: ../../
-      dockerfile: docker/production/Dockerfile
+      context: ../
+      dockerfile: docker/Dockerfile
       args:
         NODE_ENV: development
     ports:
@@ -11,20 +11,20 @@ services:
     environment:
       - MIGRATE=true
       - NODE_ENV=production
-      - DATABASE_URL=postgresql://admin:samplepass@postgres:5432/db?connect_timeout=300
+      - DATABASE_URL=postgresql://admin:samplepass@tyl-postgres:5432/db?connect_timeout=300
     tty: true
     depends_on:
-      postgres:
+      tyl-postgres:
         condition: service_healthy
-  postgres:
-    image: postgres:latest
+  tyl-postgres:
+    image: postgres:alpine
     restart: always
     environment:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=samplepass
       - POSTGRES_DB=db
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - tyl-db:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready", "-d", "db_prod"]
       interval: 5s
@@ -33,4 +33,4 @@ services:
       start_period: 5s
 
 volumes:
-  pgdata:
+  tyl-db:
