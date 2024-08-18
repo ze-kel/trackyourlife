@@ -1,16 +1,17 @@
-### Current state
-
-updated: 26.03.2023
-
-Right now only basic functionality is implemented(no stats, no mobile version, limited customization, etc.). I'm trying to polish existing things before moving and it takes time.
-
-I intend to keep working on it for the foreseable future.
-
 ### TrackYourLife
 
 App to track stuff. Kinds of like a habit tracker but more: data types, customization, etc.
 
-![](./public/screenshot.jpg)
+### Current state
+
+updated: 18.08.2024
+
+I use it as habit tracker personally, however I would not call this stable, because I have more interest in tinkering with various tech pursuing that perfect stack.
+There might be polishing and more features, but I'm more likely to dump time into one of three time consuming refactors in the next year:
+
+1. Move to tanstack start: I'm not happy with server components for app like this, and if I just do 'use client' everywhere app loses SSR
+2. Rework data fetching to some local-first solution(zerosync?). Current tanstack query setup is fine for a website, but not good enough for app(thats why app is postponed atm)
+3. Rework data storage to support multiple data points in a single day
 
 ### Development
 
