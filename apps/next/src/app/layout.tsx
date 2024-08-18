@@ -58,7 +58,7 @@ export default async function RootLayout({
                     <Header user={user || undefined} />
                   </div>
                   {user && (
-                    <div className="sidebar sticky top-14 hidden h-full max-h-[calc(100vh-3.5rem)] overflow-scroll border-r-2 border-neutral-300 bg-neutral-100 px-3 py-6 dark:border-neutral-800 dark:bg-neutral-900 xl:block">
+                    <div className="sidebar customScrollBar customScrollBarBig sticky top-14 hidden h-full max-h-[calc(100vh-3.5rem)] overflow-auto border-r-2 border-neutral-300 bg-neutral-100 px-3 py-6 dark:border-neutral-800 dark:bg-neutral-900 xl:block">
                       <Sidebar />
                     </div>
                   )}
