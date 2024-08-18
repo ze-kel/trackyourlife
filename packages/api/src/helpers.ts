@@ -118,7 +118,6 @@ export const makeTrackableData = (
       if (!result[year2]) {
         result[year2] = { [month2]: [] };
       } else {
-        //@ts-expect-error ts please
         result[year2][month2] = {};
       }
     }
@@ -135,11 +134,9 @@ export const makeTrackableData = (
       result[y] = {};
     }
     if (!result[y]?.[m]) {
-      //@ts-expect-error ts please
       result[y][m] = {};
     }
 
-    //@ts-expect-error ts please
     result[y][m][d] = el.value;
   });
 
