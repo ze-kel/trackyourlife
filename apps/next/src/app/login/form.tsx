@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Input } from "@tyl/ui/input";
-
-import { Button } from "@tyl/ui/button";
-
 import { useRouter } from "next/navigation";
+
+import { cn } from "@tyl/ui";
+import { Alert, AlertDescription, AlertTitle } from "@tyl/ui/alert";
+import { Button } from "@tyl/ui/button";
 import {
   Card,
   CardContent,
@@ -13,10 +13,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@tyl/ui/card";
-import { RadioTabs, RadioTabItem } from "@tyl/ui/radio-tabs";
-import { Alert, AlertDescription, AlertTitle } from "@tyl/ui/alert";
-
-import { cn } from "@tyl/ui"
+import { Input } from "@tyl/ui/input";
+import { RadioTabItem, RadioTabs } from "@tyl/ui/radio-tabs";
 
 type ActionState = "login" | "register";
 

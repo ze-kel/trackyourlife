@@ -109,9 +109,17 @@ export type ITrackableSettings =
 //
 // Trackable
 //
-export type ITrackableDataMonth = Record<number, string>;
-export type ITrackableDataYear = Record<number, ITrackableDataMonth>;
-export type ITrackableData = Record<number, ITrackableDataYear>;
+
+export const zTrackableDataMonth = z.record(z.coerce.number(), z.string());
+export const zTrackableDataYear = z.record(
+  z.coerce.number(),
+  zTrackableDataMonth,
+);
+export const zTrackableData = z.record(z.coerce.number(), zTrackableDataYear);
+
+export type ITrackableDataMonth = z.infer<typeof zTrackableDataMonth>;
+export type ITrackableDataYear = z.infer<typeof zTrackableDataYear>;
+export type ITrackableData = z.infer<typeof zTrackableData>;
 
 export type ITrackableUnsaved =
   | {
@@ -133,7 +141,34 @@ export type ITrackableUnsaved =
       data: ITrackableData;
     };
 
-export type ITrackable = ITrackableUnsaved & { id: string };
+export const ZTrackable = z
+  .object({
+    id: z.string(),
+    name: z.string(),
+    type: z.literal("boolean"),
+    settings: ZTrackableSettingsBoolean,
+    data: zTrackableData,
+  })
+  .or(
+    z.object({
+      id: z.string(),
+      name: z.string(),
+      type: z.literal("number"),
+      settings: ZTrackableSettingsNumber,
+      data: zTrackableData,
+    }),
+  )
+  .or(
+    z.object({
+      id: z.string(),
+      name: z.string(),
+      type: z.literal("range"),
+      settings: ZTrackableSettingsRange,
+      data: zTrackableData,
+    }),
+  );
+
+export type ITrackable = z.infer<typeof ZTrackable>;
 export type ITrackableBasic = Omit<Omit<ITrackable, "data">, "settings">;
 
 //

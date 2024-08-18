@@ -3,7 +3,7 @@ import { format } from "date-fns";
 import { z } from "zod";
 
 import type { DbTrackableRecordInsert } from "@tyl/db/schema";
-import { and, between, eq } from "@tyl/db";
+import { and, between, eq, sql } from "@tyl/db";
 import { trackable, trackableRecord } from "@tyl/db/schema";
 import { ZGETLimits } from "@tyl/validators/api";
 import {
@@ -167,6 +167,26 @@ export const trackablesRouter = {
           set: { value: input.value },
         })
         .returning();
+
+      return input;
+    }),
+  updateTrackableEntries: protectedProcedure
+    .input(z.array(ZTrackableUpdate))
+    .mutation(async ({ ctx, input }) => {
+      const toInsert: DbTrackableRecordInsert[] = input.map((i) => ({
+        trackableId: i.id,
+        value: i.value,
+        date: format(new Date(i.year, i.month, i.day), "yyyy-MM-dd"),
+        userId: ctx.user.id,
+      }));
+
+      await ctx.db
+        .insert(trackableRecord)
+        .values(toInsert)
+        .onConflictDoUpdate({
+          target: [trackableRecord.trackableId, trackableRecord.date],
+          set: { value: sql.raw(`excluded.${trackableRecord.value.name}`) },
+        });
 
       return input;
     }),

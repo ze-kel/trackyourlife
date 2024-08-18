@@ -14,6 +14,7 @@ import { useTheme } from "next-themes";
 import { useMediaQuery } from "usehooks-ts";
 
 import type { ButtonProps } from "@tyl/ui/button";
+import { User } from "@tyl/auth";
 import { Button } from "@tyl/ui/button";
 import {
   Drawer,
@@ -29,7 +30,6 @@ import {
   DropdownContent,
   DropdownTrigger,
 } from "~/components/Dropdown";
-import { User } from "@tyl/auth";
 
 const SigOutButton = () => {
   const router = useRouter();
