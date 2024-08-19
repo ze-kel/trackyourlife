@@ -1,3 +1,4 @@
+import timezones from "timezones-list";
 import {
   CurrentTime,
   TimezoneSelector,
@@ -11,7 +12,7 @@ export const UserSettings = () => {
         <CurrentTime />
       </div>
 
-      <TimezoneSelector />
+      <TimezoneSelector list={timezones} />
     </div>
   );
 };

@@ -17,8 +17,8 @@
   "dependencies": {
     "@bacons/text-decoder": "^0.0.0",
     "@expo/metro-config": "^0.18.3",
-    "@shopify/flash-list": "1.6.4",
-    "@tanstack/react-query": "^5.44.0",
+    "@shopify/flash-list": "1.7.1",
+    "@tanstack/react-query": "^5.51.24",
     "@trpc/client": "11.0.0-rc.403",
     "@trpc/react-query": "11.0.0-rc.403",
     "@trpc/server": "11.0.0-rc.403",
@@ -46,14 +46,14 @@
     "@tyl/eslint-config": "workspace:*",
     "@tyl/prettier-config": "workspace:*",
     "@tyl/tsconfig": "workspace:*",
-    "@babel/core": "^7.24.7",
-    "@babel/preset-env": "^7.24.7",
-    "@babel/runtime": "^7.24.7",
+    "@babel/core": "^7.25.2",
+    "@babel/preset-env": "^7.25.3",
+    "@babel/runtime": "^7.25.0",
     "@types/babel__core": "^7.20.5",
     "@types/react": "^18.3.3",
     "eslint": "^8.57.0",
-    "prettier": "^3.3.2",
-    "typescript": "^5.4.5"
+    "prettier": "^3.3.3",
+    "typescript": "^5.5.4"
   },
   "prettier": "@tyl/prettier-config"
 }

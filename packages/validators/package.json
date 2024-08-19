@@ -27,10 +27,10 @@
     "@tyl/eslint-config": "workspace:*",
     "@tyl/prettier-config": "workspace:*",
     "@tyl/tsconfig": "workspace:*",
-    "@types/uuid": "^9.0.8",
+    "@types/uuid": "^10.0.0",
     "eslint": "^8.57.0",
-    "prettier": "^3.3.2",
-    "typescript": "^5.4.5"
+    "prettier": "^3.3.3",
+    "typescript": "^5.5.4"
   },
   "prettier": "@tyl/prettier-config"
 }

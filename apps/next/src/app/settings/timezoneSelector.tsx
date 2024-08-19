@@ -2,7 +2,6 @@
 
 import { CaretSortIcon } from "@radix-ui/react-icons";
 import type { TimeZone } from "timezones-list";
-import timezones from "timezones-list";
 
 import { Button } from "@tyl/ui/button";
 
@@ -18,7 +17,7 @@ import { useMediaQuery } from "usehooks-ts";
 import { useUserSettings } from "~/components/Providers/UserSettingsProvider";
 import { format } from "date-fns";
 import { cn } from "@tyl/ui"
-import { clamp } from "lodash";
+import {clamp} from "lodash-es";
 import { getDateInTimezone } from "src/helpers/timezone";
 
 export const CurrentTime = () => {
@@ -110,7 +109,7 @@ const SearchableList = ({
   );
 };
 
-export const TimezoneSelector = () => {
+export const TimezoneSelector = ({list}: {list: TimeZone[]}) => {
   const [open, setOpen] = useState(false);
 
   const { settings, updateSettingsPartial } = useUserSettings();
@@ -153,7 +152,7 @@ export const TimezoneSelector = () => {
 
         <DrawerContent>
           <SearchableList
-            list={timezones}
+            list={list}
             value={value}
             update={(v) => {
               update(v);
@@ -170,7 +169,7 @@ export const TimezoneSelector = () => {
 
       <DropdownContent className=" max-w-[400px] p-0">
         <SearchableList
-          list={timezones}
+          list={list}
           value={value}
           update={(v) => {
             update(v);

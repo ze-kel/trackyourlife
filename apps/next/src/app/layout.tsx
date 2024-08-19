@@ -78,9 +78,16 @@ export default async function RootLayout({
 export const metadata: Metadata = {
   title: "TrackYourLife",
   description: "TrackYourLifeApp",
-  icons: {
-    shortcut: "/favicon.ico",
-    apple: "/apple-touch-icon.png",
-    icon: "/favicon-32x32.png",
-  },
+  icons:
+    process.env.SITE === "stage"
+      ? {
+          shortcut: "/stg/favicon.ico",
+          apple: "/stg/apple-touch-icon.png",
+          icon: "/stg/favicon-32x32.png",
+        }
+      : {
+          shortcut: "/favicon.ico",
+          apple: "/apple-touch-icon.png",
+          icon: "/favicon-32x32.png",
+        },
 };

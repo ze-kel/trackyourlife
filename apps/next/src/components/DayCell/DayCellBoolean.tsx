@@ -2,7 +2,7 @@
 import type { MouseEvent, ReactNode } from "react";
 import { useRef, useState } from "react";
 import { AnimatePresence, m } from "framer-motion";
-import clamp from "lodash/clamp";
+import {clamp} from "lodash-es";
 import { cn } from "@tyl/ui"
 import { useDayCellContextBoolean } from "~/components/Providers/DayCellProvider";
 

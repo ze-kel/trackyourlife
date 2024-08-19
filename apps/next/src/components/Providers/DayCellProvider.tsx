@@ -7,7 +7,7 @@ import type {
   IRangeSettings,
   ITrackable,
 } from "@tyl/validators/trackable";
-import { clamp } from "lodash";
+import {clamp} from "lodash-es";
 import type { CSSProperties, ReactNode } from "react";
 import { createContext, memo, useContext } from "react";
 import { makeColorString } from "src/helpers/colorTools";

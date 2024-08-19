@@ -1,6 +1,6 @@
 "use client";
 import type { IColorValue, IRangeSettings } from "@tyl/validators/trackable";
-import cloneDeep from "lodash/cloneDeep";
+import {cloneDeep} from "lodash-es";
 import { useState } from "react";
 import { Reorder, useDragControls, AnimatePresence } from "framer-motion";
 import {

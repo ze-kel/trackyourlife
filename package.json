@@ -4,7 +4,7 @@
   "engines": {
     "node": ">=20.12.0"
   },
-  "packageManager": "pnpm@9.2.0",
+  "packageManager": "pnpm@9.7.1",
   "scripts": {
     "build": "turbo run build",
     "clean": "git clean -xdf node_modules",
@@ -25,10 +25,10 @@
   },
   "devDependencies": {
     "@tyl/prettier-config": "workspace:*",
-    "@turbo/gen": "^2.0.3",
-    "prettier": "^3.3.2",
-    "turbo": "^2.0.3",
-    "typescript": "^5.4.5"
+    "@turbo/gen": "^2.0.14",
+    "prettier": "^3.3.3",
+    "turbo": "^2.0.14",
+    "typescript": "^5.5.4"
   },
   "prettier": "@tyl/prettier-config"
 }

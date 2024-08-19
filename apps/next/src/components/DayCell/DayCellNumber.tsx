@@ -2,7 +2,7 @@
 import type React from "react";
 import type { CSSProperties, ReactNode } from "react";
 import { useCallback, useLayoutEffect, useMemo, useState } from "react";
-import debounce from "lodash/debounce";
+import {debounce} from "lodash-es";
 import { makeColorString } from "src/helpers/colorTools";
 import { cn } from "@tyl/ui"
 import { useDayCellContextNumber } from "~/components/Providers/DayCellProvider";

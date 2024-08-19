@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
-import cloneDeep from "lodash/cloneDeep";
+import {cloneDeep} from "lodash-es";
 
 import type {
   ITrackableSettings,

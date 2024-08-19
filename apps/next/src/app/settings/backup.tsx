@@ -4,6 +4,7 @@ import { useState } from "react";
 import { z } from "zod";
 
 import { Button } from "@tyl/ui/button";
+import { Input } from "@tyl/ui/input";
 import {
   ITrackable,
   ITrackableUpdate,
@@ -98,6 +99,8 @@ const parseContentJson = (content: string) => {
 };
 
 const FileParser = ({ content }: { content?: string }) => {
+  const [prefix, setPrefix] = useState("");
+
   if (!content || !content.length) return;
 
   const objectFromJson = parseContentJson(content);
@@ -122,20 +125,38 @@ const FileParser = ({ content }: { content?: string }) => {
   }
 
   return (
-    <div className="grid auto-cols-auto grid-cols-6 items-center justify-center gap-2 py-3 text-xs md:grid-cols-7">
-      <div className="col-span-2 truncate md:col-span-3">Id</div>
-      <div className="col-span-2">Name</div>
-      <div className="">Type</div>
-      <div className=""></div>
+    <>
+      <div className="text-xs">
+        Prefix for item names:
+        <Input
+          className="mt-2"
+          onChange={(e) => setPrefix(e.target.value)}
+          value={prefix}
+          placeholder="restored_"
+        />
+      </div>
 
-      {parsed.data.map((v) => {
-        return <ParsedItem trackable={v} key={v.id} />;
-      })}
-    </div>
+      <div className="grid auto-cols-auto grid-cols-6 items-center justify-center gap-2 py-3 text-xs md:grid-cols-7">
+        <div className="col-span-2 truncate text-base md:col-span-3">Id</div>
+        <div className="col-span-2 text-xs">Name</div>
+        <div className="text-xs">Type</div>
+        <div className=""></div>
+
+        {parsed.data.map((v) => {
+          return <ParsedItem namePrefix={prefix} trackable={v} key={v.id} />;
+        })}
+      </div>
+    </>
   );
 };
 
-const ParsedItem = ({ trackable }: { trackable: ITrackable }) => {
+const ParsedItem = ({
+  trackable,
+  namePrefix,
+}: {
+  namePrefix: string;
+  trackable: ITrackable;
+}) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const [savedId, setSavedId] = useState("");
@@ -143,7 +164,7 @@ const ParsedItem = ({ trackable }: { trackable: ITrackable }) => {
   const save = async () => {
     setIsLoading(true);
     const newOne = await api.trackablesRouter.createTrackable.mutate({
-      name: `restored_${trackable.name}`,
+      name: `${namePrefix}${trackable.name}`,
       settings: trackable.settings,
       type: trackable.type,
     });
@@ -166,11 +187,10 @@ const ParsedItem = ({ trackable }: { trackable: ITrackable }) => {
       });
     });
 
-    console.log(allEntries);
+    if (allEntries.length) {
+      await api.trackablesRouter.updateTrackableEntries.mutate(allEntries);
+    }
 
-    await api.trackablesRouter.updateTrackableEntries.mutate(allEntries);
-
-    console.log("all good");
     setIsLoading(false);
     setSavedId(newOne.id);
   };
@@ -178,7 +198,10 @@ const ParsedItem = ({ trackable }: { trackable: ITrackable }) => {
   return (
     <>
       <div className="col-span-2 md:col-span-3">{trackable.id}</div>
-      <div className="col-span-2"> {trackable.name}</div>
+      <div className="col-span-2">
+        <span className="opacity-50">{namePrefix}</span>
+        {trackable.name}
+      </div>
       <div>{trackable.type}</div>
 
       {!savedId ? (
@@ -186,7 +209,7 @@ const ParsedItem = ({ trackable }: { trackable: ITrackable }) => {
           Save
         </Button>
       ) : (
-        <Button asChild>
+        <Button asChild variant={"outline"}>
           <a href={"/trackables/" + savedId} target="_blank">
             Open
           </a>

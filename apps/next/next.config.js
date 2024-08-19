@@ -1,3 +1,5 @@
+import nba from '@next/bundle-analyzer'
+
 /** @type {import("next").NextConfig} */
 const config = {
   reactStrictMode: true,
@@ -23,4 +25,8 @@ const config = {
   typescript: { ignoreBuildErrors: true },
 };
 
-export default config;
+const withBundleAnalyzer = nba({
+  enabled: process.env.ANALYZE === 'true',
+})
+ 
+export default withBundleAnalyzer(config);

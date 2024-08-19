@@ -32,8 +32,7 @@
     "with-env": "dotenv -e ../../.env --"
   },
   "dependencies": {
-    "@t3-oss/env-core": "^0.10.1",
-    "drizzle-orm": "^0.31.2",
+    "drizzle-orm": "^0.33.0",
     "drizzle-zod": "^0.5.1",
     "zod": "^3.23.8"
   },
@@ -43,11 +42,11 @@
     "@tyl/tsconfig": "workspace:*",
     "@types/pg": "^8.11.6",
     "dotenv-cli": "^7.4.2",
-    "drizzle-kit": "^0.22.6",
+    "drizzle-kit": "^0.24.0",
     "eslint": "^8.57.0",
     "pg": "^8.12.0",
-    "prettier": "^3.3.2",
-    "typescript": "^5.4.5"
+    "prettier": "^3.3.3",
+    "typescript": "^5.5.4"
   },
   "prettier": "@tyl/prettier-config"
 }
