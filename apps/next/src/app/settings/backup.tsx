@@ -44,7 +44,7 @@ export const BackupAndRestore = () => {
       <h2 className="mt-4 text-xl">Backup and Restore Trackables</h2>
       <p className="text-xs">User settings and favorites are not backed up</p>
 
-      <div className="mt-2 flex flex-col gap-4 md:items-center">
+      <div className="mt-2 flex flex-col gap-4 md:flex-row md:items-center">
         <Button variant={"outline"} onClick={() => getBackup()}>
           Backup to .json
         </Button>
