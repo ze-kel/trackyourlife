@@ -1,22 +1,24 @@
-import type { IColorValue, INumberSettings } from "@tyl/validators/trackable";
 import type { TouchEvent } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
-import type { ArrayElement } from "@tyl/validators/helpers";
-import ColorPicker, { BetterNumberInput } from "~/components/Colors";
-import { presetsMap } from "~/components/Colors/presets";
-import { range } from "src/helpers/animation";
-import { Input } from "@tyl/ui/input";
-import { cn } from "@tyl/ui"
-import { InterpolateColors, makeColorString } from "src/helpers/colorTools";
-import { ColorDisplay } from "~/components/Colors/colorDisplay";
-import { useTheme } from "next-themes";
-import { Button } from "@tyl/ui/button";
 import { Cross1Icon, PlusCircledIcon } from "@radix-ui/react-icons";
-import { RadioTabItem, RadioTabs } from "@tyl/ui/radio-tabs";
-import { useRefSize } from "~/components/Colors/contoller";
-import { Switch } from "@tyl/ui/switch";
+import { useTheme } from "next-themes";
+import { range } from "src/helpers/animation";
+import { InterpolateColors, makeColorString } from "src/helpers/colorTools";
+import { v4 as uuidv4 } from "uuid";
+
+import type { ArrayElement } from "@tyl/validators/helpers";
+import type { IColorValue, INumberSettings } from "@tyl/validators/trackable";
+import { cn } from "@tyl/ui";
+import { Button } from "@tyl/ui/button";
+import { Input } from "@tyl/ui/input";
 import { Label } from "@tyl/ui/label";
+import { RadioTabItem, RadioTabs } from "@tyl/ui/radio-tabs";
+import { Switch } from "@tyl/ui/switch";
+
+import ColorPicker, { BetterNumberInput } from "~/components/Colors";
+import { ColorDisplay } from "~/components/Colors/colorDisplay";
+import { useRefSize } from "~/components/Colors/contoller";
+import { presetsMap } from "~/components/Colors/presets";
 
 type IColorCodingValue = INumberSettings["colorCoding"];
 
@@ -280,12 +282,12 @@ const ControllerGradient = ({
         {isDragging && false && (
           <div
             className={cn(
-              "absolute z-50 h-[200%] w-full -translate-y-1/2 ",
+              "absolute z-50 h-[200%] w-full -translate-y-1/2",
               selectedColorRemove === 0
                 ? "cursor-grabbing"
                 : value.length > 1
-                ? "cursor-default"
-                : "cursor-not-allowed",
+                  ? "cursor-default"
+                  : "cursor-not-allowed",
             )}
           ></div>
         )}
@@ -301,10 +303,10 @@ const ControllerGradient = ({
                 : e.target.valueAsNumber,
             );
           }}
-          className="w-16 "
+          className="w-16"
         />
         <div
-          className="relative box-border flex h-9 w-full cursor-copy rounded-lg border-2 border-neutral-200 bg-transparent text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1  focus-visible:ring-neutral-950 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-800 max-sm:col-span-full max-sm:row-start-2 max-sm:row-end-2 "
+          className="relative box-border flex h-9 w-full cursor-copy rounded-lg border-2 border-neutral-200 bg-transparent text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-950 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-800 max-sm:col-span-full max-sm:row-start-2 max-sm:row-end-2"
           style={{
             background: makeGradient(
               value,
@@ -376,7 +378,7 @@ const ControllerGradient = ({
                   : e.target.valueAsNumber,
               );
             }}
-            className="w-16 "
+            className="w-16"
           />
         </div>
 

@@ -18,6 +18,7 @@ import { User } from "@tyl/auth";
 import { Button } from "@tyl/ui/button";
 import {
   Drawer,
+  DrawerClose,
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
@@ -81,16 +82,23 @@ export const CoreLinks = [
 const Links = ({
   variant,
   variantActive,
+  onClick,
 }: {
   variant: ButtonProps["variant"];
   variantActive: ButtonProps["variant"];
+  onClick?: () => void;
 }) => {
   const pathName = usePathname();
 
   return (
     <div className="flex w-full flex-col items-center gap-2 font-medium md:w-fit md:flex-row">
       {CoreLinks.map((v) => (
-        <Link key={v.link} href={v.link} className="block w-full">
+        <Link
+          key={v.link}
+          href={v.link}
+          className="block w-full"
+          onClick={onClick}
+        >
           <Button
             className="w-full"
             variant={v.link === pathName ? variantActive : variant}
@@ -126,6 +134,8 @@ const HeaderMenu = ({ username }: { username?: string }) => {
     initializeWithValue: false,
   });
 
+  const [opened, setOpened] = useState(false);
+
   const Trigger = (
     <div className="relative flex cursor-pointer items-center px-4 transition-colors hover:text-neutral-600 dark:hover:text-neutral-50">
       <p className="font-medium">{username || ""}</p>
@@ -147,13 +157,17 @@ const HeaderMenu = ({ username }: { username?: string }) => {
       </div>
       {isDesktop ? (
         <>
-          <Dropdown placement="bottom-end">
+          <Dropdown
+            open={opened}
+            onOpenChange={setOpened}
+            placement="bottom-end"
+          >
             <DropdownTrigger>{Trigger}</DropdownTrigger>
             <DropdownContent>{Content}</DropdownContent>
           </Dropdown>
         </>
       ) : (
-        <Drawer>
+        <Drawer open={opened} onOpenChange={setOpened}>
           <DrawerTrigger>{Trigger}</DrawerTrigger>
           <DrawerContent className="flex flex-col items-center gap-2">
             <DrawerHeader>
@@ -161,7 +175,12 @@ const HeaderMenu = ({ username }: { username?: string }) => {
             </DrawerHeader>
 
             <div className="m-auto flex w-full max-w-80 flex-col gap-2 px-4 pb-4">
-              <Links variant={"outline"} variantActive={"outline"} />
+              <Links
+                variant={"outline"}
+                variantActive={"outline"}
+                onClick={() => setOpened(false)}
+              />
+
               {Content}
             </div>
           </DrawerContent>

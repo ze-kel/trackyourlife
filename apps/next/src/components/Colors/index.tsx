@@ -1,42 +1,67 @@
-import { Input } from "@tyl/ui/input";
-import { Tabs } from "@tyl/ui/tabs";
-import { TabsContent, TabsList, TabsTrigger } from "@tyl/ui/tabs";
-import type { IColorHSL, IColorRGB, IColorValue } from "@tyl/validators/trackable";
-import { Fragment, useEffect, useState } from "react";
-import { clamp } from "src/helpers/animation";
+import { Fragment, useEffect, useLayoutEffect, useState } from "react";
 import { useTheme } from "next-themes";
-import { HSLToRGB, RGBToHSL, makeColorString } from "src/helpers/colorTools";
+import { clamp } from "src/helpers/animation";
+import { HSLToRGB, makeColorString, RGBToHSL } from "src/helpers/colorTools";
+
+import type {
+  IColorHSL,
+  IColorRGB,
+  IColorValue,
+} from "@tyl/validators/trackable";
+import { Input } from "@tyl/ui/input";
 import { RadioTabItem, RadioTabs } from "@tyl/ui/radio-tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@tyl/ui/tabs";
+
 import { Controller, Controller2D } from "./contoller";
 
 export const BetterNumberInput = ({
   value,
+  soft,
   onChange,
   limits = { min: 0, max: 255 },
 }: {
+  soft?: boolean;
   value: number;
   limits?: { min: number; max: number };
   onChange: (v: number) => void;
 }) => {
-  const [isEmpty, setEmpty] = useState(false);
+  const [internalValue, setInternalVal] = useState<number | string>(value);
+
+  useLayoutEffect(() => {
+    setInternalVal(value);
+  }, [value]);
+
+  const [isError, setIsError] = useState(false);
 
   return (
     <Input
       className="w-full text-center max-sm:p-0 max-sm:text-xs"
       type="number"
-      value={isEmpty ? "" : value}
+      error={isError}
+      value={internalValue}
       onChange={(e) => {
         // This code allows input to be empty when editing
         if (Number.isNaN(e.target.valueAsNumber)) {
-          setEmpty(true);
+          setInternalVal("");
           return;
         }
-        setEmpty(false);
-        const numb = clamp(e.target.valueAsNumber, limits.min, limits.max);
-        onChange(numb);
+        setInternalVal(e.target.valueAsNumber);
+        const clamped = clamp(e.target.valueAsNumber, limits.min, limits.max);
+
+        if (clamped !== e.target.valueAsNumber) {
+          setIsError(true);
+          return;
+        }
+
+        onChange(clamped);
       }}
       onBlur={() => {
-        if (isEmpty) setEmpty(false);
+        setIsError(false);
+        setInternalVal(value);
+        if (Number.isNaN(internalValue) || typeof internalValue === "string") {
+          return;
+        }
+        onChange(clamp(internalValue, limits.min, limits.max));
       }}
     />
   );
@@ -325,7 +350,7 @@ export const ColorPicker = ({
   return (
     <Tabs value={mode} onValueChange={setMode} className={className}>
       <TabsList className="w-full p-2">
-        <TabsTrigger className="w-full " value="universal">
+        <TabsTrigger className="w-full" value="universal">
           Universal
         </TabsTrigger>
         <div className="mx-2 h-full w-2 bg-neutral-300 dark:bg-neutral-600"></div>

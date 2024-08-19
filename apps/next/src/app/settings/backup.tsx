@@ -6,7 +6,6 @@ import { z } from "zod";
 import { Button } from "@tyl/ui/button";
 import {
   ITrackable,
-  ITrackableUnsaved,
   ITrackableUpdate,
   ZTrackable,
 } from "@tyl/validators/trackable";
@@ -39,13 +38,15 @@ const getBackup = async () => {
 
 export const BackupAndRestore = () => {
   const [fileData, setFileData] = useState(["", ""]);
+
   return (
     <div>
-      <h2 className="mb-2 mt-4 text-xl">Backup and Restore</h2>
+      <h2 className="mt-4 text-xl">Backup and Restore Trackables</h2>
+      <p className="text-xs">User settings and favorites are not backed up</p>
 
-      <div className="flex items-center gap-4">
+      <div className="mt-2 flex flex-col gap-4 md:items-center">
         <Button variant={"outline"} onClick={() => getBackup()}>
-          Backup all Trackables
+          Backup to .json
         </Button>
 
         <Button asChild variant={"outline"} className="cursor-pointer">
@@ -121,8 +122,8 @@ const FileParser = ({ content }: { content?: string }) => {
   }
 
   return (
-    <div className="grid auto-cols-auto grid-cols-7 items-center justify-center gap-2 py-3 text-xs">
-      <div className="col-span-3">Id</div>
+    <div className="grid auto-cols-auto grid-cols-6 items-center justify-center gap-2 py-3 text-xs md:grid-cols-7">
+      <div className="col-span-2 truncate md:col-span-3">Id</div>
       <div className="col-span-2">Name</div>
       <div className="">Type</div>
       <div className=""></div>
@@ -176,7 +177,7 @@ const ParsedItem = ({ trackable }: { trackable: ITrackable }) => {
 
   return (
     <>
-      <div className="col-span-3">{trackable.id}</div>
+      <div className="col-span-2 md:col-span-3">{trackable.id}</div>
       <div className="col-span-2"> {trackable.name}</div>
       <div>{trackable.type}</div>
 
