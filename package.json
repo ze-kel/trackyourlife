@@ -18,16 +18,16 @@
     "lint": "turbo run lint --continue -- --cache --cache-location node_modules/.cache/.eslintcache",
     "lint:fix": "turbo run lint --continue -- --fix --cache --cache-location node_modules/.cache/.eslintcache",
     "lint:ws": "pnpm dlx sherif@latest",
-    "postinstall": "pnpm lint:ws",
+    "postinsta2ll": "pnpm lint:ws",
     "test": "turbo run test",
     "typecheck": "turbo run typecheck",
     "ui-add": "turbo run ui-add"
   },
   "devDependencies": {
     "@tyl/prettier-config": "workspace:*",
-    "@turbo/gen": "^2.0.14",
+    "@turbo/gen": "^2.0.15-canary.2",
     "prettier": "^3.3.3",
-    "turbo": "^2.0.14",
+    "turbo": "2.0.15-canary.2",
     "typescript": "^5.5.4"
   },
   "prettier": "@tyl/prettier-config"

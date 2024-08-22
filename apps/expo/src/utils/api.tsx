@@ -1,57 +1,44 @@
-import { useState } from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { httpBatchLink, loggerLink } from "@trpc/client";
-import { createTRPCReact } from "@trpc/react-query";
+import { createTRPCClient, httpBatchLink, loggerLink } from "@trpc/client";
 import superjson from "superjson";
 
 import type { AppRouter } from "@tyl/api";
 
-import { getBaseUrl } from "./base-url";
-import { getToken } from "./session-store";
+import { getUserData } from "./session-store";
 
-/**
- * A set of typesafe hooks for consuming your API.
- */
-export const api = createTRPCReact<AppRouter>();
 export { type RouterInputs, type RouterOutputs } from "@tyl/api";
 
-/**
- * A wrapper for your app that provides the TRPC context.
- * Use only in _app.tsx
- */
-export function TRPCProvider(props: { children: React.ReactNode }) {
-  const [queryClient] = useState(() => new QueryClient());
-  const [trpcClient] = useState(() =>
-    api.createClient({
-      links: [
-        loggerLink({
-          enabled: (opts) =>
-            process.env.NODE_ENV === "development" ||
-            (opts.direction === "down" && opts.result instanceof Error),
-          colorMode: "ansi",
-        }),
-        httpBatchLink({
-          transformer: superjson,
-          url: `${getBaseUrl()}/api/trpc`,
-          headers() {
-            const headers = new Map<string, string>();
-            headers.set("x-trpc-source", "expo-react");
+const makeTrpcClient = () => {
+  const uData = getUserData();
 
-            const token = getToken();
-            if (token) headers.set("Authorization", `Bearer ${token}`);
+  return createTRPCClient<AppRouter>({
+    links: [
+      loggerLink({
+        enabled: (opts) =>
+          process.env.NODE_ENV === "development" ||
+          (opts.direction === "down" && opts.result instanceof Error),
+        colorMode: "ansi",
+      }),
+      httpBatchLink({
+        transformer: superjson,
+        url: `${uData?.host ?? ""}/api/trpc`,
+        headers() {
+          const headers = new Map<string, string>();
+          headers.set("x-trpc-source", "expo-react");
 
-            return Object.fromEntries(headers);
-          },
-        }),
-      ],
-    }),
-  );
+          const { token } = getUserData() || {};
+          if (token) {
+            headers.set("Cookie", `auth_session=${token}`);
+          }
 
-  return (
-    <api.Provider client={trpcClient} queryClient={queryClient}>
-      <QueryClientProvider client={queryClient}>
-        {props.children}
-      </QueryClientProvider>
-    </api.Provider>
-  );
-}
+          return Object.fromEntries(headers);
+        },
+      }),
+    ],
+  });
+};
+
+export let api = makeTrpcClient();
+
+export const updateTrpcClient = () => {
+  api = makeTrpcClient();
+};

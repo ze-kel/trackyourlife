@@ -1,6 +1,29 @@
 import * as SecureStore from "expo-secure-store";
+import { z } from "zod";
 
-const key = "session_token";
-export const getToken = () => SecureStore.getItem(key);
-export const deleteToken = () => SecureStore.deleteItemAsync(key);
-export const setToken = (v: string) => SecureStore.setItem(key, v);
+const key = "user_data";
+const zUserData = z.object({
+  token: z.string(),
+  host: z.string(),
+});
+
+type IUserData = z.infer<typeof zUserData>;
+
+export const getUserData = () => {
+  try {
+    const r = SecureStore.getItem(key);
+
+    if (!r) return;
+    return zUserData.parse(JSON.parse(r));
+  } catch {
+    return;
+  }
+};
+
+export const setUserData = async (data: IUserData) => {
+  await SecureStore.setItemAsync(key, JSON.stringify(data));
+};
+
+export const clearUserData = async () => {
+  await SecureStore.deleteItemAsync(key);
+};

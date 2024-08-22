@@ -2,29 +2,50 @@ import "@bacons/text-decoder/install";
 
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-
-import { TRPCProvider } from "~/utils/api";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useColorScheme } from "nativewind";
 
 import "../styles.css";
+
+import type { ReactNode } from "react";
+import { useState } from "react";
+
+import { SessionProvider } from "~/app/authContext";
+
+function QueryProvider({ children }: { children: ReactNode }) {
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            staleTime: 60 * 1000,
+          },
+        },
+      }),
+  );
+
+  return (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  );
+}
 
 // This is the main layout of the app
 // It wraps your pages with the providers they need
 export default function RootLayout() {
+  const { colorScheme } = useColorScheme();
+
   return (
-    <TRPCProvider>
-      {/*
-          The Stack component displays the current page.
-          It also allows you to configure your screens 
-        */}
-      <Stack
-        screenOptions={{
-          headerStyle: {
-            backgroundColor: "#f472b6",
-          },
-          contentStyle: {},
-        }}
-      />
-      <StatusBar />
-    </TRPCProvider>
+    <SessionProvider>
+      <QueryProvider>
+        <Stack
+          screenOptions={{
+            contentStyle: {
+              backgroundColor: colorScheme == "dark" ? "#09090B" : "#FFFFFF",
+            },
+          }}
+        />
+        <StatusBar />
+      </QueryProvider>
+    </SessionProvider>
   );
 }
