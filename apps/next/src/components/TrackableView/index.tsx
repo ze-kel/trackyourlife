@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
 import { format, getDaysInMonth, getISODay, getMonth, getYear } from "date-fns";
 import { ErrorBoundary } from "react-error-boundary";
-import { getDateInTimezone } from "src/helpers/timezone";
 
+import { getDateInTimezone } from "@tyl/helpers/timezone";
 import { cn } from "@tyl/ui";
 import { Button } from "@tyl/ui/button";
 

@@ -7,9 +7,23 @@ import Animated, {
   withRepeat,
   withTiming,
 } from "react-native-reanimated";
-import SpinnerIBw from "@assets/spinnerbw.png";
+import SpinnerBlack from "@assets/spinner-black.png";
+import SpinnerWhite from "@assets/spinner-white.png";
 
-export default function Spinner({ width = 50 }: { width?: number }) {
+const colors = {
+  black: SpinnerBlack,
+  white: SpinnerWhite,
+};
+
+export type ISpinnerColor = keyof typeof colors;
+
+export default function Spinner({
+  width = 50,
+  color = "black",
+}: {
+  width?: number;
+  color?: ISpinnerColor;
+}) {
   const randomWidth = useSharedValue(0);
 
   const config = {
@@ -43,7 +57,7 @@ export default function Spinner({ width = 50 }: { width?: number }) {
         ]}
       >
         <Image
-          source={SpinnerIBw}
+          source={colors[color]}
           style={{ width, resizeMode: "contain", display: "flex" }}
         />
       </Animated.View>

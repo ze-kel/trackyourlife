@@ -1,37 +1,13 @@
 import type { PropsWithChildren } from "react";
 import { createContext, useContext, useState } from "react";
-import * as SecureStore from "expo-secure-store";
-import { z } from "zod";
 
 import { updateTrpcClient } from "~/utils/api";
-
-const key = "user_data";
-const zUserData = z.object({
-  token: z.string(),
-  host: z.string(),
-});
-
-type IUserData = z.infer<typeof zUserData>;
-
-export const getUserData = () => {
-  try {
-    const r = SecureStore.getItem(key);
-
-    if (!r) return;
-    return zUserData.parse(JSON.parse(r));
-  } catch {
-    return;
-  }
-};
-
-export const setUserData = async (data: IUserData) => {
-  await SecureStore.setItemAsync(key, JSON.stringify(data));
-  updateTrpcClient();
-};
-
-export const clearUserData = async () => {
-  await SecureStore.deleteItemAsync(key);
-};
+import {
+  clearUserData,
+  getUserData,
+  IUserData,
+  setUserData,
+} from "~/utils/session-store";
 
 const AuthContext = createContext<{
   signIn: (data: IUserData) => void;
@@ -59,6 +35,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
         signIn: (data: IUserData) => {
           setUserData(data);
           setUdata(data);
+          updateTrpcClient();
         },
         signOut: async () => {
           await clearUserData();

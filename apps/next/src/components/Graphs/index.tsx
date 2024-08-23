@@ -16,8 +16,8 @@ import {
   isSameMonth,
 } from "date-fns";
 import { useTheme } from "next-themes";
-import { makeColorString } from "src/helpers/colorTools";
-import { getDateInTimezone } from "src/helpers/timezone";
+import { makeColorString } from "@tyl/helpers/colorTools";
+import { getDateInTimezone } from "@tyl/helpers/timezone";
 import { useResizeObserver } from "usehooks-ts";
 
 import { RadioTabItem, RadioTabs } from "@tyl/ui/radio-tabs";

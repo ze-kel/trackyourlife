@@ -5,9 +5,10 @@ const key = "user_data";
 const zUserData = z.object({
   token: z.string(),
   host: z.string(),
+  userId: z.string(),
 });
 
-type IUserData = z.infer<typeof zUserData>;
+export type IUserData = z.infer<typeof zUserData>;
 
 export const getUserData = () => {
   try {

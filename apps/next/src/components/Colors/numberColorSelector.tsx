@@ -2,12 +2,15 @@ import type { TouchEvent } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Cross1Icon, PlusCircledIcon } from "@radix-ui/react-icons";
 import { useTheme } from "next-themes";
-import { range } from "src/helpers/animation";
-import { InterpolateColors, makeColorString } from "src/helpers/colorTools";
 import { v4 as uuidv4 } from "uuid";
 
-import type { ArrayElement } from "@tyl/validators/helpers";
-import type { IColorValue, INumberSettings } from "@tyl/validators/trackable";
+import type {
+  IColorCodingValue,
+  IColorValue,
+} from "@tyl/validators/trackable";
+import { range } from "@tyl/helpers/animation";
+import { presetsMap } from "@tyl/helpers/colorPresets";
+import { InterpolateColors, makeColorString, makeCssGradient } from "@tyl/helpers/colorTools";
 import { cn } from "@tyl/ui";
 import { Button } from "@tyl/ui/button";
 import { Input } from "@tyl/ui/input";
@@ -18,39 +21,7 @@ import { Switch } from "@tyl/ui/switch";
 import ColorPicker, { BetterNumberInput } from "~/components/Colors";
 import { ColorDisplay } from "~/components/Colors/colorDisplay";
 import { useRefSize } from "~/components/Colors/contoller";
-import { presetsMap } from "~/components/Colors/presets";
 
-type IColorCodingValue = INumberSettings["colorCoding"];
-
-type IColorCodingItem = ArrayElement<NonNullable<IColorCodingValue>>;
-
-const makeGradient = (
-  values: IColorCodingItem[],
-  min: number,
-  max: number,
-  theme = "dark",
-) => {
-  if (!values.length) return "";
-
-  if (values.length === 1 && values[0])
-    return `linear-gradient(in srgb to right, ${makeColorString(
-      theme === "light" ? values[0].color.lightMode : values[0].color.darkMode,
-    )} 0%, ${makeColorString(
-      theme === "light" ? values[0].color.lightMode : values[0].color.darkMode,
-    )} 100%`;
-
-  return `linear-gradient(in srgb to right, ${values
-    .map(
-      (v) =>
-        makeColorString(
-          theme === "light" ? v.color.lightMode : v.color.darkMode,
-        ) +
-        " " +
-        range(min, max, 0, 100, v.point) +
-        "%",
-    )
-    .join(", ")})`;
-};
 
 const getActualMin = (
   firstVal: number | undefined,
@@ -77,14 +48,14 @@ export const getColorAtPosition = ({
   value,
   point,
 }: {
-  value: IColorCodingItem[];
+  value: IColorCodingValue[];
   point: number;
 }): IColorValue => {
   if (!value.length) return presetsMap.neutral;
   if (value.length === 1 && value[0]) return value[0].color;
 
-  let leftSide: IColorCodingItem | undefined = undefined;
-  let rightSide: IColorCodingItem | undefined = undefined;
+  let leftSide: IColorCodingValue | undefined = undefined;
+  let rightSide: IColorCodingValue | undefined = undefined;
 
   for (const v of value) {
     if (!leftSide || (leftSide && v.point <= point)) {
@@ -122,8 +93,8 @@ const ControllerGradient = ({
   value,
   onChange,
 }: {
-  value: IColorCodingItem[];
-  onChange: (v: IColorCodingItem[]) => void;
+  value: IColorCodingValue[];
+  onChange: (v: IColorCodingValue[]) => void;
 }) => {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -308,7 +279,7 @@ const ControllerGradient = ({
         <div
           className="relative box-border flex h-9 w-full cursor-copy rounded-lg border-2 border-neutral-200 bg-transparent text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-950 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-800 max-sm:col-span-full max-sm:row-start-2 max-sm:row-end-2"
           style={{
-            background: makeGradient(
+            background: makeCssGradient(
               value,
               actualMin,
               actualMax,
@@ -471,8 +442,8 @@ const NumberColorSelector = ({
 }: {
   enabled?: boolean;
   onEnabledChange: (v: boolean) => void;
-  value: IColorCodingValue;
-  onChange: (v: NonNullable<IColorCodingValue>) => void;
+  value: IColorCodingValue[];
+  onChange: (v: NonNullable<IColorCodingValue[]>) => void;
 }) => {
   const [innerEnabled, setInnerEnabled] = useState(enabled || false);
   const [innerValue, setInnerValue] = useState(

@@ -3,6 +3,6 @@ import type { Config } from "tailwindcss";
 import nativewind from "nativewind/preset";
 
 export default {
-  content: ["./src/**/*.{ts,tsx}"],
+  content: ["./src/**/*.{js,jsx,ts,tsx}"],
   presets: [nativewind],
 } satisfies Config;

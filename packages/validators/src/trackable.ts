@@ -40,6 +40,15 @@ export const ZTrackableSettingsBoolean = z.object({
   activeColor: ZColorValue.optional(),
 });
 
+export const ZColorCodingValue = z.object({
+  point: z.number(),
+  color: ZColorValue,
+  // used to key inputs when editing, can be changed voluntarily
+  id: z.string().uuid().default(uuidv4),
+});
+
+export type IColorCodingValue = z.infer<typeof ZColorCodingValue>;
+
 export const ZTrackableSettingsNumber = z.object({
   ...basics,
   incrementBy: z.number().min(1).optional(),
@@ -51,16 +60,7 @@ export const ZTrackableSettingsNumber = z.object({
     })
     .optional(),
   colorCodingEnabled: z.boolean().optional(),
-  colorCoding: z
-    .array(
-      z.object({
-        point: z.number(),
-        color: ZColorValue,
-        // used to key inputs when editing, can be changed voluntarily
-        id: z.string().uuid().default(uuidv4),
-      }),
-    )
-    .optional(),
+  colorCoding: z.array(ZColorCodingValue).optional(),
 });
 
 export const ZTrackableSettingsRange = z.object({

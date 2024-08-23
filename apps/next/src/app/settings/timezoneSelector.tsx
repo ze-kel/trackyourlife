@@ -1,24 +1,23 @@
 "use client";
 
-import { CaretSortIcon } from "@radix-ui/react-icons";
 import type { TimeZone } from "timezones-list";
-
-import { Button } from "@tyl/ui/button";
-
 import { useEffect, useState } from "react";
+import { CaretSortIcon } from "@radix-ui/react-icons";
+import { format } from "date-fns";
+import { useMediaQuery } from "usehooks-ts";
+
+import { clamp } from "@tyl/helpers";
+import { getDateInTimezone } from "@tyl/helpers/timezone";
+import { cn } from "@tyl/ui";
+import { Button } from "@tyl/ui/button";
+import { Drawer, DrawerContent, DrawerTrigger } from "@tyl/ui/drawer";
 
 import {
   Dropdown,
   DropdownContent,
   DropdownTrigger,
 } from "~/components/Dropdown";
-import { Drawer, DrawerContent, DrawerTrigger } from "@tyl/ui/drawer";
-import { useMediaQuery } from "usehooks-ts";
 import { useUserSettings } from "~/components/Providers/UserSettingsProvider";
-import { format } from "date-fns";
-import { cn } from "@tyl/ui"
-import {clamp} from "lodash-es";
-import { getDateInTimezone } from "src/helpers/timezone";
 
 export const CurrentTime = () => {
   const [value, setValue] = useState("");
@@ -109,7 +108,7 @@ const SearchableList = ({
   );
 };
 
-export const TimezoneSelector = ({list}: {list: TimeZone[]}) => {
+export const TimezoneSelector = ({ list }: { list: TimeZone[] }) => {
   const [open, setOpen] = useState(false);
 
   const { settings, updateSettingsPartial } = useUserSettings();
@@ -167,7 +166,7 @@ export const TimezoneSelector = ({list}: {list: TimeZone[]}) => {
     <Dropdown open={open} onOpenChange={setOpen}>
       <DropdownTrigger>{Trigger}</DropdownTrigger>
 
-      <DropdownContent className=" max-w-[400px] p-0">
+      <DropdownContent className="max-w-[400px] p-0">
         <SearchableList
           list={list}
           value={value}

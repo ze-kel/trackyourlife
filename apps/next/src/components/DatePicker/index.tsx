@@ -1,25 +1,28 @@
-import {
-  addMonths,
-  format,
-  getDaysInMonth,
-  getISODay,
-  isSameMonth,
-  startOfMonth,
-  clamp,
-  isBefore,
-  isAfter,
-} from "date-fns";
 import { useContext, useEffect, useRef, useState } from "react";
 import {
+  CalendarIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   DoubleArrowLeftIcon,
   DoubleArrowRightIcon,
 } from "@radix-ui/react-icons";
-import { Dropdown, DropdownContent, DropdownTrigger } from "../Dropdown";
+import {
+  addMonths,
+  clamp,
+  format,
+  getDaysInMonth,
+  getISODay,
+  isAfter,
+  isBefore,
+  isSameMonth,
+  startOfMonth,
+} from "date-fns";
 import { AnimatePresence, m } from "framer-motion";
+import { useMediaQuery, useResizeObserver } from "usehooks-ts";
+
+import { getDateInTimezone } from "@tyl/helpers/timezone";
+import { cn } from "@tyl/ui";
 import { Button, buttonVariants } from "@tyl/ui/button";
-import { CalendarIcon } from "@radix-ui/react-icons";
 import {
   Drawer,
   DrawerContent,
@@ -28,10 +31,9 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@tyl/ui/drawer";
-import { cn } from "@tyl/ui"
-import { useMediaQuery, useResizeObserver } from "usehooks-ts";
-import { getDateInTimezone } from "src/helpers/timezone";
+
 import { useUserSettings } from "~/components/Providers/UserSettingsProvider";
+import { Dropdown, DropdownContent, DropdownTrigger } from "../Dropdown";
 
 const DatePicker = ({
   date,
@@ -134,7 +136,7 @@ const DatePicker = ({
       <span className="">
         {innerDate ? format(innerDate, "d MMMM yyyy") : "No date set"}
       </span>
-      <CalendarIcon className="ml-auto h-4 w-4 " />
+      <CalendarIcon className="ml-auto h-4 w-4" />
     </div>
   );
 

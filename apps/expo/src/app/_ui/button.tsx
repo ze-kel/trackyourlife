@@ -1,12 +1,12 @@
 import type { VariantProps } from "class-variance-authority";
+import type { ReactNode } from "react";
 import type { PressableProps } from "react-native";
 import * as React from "react";
 import { Pressable, Text } from "react-native";
 import { cva } from "class-variance-authority";
 
 import { cn } from "~/utils/cn";
-import Spinner from "./spinner";
-import type { ReactNode } from "react";
+import Spinner, { ISpinnerColor } from "./spinner";
 
 const textVariants = cva("text-sm font-medium", {
   variants: {
@@ -16,10 +16,9 @@ const textVariants = cva("text-sm font-medium", {
       outline: "",
       secondary: "",
       ghost: "",
-      link: "text-neutral-900 dark:text-neutral-50",
     },
     size: {
-      default: "",
+      default: "text-lg font-bold",
       sm: "text-xs",
       lg: "",
       icon: "",
@@ -41,10 +40,9 @@ const buttonVariants = cva(
           "border border-neutral-200 bg-transparent shadow-sm dark:border-neutral-800",
         secondary: "bg-neutral-100 shadow-sm dark:bg-neutral-800",
         ghost: "",
-        link: "underline-offset-4",
       },
       size: {
-        default: "h-9 px-4 py-2",
+        default: "h-12 px-4 py-2",
         sm: "h-8 rounded-md px-3",
         lg: "h-10 rounded-md px-8",
         icon: "h-9 w-9",
@@ -65,6 +63,16 @@ interface ButtonProps
   loading?: boolean;
 }
 
+type Variants = NonNullable<VariantProps<typeof buttonVariants>["variant"]>;
+
+const spinnerColors: Record<Variants, ISpinnerColor> = {
+  default: "white",
+  destructive: "white",
+  outline: "black",
+  secondary: "black",
+  ghost: "black",
+};
+
 //@ts-expect-error Pressable type
 const Button = React.forwardRef<Pressable, ButtonProps>(
   (
@@ -79,7 +87,7 @@ const Button = React.forwardRef<Pressable, ButtonProps>(
         {...props}
       >
         {loading ? (
-          <Spinner width={20} />
+          <Spinner color={spinnerColors[variant || "default"]} width={20} />
         ) : (
           <>
             {leftIcon ? leftIcon : <></>}

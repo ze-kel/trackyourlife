@@ -2,7 +2,6 @@
 
 import type { MutableRefObject } from "react";
 import { useEffect, useRef, useState } from "react";
-import { getDateInTimezone } from "src/helpers/timezone";
 import { v4 as uuidv4 } from "uuid";
 
 import type {
@@ -10,8 +9,9 @@ import type {
   INumberSettings,
   IRangeSettings,
   ITrackable,
-  ITrackableUnsaved,
 } from "@tyl/validators/trackable";
+import { presetsMap } from "@tyl/helpers/colorPresets";
+import { getDateInTimezone } from "@tyl/helpers/timezone";
 import { cn } from "@tyl/ui";
 import { Button } from "@tyl/ui/button";
 import { DrawerMobileTitleProvider } from "@tyl/ui/drawer";
@@ -19,7 +19,6 @@ import { Label } from "@tyl/ui/label";
 import { Switch } from "@tyl/ui/switch";
 
 import ColorInput from "~/components/Colors/colorInput";
-import { presetsMap } from "~/components/Colors/presets";
 import DatePicker from "~/components/DatePicker";
 import { DayCellBaseClasses } from "~/components/DayCell";
 import { DayCellBoolean } from "~/components/DayCell/DayCellBoolean";
@@ -101,7 +100,7 @@ export const SettingsNumber = ({
             settings.current.colorCodingEnabled = v;
             notifyAboutChange();
           }}
-          value={settings.current.colorCoding}
+          value={settings.current.colorCoding || []}
           onChange={(v) => {
             settings.current.colorCoding = v;
             notifyAboutChange();

@@ -1,5 +1,12 @@
-import type { IColorHSL, IColorRGB } from "@tyl/validators/trackable";
 import chroma from "chroma-js";
+
+import type {
+  IColorCodingValue,
+  IColorHSL,
+  IColorRGB,
+} from "@tyl/validators/trackable";
+
+import { range } from "./animation";
 
 // It is probably possible to write this without using a library, especially because we only need a few transforms.
 
@@ -47,4 +54,32 @@ export const RGBToHSL = ({ r, g, b }: IColorRGB): IColorHSL => {
 export const HSLToRGB = ({ h, s, l }: IColorHSL): IColorRGB => {
   const [r, g, b] = chroma.hsl(h, s / 100, l / 100).rgb(true);
   return { r, g, b };
+};
+
+export const makeCssGradient = (
+  values: IColorCodingValue[],
+  min: number,
+  max: number,
+  theme = "dark",
+) => {
+  if (!values.length) return "";
+
+  if (values.length === 1 && values[0])
+    return `linear-gradient(in srgb to right, ${makeColorString(
+      theme === "light" ? values[0].color.lightMode : values[0].color.darkMode,
+    )} 0%, ${makeColorString(
+      theme === "light" ? values[0].color.lightMode : values[0].color.darkMode,
+    )} 100%`;
+
+  return `linear-gradient(in srgb to right, ${values
+    .map(
+      (v) =>
+        makeColorString(
+          theme === "light" ? v.color.lightMode : v.color.darkMode,
+        ) +
+        " " +
+        range(min, max, 0, 100, v.point) +
+        "%",
+    )
+    .join(", ")})`;
 };

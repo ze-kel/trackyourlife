@@ -1,5 +1,6 @@
-import { getColorAtPosition } from "~/components/Colors/numberColorSelector";
-import { presetsMap } from "~/components/Colors/presets";
+import type { CSSProperties, ReactNode } from "react";
+import { createContext, memo, useContext } from "react";
+
 import type {
   IBooleanSettings,
   IColorValue,
@@ -7,10 +8,11 @@ import type {
   IRangeSettings,
   ITrackable,
 } from "@tyl/validators/trackable";
-import {clamp} from "lodash-es";
-import type { CSSProperties, ReactNode } from "react";
-import { createContext, memo, useContext } from "react";
-import { makeColorString } from "src/helpers/colorTools";
+import { clamp } from "@tyl/helpers";
+import { presetsMap } from "@tyl/helpers/colorPresets";
+import { makeColorString } from "@tyl/helpers/colorTools";
+
+import { getColorAtPosition } from "~/components/Colors/numberColorSelector";
 
 export interface IDayCellBooleanContext {
   type: "boolean";

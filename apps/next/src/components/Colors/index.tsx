@@ -1,13 +1,13 @@
 import { Fragment, useEffect, useLayoutEffect, useState } from "react";
 import { useTheme } from "next-themes";
-import { clamp } from "src/helpers/animation";
-import { HSLToRGB, makeColorString, RGBToHSL } from "src/helpers/colorTools";
 
 import type {
   IColorHSL,
   IColorRGB,
   IColorValue,
 } from "@tyl/validators/trackable";
+import { clamp } from "@tyl/helpers/animation";
+import { HSLToRGB, makeColorString, RGBToHSL } from "@tyl/helpers/colorTools";
 import { Input } from "@tyl/ui/input";
 import { RadioTabItem, RadioTabs } from "@tyl/ui/radio-tabs";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@tyl/ui/tabs";

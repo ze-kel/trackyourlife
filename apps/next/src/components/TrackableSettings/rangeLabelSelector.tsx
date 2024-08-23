@@ -1,16 +1,18 @@
 "use client";
-import type { IColorValue, IRangeSettings } from "@tyl/validators/trackable";
-import {cloneDeep} from "lodash-es";
+
 import { useState } from "react";
-import { Reorder, useDragControls, AnimatePresence } from "framer-motion";
 import {
   Cross1Icon,
   DragHandleDots2Icon,
   PlusIcon,
 } from "@radix-ui/react-icons";
-import type { ArrayElement } from "@tyl/validators/helpers";
-import { v4 as uuidv4 } from "uuid";
 import emojiRegex from "emoji-regex";
+import { AnimatePresence, Reorder, useDragControls } from "framer-motion";
+import { v4 as uuidv4 } from "uuid";
+
+import type { ArrayElement } from "@tyl/validators/helpers";
+import type { IColorValue, IRangeSettings } from "@tyl/validators/trackable";
+import { cloneDeep } from "@tyl/helpers";
 import { Button } from "@tyl/ui/button";
 import {
   HoverCard,
@@ -18,6 +20,7 @@ import {
   HoverCardTrigger,
 } from "@tyl/ui/hover-card";
 import { Input } from "@tyl/ui/input";
+
 import ColorInput from "~/components/Colors/colorInput";
 
 export interface IRangeLabelSelector {
@@ -204,7 +207,7 @@ const RangeLabelSelector = ({
       <div className="mb-1 flex w-fit flex-col">
         {value.length > 0 && (
           <div className="flex w-full gap-2 text-xs text-neutral-400 dark:text-neutral-500">
-            <div className="w-64 ">Value</div>
+            <div className="w-64">Value</div>
             <div>Icon</div>
             <div></div>
           </div>
