@@ -7,15 +7,18 @@ import {
   unique,
 } from "drizzle-orm/sqlite-core";
 
+import { ITrackable } from "@tyl/validators/trackable";
+
 export const trackable = sqliteTable("trackable", {
   updated: integer("updated", { mode: "timestamp_ms" })
     .notNull()
-    .default(sql`(current_timestamp)`),
+    .default(sql`(current_timestamp)`)
+    .$onUpdate(() => new Date()),
 
   id: text("id").primaryKey(),
   name: text("name").notNull(),
   userId: text("user_id").notNull(),
-  type: text("type").notNull(),
+  type: text("type").notNull().$type<ITrackable["type"]>(),
 
   settings: text("settings", { mode: "json" }).default({}),
 });
@@ -29,7 +32,8 @@ export const trackableRecord = sqliteTable(
   {
     updated: integer("updated", { mode: "timestamp_ms" })
       .notNull()
-      .default(sql`(current_timestamp)`),
+      .default(sql`(current_timestamp)`)
+      .$onUpdate(() => new Date()),
 
     trackableId: text("trackableId")
       .notNull()

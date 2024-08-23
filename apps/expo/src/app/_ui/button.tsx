@@ -29,22 +29,23 @@ const textVariants = cva("text-sm font-medium", {
     size: "default",
   },
 });
+
 const buttonVariants = cva(
-  "inline-flex items-center justify-center rounded-md transition-colors disabled:opacity-50",
+  "flex items-center justify-center rounded-md border border-transparent opacity-100 disabled:opacity-50",
   {
     variants: {
       variant: {
-        default: "bg-neutral-900 shadow dark:bg-neutral-50",
-        destructive: "bg-red-500 shadow-sm dark:bg-red-900",
+        default: "bg-neutral-900 dark:bg-neutral-50",
+        destructive: "bg-red-500 dark:bg-red-900",
         outline:
-          "border border-neutral-200 bg-transparent shadow-sm dark:border-neutral-800",
-        secondary: "bg-neutral-100 shadow-sm dark:bg-neutral-800",
+          "border border-neutral-200 bg-transparent dark:border-neutral-800",
+        secondary: "bg-neutral-100 dark:bg-neutral-800",
         ghost: "",
       },
       size: {
         default: "h-12 px-4 py-2",
-        sm: "h-8 rounded-md px-3",
-        lg: "h-10 rounded-md px-8",
+        sm: "h-8 px-3",
+        lg: "h-10 px-8",
         icon: "h-9 w-9",
       },
     },
@@ -81,8 +82,7 @@ const Button = React.forwardRef<Pressable, ButtonProps>(
   ) => {
     return (
       <Pressable
-        className={cn(buttonVariants({ variant, size, className }), className)}
-        style={{}}
+        className={cn(buttonVariants({ variant, size, className }))}
         ref={ref}
         {...props}
       >

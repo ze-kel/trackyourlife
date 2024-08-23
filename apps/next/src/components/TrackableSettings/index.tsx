@@ -11,7 +11,7 @@ import type {
   ITrackable,
 } from "@tyl/validators/trackable";
 import { presetsMap } from "@tyl/helpers/colorPresets";
-import { getDateInTimezone } from "@tyl/helpers/timezone";
+import { getNowInTimezone } from "@tyl/helpers/timezone";
 import { cn } from "@tyl/ui";
 import { Button } from "@tyl/ui/button";
 import { DrawerMobileTitleProvider } from "@tyl/ui/drawer";
@@ -290,7 +290,7 @@ const TrackableSettings = ({
             onChange={(v) => (settings.current.startDate = String(v))}
             limits={{
               start: new Date(1990, 0, 1),
-              end: getDateInTimezone(u.settings.timezone),
+              end: getNowInTimezone(u.settings.timezone),
             }}
             className="mt-2"
           />

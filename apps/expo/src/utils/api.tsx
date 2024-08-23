@@ -20,7 +20,7 @@ const makeTrpcClient = () => {
       }),
       httpBatchLink({
         transformer: superjson,
-        url: `${uData?.host ?? ""}/api/trpc`,
+        url: `http://${uData?.host ?? ""}/api/trpc`,
         headers() {
           const headers = new Map<string, string>();
           headers.set("x-trpc-source", "expo-react");

@@ -169,7 +169,8 @@ export const ZTrackable = z
   );
 
 export type ITrackable = z.infer<typeof ZTrackable>;
-export type ITrackableBasic = Omit<Omit<ITrackable, "data">, "settings">;
+export type ITrackableBase = Omit<ITrackable, "data">;
+export type ITrackableFromList = Omit<ITrackableBase, "settings">;
 
 //
 // Update

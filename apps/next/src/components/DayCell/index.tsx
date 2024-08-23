@@ -6,7 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { isAfter, isBefore, isSameDay } from "date-fns";
 
 import type { ITrackable, ITrackableSettings } from "@tyl/validators/trackable";
-import { getDateInTimezone } from "@tyl/helpers/timezone";
+import { getNowInTimezone } from "@tyl/helpers/timezone";
 import { cn } from "@tyl/ui";
 import { Skeleton } from "@tyl/ui/skeleton";
 
@@ -152,7 +152,7 @@ const DayCellWrapper = ({
         month,
         year,
         startDate: settings?.startDate,
-        dateNow: getDateInTimezone(u.settings.timezone),
+        dateNow: getNowInTimezone(u.settings.timezone),
       }),
     [day, month, year, settings?.startDate, u.settings.timezone],
   );

@@ -42,7 +42,10 @@ export const user_session = pgTable("user_session", {
 export const trackableTypeEnum = pgEnum("type", ["boolean", "number", "range"]);
 
 export const trackable = pgTable("trackable", {
-  updated: timestamp("updated").defaultNow().notNull(),
+  updated: timestamp("updated")
+    .defaultNow()
+    .notNull()
+    .$onUpdate(() => new Date()),
 
   id: uuid("id").defaultRandom().primaryKey(),
   name: varchar("name").notNull(),
@@ -62,7 +65,10 @@ export const trackableRelations = relations(trackable, ({ many }) => ({
 export const trackableRecord = pgTable(
   "trackableRecord",
   {
-    updated: timestamp("updated").defaultNow().notNull(),
+    updated: timestamp("updated")
+      .defaultNow()
+      .notNull()
+      .$onUpdate(() => new Date()),
 
     trackableId: uuid("trackableId")
       .notNull()

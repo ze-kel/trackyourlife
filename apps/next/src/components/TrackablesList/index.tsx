@@ -6,8 +6,8 @@ import { useQuery } from "@tanstack/react-query";
 import { format, isLastDayOfMonth } from "date-fns";
 import { AnimatePresence, m } from "framer-motion";
 
-import type { ITrackable, ITrackableBasic } from "@tyl/validators/trackable";
-import { getDateInTimezone } from "@tyl/helpers/timezone";
+import type { ITrackable, ITrackableFromList } from "@tyl/validators/trackable";
+import { getNowInTimezone } from "@tyl/helpers/timezone";
 import { cn } from "@tyl/ui";
 import { Badge } from "@tyl/ui/badge";
 import { Button } from "@tyl/ui/button";
@@ -44,7 +44,7 @@ type TrackableTypeFilterState = Record<ITrackable["type"], boolean>;
 const filterTrackables = (
   query: string,
   types: TrackableTypeFilterState,
-  list: ITrackableBasic[],
+  list: ITrackableFromList[],
 ) => {
   const filterByType = Object.values(types).some((v) => v);
 
@@ -88,7 +88,7 @@ const TrackablesList = ({ daysToShow }: { daysToShow: number }) => {
   );
 
   const daysToRender = useMemo(
-    () => generateDates(daysToShow, getDateInTimezone(settings.timezone)),
+    () => generateDates(daysToShow, getNowInTimezone(settings.timezone)),
     [daysToShow, settings.timezone],
   );
 
@@ -168,7 +168,7 @@ export const DailyList = ({ daysToShow }: { daysToShow: number }) => {
 
   const daysToRender = useMemo(
     () =>
-      generateDates(daysToShow, getDateInTimezone(settings.timezone)).reverse(),
+      generateDates(daysToShow, getNowInTimezone(settings.timezone)).reverse(),
     [daysToShow, settings.timezone],
   );
 

@@ -36,13 +36,14 @@ function withMonorepoPaths(config) {
   const workspaceRoot = path.resolve(projectRoot, "../..");
 
   // #1 - Watch all files in the monorepo
-  config.watchFolders = [workspaceRoot];
+  config.watchFolders.push(workspaceRoot);
 
   // #2 - Resolve modules within the project's `node_modules` first, then all monorepo modules
-  config.resolver.nodeModulesPaths = [
+
+  config.resolver.nodeModulesPaths.push(
     path.resolve(projectRoot, "node_modules"),
     path.resolve(workspaceRoot, "node_modules"),
-  ];
+  );
 
   return config;
 }
@@ -56,8 +57,8 @@ function withMonorepoPaths(config) {
  * @returns {import('expo/metro-config').MetroConfig}
  */
 function withTurborepoManagedCache(config) {
-  config.cacheStores = [
+  config.cacheStores.push(
     new FileStore({ root: path.join(__dirname, ".cache/metro") }),
-  ];
+  );
   return config;
 }

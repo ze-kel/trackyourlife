@@ -4,13 +4,15 @@ import { Cross1Icon, PlusCircledIcon } from "@radix-ui/react-icons";
 import { useTheme } from "next-themes";
 import { v4 as uuidv4 } from "uuid";
 
-import type {
-  IColorCodingValue,
-  IColorValue,
-} from "@tyl/validators/trackable";
+import type { IColorCodingValue, IColorValue } from "@tyl/validators/trackable";
 import { range } from "@tyl/helpers/animation";
 import { presetsMap } from "@tyl/helpers/colorPresets";
-import { InterpolateColors, makeColorString, makeCssGradient } from "@tyl/helpers/colorTools";
+import {
+  getColorAtPosition,
+  InterpolateColors,
+  makeColorString,
+  makeCssGradient,
+} from "@tyl/helpers/colorTools";
 import { cn } from "@tyl/ui";
 import { Button } from "@tyl/ui/button";
 import { Input } from "@tyl/ui/input";
@@ -21,7 +23,6 @@ import { Switch } from "@tyl/ui/switch";
 import ColorPicker, { BetterNumberInput } from "~/components/Colors";
 import { ColorDisplay } from "~/components/Colors/colorDisplay";
 import { useRefSize } from "~/components/Colors/contoller";
-
 
 const getActualMin = (
   firstVal: number | undefined,
@@ -42,51 +43,6 @@ const getActualMax = (
   const a = typeof firstVal === "number" ? firstVal : -Infinity;
   const b = typeof maxInput === "number" ? maxInput : -Infinity;
   return Math.max(a, b);
-};
-
-export const getColorAtPosition = ({
-  value,
-  point,
-}: {
-  value: IColorCodingValue[];
-  point: number;
-}): IColorValue => {
-  if (!value.length) return presetsMap.neutral;
-  if (value.length === 1 && value[0]) return value[0].color;
-
-  let leftSide: IColorCodingValue | undefined = undefined;
-  let rightSide: IColorCodingValue | undefined = undefined;
-
-  for (const v of value) {
-    if (!leftSide || (leftSide && v.point <= point)) {
-      leftSide = v;
-    }
-    if (!rightSide && v.point >= point) {
-      rightSide = v;
-    }
-  }
-
-  if (!leftSide && rightSide) return rightSide.color;
-  if (!rightSide && leftSide) return leftSide.color;
-  if (!leftSide || !rightSide) return presetsMap.neutral;
-
-  if (point === leftSide.point) return leftSide.color;
-  if (point === rightSide.point) return rightSide.color;
-
-  const proportion = range(leftSide.point, rightSide.point, 0, 1, point);
-
-  return {
-    lightMode: InterpolateColors(
-      leftSide.color.lightMode,
-      rightSide.color.lightMode,
-      proportion,
-    ),
-    darkMode: InterpolateColors(
-      leftSide.color.darkMode,
-      rightSide.color.darkMode,
-      proportion,
-    ),
-  };
 };
 
 const ControllerGradient = ({

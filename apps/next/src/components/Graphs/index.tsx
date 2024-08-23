@@ -17,7 +17,7 @@ import {
 } from "date-fns";
 import { useTheme } from "next-themes";
 import { makeColorString } from "@tyl/helpers/colorTools";
-import { getDateInTimezone } from "@tyl/helpers/timezone";
+import { getNowInTimezone } from "@tyl/helpers/timezone";
 import { useResizeObserver } from "usehooks-ts";
 
 import { RadioTabItem, RadioTabs } from "@tyl/ui/radio-tabs";
@@ -67,7 +67,7 @@ export const GraphYear = ({ year }: { year: number }) => {
 
   const { settings } = useUserSettings();
 
-  const now = getDateInTimezone(settings.timezone);
+  const now = getNowInTimezone(settings.timezone);
 
   const needMonths = now.getFullYear() === year ? now.getMonth() + 1 : 12;
 

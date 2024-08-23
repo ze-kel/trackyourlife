@@ -5,7 +5,7 @@ import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
 import { format, getDaysInMonth, getISODay, getMonth, getYear } from "date-fns";
 import { ErrorBoundary } from "react-error-boundary";
 
-import { getDateInTimezone } from "@tyl/helpers/timezone";
+import { getNowInTimezone } from "@tyl/helpers/timezone";
 import { cn } from "@tyl/ui";
 import { Button } from "@tyl/ui/button";
 
@@ -78,7 +78,7 @@ const Year = ({
 }) => {
   const { settings } = useUserSettings();
 
-  const active = activeMonths(year, getDateInTimezone(settings.timezone));
+  const active = activeMonths(year, getNowInTimezone(settings.timezone));
   const toRender = 12;
 
   const months = Array(toRender)
@@ -180,7 +180,7 @@ type TView = "days" | "months";
 const TrackableView = ({ y, m }: { y?: number; m?: number }) => {
   const { settings } = useUserSettings();
 
-  const now = getDateInTimezone(settings.timezone);
+  const now = getNowInTimezone(settings.timezone);
   const [year, setYear] = useState(
     typeof y === "number" ? y : now.getFullYear(),
   );
@@ -219,7 +219,7 @@ const TrackableView = ({ y, m }: { y?: number; m?: number }) => {
   };
 
   const openCurrentMonth = () => {
-    const now = getDateInTimezone(settings.timezone);
+    const now = getNowInTimezone(settings.timezone);
     setYear(now.getFullYear());
     setMonth(now.getMonth());
     setView("days");

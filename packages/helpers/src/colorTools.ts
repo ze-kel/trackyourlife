@@ -4,9 +4,11 @@ import type {
   IColorCodingValue,
   IColorHSL,
   IColorRGB,
+  IColorValue,
 } from "@tyl/validators/trackable";
 
 import { range } from "./animation";
+import { presetsMap } from "./colorPresets";
 
 // It is probably possible to write this without using a library, especially because we only need a few transforms.
 
@@ -82,4 +84,49 @@ export const makeCssGradient = (
         "%",
     )
     .join(", ")})`;
+};
+
+export const getColorAtPosition = ({
+  value,
+  point,
+}: {
+  value: IColorCodingValue[];
+  point: number;
+}): IColorValue => {
+  if (!value.length) return presetsMap.neutral;
+  if (value.length === 1 && value[0]) return value[0].color;
+
+  let leftSide: IColorCodingValue | undefined = undefined;
+  let rightSide: IColorCodingValue | undefined = undefined;
+
+  for (const v of value) {
+    if (!leftSide || (leftSide && v.point <= point)) {
+      leftSide = v;
+    }
+    if (!rightSide && v.point >= point) {
+      rightSide = v;
+    }
+  }
+
+  if (!leftSide && rightSide) return rightSide.color;
+  if (!rightSide && leftSide) return leftSide.color;
+  if (!leftSide || !rightSide) return presetsMap.neutral;
+
+  if (point === leftSide.point) return leftSide.color;
+  if (point === rightSide.point) return rightSide.color;
+
+  const proportion = range(leftSide.point, rightSide.point, 0, 1, point);
+
+  return {
+    lightMode: InterpolateColors(
+      leftSide.color.lightMode,
+      rightSide.color.lightMode,
+      proportion,
+    ),
+    darkMode: InterpolateColors(
+      leftSide.color.darkMode,
+      rightSide.color.darkMode,
+      proportion,
+    ),
+  };
 };

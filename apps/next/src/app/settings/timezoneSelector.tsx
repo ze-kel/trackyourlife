@@ -7,7 +7,7 @@ import { format } from "date-fns";
 import { useMediaQuery } from "usehooks-ts";
 
 import { clamp } from "@tyl/helpers";
-import { getDateInTimezone } from "@tyl/helpers/timezone";
+import { getNowInTimezone } from "@tyl/helpers/timezone";
 import { cn } from "@tyl/ui";
 import { Button } from "@tyl/ui/button";
 import { Drawer, DrawerContent, DrawerTrigger } from "@tyl/ui/drawer";
@@ -26,7 +26,7 @@ export const CurrentTime = () => {
 
   useEffect(() => {
     const timeout = setInterval(() => {
-      setValue(format(getDateInTimezone(settings.timezone), "HH:mm:ss")), 1000;
+      setValue(format(getNowInTimezone(settings.timezone), "HH:mm:ss")), 1000;
     });
     return () => clearTimeout(timeout);
   });

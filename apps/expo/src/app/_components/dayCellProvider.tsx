@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactNode } from "react";
 import { createContext, memo, useContext } from "react";
+import { View } from "react-native";
 
 import type {
   IBooleanSettings,
@@ -66,16 +67,7 @@ const DayCellBooleanProvider = ({
   );
 
   return (
-    <div
-      style={
-        {
-          "--themeActiveLight": themeActiveLight,
-          "--themeActiveDark": themeActiveDark,
-          "--themeInactiveLight": themeInactiveLight,
-          "--themeInactiveDark": themeInactiveDark,
-        } as CSSProperties
-      }
-    >
+    <View>
       <DayCellContext.Provider
         value={{
           type: "boolean",
@@ -88,7 +80,7 @@ const DayCellBooleanProvider = ({
       >
         {children}
       </DayCellContext.Provider>
-    </div>
+    </View>
   );
 };
 
@@ -132,7 +124,7 @@ const DayCellNumberProvider = ({
   };
 
   return (
-    <div>
+    <View>
       <DayCellContext.Provider
         value={{
           type: "number",
@@ -143,7 +135,7 @@ const DayCellNumberProvider = ({
       >
         {children}
       </DayCellContext.Provider>
-    </div>
+    </View>
   );
 };
 
@@ -167,7 +159,7 @@ const DayCellRangeProvider = ({
   const labelMapping = getRangeLabelMapping(settings);
 
   return (
-    <div>
+    <View>
       <DayCellContext.Provider
         value={{
           type: "range",
@@ -178,7 +170,7 @@ const DayCellRangeProvider = ({
       >
         {children}
       </DayCellContext.Provider>
-    </div>
+    </View>
   );
 };
 

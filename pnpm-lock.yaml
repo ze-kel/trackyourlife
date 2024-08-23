@@ -87,6 +87,15 @@ importers:
       '@trpc/server':
         specifier: 'catalog:'
         version: 11.0.0-rc.485
+      '@tyl/api':
+        specifier: workspace:*
+        version: link:../../packages/api
+      '@tyl/helpers':
+        specifier: workspace:*
+        version: link:../../packages/helpers
+      '@tyl/validators':
+        specifier: workspace:*
+        version: link:../../packages/validators
       babel-plugin-inline-import:
         specifier: ^3.0.0
         version: 3.0.0
@@ -105,6 +114,9 @@ importers:
       expo-dev-client:
         specifier: ~4.0.23
         version: 4.0.24(expo@51.0.30(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2)))
+      expo-drizzle-studio-plugin:
+        specifier: ^0.0.2
+        version: 0.0.2(expo@51.0.30(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2)))
       expo-linking:
         specifier: ~6.3.1
         version: 6.3.1(expo@51.0.30(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2)))
@@ -169,9 +181,6 @@ importers:
       '@babel/runtime':
         specifier: ^7.25.0
         version: 7.25.0
-      '@tyl/api':
-        specifier: workspace:*
-        version: link:../../packages/api
       '@tyl/eslint-config':
         specifier: workspace:*
         version: link:../../tooling/eslint
@@ -413,6 +422,9 @@ importers:
       '@tyl/db':
         specifier: workspace:*
         version: link:../db
+      '@tyl/helpers':
+        specifier: workspace:*
+        version: link:../helpers
       '@tyl/validators':
         specifier: workspace:*
         version: link:../validators
@@ -730,7 +742,7 @@ importers:
         version: 7.35.0(eslint@8.57.0)
       eslint-plugin-react-hooks:
         specifier: rc
-        version: 5.1.0-rc-eb3ad065-20240822(eslint@8.57.0)
+        version: 5.1.0-rc-b57d2823-20240822(eslint@8.57.0)
       eslint-plugin-turbo:
         specifier: ^2.0.14
         version: 2.0.14(eslint@8.57.0)
@@ -5388,8 +5400,8 @@ packages:
     peerDependencies:
       eslint: ^3 || ^4 || ^5 || ^6 || ^7 || ^8
 
-  eslint-plugin-react-hooks@5.1.0-rc-eb3ad065-20240822:
-    resolution: {integrity: sha512-0kRgi63o6UVkYeo1aePMQuuN20HnfIqMl7Ol/VOwY7UectPexCmZp9AcmGmQ8JTnBomO8/B9Y2zbcrUSeajX0w==}
+  eslint-plugin-react-hooks@5.1.0-rc-b57d2823-20240822:
+    resolution: {integrity: sha512-YY9FJcnmCAA/DVWYjm7TBcgKDWZGtrIzL2BrddxM705RTZog56zdu4G0//d1W9TZV3mQkDratfjtH/tMTaL5Gw==}
     engines: {node: '>=10'}
     peerDependencies:
       eslint: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0-0 || ^9.0.0
@@ -5497,6 +5509,11 @@ packages:
 
   expo-dev-menu@5.0.20:
     resolution: {integrity: sha512-R6dZwgOAYNdPEWJEOgdqXZ8+cKLWMpRhRyFPjiuMlj50bVVEPEo07lPV2SAY+ybwTqntPILqUp6CHppRrHyAyA==}
+    peerDependencies:
+      expo: '*'
+
+  expo-drizzle-studio-plugin@0.0.2:
+    resolution: {integrity: sha512-Q5PODIlRp1Hox8a55kJ0iEaaDBL1xo9+oidO03dRu45sB4GAulFcKqc4bZ3qpND4mex0sFu+xm72pmXa/GkjHw==}
     peerDependencies:
       expo: '*'
 
@@ -14851,7 +14868,7 @@ snapshots:
       safe-regex-test: 1.0.3
       string.prototype.includes: 2.0.0
 
-  eslint-plugin-react-hooks@5.1.0-rc-eb3ad065-20240822(eslint@8.57.0):
+  eslint-plugin-react-hooks@5.1.0-rc-b57d2823-20240822(eslint@8.57.0):
     dependencies:
       eslint: 8.57.0
 
@@ -15076,6 +15093,11 @@ snapshots:
       expo: 51.0.30(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2))
       expo-dev-menu-interface: 1.8.3(expo@51.0.30(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2)))
       semver: 7.6.2
+
+  expo-drizzle-studio-plugin@0.0.2(expo@51.0.30(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2))):
+    dependencies:
+      expo: 51.0.30(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2))
+      expo-sqlite: 14.0.6(expo@51.0.30(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2)))
 
   expo-file-system@17.0.1(expo@51.0.30(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2))):
     dependencies:

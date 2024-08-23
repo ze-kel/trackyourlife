@@ -20,7 +20,7 @@ import {
 import { AnimatePresence, m } from "framer-motion";
 import { useMediaQuery, useResizeObserver } from "usehooks-ts";
 
-import { getDateInTimezone } from "@tyl/helpers/timezone";
+import { getNowInTimezone } from "@tyl/helpers/timezone";
 import { cn } from "@tyl/ui";
 import { Button, buttonVariants } from "@tyl/ui/button";
 import {
@@ -53,7 +53,7 @@ const DatePicker = ({
   className?: string;
 }) => {
   const { settings } = useUserSettings();
-  const dateNow = getDateInTimezone(settings.timezone);
+  const dateNow = getNowInTimezone(settings.timezone);
 
   const [innerDate, setInnerDate] = useState(date);
 

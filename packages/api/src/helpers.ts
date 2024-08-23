@@ -1,6 +1,4 @@
-import type { TimeZone } from "timezones-list";
 import { add, startOfMonth, sub, subDays } from "date-fns";
-import { toZonedTime } from "date-fns-tz";
 
 import type {
   DbTrackableRecordSelect,
@@ -35,10 +33,7 @@ export const GetUserSettings = async ({ userId }: { userId: string }) => {
 const PG_MINUS_INFINITY = new Date(1970, 0, 1);
 const PG_INFINITY = new Date(new Date().getFullYear() + 100, 0, 1);
 
-export const getDateBounds = (
-  limits: TGETLimits | undefined,
-  dateNow: Date,
-) => {
+export const getDateBounds = (limits: TGETLimits | undefined) => {
   if (!limits) {
     return { from: PG_MINUS_INFINITY, to: PG_INFINITY };
   }
@@ -73,12 +68,8 @@ export const getDateBounds = (
   // This is intentional to not ensure that any month stored on a client has all its data fetched.
   return {
     from: startOfMonth(sub(new Date(), { days: limits.days })),
-    to: dateNow,
+    to: add(new Date(), { days: 1 }),
   };
-};
-
-export const getDateInTimezone = (timezone?: TimeZone) => {
-  return toZonedTime(Date.now(), timezone ? timezone.tzCode : "Europe/London");
 };
 
 export const makeTrackableData = (
