@@ -1,10 +1,8 @@
 {
-  "id": "f9eab7a9-c00a-4df4-8299-2b9efb9c54fa",
-  "prevId": "e2a37e30-5f0a-4184-ac59-270031809844",
-  "version": "5",
-  "dialect": "pg",
+  "version": "7",
+  "dialect": "postgresql",
   "tables": {
-    "TYL_auth_user": {
+    "public.TYL_auth_user": {
       "name": "TYL_auth_user",
       "schema": "",
       "columns": {
@@ -52,14 +50,14 @@
       "uniqueConstraints": {
         "TYL_auth_user_email_unique": {
           "name": "TYL_auth_user_email_unique",
-          "nullsNotDistinct": false,
           "columns": [
             "email"
-          ]
+          ],
+          "nullsNotDistinct": false
         }
       }
     },
-    "TYL_trackable": {
+    "public.TYL_trackable": {
       "name": "TYL_trackable",
       "schema": "",
       "columns": {
@@ -101,21 +99,21 @@
         "TYL_trackable_user_id_TYL_auth_user_id_fk": {
           "name": "TYL_trackable_user_id_TYL_auth_user_id_fk",
           "tableFrom": "TYL_trackable",
-          "tableTo": "TYL_auth_user",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "TYL_auth_user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "TYL_trackableRecord": {
+    "public.TYL_trackableRecord": {
       "name": "TYL_trackableRecord",
       "schema": "",
       "columns": {
@@ -149,28 +147,28 @@
         "TYL_trackableRecord_trackableId_TYL_trackable_id_fk": {
           "name": "TYL_trackableRecord_trackableId_TYL_trackable_id_fk",
           "tableFrom": "TYL_trackableRecord",
-          "tableTo": "TYL_trackable",
           "columnsFrom": [
             "trackableId"
           ],
+          "tableTo": "TYL_trackable",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         },
         "TYL_trackableRecord_user_id_TYL_auth_user_id_fk": {
           "name": "TYL_trackableRecord_user_id_TYL_auth_user_id_fk",
           "tableFrom": "TYL_trackableRecord",
-          "tableTo": "TYL_auth_user",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "TYL_auth_user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {
@@ -185,15 +183,15 @@
       "uniqueConstraints": {
         "TYL_trackableRecord_trackableId_date_unique": {
           "name": "TYL_trackableRecord_trackableId_date_unique",
-          "nullsNotDistinct": true,
           "columns": [
             "trackableId",
             "date"
-          ]
+          ],
+          "nullsNotDistinct": true
         }
       }
     },
-    "TYL_user_session": {
+    "public.TYL_user_session": {
       "name": "TYL_user_session",
       "schema": "",
       "columns": {
@@ -221,15 +219,15 @@
         "TYL_user_session_user_id_TYL_auth_user_id_fk": {
           "name": "TYL_user_session_user_id_TYL_auth_user_id_fk",
           "tableFrom": "TYL_user_session",
-          "tableTo": "TYL_auth_user",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "TYL_auth_user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -237,19 +235,23 @@
     }
   },
   "enums": {
-    "type": {
+    "public.type": {
       "name": "type",
-      "values": {
-        "boolean": "boolean",
-        "number": "number",
-        "range": "range"
-      }
+      "schema": "public",
+      "values": [
+        "boolean",
+        "number",
+        "range"
+      ]
     }
   },
   "schemas": {},
   "_meta": {
-    "columns": {},
     "schemas": {},
-    "tables": {}
-  }
+    "tables": {},
+    "columns": {}
+  },
+  "id": "f9eab7a9-c00a-4df4-8299-2b9efb9c54fa",
+  "prevId": "e2a37e30-5f0a-4184-ac59-270031809844",
+  "sequences": {}
 }

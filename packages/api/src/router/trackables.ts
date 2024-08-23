@@ -1,5 +1,4 @@
 import type { TRPCRouterRecord } from "@trpc/server";
-import { format } from "date-fns";
 import { z } from "zod";
 
 import type { DbTrackableRecordInsert } from "@tyl/db/schema";
@@ -152,10 +151,7 @@ export const trackablesRouter = {
       const toInsert: DbTrackableRecordInsert = {
         trackableId: input.id,
         value: input.value,
-        date: format(
-          new Date(input.year, input.month, input.day),
-          "yyyy-MM-dd",
-        ),
+        date: new Date(input.year, input.month, input.day),
         userId: ctx.user.id,
       };
 
@@ -176,7 +172,7 @@ export const trackablesRouter = {
       const toInsert: DbTrackableRecordInsert[] = input.map((i) => ({
         trackableId: i.id,
         value: i.value,
-        date: format(new Date(i.year, i.month, i.day), "yyyy-MM-dd"),
+        date: new Date(i.year, i.month, i.day),
         userId: ctx.user.id,
       }));
 
