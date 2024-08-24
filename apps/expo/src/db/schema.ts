@@ -9,6 +9,11 @@ import {
 
 import { ITrackable } from "@tyl/validators/trackable";
 
+export const meta = sqliteTable("meta", {
+  user: text("user").primaryKey(),
+  lastSync: integer("updated", { mode: "timestamp_ms" }),
+});
+
 export const trackable = sqliteTable("trackable", {
   updated: integer("updated", { mode: "timestamp_ms" })
     .notNull()
@@ -56,3 +61,9 @@ export const recordRelations = relations(trackableRecord, ({ one }) => ({
     references: [trackable.id],
   }),
 }));
+
+export type LDbTrackableSelect = typeof trackable.$inferSelect;
+export type LDbTrackableInsert = typeof trackable.$inferInsert;
+
+export type LDbTrackableRecordSelect = typeof trackableRecord.$inferSelect;
+export type LDbTrackableRecordInsert = typeof trackableRecord.$inferInsert;

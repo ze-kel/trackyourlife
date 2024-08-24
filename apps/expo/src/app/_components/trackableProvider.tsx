@@ -8,8 +8,10 @@ import {
   ZTrackableSettings,
 } from "@tyl/validators/trackable";
 
+import { MemoDayCellProvider } from "~/app/_components/DayCellProvider";
 import { db } from "~/db";
 import { trackableRecord } from "~/db/schema";
+import { useSync } from "~/db/syncContext";
 
 type UseReturn = {
   value?: string;
@@ -41,6 +43,8 @@ export const TrackableProvider = ({
   trackable: ITrackableFromList & { settings: unknown; userId: string };
   children: ReactNode;
 }) => {
+  const { updateTrackableRecord } = useSync();
+
   const parsedSettings = useMemo(
     () => makeTrackableSettings(trackable),
     [trackable.settings],
@@ -66,20 +70,13 @@ export const TrackableProvider = ({
 
   const setValue = async (d: Date, v: string) => {
     d.setUTCHours(0, 0, 0, 0);
-    await db
-      .insert(trackableRecord)
-      .values({
-        userId: trackable.userId,
-        trackableId: trackable.id,
-        value: v,
-        date: d,
-      })
-      .onConflictDoUpdate({
-        target: [trackableRecord.trackableId, trackableRecord.date],
-        set: {
-          value: sql.raw(`excluded.${trackableRecord.value.name}`),
-        },
-      });
+
+    await updateTrackableRecord({
+      userId: trackable.userId,
+      trackableId: trackable.id,
+      value: v,
+      date: d,
+    });
   };
 
   return (
@@ -92,7 +89,9 @@ export const TrackableProvider = ({
         setValue,
       }}
     >
-      {children}
+      <MemoDayCellProvider type={trackable.type} settings={parsedSettings}>
+        {children}
+      </MemoDayCellProvider>
     </TrackableContext.Provider>
   );
 };

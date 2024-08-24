@@ -2,10 +2,10 @@ import type { VariantProps } from "class-variance-authority";
 import type { ReactNode } from "react";
 import type { PressableProps } from "react-native";
 import * as React from "react";
-import { Pressable, Text } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { cva } from "class-variance-authority";
 
-import { cn } from "~/utils/cn";
+import { tw, tws } from "~/utils/tw";
 import Spinner, { ISpinnerColor } from "./spinner";
 
 const textVariants = cva("text-sm font-medium", {
@@ -13,12 +13,12 @@ const textVariants = cva("text-sm font-medium", {
     variant: {
       default: "text-neutral-50 dark:text-neutral-900",
       destructive: "text-neutral-50 dark:text-neutral-50",
-      outline: "",
-      secondary: "",
-      ghost: "",
+      outline: "text-neutral-950 dark:text-neutral-50",
+      secondary: "text-neutral-950 dark:text-neutral-50",
+      ghost: "text-neutral-950 dark:text-neutral-50",
     },
     size: {
-      default: "text-lg font-bold",
+      default: "font-bold",
       sm: "text-xs",
       lg: "",
       icon: "",
@@ -43,7 +43,7 @@ const buttonVariants = cva(
         ghost: "",
       },
       size: {
-        default: "h-12 px-4 py-2",
+        default: "h-10 px-4 py-2",
         sm: "h-8 px-3",
         lg: "h-10 px-8",
         icon: "h-9 w-9",
@@ -67,40 +67,52 @@ interface ButtonProps
 type Variants = NonNullable<VariantProps<typeof buttonVariants>["variant"]>;
 
 const spinnerColors: Record<Variants, ISpinnerColor> = {
-  default: "white",
-  destructive: "white",
-  outline: "black",
-  secondary: "black",
-  ghost: "black",
+  default: "secondary",
+  destructive: "secondary",
+  outline: "primary",
+  secondary: "primary",
+  ghost: "primary",
 };
 
-//@ts-expect-error Pressable type
-const Button = React.forwardRef<Pressable, ButtonProps>(
+const Button = React.forwardRef<View, ButtonProps>(
   (
-    { className, loading, variant, size, children, icon, leftIcon, ...props },
+    { loading, style, variant, size, children, icon, leftIcon, ...props },
     ref,
   ) => {
     return (
       <Pressable
-        className={cn(buttonVariants({ variant, size, className }))}
+        style={[
+          tws(buttonVariants({ variant, size })),
+          typeof style === "object" && style,
+        ]}
         ref={ref}
         {...props}
       >
         {loading ? (
-          <Spinner color={spinnerColors[variant || "default"]} width={20} />
+          <View
+            style={tws(
+              `absolute flex h-full w-full items-center justify-center`,
+            )}
+          >
+            <Spinner color={spinnerColors[variant || "default"]} width={20} />
+          </View>
         ) : (
-          <>
-            {leftIcon ? leftIcon : <></>}
+          <></>
+        )}
 
+        <View style={{ opacity: loading ? 0 : 1 }}>
+          {leftIcon ? leftIcon : <></>}
+
+          <>
             {icon ? (
               children
             ) : (
-              <Text className={textVariants({ variant, size })}>
+              <Text style={tws(textVariants({ variant, size }))}>
                 {children as ReactNode}
               </Text>
             )}
           </>
-        )}
+        </View>
       </Pressable>
     );
   },

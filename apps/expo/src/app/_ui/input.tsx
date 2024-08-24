@@ -2,7 +2,7 @@ import type { TextInputProps } from "react-native";
 import * as React from "react";
 import { TextInput } from "react-native";
 
-import { cn } from "~/utils/cn";
+import { tw, tws } from "~/utils/tw";
 
 export interface InputProps extends TextInputProps {
   isValid?: boolean;
@@ -10,20 +10,17 @@ export interface InputProps extends TextInputProps {
 }
 
 const Input = React.forwardRef<TextInput, InputProps>(
-  ({ className, isValid, error, ...props }, ref) => {
+  ({ style, isValid, error, ...props }, ref) => {
     return (
       <TextInput
-        className={cn(
-          "flex h-12 w-full items-center justify-center rounded-lg border px-2 py-0 transition-colors",
-          "border-neutral-200 placeholder:text-neutral-500 disabled:opacity-50 dark:border-neutral-800 dark:placeholder:text-neutral-400",
-          className,
-        )}
-        style={{
-          justifyContent: "center",
-          alignItems: "center",
-          fontSize: 18,
-          lineHeight: 22,
-        }}
+        style={[
+          tws(
+            "flex h-12 w-full items-center justify-center rounded-lg border px-2 py-0 ",
+            "text-neutral-950 dark:text-neutral-50",
+            "border-neutral-200 placeholder:text-neutral-500 disabled:opacity-50 dark:border-neutral-800 dark:placeholder:text-neutral-400",
+          ),
+          style,
+        ]}
         autoCorrect={false}
         ref={ref}
         {...props}

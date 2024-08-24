@@ -1,5 +1,9 @@
+CREATE TABLE `meta` (
+	`user` text PRIMARY KEY NOT NULL,
+	`updated` integer
+);
+--> statement-breakpoint
 CREATE TABLE `trackable` (
-	`created` integer DEFAULT (current_timestamp) NOT NULL,
 	`updated` integer DEFAULT (current_timestamp) NOT NULL,
 	`id` text PRIMARY KEY NOT NULL,
 	`name` text NOT NULL,
@@ -9,7 +13,6 @@ CREATE TABLE `trackable` (
 );
 --> statement-breakpoint
 CREATE TABLE `trackableRecord` (
-	`created` integer DEFAULT (current_timestamp) NOT NULL,
 	`updated` integer DEFAULT (current_timestamp) NOT NULL,
 	`trackableId` text NOT NULL,
 	`date` integer DEFAULT (current_timestamp) NOT NULL,

@@ -6,6 +6,8 @@ const zUserData = z.object({
   token: z.string(),
   host: z.string(),
   userId: z.string(),
+  email: z.string(),
+  username: z.string(),
 });
 
 export type IUserData = z.infer<typeof zUserData>;

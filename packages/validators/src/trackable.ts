@@ -69,7 +69,7 @@ export const ZTrackableSettingsRange = z.object({
     .array(
       z.object({
         internalKey: z.string().min(1),
-        emoji: z.string().emoji().optional(),
+        emoji: z.string().optional(),
         color: ZColorValue.optional(),
         // used to key inputs when editing, can be changed voluntarily
         id: z.string().uuid().default(uuidv4),

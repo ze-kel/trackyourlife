@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
-import { createContext, memo, useContext } from "react";
+import { createContext, memo, useCallback, useContext, useMemo } from "react";
 
 import type {
   IBooleanSettings,
@@ -8,9 +8,12 @@ import type {
   IRangeSettings,
   ITrackable,
 } from "@tyl/validators/trackable";
-import { clamp } from "@tyl/helpers";
-import { presetsMap } from "@tyl/helpers/colorPresets";
-import { getColorAtPosition, makeColorString } from "@tyl/helpers/colorTools";
+import {
+  getDayCellBooleanColors,
+  getRangeLabelMapping,
+  getValueToColorFunc,
+  getValueToProgressPercentage,
+} from "@tyl/helpers/trackables";
 
 export interface IDayCellBooleanContext {
   type: "boolean";
@@ -49,21 +52,12 @@ const DayCellBooleanProvider = ({
   settings: IBooleanSettings;
   children: ReactNode;
 }) => {
-  const themeActive = settings.activeColor;
-  const themeInactive = settings.inactiveColor;
-
-  const themeActiveLight = makeColorString(
-    themeActive?.lightMode || presetsMap.green.lightMode,
-  );
-  const themeActiveDark = makeColorString(
-    themeActive?.darkMode || presetsMap.green.darkMode,
-  );
-  const themeInactiveLight = makeColorString(
-    themeInactive?.lightMode || presetsMap.neutral.lightMode,
-  );
-  const themeInactiveDark = makeColorString(
-    themeInactive?.darkMode || presetsMap.neutral.darkMode,
-  );
+  const {
+    themeActiveDark,
+    themeActiveLight,
+    themeInactiveDark,
+    themeInactiveLight,
+  } = useMemo(() => getDayCellBooleanColors(settings), [settings]);
 
   return (
     <div
@@ -99,37 +93,12 @@ const DayCellNumberProvider = ({
   settings: INumberSettings;
   children: ReactNode;
 }) => {
-  // Maybe we should memoize this
-  const valueToColor = (displayedNumber: number) => {
-    if (
-      !settings.colorCodingEnabled ||
-      !settings.colorCoding ||
-      displayedNumber === 0
-    ) {
-      return presetsMap.neutral;
-    }
-    return getColorAtPosition({
-      value: settings.colorCoding,
-      point: displayedNumber,
-    });
-  };
+  const valueToColor = useCallback(getValueToColorFunc(settings), [settings]);
 
-  const valueToProgressPercentage = (val: number | undefined) => {
-    const progress = settings.progress;
-    if (
-      !progress ||
-      !settings.progressEnabled ||
-      typeof progress.max === "undefined" ||
-      typeof progress.min === "undefined" ||
-      typeof val === "undefined"
-    ) {
-      return null;
-    }
-    return Math.round(
-      (clamp(val, progress.min, progress.max) / (progress.max - progress.min)) *
-        100,
-    );
-  };
+  const valueToProgressPercentage = useCallback(
+    getValueToProgressPercentage(settings),
+    [settings],
+  );
 
   return (
     <div>
@@ -147,16 +116,6 @@ const DayCellNumberProvider = ({
   );
 };
 
-const getRangeLabelMapping = (settings: IRangeSettings) => {
-  const map: Record<string, string> = {};
-  if (!settings.labels) return map;
-  settings.labels.forEach((v) => {
-    map[v.internalKey] = v.emoji || "";
-  });
-
-  return map;
-};
-
 const DayCellRangeProvider = ({
   settings,
   children,
@@ -164,7 +123,10 @@ const DayCellRangeProvider = ({
   settings: IRangeSettings;
   children: ReactNode;
 }) => {
-  const labelMapping = getRangeLabelMapping(settings);
+  const labelMapping = useMemo(
+    () => getRangeLabelMapping(settings),
+    [settings],
+  );
 
   return (
     <div>

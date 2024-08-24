@@ -1,25 +1,14 @@
-import { useState } from "react";
-import { Text, View } from "react-native";
-import { useQuery } from "@tanstack/react-query";
+import { Fragment, useState } from "react";
+import { ScrollView, Text, useColorScheme, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useLiveQuery } from "drizzle-orm/expo-sqlite";
 
-import { getDateInTimezone } from "@tyl/helpers/timezone";
-import {
-  ITrackable,
-  ITrackableSettings,
-  ZTrackableSettings,
-} from "@tyl/validators/trackable";
+import { ZTrackableSettings } from "@tyl/validators/trackable";
 
-import { DayCellBoolean } from "~/app/_components/dayCellBoolean";
-import { DayCellProvider } from "~/app/_components/dayCellProvider";
-import {
-  TrackableProvider,
-  useTrackableContextSafe,
-} from "~/app/_components/trackableProvider";
-import { Button } from "~/app/_ui/button";
-import { useSession } from "~/app/authContext";
+import DayCellWrapper from "~/app/_components/dayCell";
+import { TrackableProvider } from "~/app/_components/trackableProvider";
 import { db } from "~/db";
-import { useSync } from "~/db/syncContext";
+import { tws } from "~/utils/tw";
 
 export const makeTrackableSettings = (trackable: unknown) => {
   const parseRes = ZTrackableSettings.safeParse(trackable);
@@ -31,65 +20,49 @@ export const makeTrackableSettings = (trackable: unknown) => {
 
 const Today = () => {
   const now = new Date();
-  const d = new Date(
-    Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0),
-  );
-  const { useValue, setValue, settings, name } = useTrackableContextSafe();
-  const { value, error } = useValue(d);
-
   return (
-    <DayCellProvider type="boolean" settings={settings}>
-      <DayCellBoolean value={value} onChange={(v) => setValue(d, v)}>
-        <Text>{name}</Text>
-      </DayCellBoolean>
-    </DayCellProvider>
+    <DayCellWrapper
+      day={now.getDate()}
+      month={now.getMonth()}
+      year={now.getFullYear()}
+    ></DayCellWrapper>
   );
 };
 
 export default function Index() {
-  const { signOut } = useSession();
-
-  const { isLoading, lastSync, sync } = useSync();
-
   const { data } = useLiveQuery(db.query.trackable.findMany());
   const [value, setValue] = useState("true");
 
+  const colorScheme = useColorScheme();
+
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text className="">You are logged in </Text>
-
-      <Text>Last sync {lastSync.toUTCString()}</Text>
-      {isLoading && <Text>syncing</Text>}
-      <Button variant={"default"} onPress={() => sync()}>
-        Sync
-      </Button>
-
-      <Button variant={"default"} onPress={() => sync(true)}>
-        Sync clear
-      </Button>
-
-      <Text>
-        {data.length} trackables {value}
-      </Text>
-      <View>
-        {data.map((v) => (
-          <View key={v.id} className="mt-2">
-            {v.type === "boolean" && (
+    <View
+      style={[
+        tws(""),
+        { flex: 1, justifyContent: "center", alignItems: "center" },
+      ]}
+    >
+      <SafeAreaView edges={["top"]} />
+      <ScrollView>
+        <View
+          style={[tws("flex  flex-row flex-wrap justify-start gap-4 px-4")]}
+        >
+          {data.map((v) => (
+            <View key={v.id} style={tws("w-[50%]")}>
+              <Text
+                style={tws(
+                  "text-lg text-neutral-900 opacity-30 dark:opacity-20 dark:text-neutral-50",
+                )}
+              >
+                {v.name}
+              </Text>
               <TrackableProvider trackable={v}>
                 <Today />
               </TrackableProvider>
-            )}
-          </View>
-        ))}
-      </View>
-
-      <Text
-        onPress={() => {
-          signOut();
-        }}
-      >
-        Sign Out
-      </Text>
+            </View>
+          ))}
+        </View>
+      </ScrollView>
     </View>
   );
 }

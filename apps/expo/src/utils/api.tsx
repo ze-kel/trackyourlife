@@ -7,8 +7,15 @@ import { getUserData } from "./session-store";
 
 export { type RouterInputs, type RouterOutputs } from "@tyl/api";
 
+export const getHostLink = (v?: string) =>
+  v ? `${v}${v.endsWith("/") ? "" : "/"}` : "";
+
 const makeTrpcClient = () => {
   const uData = getUserData();
+
+  const url = `${getHostLink(uData?.host)}api/trpc`;
+
+  console.log(url);
 
   return createTRPCClient<AppRouter>({
     links: [
@@ -20,7 +27,7 @@ const makeTrpcClient = () => {
       }),
       httpBatchLink({
         transformer: superjson,
-        url: `http://${uData?.host ?? ""}/api/trpc`,
+        url,
         headers() {
           const headers = new Map<string, string>();
           headers.set("x-trpc-source", "expo-react");

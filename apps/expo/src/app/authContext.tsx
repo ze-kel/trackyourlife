@@ -1,6 +1,7 @@
 import type { PropsWithChildren } from "react";
 import { createContext, useContext, useState } from "react";
 
+import { clearDB } from "~/db";
 import { updateTrpcClient } from "~/utils/api";
 import {
   clearUserData,
@@ -39,6 +40,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
         },
         signOut: async () => {
           await clearUserData();
+          await clearDB();
           setUdata(undefined);
         },
         userData: uData,

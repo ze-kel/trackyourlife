@@ -1,7 +1,8 @@
 import { ReactNode, useState } from "react";
-import { TextInput, View } from "react-native";
+import { Pressable, TextInput, View, ViewStyle } from "react-native";
 
-import { useDayCellContextNumber } from "~/app/_components/dayCellProvider";
+import { useDayCellContextNumber } from "~/app/_components/DayCellProvider";
+import { tws } from "~/utils/tw";
 
 const getNumberSafe = (v: string | undefined) => {
   if (!v) return 0;
@@ -19,13 +20,13 @@ export const DayCellNumber = ({
   onChange,
   children,
   dateDay,
-  className,
+  style,
 }: {
   value?: string;
   onChange?: (v: string) => Promise<void> | void;
-  children: ReactNode;
+  children?: ReactNode;
   dateDay: Date;
-  className?: string;
+  style?: ViewStyle;
 }) => {
   const { valueToColor, valueToProgressPercentage } = useDayCellContextNumber();
 
@@ -35,8 +36,8 @@ export const DayCellNumber = ({
   const [isEditing, setIsEditing] = useState(false);
 
   return (
-    <View>
+    <Pressable style={[tws("h-[80px] bg-red-500"), style]}>
       <TextInput keyboardType="numeric" />
-    </View>
+    </Pressable>
   );
 };

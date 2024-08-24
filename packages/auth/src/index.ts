@@ -31,8 +31,6 @@ export const lucia = new Lucia(adapter, {
   },
 });
 
-console.log("asdhjkashdjkasdjkashd", lucia.sessionCookieName);
-
 // IMPORTANT!
 declare module "lucia" {
   interface Register {

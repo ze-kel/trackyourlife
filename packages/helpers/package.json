@@ -8,7 +8,8 @@
     "./animation": "./src/animation.ts",
     "./colorPresets": "./src/colorPresets.ts",
     "./colorTools": "./src/colorTools.ts",
-    "./timezone": "./src/timezone.ts"
+    "./timezone": "./src/timezone.ts",
+    "./trackables": "./src/trackables.ts"
   },
   "license": "MIT",
   "scripts": {
@@ -20,7 +21,9 @@
   "dependencies": {
     "@tyl/validators": "workspace:*",
     "chroma-js": "^3.0.0",
-    "lodash-es": "^4.17.21"
+    "lodash-es": "^4.17.21",
+    "date-fns": "catalog:",
+    "date-fns-tz": "catalog:"
   },
   "devDependencies": {
     "@tyl/eslint-config": "workspace:*",

@@ -60,7 +60,12 @@ export const POST = async (request: NextRequest) => {
     const session = await lucia.createSession(user.id, {});
 
     log(`API: User login ${email}`);
-    return NextResponse.json({ token: session.id, userId: user.id });
+    return NextResponse.json({
+      token: session.id,
+      userId: user.id,
+      email: user.email,
+      username: user.username,
+    });
   } catch (e) {
     log(`API: Fail to login, UNKNOWN`, e);
     return NextResponse.json(

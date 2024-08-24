@@ -1,20 +1,35 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "1ee44191-d2fd-4935-9362-5fea1378679d",
+  "id": "7892603d-4eea-4869-af75-2e3eac95409a",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
+    "meta": {
+      "name": "meta",
+      "columns": {
+        "user": {
+          "name": "user",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated": {
+          "name": "updated",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
     "trackable": {
       "name": "trackable",
       "columns": {
-        "created": {
-          "name": "created",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "(current_timestamp)"
-        },
         "updated": {
           "name": "updated",
           "type": "integer",
@@ -68,14 +83,6 @@
     "trackableRecord": {
       "name": "trackableRecord",
       "columns": {
-        "created": {
-          "name": "created",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "(current_timestamp)"
-        },
         "updated": {
           "name": "updated",
           "type": "integer",

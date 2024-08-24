@@ -1,5 +1,5 @@
 import React from "react";
-import { Image, View } from "react-native";
+import { Image, useColorScheme, View, ViewStyle } from "react-native";
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -10,19 +10,29 @@ import Animated, {
 import SpinnerBlack from "@assets/spinner-black.png";
 import SpinnerWhite from "@assets/spinner-white.png";
 
+import { tw, tws } from "~/utils/tw";
+
 const colors = {
-  black: SpinnerBlack,
-  white: SpinnerWhite,
+  primary: {
+    light: SpinnerBlack,
+    dark: SpinnerWhite,
+  },
+  secondary: {
+    light: SpinnerWhite,
+    dark: SpinnerBlack,
+  },
 };
 
 export type ISpinnerColor = keyof typeof colors;
 
 export default function Spinner({
   width = 50,
-  color = "black",
+  color = "primary",
+  style,
 }: {
   width?: number;
   color?: ISpinnerColor;
+  style?: ViewStyle;
 }) {
   const randomWidth = useSharedValue(0);
 
@@ -35,14 +45,16 @@ export default function Spinner({
     randomWidth.value = withRepeat(withTiming(1, config), 100);
   }, []);
 
-  const style = useAnimatedStyle(() => {
+  const animatedStyle = useAnimatedStyle(() => {
     return {
       transform: [{ rotate: `${randomWidth.value * 360}deg` }],
     };
   });
 
+  const colorScheme = useColorScheme();
+
   return (
-    <View className="flex h-full w-full items-center justify-center">
+    <View style={tws("flex h-full w-full items-center justify-center", style)}>
       <Animated.View
         style={[
           {
@@ -53,11 +65,11 @@ export default function Spinner({
             justifyContent: "center",
             alignItems: "center",
           },
-          style,
+          animatedStyle,
         ]}
       >
         <Image
-          source={colors[color]}
+          source={colors[color][colorScheme || "light"]}
           style={{ width, resizeMode: "contain", display: "flex" }}
         />
       </Animated.View>

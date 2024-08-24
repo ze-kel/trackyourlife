@@ -6,6 +6,13 @@ import { router, Stack } from "expo-router";
 import { Button } from "~/app/_ui/button";
 import { Input } from "~/app/_ui/input";
 import { useSession } from "~/app/authContext";
+import { getHostLink } from "~/utils/api";
+import { tws } from "~/utils/tw";
+
+const errorInfo: Record<string, string> = {
+  "Network request failed":
+    ". If you are connected to the internet this usually means host is typed incorrectly. \n\nMost common mistake is not specifying protocol: tyl.zekel.io should be https://tyl.zekel.io (use http:// when connecting to a server without TLS certificate)",
+};
 
 const LoginForm = () => {
   const { signIn } = useSession();
@@ -22,7 +29,7 @@ const LoginForm = () => {
     setLoading(true);
     try {
       const res = await fetch(
-        "http://" + host.current + "/api/user/logintoken",
+        getHostLink(host.current) + "api/user/logintoken",
         {
           method: "POST",
           body: JSON.stringify({
@@ -40,17 +47,23 @@ const LoginForm = () => {
           setError(j.error);
         }
       } else {
-        const { token, userId } = j;
+        const { token, userId, username, email } = j;
 
-        if (token && userId) {
+        if (token && userId && username && email) {
           setToken(token);
-          signIn({ token, host: host.current, userId });
+          signIn({ token, host: host.current, userId, username, email });
           router.replace("/");
         } else {
           setError("Unknown error");
         }
       }
     } catch (e) {
+      console.log(e);
+      if (e instanceof Error) {
+        setError(String(e.message + errorInfo[e.message] || ""));
+
+        return;
+      }
       setError(String(e));
     } finally {
       setLoading(false);
@@ -58,42 +71,66 @@ const LoginForm = () => {
   };
 
   return (
-    <View className="">
-      <Text className="text-xl">Host</Text>
+    <View>
+      <Text
+        style={tws(
+          "text-4xl text-center py-10 font-black tracking-wider text-neutral-950 dark:text-neutral-50",
+        )}
+      >
+        TYL
+      </Text>
+
+      <Text
+        style={tws("text-xl font-bold text-neutral-950 dark:text-neutral-50")}
+      >
+        Host
+      </Text>
       <Input
         autoCapitalize="none"
-        placeholder="tyl.zekel.io"
-        className="mt-2"
+        placeholder="https://tyl.zekel.io"
+        style={tws("mt-2")}
         onChangeText={(v) => (host.current = v)}
       />
-      <Text className="mt-6 text-xl">Login</Text>
+      <Text
+        style={tws(
+          "mt-6 text-xl font-bold text-neutral-950 dark:text-neutral-50",
+        )}
+      >
+        Login
+      </Text>
       <Input
+        placeholder="kel@gmail.com"
         autoCapitalize="none"
         autoComplete="email"
-        className="mt-1"
+        style={tws("mt-1")}
         onChangeText={(v) => (email.current = v)}
       />
-      <Text className="mt-2 text-xl">Password</Text>
+      <Text
+        style={tws(
+          "mt-2 text-xl font-bold text-neutral-950 dark:text-neutral-50",
+        )}
+      >
+        Password
+      </Text>
       <Input
         autoCapitalize="none"
         autoComplete="current-password"
-        className="mt-1"
+        style={tws("mt-1")}
         onChangeText={(v) => (password.current = v)}
       />
-      <Button className="mt-6" onPress={logIn} loading={loading}>
+      <Button style={tws("mt-6")} onPress={logIn} loading={loading}>
         Login
       </Button>
-      <Text>{error}</Text>
-      <Text>{token}</Text>
+      <Text style={tws("text-red-500 dark:text-red-600 mt-4")}>{error}</Text>
     </View>
   );
 };
 
 export default function Index() {
   return (
-    <SafeAreaView className="bg-background">
+    <SafeAreaView style={tws("")}>
       <Stack.Screen options={{ title: "Home Page" }} />
-      <View className="bg-background h-full w-full p-4">
+      <View style={tws("h-full w-full p-4")}>
         <LoginForm />
       </View>
     </SafeAreaView>
