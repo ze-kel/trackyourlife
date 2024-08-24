@@ -54,9 +54,11 @@ export const DayCellNumber = ({
   const [isEditing, setIsEditing] = useState(false);
 
   useLayoutEffect(() => {
-    if (internalNumber !== getNumberSafe(value) && !isEditing) {
+    if (internalNumber !== getNumberSafe(value)) {
       setInternalNumber(getNumberSafe(value));
-      setRawInput(String(internalNumber));
+      if (!isEditing) {
+        setRawInput(String(internalNumber));
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);

@@ -64,7 +64,7 @@ export const DayCellBoolean = ({
         key={isActive ? "active" : "inactive"}
         entering={CustomIN}
         style={[
-          tws("w-full h-full absolute left-0 top-0 rounded-[1px]"),
+          tws("w-full h-full absolute left-0 top-0 rounded-sm"),
           {
             transformOrigin: animateFrom.real
               ? `${animateFrom.x}px ${animateFrom.y}px`

@@ -3,8 +3,10 @@ import "@bacons/text-decoder/install";
 import type { ReactNode } from "react";
 import { useState } from "react";
 import { Text, useColorScheme, View } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
 import { useDeviceContext } from "twrnc";
@@ -59,18 +61,22 @@ export default function RootLayout() {
   }
 
   return (
-    <SessionProvider>
-      <QueryProvider>
-        <SyncContextProvider>
-          <Stack
-            screenOptions={{
-              headerShown: false,
-              contentStyle: tws("bg-neutral-50 dark:bg-neutral-950"),
-            }}
-          />
-          <StatusBar />
-        </SyncContextProvider>
-      </QueryProvider>
-    </SessionProvider>
+    <GestureHandlerRootView>
+      <BottomSheetModalProvider>
+        <SessionProvider>
+          <QueryProvider>
+            <SyncContextProvider>
+              <Stack
+                screenOptions={{
+                  headerShown: false,
+                  contentStyle: tws("bg-neutral-50 dark:bg-neutral-950"),
+                }}
+              />
+              <StatusBar />
+            </SyncContextProvider>
+          </QueryProvider>
+        </SessionProvider>
+      </BottomSheetModalProvider>
+    </GestureHandlerRootView>
   );
 }

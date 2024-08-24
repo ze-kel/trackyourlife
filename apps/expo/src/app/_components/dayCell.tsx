@@ -11,8 +11,7 @@ import { DayCellBoolean } from "./DayCellBoolean";
 import { DayCellNumber } from "./DayCellNumber";
 import { DayCellRange } from "./DayCellRange";
 
-export const DayCellBaseClasses =
-  "relative  overflow-hidden border-transparent  border-2 rounded-sm";
+export const DayCellBaseClasses = "relative rounded-sm";
 
 const DayCellInner = ({
   type,
@@ -131,14 +130,14 @@ const DayCellWrapper = ({
         onChange={updateHandler}
       >
         {labelType === "inside" && (
-          <View
+          <Text
             style={tws(
               "absolute left-1 top-1 text-base text-neutral-800",
               isToday ? "font-normal underline" : "font-light",
             )}
           >
-            <Text>{day}</Text>
-          </View>
+            {day}
+          </Text>
         )}
       </DayCellInner>
     </View>
