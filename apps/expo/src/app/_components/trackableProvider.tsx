@@ -36,11 +36,16 @@ export const makeTrackableSettings = (trackable: unknown) => {
 
 const TrackableContext = createContext<ITrackableContext | null>(null);
 
+export type ITrackableFromAppDB = ITrackableFromList & {
+  settings: unknown;
+  userId: string;
+};
+
 export const TrackableProvider = ({
   trackable,
   children,
 }: {
-  trackable: ITrackableFromList & { settings: unknown; userId: string };
+  trackable: ITrackableFromAppDB;
   children: ReactNode;
 }) => {
   const { updateTrackableRecord } = useSync();

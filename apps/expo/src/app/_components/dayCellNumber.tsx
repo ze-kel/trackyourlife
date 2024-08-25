@@ -79,7 +79,7 @@ export const DayCellNumber = ({
   }, [value]);
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-  const snapPoints = useMemo(() => [200], []);
+  const snapPoints = useMemo(() => [130], []);
 
   const isBigNumber = internalNumber >= 10000;
 

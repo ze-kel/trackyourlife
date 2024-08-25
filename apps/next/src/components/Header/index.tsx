@@ -60,22 +60,22 @@ export const CoreLinks = [
   {
     icon: CalendarIcon,
     name: "Today",
-    link: "/",
+    link: "/app",
   },
   {
     icon: ActivityLogIcon,
     name: "Trackables",
-    link: "/trackables",
+    link: "/app/trackables",
   },
   {
     icon: PlusCircledIcon,
     name: "Create",
-    link: "/create",
+    link: "/app/create",
   },
   {
     icon: GearIcon,
     name: "Settings",
-    link: "/settings",
+    link: "/app/settings",
   },
 ];
 
@@ -194,7 +194,7 @@ const Header = ({ user }: { user?: User }) => {
   return (
     <div className="flex h-full w-full items-center justify-between px-0">
       <Link
-        href={"/"}
+        href={"/app/"}
         className="flex h-full items-center justify-center px-4 xl:px-6"
       >
         <h2 className="text-2xl font-bold tracking-wider">TYL</h2>

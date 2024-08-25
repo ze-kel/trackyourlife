@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useLayoutEffect, useState } from "react";
 import { Pressable, useColorScheme, ViewStyle } from "react-native";
 import Animated, { Easing, ZoomIn } from "react-native-reanimated";
 
@@ -18,6 +18,14 @@ export const DayCellBoolean = ({
   children?: ReactNode;
   style?: ViewStyle;
 }) => {
+  const [internalValue, setInternalValue] = useState(value);
+
+  useLayoutEffect(() => {
+    if (internalValue !== value) {
+      setInternalValue(value);
+    }
+  }, []);
+
   const [animateFrom, setAnimateFrom] = useState({ x: 1, y: 1, real: false });
 
   const {
@@ -26,7 +34,7 @@ export const DayCellBoolean = ({
     themeInactiveDark,
     themeInactiveLight,
   } = useDayCellContextBoolean();
-  const isActive = value === "true";
+  const isActive = internalValue === "true";
 
   const colorScheme = useColorScheme();
 
@@ -41,7 +49,6 @@ export const DayCellBoolean = ({
         {
           overflow: "hidden",
           display: "flex",
-          minWidth: 120,
           position: "relative",
           flexGrow: 1,
           height: 80,
@@ -55,6 +62,7 @@ export const DayCellBoolean = ({
           y: Math.round(e.nativeEvent.locationY),
           real: true,
         });
+        setInternalValue(isActive ? "false" : "true");
         if (onChange) {
           onChange(isActive ? "false" : "true");
         }

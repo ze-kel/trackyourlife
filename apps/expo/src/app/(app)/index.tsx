@@ -1,12 +1,22 @@
 import { Fragment, useState } from "react";
-import { ScrollView, Text, useColorScheme, View } from "react-native";
+import {
+  ScrollView,
+  Text,
+  useColorScheme,
+  useWindowDimensions,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { FlashList } from "@shopify/flash-list";
+import { eachDayOfInterval, format, sub } from "date-fns";
 import { useLiveQuery } from "drizzle-orm/expo-sqlite";
 
+import { chunk } from "@tyl/helpers";
 import { ZTrackableSettings } from "@tyl/validators/trackable";
 
 import DayCellWrapper from "~/app/_components/dayCell";
 import { TrackableProvider } from "~/app/_components/trackableProvider";
+import { Button } from "~/app/_ui/button";
 import { db } from "~/db";
 import { tws } from "~/utils/tw";
 
@@ -29,40 +39,101 @@ const Today = () => {
   );
 };
 
-export default function Index() {
+const DateView = ({ date }: { date: Date }) => {
   const { data } = useLiveQuery(db.query.trackable.findMany());
-  const [value, setValue] = useState("true");
+  const { height, width } = useWindowDimensions();
 
-  const colorScheme = useColorScheme();
+  const columns = chunk(data, Math.ceil(data.length / 2));
 
   return (
-    <View
-      style={[
-        tws(""),
-        { flex: 1, justifyContent: "center", alignItems: "center" },
-      ]}
-    >
-      <SafeAreaView edges={["top"]} />
+    <>
+      <View
+        style={[
+          tws(
+            "px-4 flex flex-row items-center justify-between pb-2 overflow-hidden",
+          ),
+          { width: width },
+        ]}
+      >
+        <Text style={tws("text-color-base text-4xl font-extrabold")}>
+          <Text>{format(date, "EEEE")} </Text>
+          <Text style={[tws("font-semibold text-2xl opacity-80")]}>
+            {format(date, "d MMM")}
+          </Text>
+        </Text>
+
+        <View style={[tws("flex flex-row gap-2")]}>
+          <Button size={"icon"} variant={"ghost"}>
+            {"<"}
+          </Button>
+          <Button size={"icon"} variant={"ghost"}>
+            {">"}
+          </Button>
+        </View>
+      </View>
       <ScrollView>
-        <View
-          style={[tws("flex  flex-row flex-wrap justify-start gap-4 px-4")]}
-        >
-          {data.map((v) => (
-            <View key={v.id} style={tws("w-[50%]")}>
-              <Text
-                style={tws(
-                  "text-lg text-neutral-900 opacity-30 dark:opacity-20 dark:text-neutral-50",
-                )}
-              >
-                {v.name}
-              </Text>
-              <TrackableProvider trackable={v}>
-                <Today />
-              </TrackableProvider>
-            </View>
-          ))}
+        <View style={[tws("flex flex-row")]}>
+          {columns.map((items, i) => {
+            return (
+              <View key={i} style={{ width: width / 2 }}>
+                {items.map((v) => (
+                  <View
+                    style={[
+                      i === 0 ? tws("pl-4 pr-2") : tws("pr-4 pl-2"),
+                      tws("py-1"),
+                    ]}
+                    key={v.id}
+                  >
+                    <Text
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                      style={tws(
+                        "text-lg text-neutral-900 opacity-30 dark:opacity-20 dark:text-neutral-50",
+                      )}
+                    >
+                      {v.name}
+                    </Text>
+                    <TrackableProvider trackable={v}>
+                      <DayCellWrapper
+                        day={date.getDate()}
+                        month={date.getMonth()}
+                        year={date.getFullYear()}
+                      ></DayCellWrapper>
+                    </TrackableProvider>
+                  </View>
+                ))}
+              </View>
+            );
+          })}
         </View>
       </ScrollView>
-    </View>
+    </>
+  );
+};
+
+const DAYS = 7;
+
+export default function Index() {
+  const { height, width } = useWindowDimensions();
+
+  const dates = eachDayOfInterval({
+    start: sub(new Date(), { days: DAYS }),
+    end: new Date(),
+  });
+
+  return (
+    <>
+      <SafeAreaView edges={["top"]} />
+      <FlashList
+        snapToInterval={width}
+        horizontal={true}
+        data={dates}
+        renderItem={(i) => <DateView date={i.item} />}
+        estimatedItemSize={width}
+        snapToAlignment="center"
+        decelerationRate="fast"
+        initialScrollIndex={dates.length - 1}
+      ></FlashList>
+    </>
   );
 }

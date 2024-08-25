@@ -46,7 +46,7 @@ const SettingsWrapper = () => {
       handleSave={async (v: ITrackableSettings) => {
         await settingsMutation.mutateAsync(v, {
           onSuccess: () => {
-            router.push(`/trackables/${trackable.id}`);
+            router.push(`/app/trackables/${trackable.id}`);
           },
         });
       }}

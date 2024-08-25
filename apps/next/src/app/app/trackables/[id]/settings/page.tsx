@@ -1,15 +1,19 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { CalendarIcon } from "@radix-ui/react-icons";
-import { HydrationBoundary, QueryClient, dehydrate } from "@tanstack/react-query";
-import SettingWrapperContext from "src/app/trackables/[id]/settings/settingsWrapper";
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from "@tanstack/react-query";
 
 import { validateRequest } from "@tyl/auth";
 import { Button } from "@tyl/ui/button";
 
-import { fillPrefetchedTrackable } from "~/app/trackables/helpers";
 import DeleteButton from "~/components/DeleteButton";
 import { api } from "~/trpc/server";
+import { fillPrefetchedTrackable } from "~/utils/fillPrefetched";
+import SettingWrapperContext from "./settingsWrapper";
 
 const TrackableSettingsPage = async ({
   params,
@@ -34,7 +38,7 @@ const TrackableSettingsPage = async ({
       <div className="content-container flex h-full max-h-full w-full flex-col pb-6">
         <div className="mb-4 flex w-full items-center justify-between">
           <h2 className="w-full bg-inherit text-2xl font-semibold">Settings</h2>
-          <Link href={`/trackables/${trackable.id}/`} className="mr-2">
+          <Link href={`/app/trackables/${trackable.id}/`} className="mr-2">
             <Button variant="outline" size="icon">
               <CalendarIcon className="h-4 w-4" />
             </Button>

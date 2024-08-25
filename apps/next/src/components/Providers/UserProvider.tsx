@@ -3,26 +3,36 @@
 import type { ReactNode } from "react";
 import { createContext, useContext } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Session, User } from "lucia";
 
 import type { IUserSettings } from "@tyl/validators/user";
 import { UserSettingsFallback } from "@tyl/validators/user";
 
 import { api } from "~/trpc/react";
 
-interface ISettingsContext {
+interface IUserContext {
   settings?: IUserSettings;
+  user: User | null;
+  session: Session | null;
   updateSettings?: (v: IUserSettings) => Promise<unknown>;
   updateSettingsPartial?: (update: Partial<IUserSettings>) => Promise<unknown>;
 }
 
-const SettingsContext = createContext<ISettingsContext>({});
+const UserContext = createContext<IUserContext>({
+  user: null,
+  session: null,
+});
 
 const QUERY_KEY = ["user", "settings"];
 
-const UserSettingsProvider = ({
+const UserProvider = ({
+  user,
+  session,
   initialSettings,
   children,
 }: {
+  user: User | null;
+  session: Session | null;
   children: ReactNode;
   initialSettings: IUserSettings;
 }) => {
@@ -67,27 +77,29 @@ const UserSettingsProvider = ({
   };
 
   return (
-    <SettingsContext.Provider
+    <UserContext.Provider
       value={{
         settings: data,
         updateSettings: settingsMutation.mutateAsync,
         updateSettingsPartial,
+        user,
+        session,
       }}
     >
       {children}
-    </SettingsContext.Provider>
+    </UserContext.Provider>
   );
 };
 
-export const useUserSettings = () => {
-  const { settings, updateSettings, updateSettingsPartial } =
-    useContext(SettingsContext);
+export const userUserContext = () => {
+  const { settings, updateSettings, updateSettingsPartial, user, session } =
+    useContext(UserContext);
 
   if (!settings || !updateSettings || !updateSettingsPartial) {
-    throw new Error("UserSettingsContext error");
+    throw new Error("userUserContext error");
   }
 
-  return { settings, updateSettings, updateSettingsPartial };
+  return { settings, updateSettings, updateSettingsPartial, user, session };
 };
 
-export default UserSettingsProvider;
+export default UserProvider;

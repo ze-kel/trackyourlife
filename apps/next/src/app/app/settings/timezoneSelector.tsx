@@ -17,12 +17,12 @@ import {
   DropdownContent,
   DropdownTrigger,
 } from "~/components/Dropdown";
-import { useUserSettings } from "~/components/Providers/UserSettingsProvider";
+import { userUserContext } from "~/components/Providers/UserProvider";
 
 export const CurrentTime = () => {
   const [value, setValue] = useState("");
 
-  const { settings } = useUserSettings();
+  const { settings } = userUserContext();
 
   useEffect(() => {
     const timeout = setInterval(() => {
@@ -111,7 +111,7 @@ const SearchableList = ({
 export const TimezoneSelector = ({ list }: { list: TimeZone[] }) => {
   const [open, setOpen] = useState(false);
 
-  const { settings, updateSettingsPartial } = useUserSettings();
+  const { settings, updateSettingsPartial } = userUserContext();
 
   const value = settings.timezone;
 

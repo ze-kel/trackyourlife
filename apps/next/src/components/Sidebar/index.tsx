@@ -18,7 +18,7 @@ import { Button } from "@tyl/ui/button";
 import { Spinner } from "@tyl/ui/spinner";
 
 import { CoreLinks } from "~/components/Header";
-import { useUserSettings } from "~/components/Providers/UserSettingsProvider";
+import { userUserContext } from "~/components/Providers/UserProvider";
 import { sortTrackableList } from "~/components/TrackablesList/helper";
 import { api } from "~/trpc/react";
 
@@ -38,7 +38,7 @@ const TrackablesMiniList = () => {
 
   const pathname = usePathname();
 
-  const { settings } = useUserSettings();
+  const { settings } = userUserContext();
 
   const favsSet = useMemo(() => {
     return new Set(settings.favorites);
@@ -60,7 +60,7 @@ const TrackablesMiniList = () => {
     <div className="flex flex-col gap-2">
       {sorted.map((tr) => {
         return (
-          <Link key={tr.id} href={`/trackables/${tr.id}/today`}>
+          <Link key={tr.id} href={`/app/trackables/${tr.id}/today`}>
             <Button
               variant={pathname.includes(tr.id) ? "secondary" : "ghost"}
               size={"lg"}

@@ -1,6 +1,5 @@
-import { UserSettings } from "src/app/settings/userSettings";
-
-import { BackupAndRestore } from "~/app/settings/backup";
+import { BackupAndRestore } from "./backup";
+import { UserSettings } from "./userSettings";
 
 const Page = () => {
   return (

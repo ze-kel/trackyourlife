@@ -3,10 +3,10 @@ import {
   HydrationBoundary,
   QueryClient,
 } from "@tanstack/react-query";
-import { fillPrefetchedTrackablesList } from "src/app/trackables/helpers";
 
 import TrackablesList from "~/components/TrackablesList";
 import { api } from "~/trpc/server";
+import { fillPrefetchedTrackablesList } from "~/utils/fillPrefetched";
 
 const SHOW_DAYS = 6;
 

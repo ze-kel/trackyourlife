@@ -1,1 +1,1 @@
-export { clamp, cloneDeep, debounce } from "lodash-es";
+export { clamp, cloneDeep, debounce, chunk } from "lodash-es";

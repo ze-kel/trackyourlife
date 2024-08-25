@@ -113,10 +113,12 @@ const DayCellWrapper = ({
     <View style={tws("flex flex-col")}>
       {labelType === "outside" && (
         <Text
-          style={tws(
-            "mr-1 text-right text-xs text-neutral-800",
-            isToday ? "font-normal underline" : "font-light",
-          )}
+          style={[
+            tws(
+              "mr-1 text-right text-xs text-neutral-800",
+              isToday ? "font-normal underline" : "font-light",
+            ),
+          ]}
         >
           {day}
         </Text>

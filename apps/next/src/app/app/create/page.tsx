@@ -37,7 +37,7 @@ const Create = () => {
   const mutation = useMutation({
     mutationFn: api.trackablesRouter.createTrackable.mutate,
     onSuccess: (data) => {
-      router.push(`/trackables/${data.id}`);
+      router.push(`/app/trackables/${data.id}`);
     },
   });
 
@@ -52,7 +52,7 @@ const Create = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   return (
-    <div className="content-container flex flex-col gap-2">
+    <div className="content-container flex flex-col gap-2 pb-6">
       <h3 className="w-full bg-inherit text-2xl font-semibold lg:text-3xl">
         Create new Trackable
       </h3>

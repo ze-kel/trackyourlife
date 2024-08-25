@@ -1,8 +1,6 @@
 import timezones from "timezones-list";
-import {
-  CurrentTime,
-  TimezoneSelector,
-} from "src/app/settings/timezoneSelector";
+
+import { CurrentTime, TimezoneSelector } from "./timezoneSelector";
 
 export const UserSettings = () => {
   return (

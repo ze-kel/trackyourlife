@@ -32,7 +32,7 @@ import {
   DrawerTrigger,
 } from "@tyl/ui/drawer";
 
-import { useUserSettings } from "~/components/Providers/UserSettingsProvider";
+import { userUserContext } from "~/components/Providers/UserProvider";
 import { Dropdown, DropdownContent, DropdownTrigger } from "../Dropdown";
 
 const DatePicker = ({
@@ -52,7 +52,7 @@ const DatePicker = ({
   };
   className?: string;
 }) => {
-  const { settings } = useUserSettings();
+  const { settings } = userUserContext();
   const dateNow = getNowInTimezone(settings.timezone);
 
   const [innerDate, setInnerDate] = useState(date);

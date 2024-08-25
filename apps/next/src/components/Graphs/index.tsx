@@ -26,7 +26,7 @@ import { Spinner } from "@tyl/ui/spinner";
 import { NumberFormatter } from "~/components/DayCell/DayCellNumber";
 import { useDayCellContextNumber } from "~/components/Providers/DayCellProvider";
 import { useTrackableContextSafe } from "~/components/Providers/TrackableProvider";
-import { useUserSettings } from "~/components/Providers/UserSettingsProvider";
+import { userUserContext } from "~/components/Providers/UserProvider";
 import { api } from "~/trpc/react";
 
 export type CurveProps = {
@@ -65,7 +65,7 @@ export const GraphYear = ({ year }: { year: number }) => {
 
   if (!trackable) throw new Error("no trackable in context");
 
-  const { settings } = useUserSettings();
+  const { settings } = userUserContext();
 
   const now = getNowInTimezone(settings.timezone);
 

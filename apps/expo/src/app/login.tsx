@@ -52,6 +52,7 @@ const LoginForm = () => {
         if (token && userId && username && email) {
           setToken(token);
           signIn({ token, host: host.current, userId, username, email });
+
           router.replace("/");
         } else {
           setError("Unknown error");
@@ -74,30 +75,20 @@ const LoginForm = () => {
     <View>
       <Text
         style={tws(
-          "text-4xl text-center py-10 font-black tracking-wider text-neutral-950 dark:text-neutral-50",
+          "text-4xl py-5 font-black tracking-wider text-neutral-950 dark:text-neutral-50",
         )}
       >
         TYL
       </Text>
 
-      <Text
-        style={tws("text-xl font-bold text-neutral-950 dark:text-neutral-50")}
-      >
-        Host
-      </Text>
+      <Text style={tws("text-lg text-color-base")}>Host</Text>
       <Input
         autoCapitalize="none"
         placeholder="https://tyl.zekel.io"
         style={tws("mt-2")}
         onChangeText={(v) => (host.current = v)}
       />
-      <Text
-        style={tws(
-          "mt-6 text-xl font-bold text-neutral-950 dark:text-neutral-50",
-        )}
-      >
-        Login
-      </Text>
+      <Text style={tws("mt-6 text-lg text-color-base")}>Email</Text>
       <Input
         placeholder="kel@gmail.com"
         autoCapitalize="none"
@@ -105,20 +96,20 @@ const LoginForm = () => {
         style={tws("mt-1")}
         onChangeText={(v) => (email.current = v)}
       />
-      <Text
-        style={tws(
-          "mt-2 text-xl font-bold text-neutral-950 dark:text-neutral-50",
-        )}
-      >
-        Password
-      </Text>
+      <Text style={tws("mt-2 text-lg text-color-base")}>Password</Text>
       <Input
         autoCapitalize="none"
         autoComplete="current-password"
         style={tws("mt-1")}
         onChangeText={(v) => (password.current = v)}
       />
-      <Button style={tws("mt-6")} onPress={logIn} loading={loading}>
+      <Button
+        size={"lg"}
+        variant={"outline"}
+        style={tws("mt-6")}
+        onPress={logIn}
+        loading={loading}
+      >
         Login
       </Button>
       <Text style={tws("text-red-500 dark:text-red-600 mt-4")}>{error}</Text>

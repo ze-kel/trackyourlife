@@ -25,7 +25,7 @@ import { DayCellBoolean } from "~/components/DayCell/DayCellBoolean";
 import { DayCellNumber } from "~/components/DayCell/DayCellNumber";
 import { DayCellRange } from "~/components/DayCell/DayCellRange";
 import { DayCellProvider } from "~/components/Providers/DayCellProvider";
-import { useUserSettings } from "~/components/Providers/UserSettingsProvider";
+import { userUserContext } from "~/components/Providers/UserProvider";
 import NumberColorSelector from "../Colors/numberColorSelector";
 import NumberLimitsSelector from "./numberLimitsSelector";
 import RangeLabelSelector from "./rangeLabelSelector";
@@ -257,7 +257,7 @@ const TrackableSettings = ({
   const signal = useRef(new TinySignal());
   const settings = useRef(trackableSettings);
 
-  const u = useUserSettings();
+  const u = userUserContext();
 
   return (
     <div className="flex flex-col gap-4">

@@ -10,7 +10,7 @@ import { cn } from "@tyl/ui";
 import { Button } from "@tyl/ui/button";
 
 import { useTrackableContextSafe } from "~/components/Providers/TrackableProvider";
-import { useUserSettings } from "~/components/Providers/UserSettingsProvider";
+import { userUserContext } from "~/components/Providers/UserProvider";
 import { YearSelector } from "~/components/TrackableView/yearSelector";
 import DayCellWrapper from "../DayCell";
 
@@ -76,7 +76,7 @@ const Year = ({
   year: number;
   openMonth: (n: number) => void;
 }) => {
-  const { settings } = useUserSettings();
+  const { settings } = userUserContext();
 
   const active = activeMonths(year, getNowInTimezone(settings.timezone));
   const toRender = 12;
@@ -178,7 +178,7 @@ const ViewController = ({
 type TView = "days" | "months";
 
 const TrackableView = ({ y, m }: { y?: number; m?: number }) => {
-  const { settings } = useUserSettings();
+  const { settings } = userUserContext();
 
   const now = getNowInTimezone(settings.timezone);
   const [year, setYear] = useState(
@@ -232,10 +232,10 @@ const TrackableView = ({ y, m }: { y?: number; m?: number }) => {
     let url;
     switch (view) {
       case "days":
-        url = `/trackables/${trackable?.id || ""}/${year}/${month + 1}`;
+        url = `/app/trackables/${trackable?.id || ""}/${year}/${month + 1}`;
         break;
       case "months":
-        url = `/trackables/${trackable?.id || ""}/${year}`;
+        url = `/app/trackables/${trackable?.id || ""}/${year}`;
         break;
     }
     if (url && url !== window.location.pathname) {

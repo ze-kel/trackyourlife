@@ -210,7 +210,7 @@ const ParsedItem = ({
         </Button>
       ) : (
         <Button asChild variant={"outline"}>
-          <a href={"/trackables/" + savedId} target="_blank">
+          <a href={"/app/trackables/" + savedId} target="_blank">
             Open
           </a>
         </Button>

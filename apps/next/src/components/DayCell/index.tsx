@@ -10,7 +10,7 @@ import { cn } from "@tyl/ui";
 import { Skeleton } from "@tyl/ui/skeleton";
 
 import { useTrackableContextSafe } from "~/components/Providers/TrackableProvider";
-import { useUserSettings } from "~/components/Providers/UserSettingsProvider";
+import { userUserContext } from "~/components/Providers/UserProvider";
 import { DayCellBoolean } from "./DayCellBoolean";
 import { DayCellNumber } from "./DayCellNumber";
 import { DayCellRange } from "./DayCellRange";
@@ -112,7 +112,7 @@ const DayCellWrapper = ({
 
   const { data, isLoading } = useTrackableQueryByMonth({ month, year });
 
-  const u = useUserSettings();
+  const u = userUserContext();
 
   const { inTrackRange, isToday, dateDay } = useMemo(
     () =>

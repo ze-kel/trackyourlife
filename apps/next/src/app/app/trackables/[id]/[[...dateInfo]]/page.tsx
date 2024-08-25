@@ -6,7 +6,6 @@ import {
   HydrationBoundary,
   QueryClient,
 } from "@tanstack/react-query";
-import { fillPrefetchedTrackable } from "src/app/trackables/helpers";
 
 import { validateRequest } from "@tyl/auth";
 import { Button } from "@tyl/ui/button";
@@ -17,6 +16,7 @@ import TrackableProvider from "~/components/Providers/TrackableProvider";
 import { TrackableNameEditable } from "~/components/TrackableName";
 import TrackableView from "~/components/TrackableView";
 import { api } from "~/trpc/server";
+import { fillPrefetchedTrackable } from "~/utils/fillPrefetched";
 
 const getYearSafe = (y: string | undefined) => {
   if (!y || y.length !== 4) return new Date().getFullYear();
@@ -112,7 +112,10 @@ const Trackable = async ({
               <TrackableNameEditable />
               <div className="flex gap-2">
                 <FavoriteButton variant={"outline"} />
-                <Link href={`/trackables/${params.id}/settings`} className="">
+                <Link
+                  href={`/app/trackables/${params.id}/settings`}
+                  className=""
+                >
                   <Button name="settings" variant="outline" size="icon">
                     <GearIcon className="h-4 w-4" />
                   </Button>

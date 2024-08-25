@@ -16,7 +16,7 @@ import { Spinner } from "@tyl/ui/spinner";
 
 import DayCellWrapper from "~/components/DayCell";
 import TrackableProvider from "~/components/Providers/TrackableProvider";
-import { useUserSettings } from "~/components/Providers/UserSettingsProvider";
+import { userUserContext } from "~/components/Providers/UserProvider";
 import { TrackableNameText } from "~/components/TrackableName";
 import {
   generateDates,
@@ -32,7 +32,7 @@ const EmptyList = () => {
         You do not have any trackables yet.
       </h2>
 
-      <Link className="mt-4" href={"/create"}>
+      <Link className="mt-4" href={"/app/create"}>
         <Button variant="outline">Create Trackable</Button>
       </Link>
     </div>
@@ -61,7 +61,7 @@ const filterTrackables = (
 };
 
 const TrackablesList = ({ daysToShow }: { daysToShow: number }) => {
-  const { settings } = useUserSettings();
+  const { settings } = userUserContext();
 
   const { data, isLoading } = useQuery({
     queryKey: ["trackables", "list"],
@@ -164,7 +164,7 @@ export const DailyList = ({ daysToShow }: { daysToShow: number }) => {
     },
   });
 
-  const { settings } = useUserSettings();
+  const { settings } = userUserContext();
 
   const daysToRender = useMemo(
     () =>
@@ -211,7 +211,7 @@ export const DailyList = ({ daysToShow }: { daysToShow: number }) => {
                 <div key={index}>
                   <TrackableProvider id={tr.id}>
                     <Link
-                      href={`/trackables/${tr.id}/${date.year}/${date.month + 1}`}
+                      href={`/app/trackables/${tr.id}/${date.year}/${date.month + 1}`}
                       className={cn(
                         "mb-1 block w-full truncate text-xl text-neutral-950 opacity-20 dark:text-neutral-50",
                       )}
