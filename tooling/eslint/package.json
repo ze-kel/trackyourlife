@@ -25,9 +25,9 @@
   "devDependencies": {
     "@tyl/prettier-config": "workspace:*",
     "@tyl/tsconfig": "workspace:*",
-    "eslint": "^8.57.0",
-    "prettier": "^3.3.3",
-    "typescript": "^5.5.4"
+    "eslint": "catalog:",
+    "prettier": "catalog:",
+    "typescript": "catalog:"
   },
   "prettier": "@tyl/prettier-config"
 }

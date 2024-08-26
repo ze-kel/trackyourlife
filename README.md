@@ -19,7 +19,7 @@ Option A:
 Run next locally, host postgres somewhere.
 
 1. Create remote database
-2. Add .env.development with "DATABASE_URL" defined
+2. Add .env with "DATABASE_URL" defined.
 3. Run `npm run dev`
 4. http://localhost:3000/
 

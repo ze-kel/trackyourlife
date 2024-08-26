@@ -8,7 +8,7 @@
   }
 
   .customScrollBar::-webkit-scrollbar {
-    @apply w-0.5 bg-transparent;
+    @apply w-1 bg-transparent;
   }
 
   .customScrollBarBig::-webkit-scrollbar {

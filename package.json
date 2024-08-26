@@ -11,6 +11,7 @@
     "clean:workspaces": "turbo run clean",
     "db:push": "turbo -F @tyl/db push",
     "db:studio": "turbo -F @tyl/db studio",
+    "db:gen": "turbo -F @tyl/db gen",
     "dev": "turbo watch dev",
     "dev:next": "turbo watch dev -F @tyl/nextjs...",
     "format": "turbo run format --continue -- --cache --cache-location node_modules/.cache/.prettiercache",
@@ -25,9 +26,9 @@
   },
   "devDependencies": {
     "@tyl/prettier-config": "workspace:*",
-    "@turbo/gen": "^2.0.14",
+    "@turbo/gen": "^2.0.15-canary.2",
     "prettier": "^3.3.3",
-    "turbo": "^2.0.14",
+    "turbo": "2.0.15-canary.2",
     "typescript": "^5.5.4"
   },
   "prettier": "@tyl/prettier-config"

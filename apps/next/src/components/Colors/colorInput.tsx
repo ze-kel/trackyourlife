@@ -1,3 +1,8 @@
+import { useContext, useState } from "react";
+import { useMediaQuery } from "usehooks-ts";
+
+import type { IColorValue } from "@tyl/validators/trackable";
+import { presetsMap } from "@tyl/helpers/colorPresets";
 import {
   Drawer,
   DrawerContent,
@@ -6,17 +11,14 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@tyl/ui/drawer";
+
 import ColorPicker from "~/components/Colors";
 import { ColorDisplay } from "~/components/Colors/colorDisplay";
-import { presetsMap } from "~/components/Colors/presets";
 import {
   Dropdown,
-  DropdownTrigger,
   DropdownContent,
+  DropdownTrigger,
 } from "~/components/Dropdown";
-import type { IColorValue } from "@tyl/validators/trackable";
-import { useContext, useState } from "react";
-import { useMediaQuery } from "usehooks-ts";
 
 const ColorInput = ({
   value = presetsMap.neutral,

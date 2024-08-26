@@ -17,7 +17,12 @@ const pool = new Pool({
 const db: NodePgDatabase<typeof schema> = drizzle(pool, { schema });
 
 if (process.env.MIGRATE === "true") {
-  void migrate(db, { migrationsFolder: "./drizzle" });
+  void migrate(db, {
+    migrationsFolder:
+      process.env.NODE_ENV === "development"
+        ? "../../packages/db/drizzle" // Local development when root folder is apps/next
+        : "./drizzle", // Docker build when drizzle folder is copied to build dir
+  });
 }
 
 export { db, pool };

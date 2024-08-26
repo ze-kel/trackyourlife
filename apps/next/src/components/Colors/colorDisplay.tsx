@@ -1,8 +1,9 @@
-import { presetsArray } from "~/components/Colors/presets";
-import type { IColorValue } from "@tyl/validators/trackable";
 import type { CSSProperties } from "react";
-import { cn } from "@tyl/ui"
-import { makeColorString } from "src/helpers/colorTools";
+
+import type { IColorValue } from "@tyl/validators/trackable";
+import { presetsArray } from "@tyl/helpers/colorPresets";
+import { makeColorString } from "@tyl/helpers/colorTools";
+import { cn } from "@tyl/ui";
 
 export const ColorDisplay = ({
   color,

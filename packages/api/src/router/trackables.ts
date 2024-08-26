@@ -1,10 +1,10 @@
 import type { TRPCRouterRecord } from "@trpc/server";
-import { format } from "date-fns";
 import { z } from "zod";
 
 import type { DbTrackableRecordInsert } from "@tyl/db/schema";
 import { and, between, eq, sql } from "@tyl/db";
 import { trackable, trackableRecord } from "@tyl/db/schema";
+import { getNowInTimezone, getStartOfDayGMT } from "@tyl/helpers/timezone";
 import { ZGETLimits } from "@tyl/validators/api";
 import {
   trackableToCreate,
@@ -14,7 +14,6 @@ import {
 
 import {
   getDateBounds,
-  getDateInTimezone,
   GetUserSettings,
   makeTrackableData,
   makeTrackableSettings,
@@ -38,10 +37,7 @@ export const trackablesRouter = {
     .query(async ({ ctx, input }) => {
       const settings = await GetUserSettings({ userId: ctx.user.id });
 
-      const bounds = getDateBounds(
-        input.limits ?? { type: "last", days: 31 },
-        getDateInTimezone(settings.timezone),
-      );
+      const bounds = getDateBounds(input.limits ?? { type: "last", days: 31 });
 
       const raw = await ctx.db.query.trackable.findMany({
         where: eq(trackable.userId, ctx.user.id),
@@ -59,10 +55,7 @@ export const trackablesRouter = {
     .input(z.object({ id: z.string(), limits: ZGETLimits }))
     .query(async ({ ctx, input }) => {
       const settings = await GetUserSettings({ userId: ctx.user.id });
-      const bounds = getDateBounds(
-        input.limits ?? { type: "last", days: 31 },
-        getDateInTimezone(settings.timezone),
-      );
+      const bounds = getDateBounds(input.limits ?? { type: "last", days: 31 });
       const tr = await ctx.db.query.trackable.findFirst({
         where: and(
           eq(trackable.id, input.id),
@@ -86,10 +79,7 @@ export const trackablesRouter = {
     .input(z.object({ id: z.string(), limits: ZGETLimits }))
     .query(async ({ ctx, input }) => {
       const settings = await GetUserSettings({ userId: ctx.user.id });
-      const bounds = getDateBounds(
-        input.limits,
-        getDateInTimezone(settings.timezone),
-      );
+      const bounds = getDateBounds(input.limits);
 
       const data = await ctx.db.query.trackableRecord.findMany({
         where: and(
@@ -152,9 +142,8 @@ export const trackablesRouter = {
       const toInsert: DbTrackableRecordInsert = {
         trackableId: input.id,
         value: input.value,
-        date: format(
-          new Date(input.year, input.month, input.day),
-          "yyyy-MM-dd",
+        date: new Date(
+          Date.UTC(input.year, input.month, input.day, 0, 0, 0, 0),
         ),
         userId: ctx.user.id,
       };
@@ -176,7 +165,7 @@ export const trackablesRouter = {
       const toInsert: DbTrackableRecordInsert[] = input.map((i) => ({
         trackableId: i.id,
         value: i.value,
-        date: format(new Date(i.year, i.month, i.day), "yyyy-MM-dd"),
+        date: new Date(Date.UTC(i.year, i.month, i.day, 0, 0, 0, 0)),
         userId: ctx.user.id,
       }));
 

@@ -1,6 +1,7 @@
-import { presetsArray } from "~/components/Colors/presets";
 import type { IColorValue } from "@tyl/validators/trackable";
-import { cn } from "@tyl/ui"
+import { presetsArray } from "@tyl/helpers/colorPresets";
+import { cn } from "@tyl/ui";
+
 import { ColorDisplay } from "~/components/Colors/colorDisplay";
 
 export const Presets = ({

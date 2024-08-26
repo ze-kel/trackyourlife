@@ -1,10 +1,8 @@
 {
-  "version": "5",
-  "dialect": "pg",
-  "id": "80f7501b-bd9a-4860-bf30-09919fdc518a",
-  "prevId": "370ca763-fcd0-4ee0-94aa-63135eeb9573",
+  "version": "7",
+  "dialect": "postgresql",
   "tables": {
-    "auth_user": {
+    "public.auth_user": {
       "name": "auth_user",
       "schema": "",
       "columns": {
@@ -52,14 +50,14 @@
       "uniqueConstraints": {
         "auth_user_email_unique": {
           "name": "auth_user_email_unique",
-          "nullsNotDistinct": false,
           "columns": [
             "email"
-          ]
+          ],
+          "nullsNotDistinct": false
         }
       }
     },
-    "trackable": {
+    "public.trackable": {
       "name": "trackable",
       "schema": "",
       "columns": {
@@ -95,21 +93,21 @@
         "trackable_user_id_auth_user_id_fk": {
           "name": "trackable_user_id_auth_user_id_fk",
           "tableFrom": "trackable",
-          "tableTo": "auth_user",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "auth_user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "trackableRecord": {
+    "public.trackableRecord": {
       "name": "trackableRecord",
       "schema": "",
       "columns": {
@@ -143,28 +141,28 @@
         "trackableRecord_trackableId_trackable_id_fk": {
           "name": "trackableRecord_trackableId_trackable_id_fk",
           "tableFrom": "trackableRecord",
-          "tableTo": "trackable",
           "columnsFrom": [
             "trackableId"
           ],
+          "tableTo": "trackable",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         },
         "trackableRecord_user_id_auth_user_id_fk": {
           "name": "trackableRecord_user_id_auth_user_id_fk",
           "tableFrom": "trackableRecord",
-          "tableTo": "auth_user",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "auth_user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {
@@ -178,7 +176,7 @@
       },
       "uniqueConstraints": {}
     },
-    "user_key": {
+    "public.user_key": {
       "name": "user_key",
       "schema": "",
       "columns": {
@@ -200,21 +198,21 @@
         "user_key_user_id_auth_user_id_fk": {
           "name": "user_key_user_id_auth_user_id_fk",
           "tableFrom": "user_key",
-          "tableTo": "auth_user",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "auth_user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "user_session": {
+    "public.user_session": {
       "name": "user_session",
       "schema": "",
       "columns": {
@@ -242,15 +240,15 @@
         "user_session_user_id_auth_user_id_fk": {
           "name": "user_session_user_id_auth_user_id_fk",
           "tableFrom": "user_session",
-          "tableTo": "auth_user",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "auth_user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -258,13 +256,14 @@
     }
   },
   "enums": {
-    "type": {
+    "public.type": {
       "name": "type",
-      "values": {
-        "boolean": "boolean",
-        "number": "number",
-        "range": "range"
-      }
+      "schema": "public",
+      "values": [
+        "boolean",
+        "number",
+        "range"
+      ]
     }
   },
   "schemas": {},
@@ -272,5 +271,8 @@
     "schemas": {},
     "tables": {},
     "columns": {}
-  }
+  },
+  "id": "80f7501b-bd9a-4860-bf30-09919fdc518a",
+  "prevId": "370ca763-fcd0-4ee0-94aa-63135eeb9573",
+  "sequences": {}
 }

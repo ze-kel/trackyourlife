@@ -1,0 +1,286 @@
+{
+  "id": "ae47d5df-0502-427a-b687-67a7a5ce56d2",
+  "prevId": "82d1ca08-5ba9-4f83-a1ad-0ee58648ce27",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.TYL_auth_user": {
+      "name": "TYL_auth_user",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "username": {
+          "name": "username",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "hashed_password": {
+          "name": "hashed_password",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "settings": {
+          "name": "settings",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'{}'::json"
+        },
+        "role": {
+          "name": "role",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "TYL_auth_user_email_unique": {
+          "name": "TYL_auth_user_email_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "email"
+          ]
+        }
+      }
+    },
+    "public.TYL_trackable": {
+      "name": "TYL_trackable",
+      "schema": "",
+      "columns": {
+        "created": {
+          "name": "created",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated": {
+          "name": "updated",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "settings": {
+          "name": "settings",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'{}'::json"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "TYL_trackable_user_id_TYL_auth_user_id_fk": {
+          "name": "TYL_trackable_user_id_TYL_auth_user_id_fk",
+          "tableFrom": "TYL_trackable",
+          "tableTo": "TYL_auth_user",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.TYL_trackableRecord": {
+      "name": "TYL_trackableRecord",
+      "schema": "",
+      "columns": {
+        "created": {
+          "name": "created",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated": {
+          "name": "updated",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "trackableId": {
+          "name": "trackableId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "date": {
+          "name": "date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "value": {
+          "name": "value",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "TYL_trackableRecord_trackableId_TYL_trackable_id_fk": {
+          "name": "TYL_trackableRecord_trackableId_TYL_trackable_id_fk",
+          "tableFrom": "TYL_trackableRecord",
+          "tableTo": "TYL_trackable",
+          "columnsFrom": [
+            "trackableId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "TYL_trackableRecord_user_id_TYL_auth_user_id_fk": {
+          "name": "TYL_trackableRecord_user_id_TYL_auth_user_id_fk",
+          "tableFrom": "TYL_trackableRecord",
+          "tableTo": "TYL_auth_user",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "TYL_trackableRecord_trackableId_date_pk": {
+          "name": "TYL_trackableRecord_trackableId_date_pk",
+          "columns": [
+            "trackableId",
+            "date"
+          ]
+        }
+      },
+      "uniqueConstraints": {
+        "TYL_trackableRecord_trackableId_date_unique": {
+          "name": "TYL_trackableRecord_trackableId_date_unique",
+          "nullsNotDistinct": true,
+          "columns": [
+            "trackableId",
+            "date"
+          ]
+        }
+      }
+    },
+    "public.TYL_user_session": {
+      "name": "TYL_user_session",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "TYL_user_session_user_id_TYL_auth_user_id_fk": {
+          "name": "TYL_user_session_user_id_TYL_auth_user_id_fk",
+          "tableFrom": "TYL_user_session",
+          "tableTo": "TYL_auth_user",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    }
+  },
+  "enums": {
+    "public.type": {
+      "name": "type",
+      "schema": "public",
+      "values": [
+        "boolean",
+        "number",
+        "range"
+      ]
+    }
+  },
+  "schemas": {},
+  "sequences": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

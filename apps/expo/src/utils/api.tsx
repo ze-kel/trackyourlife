@@ -1,57 +1,51 @@
-import { useState } from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { httpBatchLink, loggerLink } from "@trpc/client";
-import { createTRPCReact } from "@trpc/react-query";
+import { createTRPCClient, httpBatchLink, loggerLink } from "@trpc/client";
 import superjson from "superjson";
 
 import type { AppRouter } from "@tyl/api";
 
-import { getBaseUrl } from "./base-url";
-import { getToken } from "./session-store";
+import { getUserData } from "./session-store";
 
-/**
- * A set of typesafe hooks for consuming your API.
- */
-export const api = createTRPCReact<AppRouter>();
 export { type RouterInputs, type RouterOutputs } from "@tyl/api";
 
-/**
- * A wrapper for your app that provides the TRPC context.
- * Use only in _app.tsx
- */
-export function TRPCProvider(props: { children: React.ReactNode }) {
-  const [queryClient] = useState(() => new QueryClient());
-  const [trpcClient] = useState(() =>
-    api.createClient({
-      links: [
-        loggerLink({
-          enabled: (opts) =>
-            process.env.NODE_ENV === "development" ||
-            (opts.direction === "down" && opts.result instanceof Error),
-          colorMode: "ansi",
-        }),
-        httpBatchLink({
-          transformer: superjson,
-          url: `${getBaseUrl()}/api/trpc`,
-          headers() {
-            const headers = new Map<string, string>();
-            headers.set("x-trpc-source", "expo-react");
+export const getHostLink = (v?: string) =>
+  v ? `${v}${v.endsWith("/") ? "" : "/"}` : "";
 
-            const token = getToken();
-            if (token) headers.set("Authorization", `Bearer ${token}`);
+const makeTrpcClient = () => {
+  const uData = getUserData();
 
-            return Object.fromEntries(headers);
-          },
-        }),
-      ],
-    }),
-  );
+  const url = `${getHostLink(uData?.host)}api/trpc`;
 
-  return (
-    <api.Provider client={trpcClient} queryClient={queryClient}>
-      <QueryClientProvider client={queryClient}>
-        {props.children}
-      </QueryClientProvider>
-    </api.Provider>
-  );
-}
+  console.log(url);
+
+  return createTRPCClient<AppRouter>({
+    links: [
+      loggerLink({
+        enabled: (opts) =>
+          process.env.NODE_ENV === "development" ||
+          (opts.direction === "down" && opts.result instanceof Error),
+        colorMode: "ansi",
+      }),
+      httpBatchLink({
+        transformer: superjson,
+        url,
+        headers() {
+          const headers = new Map<string, string>();
+          headers.set("x-trpc-source", "expo-react");
+
+          const { token } = getUserData() || {};
+          if (token) {
+            headers.set("Cookie", `auth_session=${token}`);
+          }
+
+          return Object.fromEntries(headers);
+        },
+      }),
+    ],
+  });
+};
+
+export let api = makeTrpcClient();
+
+export const updateTrpcClient = () => {
+  api = makeTrpcClient();
+};

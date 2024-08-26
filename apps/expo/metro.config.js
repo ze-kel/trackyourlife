@@ -4,9 +4,21 @@ const { FileStore } = require("metro-cache");
 
 const path = require("path");
 
-module.exports = withTurborepoManagedCache(
-  withMonorepoPaths(getDefaultConfig(__dirname)),
+const config = withTurborepoManagedCache(
+  withMonorepoPaths(getDefaultConfig(__dirname), {
+    input: "./src/styles.css",
+    configPath: "./tailwind.config.ts",
+  }),
 );
+
+// Drizzle migrations on expo-sqlite
+config.resolver.sourceExts.push("sql");
+
+// XXX: Resolve our exports in workspace packages
+// https://github.com/expo/expo/issues/26926
+config.resolver.unstable_enablePackageExports = true;
+
+module.exports = config;
 
 /**
  * Add the monorepo paths to the Metro config.
@@ -21,20 +33,20 @@ function withMonorepoPaths(config) {
   const workspaceRoot = path.resolve(projectRoot, "../..");
 
   // #1 - Watch all files in the monorepo
-  config.watchFolders = [workspaceRoot];
+  config.watchFolders.push(workspaceRoot);
 
   // #2 - Resolve modules within the project's `node_modules` first, then all monorepo modules
-  config.resolver.nodeModulesPaths = [
+
+  config.resolver.nodeModulesPaths.push(
     path.resolve(projectRoot, "node_modules"),
     path.resolve(workspaceRoot, "node_modules"),
-  ];
+  );
 
   return config;
 }
 
 /**
- * Move the Metro cache to the `node_modules/.cache/metro` folder.
- * This repository configured Turborepo to use this cache location as well.
+ * Move the Metro cache to the `.cache/metro` folder.
  * If you have any environment variables, you can configure Turborepo to invalidate it when needed.
  *
  * @see https://turbo.build/repo/docs/reference/configuration#env
@@ -42,8 +54,8 @@ function withMonorepoPaths(config) {
  * @returns {import('expo/metro-config').MetroConfig}
  */
 function withTurborepoManagedCache(config) {
-  config.cacheStores = [
-    new FileStore({ root: path.join(__dirname, "node_modules/.cache/metro") }),
-  ];
+  config.cacheStores.push(
+    new FileStore({ root: path.join(__dirname, ".cache/metro") }),
+  );
   return config;
 }

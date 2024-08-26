@@ -1,23 +1,24 @@
 /* eslint-disable react/display-name */
-import { cn } from "@tyl/ui"
 import type {
   FloatingContext,
   Placement,
   ReferenceType,
 } from "@floating-ui/react";
-import {
-  useFloating,
-  offset as offsetMiddleware,
-  flip,
-  shift,
-  autoUpdate,
-  useClick,
-  useInteractions,
-  useDismiss,
-} from "@floating-ui/react";
-import { AnimatePresence, m } from "framer-motion";
 import type { ReactNode } from "react";
 import { createContext, useContext, useState } from "react";
+import {
+  autoUpdate,
+  flip,
+  offset as offsetMiddleware,
+  shift,
+  useClick,
+  useDismiss,
+  useFloating,
+  useInteractions,
+} from "@floating-ui/react";
+import { AnimatePresence, m } from "framer-motion";
+
+import { cn } from "@tyl/ui";
 
 export type IDropdown = {
   open?: boolean;
@@ -102,7 +103,7 @@ const DropdownContent = ({
             width: "max-content",
           }}
           className={cn(
-            "z-50",
+            "relative z-50",
             background && defaultBackgroundClasses,
             className,
           )}

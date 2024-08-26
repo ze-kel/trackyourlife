@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "postcss": "^8.4.41",
-    "tailwindcss": "^3.4.10",
+    "tailwindcss": "catalog:",
     "tailwindcss-animate": "^1.0.7",
     "@tailwindcss/container-queries": "^0.1.1"
   },
@@ -23,9 +23,9 @@
     "@tyl/eslint-config": "workspace:*",
     "@tyl/prettier-config": "workspace:*",
     "@tyl/tsconfig": "workspace:*",
-    "eslint": "^8.57.0",
-    "prettier": "^3.3.3",
-    "typescript": "^5.5.4"
+    "eslint": "catalog:",
+    "prettier": "catalog:",
+    "typescript": "catalog:"
   },
   "prettier": "@tyl/prettier-config"
 }

@@ -42,6 +42,11 @@ export const user_session = pgTable("user_session", {
 export const trackableTypeEnum = pgEnum("type", ["boolean", "number", "range"]);
 
 export const trackable = pgTable("trackable", {
+  updated: timestamp("updated")
+    .defaultNow()
+    .notNull()
+    .$onUpdate(() => new Date()),
+
   id: uuid("id").defaultRandom().primaryKey(),
   name: varchar("name").notNull(),
   userId: varchar("user_id")
@@ -60,10 +65,15 @@ export const trackableRelations = relations(trackable, ({ many }) => ({
 export const trackableRecord = pgTable(
   "trackableRecord",
   {
+    updated: timestamp("updated")
+      .defaultNow()
+      .notNull()
+      .$onUpdate(() => new Date()),
+
     trackableId: uuid("trackableId")
       .notNull()
       .references(() => trackable.id, { onDelete: "cascade" }),
-    date: date("date").notNull(),
+    date: timestamp("date").notNull(),
     value: varchar("value").notNull(),
     userId: varchar("user_id")
       .notNull()

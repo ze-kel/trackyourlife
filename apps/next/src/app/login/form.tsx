@@ -83,6 +83,7 @@ const Register = () => {
 
       <Button
         isLoading={loading}
+        size={"lg"}
         type="submit"
         variant="outline"
         className={cn("mt-6 w-full")}
@@ -155,6 +156,7 @@ const Login = () => {
       <Button
         isLoading={loading}
         type="submit"
+        size={"lg"}
         variant="outline"
         className={cn("mt-6 w-full")}
       >
@@ -174,7 +176,7 @@ const LoginForm = () => {
   const [action, setRegister] = useState<ActionState>("login");
 
   return (
-    <div className="m-auto max-w-md">
+    <div className="m-auto max-w-md max-sm:px-4">
       <RadioTabs
         value={action}
         onValueChange={(v) => setRegister(v as ActionState)}

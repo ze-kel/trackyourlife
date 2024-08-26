@@ -1,9 +1,8 @@
-import { verifyRequestOrigin } from "lucia";
-import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
+import { verifyRequestOrigin } from "lucia";
 
 export function middleware(request: NextRequest): NextResponse {
-
   if (
     request.method === "GET" ||
     // For auto tests

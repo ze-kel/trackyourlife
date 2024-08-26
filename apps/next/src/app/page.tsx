@@ -1,32 +1,19 @@
-import {
-  dehydrate,
-  HydrationBoundary,
-  QueryClient,
-} from "@tanstack/react-query";
-import { fillPrefetchedTrackablesList } from "src/app/trackables/helpers";
+import { redirect } from "next/navigation";
 
-import { DailyList } from "~/components/TrackablesList";
-import { api } from "~/trpc/server";
-
-const SHOW_DAYS = 7;
+import { validateRequest } from "@tyl/auth";
 
 const Page = async () => {
-  const trackables = await api.trackablesRouter.getAllTrackables({
-    limits: {
-      type: "last",
-      days: SHOW_DAYS,
-    },
-  });
+  const { user, session } = await validateRequest();
 
-  const queryClient = new QueryClient();
-
-  fillPrefetchedTrackablesList(queryClient, trackables);
+  if (session) {
+    redirect("/app");
+  } else {
+    redirect("/login");
+  }
 
   return (
     <div className="content-container flex w-full flex-col">
-      <HydrationBoundary state={dehydrate(queryClient)}>
-        <DailyList daysToShow={SHOW_DAYS} />
-      </HydrationBoundary>
+      landing page will be here
     </div>
   );
 };

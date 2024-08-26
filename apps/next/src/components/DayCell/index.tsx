@@ -2,49 +2,18 @@
 
 import type { ReactNode } from "react";
 import { useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { isAfter, isBefore, isSameDay } from "date-fns";
-import { getDateInTimezone } from "src/helpers/timezone";
 
 import type { ITrackable, ITrackableSettings } from "@tyl/validators/trackable";
+import { getNowInTimezone } from "@tyl/helpers/timezone";
+import { computeDayCellHelpers } from "@tyl/helpers/trackables";
 import { cn } from "@tyl/ui";
 import { Skeleton } from "@tyl/ui/skeleton";
 
 import { useTrackableContextSafe } from "~/components/Providers/TrackableProvider";
-import { useUserSettings } from "~/components/Providers/UserSettingsProvider";
-import { api } from "~/trpc/react";
+import { userUserContext } from "~/components/Providers/UserProvider";
 import { DayCellBoolean } from "./DayCellBoolean";
 import { DayCellNumber } from "./DayCellNumber";
 import { DayCellRange } from "./DayCellRange";
-
-export interface IDayProps {}
-
-export const computeDayCellHelpers = ({
-  day,
-  month,
-  year,
-  startDate,
-  dateNow,
-}: {
-  day: number;
-  month: number;
-  year: number;
-  startDate: ITrackableSettings["startDate"];
-  dateNow: Date;
-}) => {
-  const dateDay = new Date(year, month, day);
-  const beforeToday = isBefore(dateDay, dateNow);
-
-  const startConvented = startDate ? new Date(startDate) : undefined;
-
-  const afterLimit = startConvented
-    ? isSameDay(dateDay, startConvented) || isAfter(dateDay, startConvented)
-    : true;
-  const inTrackRange = beforeToday && afterLimit;
-  const isToday = isSameDay(dateNow, dateDay);
-
-  return { inTrackRange, isToday, dateDay };
-};
 
 export const DayCellBaseClasses =
   "@container w-full h-full relative select-none overflow-hidden border-transparent outline-none focus:outline-neutral-300 dark:focus:outline-neutral-600 border-2 rounded-sm";
@@ -143,7 +112,7 @@ const DayCellWrapper = ({
 
   const { data, isLoading } = useTrackableQueryByMonth({ month, year });
 
-  const u = useUserSettings();
+  const u = userUserContext();
 
   const { inTrackRange, isToday, dateDay } = useMemo(
     () =>
@@ -152,7 +121,7 @@ const DayCellWrapper = ({
         month,
         year,
         startDate: settings?.startDate,
-        dateNow: getDateInTimezone(u.settings.timezone),
+        dateNow: getNowInTimezone(u.settings.timezone),
       }),
     [day, month, year, settings?.startDate, u.settings.timezone],
   );

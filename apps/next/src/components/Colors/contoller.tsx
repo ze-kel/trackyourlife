@@ -1,6 +1,7 @@
 import type { MouseEventHandler, RefObject, TouchEvent } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { range } from "src/helpers/animation";
+
+import { range } from "@tyl/helpers/animation";
 
 type IUseRefSizeReturn = {
   width: number;
@@ -102,7 +103,7 @@ export const Controller = ({
 
   return (
     <div
-      className="relative flex h-9 w-full touch-none rounded-lg border-2 border-neutral-200 bg-transparent text-sm shadow-sm transition-colors  focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-950 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-800 "
+      className="relative flex h-9 w-full touch-none rounded-lg border-2 border-neutral-200 bg-transparent text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-950 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-800"
       style={{ background: backgroundScale }}
       onMouseDown={startMouseDrag}
       onTouchMove={dragHandler}
@@ -194,7 +195,7 @@ export const Controller2D = ({
   return (
     <div
       ref={ref}
-      className="relative flex h-48 w-full touch-none overflow-hidden rounded-md border-2 border-neutral-200 bg-transparent text-sm shadow-sm transition-colors  focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-950 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-800 "
+      className="relative flex h-48 w-full touch-none overflow-hidden rounded-md border-2 border-neutral-200 bg-transparent text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-950 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-800"
       style={{ background }}
       onMouseDown={starMouseDrag}
       onTouchMove={touchHandler}

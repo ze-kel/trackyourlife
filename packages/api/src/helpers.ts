@@ -1,6 +1,4 @@
-import type { TimeZone } from "timezones-list";
 import { add, startOfMonth, sub, subDays } from "date-fns";
-import { toZonedTime } from "date-fns-tz";
 
 import type {
   DbTrackableRecordSelect,
@@ -32,40 +30,36 @@ export const GetUserSettings = async ({ userId }: { userId: string }) => {
   return parsed.data;
 };
 
-// This goes into postgres Between, where 'infinity'\'-infinity' is a valid date boundary
-const PG_MINUS_INFINITY = "-infinity";
-const PG_INFINITY = "infinity";
+const PG_MINUS_INFINITY = new Date(1970, 0, 1);
+const PG_INFINITY = new Date(new Date().getFullYear() + 100, 0, 1);
 
-export const getDateBounds = (
-  limits: TGETLimits | undefined,
-  dateNow: Date,
-) => {
+export const getDateBounds = (limits: TGETLimits | undefined) => {
   if (!limits) {
     return { from: PG_MINUS_INFINITY, to: PG_INFINITY };
   }
 
   if (limits.type === "year") {
     return {
-      from: new Date(limits.year, 0, 1).toDateString(),
-      to: new Date(limits.year + 1, 0, 1).toDateString(),
+      from: new Date(limits.year, 0, 1),
+      to: new Date(limits.year + 1, 0, 1),
     };
   }
 
   if (limits.type === "month") {
     return {
-      from: new Date(limits.year, limits.month, 1).toDateString(),
+      from: new Date(limits.year, limits.month, 1),
       to: add(new Date(limits.year, limits.month, 1), {
         months: 1,
-      }).toDateString(),
+      }),
     };
   }
 
   if (limits.type === "range") {
     return {
-      from: new Date(limits.from.year, limits.from.month, 1).toDateString(),
+      from: new Date(limits.from.year, limits.from.month, 1),
       to: add(new Date(limits.to.year, limits.to.month, 1), {
         months: 1,
-      }).toDateString(),
+      }),
     };
   }
 
@@ -73,13 +67,9 @@ export const getDateBounds = (
   // Note that this will return "full december and full january" for "last 7 days" on jan 3.
   // This is intentional to not ensure that any month stored on a client has all its data fetched.
   return {
-    from: startOfMonth(sub(new Date(), { days: limits.days })).toDateString(),
-    to: dateNow.toDateString(),
+    from: startOfMonth(sub(new Date(), { days: limits.days })),
+    to: add(new Date(), { days: 1 }),
   };
-};
-
-export const getDateInTimezone = (timezone?: TimeZone) => {
-  return toZonedTime(Date.now(), timezone ? timezone.tzCode : "Europe/London");
 };
 
 export const makeTrackableData = (

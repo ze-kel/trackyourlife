@@ -1,10 +1,8 @@
 {
-  "id": "e2a37e30-5f0a-4184-ac59-270031809844",
-  "prevId": "b2c21809-c832-40e9-bf50-3ce9266d3e0f",
-  "version": "5",
-  "dialect": "pg",
+  "version": "7",
+  "dialect": "postgresql",
   "tables": {
-    "auth_user": {
+    "public.auth_user": {
       "name": "auth_user",
       "schema": "",
       "columns": {
@@ -52,14 +50,14 @@
       "uniqueConstraints": {
         "auth_user_email_unique": {
           "name": "auth_user_email_unique",
-          "nullsNotDistinct": false,
           "columns": [
             "email"
-          ]
+          ],
+          "nullsNotDistinct": false
         }
       }
     },
-    "trackable": {
+    "public.trackable": {
       "name": "trackable",
       "schema": "",
       "columns": {
@@ -101,21 +99,21 @@
         "trackable_user_id_auth_user_id_fk": {
           "name": "trackable_user_id_auth_user_id_fk",
           "tableFrom": "trackable",
-          "tableTo": "auth_user",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "auth_user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "trackableRecord": {
+    "public.trackableRecord": {
       "name": "trackableRecord",
       "schema": "",
       "columns": {
@@ -149,28 +147,28 @@
         "trackableRecord_trackableId_trackable_id_fk": {
           "name": "trackableRecord_trackableId_trackable_id_fk",
           "tableFrom": "trackableRecord",
-          "tableTo": "trackable",
           "columnsFrom": [
             "trackableId"
           ],
+          "tableTo": "trackable",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         },
         "trackableRecord_user_id_auth_user_id_fk": {
           "name": "trackableRecord_user_id_auth_user_id_fk",
           "tableFrom": "trackableRecord",
-          "tableTo": "auth_user",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "auth_user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {
@@ -185,15 +183,15 @@
       "uniqueConstraints": {
         "trackableRecord_trackableId_date_unique": {
           "name": "trackableRecord_trackableId_date_unique",
-          "nullsNotDistinct": true,
           "columns": [
             "trackableId",
             "date"
-          ]
+          ],
+          "nullsNotDistinct": true
         }
       }
     },
-    "user_session": {
+    "public.user_session": {
       "name": "user_session",
       "schema": "",
       "columns": {
@@ -221,15 +219,15 @@
         "user_session_user_id_auth_user_id_fk": {
           "name": "user_session_user_id_auth_user_id_fk",
           "tableFrom": "user_session",
-          "tableTo": "auth_user",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "auth_user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -237,19 +235,23 @@
     }
   },
   "enums": {
-    "type": {
+    "public.type": {
       "name": "type",
-      "values": {
-        "boolean": "boolean",
-        "number": "number",
-        "range": "range"
-      }
+      "schema": "public",
+      "values": [
+        "boolean",
+        "number",
+        "range"
+      ]
     }
   },
   "schemas": {},
   "_meta": {
-    "columns": {},
     "schemas": {},
-    "tables": {}
-  }
+    "tables": {},
+    "columns": {}
+  },
+  "id": "e2a37e30-5f0a-4184-ac59-270031809844",
+  "prevId": "b2c21809-c832-40e9-bf50-3ce9266d3e0f",
+  "sequences": {}
 }

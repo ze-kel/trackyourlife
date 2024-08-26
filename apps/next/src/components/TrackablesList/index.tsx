@@ -5,9 +5,9 @@ import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { format, isLastDayOfMonth } from "date-fns";
 import { AnimatePresence, m } from "framer-motion";
-import { getDateInTimezone } from "src/helpers/timezone";
 
-import type { ITrackable, ITrackableBasic } from "@tyl/validators/trackable";
+import type { ITrackable, ITrackableFromList } from "@tyl/validators/trackable";
+import { getNowInTimezone } from "@tyl/helpers/timezone";
 import { cn } from "@tyl/ui";
 import { Badge } from "@tyl/ui/badge";
 import { Button } from "@tyl/ui/button";
@@ -16,7 +16,7 @@ import { Spinner } from "@tyl/ui/spinner";
 
 import DayCellWrapper from "~/components/DayCell";
 import TrackableProvider from "~/components/Providers/TrackableProvider";
-import { useUserSettings } from "~/components/Providers/UserSettingsProvider";
+import { userUserContext } from "~/components/Providers/UserProvider";
 import { TrackableNameText } from "~/components/TrackableName";
 import {
   generateDates,
@@ -32,7 +32,7 @@ const EmptyList = () => {
         You do not have any trackables yet.
       </h2>
 
-      <Link className="mt-4" href={"/create"}>
+      <Link className="mt-4" href={"/app/create"}>
         <Button variant="outline">Create Trackable</Button>
       </Link>
     </div>
@@ -44,7 +44,7 @@ type TrackableTypeFilterState = Record<ITrackable["type"], boolean>;
 const filterTrackables = (
   query: string,
   types: TrackableTypeFilterState,
-  list: ITrackableBasic[],
+  list: ITrackableFromList[],
 ) => {
   const filterByType = Object.values(types).some((v) => v);
 
@@ -61,7 +61,7 @@ const filterTrackables = (
 };
 
 const TrackablesList = ({ daysToShow }: { daysToShow: number }) => {
-  const { settings } = useUserSettings();
+  const { settings } = userUserContext();
 
   const { data, isLoading } = useQuery({
     queryKey: ["trackables", "list"],
@@ -88,7 +88,7 @@ const TrackablesList = ({ daysToShow }: { daysToShow: number }) => {
   );
 
   const daysToRender = useMemo(
-    () => generateDates(daysToShow, getDateInTimezone(settings.timezone)),
+    () => generateDates(daysToShow, getNowInTimezone(settings.timezone)),
     [daysToShow, settings.timezone],
   );
 
@@ -133,24 +133,22 @@ const TrackablesList = ({ daysToShow }: { daysToShow: number }) => {
       </div>
 
       <div className="mt-3 grid gap-5">
-        <AnimatePresence initial={false}>
-          {sorted.map((tr) => (
-            <m.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 1 }}
-              transition={{ duration: 0.2, ease: "circInOut" }}
-              layout
-              layoutId={tr.id}
-              key={tr.id}
-              className="border-b border-neutral-200 pb-4 last:border-0 dark:border-neutral-800"
-            >
-              <TrackableProvider id={tr.id}>
-                <MiniTrackable daysToRender={daysToRender} />
-              </TrackableProvider>
-            </m.div>
-          ))}
-        </AnimatePresence>
+        {sorted.map((tr) => (
+          <m.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 1 }}
+            transition={{ duration: 0.2, ease: "circInOut" }}
+            layout
+            layoutId={tr.id}
+            key={tr.id}
+            className="border-b border-neutral-200 pb-4 last:border-0 dark:border-neutral-800"
+          >
+            <TrackableProvider id={tr.id}>
+              <MiniTrackable daysToRender={daysToRender} />
+            </TrackableProvider>
+          </m.div>
+        ))}
       </div>
     </>
   );
@@ -164,11 +162,11 @@ export const DailyList = ({ daysToShow }: { daysToShow: number }) => {
     },
   });
 
-  const { settings } = useUserSettings();
+  const { settings } = userUserContext();
 
   const daysToRender = useMemo(
     () =>
-      generateDates(daysToShow, getDateInTimezone(settings.timezone)).reverse(),
+      generateDates(daysToShow, getNowInTimezone(settings.timezone)).reverse(),
     [daysToShow, settings.timezone],
   );
 
@@ -211,7 +209,7 @@ export const DailyList = ({ daysToShow }: { daysToShow: number }) => {
                 <div key={index}>
                   <TrackableProvider id={tr.id}>
                     <Link
-                      href={`/trackables/${tr.id}/${date.year}/${date.month + 1}`}
+                      href={`/app/trackables/${tr.id}/${date.year}/${date.month + 1}`}
                       className={cn(
                         "mb-1 block w-full truncate text-xl text-neutral-950 opacity-20 dark:text-neutral-50",
                       )}

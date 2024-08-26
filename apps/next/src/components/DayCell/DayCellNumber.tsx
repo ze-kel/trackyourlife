@@ -1,19 +1,22 @@
 "use client";
+
 import type React from "react";
 import type { CSSProperties, ReactNode } from "react";
 import { useCallback, useLayoutEffect, useMemo, useState } from "react";
-import {debounce} from "lodash-es";
-import { makeColorString } from "src/helpers/colorTools";
-import { cn } from "@tyl/ui"
-import { useDayCellContextNumber } from "~/components/Providers/DayCellProvider";
+import { format } from "date-fns";
 import { useMediaQuery } from "usehooks-ts";
+
+import { debounce } from "@tyl/helpers";
+import { makeColorString } from "@tyl/helpers/colorTools";
+import { cn } from "@tyl/ui";
 import {
   Drawer,
   DrawerContent,
   DrawerTitle,
   DrawerTrigger,
 } from "@tyl/ui/drawer";
-import { format } from "date-fns";
+
+import { useDayCellContextNumber } from "~/components/Providers/DayCellProvider";
 
 const getNumberSafe = (v: string | undefined) => {
   if (!v) return 0;
@@ -51,9 +54,11 @@ export const DayCellNumber = ({
   const [isEditing, setIsEditing] = useState(false);
 
   useLayoutEffect(() => {
-    if (internalNumber !== getNumberSafe(value) && !isEditing) {
+    if (internalNumber !== getNumberSafe(value)) {
       setInternalNumber(getNumberSafe(value));
-      setRawInput(String(internalNumber));
+      if (!isEditing) {
+        setRawInput(String(internalNumber));
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
@@ -182,8 +187,8 @@ export const DayCellNumber = ({
                 ? "text-neutral-200 dark:text-neutral-800"
                 : "text-neutral-800 dark:text-neutral-300",
               "text-xs @[4rem]:text-xl",
-              "focus:absolute focus:w-[110%]  focus:bg-neutral-50 group-hover:bg-neutral-50 focus:dark:bg-neutral-950 group-hover:dark:bg-neutral-950",
-              "group-hover:outline-neutral-100  dark:group-hover:outline-neutral-600",
+              "focus:absolute focus:w-[110%] focus:bg-neutral-50 group-hover:bg-neutral-50 focus:dark:bg-neutral-950 group-hover:dark:bg-neutral-950",
+              "group-hover:outline-neutral-100 dark:group-hover:outline-neutral-600",
               "focus:outline-neutral-300 group-hover:focus:outline-neutral-300 dark:focus:outline-neutral-400 group-hover:dark:focus:outline-neutral-400",
               "selection:bg-neutral-300 dark:selection:bg-neutral-600",
               !isEditing ? "opacity-0" : "",

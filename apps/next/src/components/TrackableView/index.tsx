@@ -4,13 +4,13 @@ import { useEffect, useState } from "react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
 import { format, getDaysInMonth, getISODay, getMonth, getYear } from "date-fns";
 import { ErrorBoundary } from "react-error-boundary";
-import { getDateInTimezone } from "src/helpers/timezone";
 
+import { getNowInTimezone } from "@tyl/helpers/timezone";
 import { cn } from "@tyl/ui";
 import { Button } from "@tyl/ui/button";
 
 import { useTrackableContextSafe } from "~/components/Providers/TrackableProvider";
-import { useUserSettings } from "~/components/Providers/UserSettingsProvider";
+import { userUserContext } from "~/components/Providers/UserProvider";
 import { YearSelector } from "~/components/TrackableView/yearSelector";
 import DayCellWrapper from "../DayCell";
 
@@ -76,9 +76,9 @@ const Year = ({
   year: number;
   openMonth: (n: number) => void;
 }) => {
-  const { settings } = useUserSettings();
+  const { settings } = userUserContext();
 
-  const active = activeMonths(year, getDateInTimezone(settings.timezone));
+  const active = activeMonths(year, getNowInTimezone(settings.timezone));
   const toRender = 12;
 
   const months = Array(toRender)
@@ -178,9 +178,9 @@ const ViewController = ({
 type TView = "days" | "months";
 
 const TrackableView = ({ y, m }: { y?: number; m?: number }) => {
-  const { settings } = useUserSettings();
+  const { settings } = userUserContext();
 
-  const now = getDateInTimezone(settings.timezone);
+  const now = getNowInTimezone(settings.timezone);
   const [year, setYear] = useState(
     typeof y === "number" ? y : now.getFullYear(),
   );
@@ -219,7 +219,7 @@ const TrackableView = ({ y, m }: { y?: number; m?: number }) => {
   };
 
   const openCurrentMonth = () => {
-    const now = getDateInTimezone(settings.timezone);
+    const now = getNowInTimezone(settings.timezone);
     setYear(now.getFullYear());
     setMonth(now.getMonth());
     setView("days");
@@ -232,10 +232,10 @@ const TrackableView = ({ y, m }: { y?: number; m?: number }) => {
     let url;
     switch (view) {
       case "days":
-        url = `/trackables/${trackable?.id || ""}/${year}/${month + 1}`;
+        url = `/app/trackables/${trackable?.id || ""}/${year}/${month + 1}`;
         break;
       case "months":
-        url = `/trackables/${trackable?.id || ""}/${year}`;
+        url = `/app/trackables/${trackable?.id || ""}/${year}`;
         break;
     }
     if (url && url !== window.location.pathname) {

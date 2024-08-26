@@ -2,7 +2,6 @@
 
 import type { MutableRefObject } from "react";
 import { useEffect, useRef, useState } from "react";
-import { getDateInTimezone } from "src/helpers/timezone";
 import { v4 as uuidv4 } from "uuid";
 
 import type {
@@ -10,8 +9,9 @@ import type {
   INumberSettings,
   IRangeSettings,
   ITrackable,
-  ITrackableUnsaved,
 } from "@tyl/validators/trackable";
+import { presetsMap } from "@tyl/helpers/colorPresets";
+import { getNowInTimezone } from "@tyl/helpers/timezone";
 import { cn } from "@tyl/ui";
 import { Button } from "@tyl/ui/button";
 import { DrawerMobileTitleProvider } from "@tyl/ui/drawer";
@@ -19,14 +19,13 @@ import { Label } from "@tyl/ui/label";
 import { Switch } from "@tyl/ui/switch";
 
 import ColorInput from "~/components/Colors/colorInput";
-import { presetsMap } from "~/components/Colors/presets";
 import DatePicker from "~/components/DatePicker";
 import { DayCellBaseClasses } from "~/components/DayCell";
 import { DayCellBoolean } from "~/components/DayCell/DayCellBoolean";
 import { DayCellNumber } from "~/components/DayCell/DayCellNumber";
 import { DayCellRange } from "~/components/DayCell/DayCellRange";
 import { DayCellProvider } from "~/components/Providers/DayCellProvider";
-import { useUserSettings } from "~/components/Providers/UserSettingsProvider";
+import { userUserContext } from "~/components/Providers/UserProvider";
 import NumberColorSelector from "../Colors/numberColorSelector";
 import NumberLimitsSelector from "./numberLimitsSelector";
 import RangeLabelSelector from "./rangeLabelSelector";
@@ -83,7 +82,10 @@ export const SettingsNumber = ({
 
         <NumberLimitsSelector
           enabled={settings.current.progressEnabled}
-          onEnabledChange={(v) => (settings.current.progressEnabled = v)}
+          onEnabledChange={(v) => {
+            settings.current.progressEnabled = v;
+            notifyAboutChange();
+          }}
           value={settings.current.progress}
           onChange={(v) => {
             settings.current.progress = v;
@@ -101,7 +103,7 @@ export const SettingsNumber = ({
             settings.current.colorCodingEnabled = v;
             notifyAboutChange();
           }}
-          value={settings.current.colorCoding}
+          value={settings.current.colorCoding || []}
           onChange={(v) => {
             settings.current.colorCoding = v;
             notifyAboutChange();
@@ -258,7 +260,7 @@ const TrackableSettings = ({
   const signal = useRef(new TinySignal());
   const settings = useRef(trackableSettings);
 
-  const u = useUserSettings();
+  const u = userUserContext();
 
   return (
     <div className="flex flex-col gap-4">
@@ -291,7 +293,7 @@ const TrackableSettings = ({
             onChange={(v) => (settings.current.startDate = String(v))}
             limits={{
               start: new Date(1990, 0, 1),
-              end: getDateInTimezone(u.settings.timezone),
+              end: getNowInTimezone(u.settings.timezone),
             }}
             className="mt-2"
           />
