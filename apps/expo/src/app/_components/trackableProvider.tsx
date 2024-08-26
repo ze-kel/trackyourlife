@@ -64,7 +64,11 @@ const useValueSub = (trackableId: string, date: Date) => {
         setValue(v?.value || "");
       });
 
-    dbSub.subscribeToValue(trackableId, Number(date), setValue);
+    const unsub = dbSub.subscribeToValue(trackableId, Number(date), setValue);
+
+    return () => {
+      dbSub.unsubscribe(trackableId, Number(date), unsub);
+    };
   });
 
   return { value };
