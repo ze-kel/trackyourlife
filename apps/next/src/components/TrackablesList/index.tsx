@@ -133,24 +133,22 @@ const TrackablesList = ({ daysToShow }: { daysToShow: number }) => {
       </div>
 
       <div className="mt-3 grid gap-5">
-        <AnimatePresence initial={false}>
-          {sorted.map((tr) => (
-            <m.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 1 }}
-              transition={{ duration: 0.2, ease: "circInOut" }}
-              layout
-              layoutId={tr.id}
-              key={tr.id}
-              className="border-b border-neutral-200 pb-4 last:border-0 dark:border-neutral-800"
-            >
-              <TrackableProvider id={tr.id}>
-                <MiniTrackable daysToRender={daysToRender} />
-              </TrackableProvider>
-            </m.div>
-          ))}
-        </AnimatePresence>
+        {sorted.map((tr) => (
+          <m.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 1 }}
+            transition={{ duration: 0.2, ease: "circInOut" }}
+            layout
+            layoutId={tr.id}
+            key={tr.id}
+            className="border-b border-neutral-200 pb-4 last:border-0 dark:border-neutral-800"
+          >
+            <TrackableProvider id={tr.id}>
+              <MiniTrackable daysToRender={daysToRender} />
+            </TrackableProvider>
+          </m.div>
+        ))}
       </div>
     </>
   );

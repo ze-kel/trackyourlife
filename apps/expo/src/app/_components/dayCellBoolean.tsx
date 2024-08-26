@@ -24,7 +24,7 @@ export const DayCellBoolean = ({
     if (internalValue !== value) {
       setInternalValue(value);
     }
-  }, []);
+  }, [value]);
 
   const [animateFrom, setAnimateFrom] = useState({ x: 1, y: 1, real: false });
 

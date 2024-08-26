@@ -1,4 +1,11 @@
-import { createContext, ReactNode, useContext, useMemo } from "react";
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { and, between, eq, sql } from "drizzle-orm";
 import { useLiveQuery } from "drizzle-orm/expo-sqlite";
 
@@ -10,6 +17,7 @@ import {
 
 import { MemoDayCellProvider } from "~/app/_components/DayCellProvider";
 import { db } from "~/db";
+import { dbSub } from "~/db/dbSub";
 import { trackableRecord } from "~/db/schema";
 import { useSync } from "~/db/syncContext";
 
@@ -41,6 +49,27 @@ export type ITrackableFromAppDB = ITrackableFromList & {
   userId: string;
 };
 
+const useValueSub = (trackableId: string, date: Date) => {
+  const [value, setValue] = useState("");
+
+  useEffect(() => {
+    db.query.trackableRecord
+      .findFirst({
+        where: and(
+          eq(trackableRecord.date, date),
+          eq(trackableRecord.trackableId, trackableId),
+        ),
+      })
+      .then((v) => {
+        setValue(v?.value || "");
+      });
+
+    dbSub.subscribeToValue(trackableId, Number(date), setValue);
+  });
+
+  return { value };
+};
+
 export const TrackableProvider = ({
   trackable,
   children,
@@ -56,21 +85,7 @@ export const TrackableProvider = ({
   );
 
   const useValue = (d: Date) => {
-    const from = new Date(d.getTime());
-    const to = new Date(d.getTime());
-    from.setUTCHours(0, 0, 0, 0);
-    to.setUTCHours(23, 59, 59, 999);
-
-    const { data, error } = useLiveQuery(
-      db.query.trackableRecord.findFirst({
-        where: and(
-          between(trackableRecord.date, from, to),
-          eq(trackableRecord.trackableId, trackable.id),
-        ),
-      }),
-    );
-
-    return { value: data?.value, error };
+    return useValueSub(trackable.id, d);
   };
 
   const setValue = async (d: Date, v: string) => {

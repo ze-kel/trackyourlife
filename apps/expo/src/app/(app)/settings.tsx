@@ -29,7 +29,7 @@ const SyncInfo = ({ style }: { style?: ViewStyle }) => {
           variant={"destructive"}
           onPress={() => sync(true)}
         >
-          Reset DB and sync
+          Full refetch
         </Button>
       </View>
     </View>

@@ -82,7 +82,10 @@ export const SettingsNumber = ({
 
         <NumberLimitsSelector
           enabled={settings.current.progressEnabled}
-          onEnabledChange={(v) => (settings.current.progressEnabled = v)}
+          onEnabledChange={(v) => {
+            settings.current.progressEnabled = v;
+            notifyAboutChange();
+          }}
           value={settings.current.progress}
           onChange={(v) => {
             settings.current.progress = v;

@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Text, useColorScheme, View } from "react-native";
 import { Redirect, Stack, Tabs } from "expo-router";
 import { RadixIcon } from "radix-ui-react-native-icons";

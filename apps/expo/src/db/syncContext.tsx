@@ -3,6 +3,7 @@ import {
   PropsWithChildren,
   useCallback,
   useContext,
+  useEffect,
   useState,
 } from "react";
 import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
@@ -20,15 +21,6 @@ import {
 } from "~/db/schema";
 import { api } from "~/utils/api";
 
-interface ISyncContext {
-  sync: (clear?: boolean) => Promise<void>;
-  lastSync?: Date;
-  isLoading: boolean;
-  error?: string;
-
-  updateTrackableRecord: (v: LDbTrackableRecordInsert) => Promise<void>;
-}
-
 const updRecord = async (v: LDbTrackableRecordInsert) => {
   await db
     .insert(trackableRecord)
@@ -40,6 +32,15 @@ const updRecord = async (v: LDbTrackableRecordInsert) => {
       },
     });
 };
+
+interface ISyncContext {
+  sync: (clear?: boolean) => Promise<void>;
+  lastSync?: Date;
+  isLoading: boolean;
+  error?: string;
+
+  updateTrackableRecord: (v: LDbTrackableRecordInsert) => Promise<void>;
+}
 
 const SyncContext = createContext<ISyncContext>({
   sync: async () => {},
@@ -55,6 +56,7 @@ export const useSync = () => {
 const USER_KEY = "all";
 
 const synchonizeDb = async (clear: boolean, lastSync?: Date) => {
+  const nowDate = new Date();
   if (clear) {
     lastSync = new Date(1970);
   }
@@ -73,10 +75,6 @@ const synchonizeDb = async (clear: boolean, lastSync?: Date) => {
     await api.syncRouter.getTrackableUpdates.query(lastSync);
 
   const recordsUpdates = await api.syncRouter.getRecordUpdates.query(lastSync);
-
-  if (clear) {
-    await clearDB();
-  }
 
   if (trackablesUpdates.length) {
     await db
@@ -106,12 +104,21 @@ const synchonizeDb = async (clear: boolean, lastSync?: Date) => {
         },
       });
   }
+
+  await db
+    .insert(meta)
+    .values({ user: USER_KEY, lastSync: nowDate })
+    .onConflictDoUpdate({
+      target: meta.user,
+      set: {
+        lastSync: nowDate,
+      },
+    });
+  console.log("done");
 };
 
 export const SyncContextProvider = ({ children }: PropsWithChildren) => {
   useDrizzleStudio(expoDb);
-
-  const r = db.query.meta.findFirst();
 
   const { data } = useLiveQuery(
     db.query.meta.findFirst({ where: eq(meta.user, USER_KEY) }),
@@ -125,20 +132,10 @@ export const SyncContextProvider = ({ children }: PropsWithChildren) => {
   const sync = async (clear = false) => {
     if (isLoading) return;
 
-    const nowDate = new Date();
     setIsLoading(true);
 
     try {
       await synchonizeDb(clear, lastSync);
-      await db
-        .insert(meta)
-        .values({ user: USER_KEY, lastSync: nowDate })
-        .onConflictDoUpdate({
-          target: meta.user,
-          set: {
-            lastSync: nowDate,
-          },
-        });
       setError(undefined);
     } catch (e) {
       setError(String(e));

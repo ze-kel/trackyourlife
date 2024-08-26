@@ -7,9 +7,9 @@ import { computeDayCellHelpers } from "@tyl/helpers/trackables";
 
 import { useTrackableContextSafe } from "~/app/_components/trackableProvider";
 import { tws } from "~/utils/tw";
-import { DayCellBoolean } from "./DayCellBoolean";
-import { DayCellNumber } from "./DayCellNumber";
-import { DayCellRange } from "./DayCellRange";
+import { DayCellBoolean } from "./dayCellBoolean";
+import { DayCellNumber } from "./dayCellNumber";
+import { DayCellRange } from "./dayCellRange";
 
 export const DayCellBaseClasses = "relative rounded-sm";
 

@@ -47,6 +47,7 @@ const DateView = ({ date }: { date: Date }) => {
 
   return (
     <>
+      <SafeAreaView edges={["top"]} />
       <View
         style={[
           tws(
@@ -62,14 +63,7 @@ const DateView = ({ date }: { date: Date }) => {
           </Text>
         </Text>
 
-        <View style={[tws("flex flex-row gap-2")]}>
-          <Button size={"icon"} variant={"ghost"}>
-            {"<"}
-          </Button>
-          <Button size={"icon"} variant={"ghost"}>
-            {">"}
-          </Button>
-        </View>
+        <View style={[tws("flex flex-row gap-2")]}></View>
       </View>
       <ScrollView>
         <View style={[tws("flex flex-row")]}>
@@ -123,15 +117,16 @@ export default function Index() {
 
   return (
     <>
-      <SafeAreaView edges={["top"]} />
       <FlashList
         snapToInterval={width}
         horizontal={true}
         data={dates}
+        nestedScrollEnabled={true}
         renderItem={(i) => <DateView date={i.item} />}
         estimatedItemSize={width}
         snapToAlignment="center"
         decelerationRate="fast"
+        showsHorizontalScrollIndicator={false}
         initialScrollIndex={dates.length - 1}
       ></FlashList>
     </>

@@ -1,9 +1,9 @@
 import { Text, View } from "react-native";
 
+import { tws } from "~/utils/tw";
+
 export default function Index() {
-  return (
-    <View>
-      <Text>Create</Text>
-    </View>
-  );
+  //;lkasdj
+
+  return <View></View>;
 }

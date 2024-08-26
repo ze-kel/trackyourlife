@@ -5,6 +5,7 @@ import { useTheme } from "next-themes";
 import { v4 as uuidv4 } from "uuid";
 
 import type { IColorCodingValue, IColorValue } from "@tyl/validators/trackable";
+import { clamp } from "@tyl/helpers";
 import { range } from "@tyl/helpers/animation";
 import { presetsMap } from "@tyl/helpers/colorPresets";
 import {
@@ -54,17 +55,20 @@ const ControllerGradient = ({
 }) => {
   const ref = useRef<HTMLDivElement>(null);
 
+  const firstItem = value[0];
+  const lastItem = value[value.length - 1];
+
   const { width, dataRef } = useRefSize(ref);
 
-  const [minInput, setMinInput] = useState<number | null>(
-    getActualMin(value[0]?.point, null),
+  const [minValue, setMinValue] = useState<number>(
+    getActualMin(value[0]?.point, 0),
   );
-  const [maxInput, setMaxInput] = useState<number | null>(
-    getActualMax(value[value.length - 1]?.point, null),
+  const [maxValue, setMaxValue] = useState<number>(
+    getActualMax(value[value.length - 1]?.point, 100),
   );
 
-  const actualMin = getActualMin(value[0]?.point, minInput);
-  const actualMax = getActualMax(value[value.length - 1]?.point, maxInput);
+  const [minInput, setMinInput] = useState(String(minValue));
+  const [maxInput, setMaxInput] = useState(String(maxValue));
 
   const setById = (id: string, point: number) => {
     const newValue = [...value];
@@ -82,7 +86,7 @@ const ControllerGradient = ({
 
       const { width, left } = dataRef.current;
       const coordinate = e.clientX - left;
-      point = Math.round(range(0, width, actualMin, actualMax, coordinate));
+      point = Math.round(range(0, width, minValue, maxValue, coordinate));
     }
 
     const newVal = [...value];
@@ -100,7 +104,7 @@ const ControllerGradient = ({
     const { width, left, top, height } = dataRef.current;
     setIsDragging(true);
     const position = Math.round(
-      range(0, width, actualMin, actualMax, clientX - left),
+      range(0, width, minValue, maxValue, clientX - left),
     );
 
     const vertical = clientY - top - height / 2;
@@ -172,9 +176,16 @@ const ControllerGradient = ({
     onChange(newVal);
   };
 
-  const setInputsToActual = () => {
-    setMinInput(actualMin);
-    setMaxInput(actualMax);
+  const minMaxInputBlur = () => {
+    setMinInput(String(minValue));
+    setMaxInput(String(maxValue));
+    const r = [...value];
+
+    r.forEach((v) => {
+      v.point = clamp(v.point, minValue, maxValue);
+    });
+
+    onChange(r);
   };
 
   const [selectedColor, setSelectedColor] = useState(value[0]?.id || "");
@@ -219,30 +230,37 @@ const ControllerGradient = ({
           ></div>
         )}
         <Input
-          error={actualMin !== minInput}
-          value={minInput === null ? "" : minInput}
+          warning={firstItem ? minValue > firstItem.point : false}
+          error={minInput !== String(minValue)}
+          value={minInput}
           type="number"
-          onBlur={setInputsToActual}
+          onBlur={minMaxInputBlur}
           onChange={(e) => {
-            setMinInput(
-              Number.isNaN(e.target.valueAsNumber)
-                ? null
-                : e.target.valueAsNumber,
-            );
+            setMinInput(e.target.value);
+            const n = e.target.valueAsNumber;
+            if (Number.isNaN(n)) return;
+            setMinValue(Math.min(n, maxValue - 1));
           }}
           className="w-16"
         />
         <div
-          className="relative box-border flex h-9 w-full cursor-copy rounded-lg border-2 border-neutral-200 bg-transparent text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-950 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-800 max-sm:col-span-full max-sm:row-start-2 max-sm:row-end-2"
+          className={cn(
+            "relative box-border flex h-9 w-full rounded-lg border-2 border-neutral-200 bg-transparent text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-950 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-800 max-sm:col-span-full max-sm:row-start-2 max-sm:row-end-2",
+            !isDragging && "cursor-copy",
+          )}
           style={{
             background: makeCssGradient(
               value,
-              actualMin,
-              actualMax,
+              minValue,
+              maxValue,
               gradientPreviewTheme,
             ),
           }}
-          onClick={addColor}
+          onClick={(e) => {
+            if (!isDragging) {
+              addColor(e);
+            }
+          }}
         >
           <div ref={ref} className="relative w-full">
             {value.map((v) => {
@@ -269,17 +287,26 @@ const ControllerGradient = ({
                     // This is fallback for SSR where we cant get width and therefore cant do Translate()
                     left: width
                       ? 0
-                      : range(actualMin, actualMax, 0, 100, v.point) + "%",
+                      : range(minValue, maxValue, 0, 100, v.point) + "%",
                     transform: `${
                       width
                         ? `translateX(calc(-50% + ${
-                            width * range(actualMin, actualMax, 0, 1, v.point)
+                            width * range(minValue, maxValue, 0, 1, v.point)
                           }px))`
                         : "translateX(-50%)"
                     } translateY(-50%)`,
                   }}
                 >
-                  <div className="h-full overflow-hidden rounded-md border-2 border-neutral-950 shadow-lg shadow-neutral-50 dark:border-neutral-50">
+                  <div
+                    className={cn(
+                      "h-full overflow-hidden rounded-md border-2 shadow-lg shadow-neutral-50",
+                      v.id === selectedColor
+                        ? "border-neutral-950 dark:border-neutral-50"
+                        : "border-neutral-500 dark:border-neutral-500",
+                      v.point !== clamp(v.point, minValue, maxValue) &&
+                        "border-orange-500 dark:border-orange-600",
+                    )}
+                  >
                     <ColorDisplay
                       color={v.color}
                       className={cn(
@@ -294,16 +321,16 @@ const ControllerGradient = ({
         </div>
         <div className="justify-self-end">
           <Input
-            error={actualMax !== maxInput}
-            value={maxInput === null ? "" : maxInput}
+            warning={lastItem ? lastItem.point > maxValue : false}
+            error={maxInput !== String(maxValue)}
+            value={maxInput}
             type="number"
-            onBlur={setInputsToActual}
+            onBlur={minMaxInputBlur}
             onChange={(e) => {
-              setMaxInput(
-                Number.isNaN(e.target.valueAsNumber)
-                  ? null
-                  : e.target.valueAsNumber,
-              );
+              setMaxInput(e.target.value);
+              const n = e.target.valueAsNumber;
+              if (Number.isNaN(n)) return;
+              setMaxValue(Math.max(n, minValue + 1));
             }}
             className="w-16"
           />
@@ -357,7 +384,7 @@ const ControllerGradient = ({
                 <ColorDisplay color={v.color} />
                 <BetterNumberInput
                   value={v.point}
-                  limits={{ min: actualMin, max: actualMax }}
+                  limits={{ min: minValue, max: maxValue }}
                   onChange={(val) => setById(v.id, val)}
                 />
                 <Button
@@ -403,10 +430,12 @@ const NumberColorSelector = ({
 }) => {
   const [innerEnabled, setInnerEnabled] = useState(enabled || false);
   const [innerValue, setInnerValue] = useState(
-    value || [
-      { point: 0, color: presetsMap.red, id: uuidv4() },
-      { point: 100, color: presetsMap.green, id: uuidv4() },
-    ],
+    value && value.length
+      ? value
+      : [
+          { point: 0, color: presetsMap.red, id: uuidv4() },
+          { point: 100, color: presetsMap.green, id: uuidv4() },
+        ],
   );
 
   const sorted = innerValue.sort((a, b) => a.point - b.point);
@@ -427,6 +456,7 @@ const NumberColorSelector = ({
         />
         <Label htmlFor="show-progress">Use color coding</Label>
       </div>
+
       {innerEnabled && (
         <ControllerGradient
           value={sorted}
