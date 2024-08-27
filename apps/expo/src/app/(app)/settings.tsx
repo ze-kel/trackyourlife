@@ -3,21 +3,21 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Button } from "~/app/_ui/button";
 import { useSession } from "~/app/authContext";
-import { useSync } from "~/db/syncContext";
+import { sync, useSyncState } from "~/db/syncContext";
 import { tws } from "~/utils/tw";
 
 const SyncInfo = ({ style }: { style?: ViewStyle }) => {
-  const { isLoading, lastSync, sync } = useSync();
+  const syncState = useSyncState();
 
   return (
     <View style={[tws("w-full"), style]}>
       <Text style={tws("text-sm text-neutral-700 dark:text-neutral-300")}>
-        Last sync: {lastSync ? lastSync.toLocaleString() : "never"}
+        Last sync: {syncState.lastSync.toLocaleString()}
       </Text>
       <View style={tws("flex flex-row gap-2 mt-2")}>
         <Button
           style={tws("grow")}
-          loading={isLoading}
+          loading={syncState.isSyncing}
           variant={"outline"}
           onPress={() => sync()}
         >
@@ -25,7 +25,7 @@ const SyncInfo = ({ style }: { style?: ViewStyle }) => {
         </Button>
 
         <Button
-          loading={isLoading}
+          loading={syncState.isSyncing}
           variant={"destructive"}
           onPress={() => sync(true)}
         >

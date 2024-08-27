@@ -43,10 +43,14 @@ class SubscriptionOverlord {
           );
         }
       }
+    } else if (v.tableName === "userData") {
+      const u = (await expoDb.getFirstAsync(
+        `SELECT * FROM userData WHERE rowid = ${v.rowId}`,
+      )) as LDbTrackableRecordSelect;
     }
   }
 
-  subscribeToValue(
+  subscribeToTrackableValue(
     trackableId: string,
     date: number,
     callback: SubscriptionCallback,
@@ -55,16 +59,17 @@ class SubscriptionOverlord {
     if (!this.trackableSubscriptions[key]) {
       this.trackableSubscriptions[key] = {};
     }
-
     // this should not cause collisions, probably
     let random = (Math.random() + 1).toString(36).substring(7);
-
     this.trackableSubscriptions[key][random] = callback;
-
     return random;
   }
 
-  unsubscribe(trackableId: string, date: number, cbKey: string) {
+  unsubscribeFromTrackableValue(
+    trackableId: string,
+    date: number,
+    cbKey: string,
+  ) {
     const key = this.getKey(trackableId, date);
     if (!this.trackableSubscriptions[key]) {
       return;

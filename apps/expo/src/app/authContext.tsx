@@ -2,6 +2,7 @@ import type { PropsWithChildren } from "react";
 import { createContext, useContext, useState } from "react";
 
 import { clearDB } from "~/db";
+import { resetLastSync } from "~/db/syncContext";
 import { updateTrpcClient } from "~/utils/api";
 import {
   clearUserData,
@@ -33,9 +34,11 @@ export function SessionProvider({ children }: PropsWithChildren) {
   return (
     <AuthContext.Provider
       value={{
-        signIn: (data: IUserData) => {
-          setUserData(data);
+        signIn: async (data: IUserData) => {
+          await setUserData(data);
           setUdata(data);
+          await resetLastSync();
+          await 
           updateTrpcClient();
         },
         signOut: async () => {

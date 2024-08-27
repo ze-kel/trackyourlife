@@ -1,0 +1,1 @@
+ALTER TABLE "TYL_auth_user" ADD COLUMN "updated" timestamp DEFAULT now() NOT NULL;

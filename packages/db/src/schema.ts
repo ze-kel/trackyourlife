@@ -21,6 +21,11 @@ export const auth_user = pgTable("auth_user", {
 
   hashedPassword: varchar("hashed_password").notNull(),
 
+  updated: timestamp("updated")
+    .defaultNow()
+    .notNull()
+    .$onUpdate(() => new Date()),
+
   settings: json("settings").default({}).$type<Record<string, unknown>>(),
   // Currently only used to identify users created by e2e testing
   role: varchar("role"),

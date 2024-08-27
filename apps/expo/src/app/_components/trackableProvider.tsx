@@ -6,8 +6,7 @@ import {
   useMemo,
   useState,
 } from "react";
-import { and, between, eq, sql } from "drizzle-orm";
-import { useLiveQuery } from "drizzle-orm/expo-sqlite";
+import { and, eq } from "drizzle-orm";
 
 import {
   ITrackable,
@@ -19,7 +18,7 @@ import { MemoDayCellProvider } from "~/app/_components/DayCellProvider";
 import { db } from "~/db";
 import { dbSub } from "~/db/dbSub";
 import { trackableRecord } from "~/db/schema";
-import { useSync } from "~/db/syncContext";
+import { updateTrackableRecord } from "~/db/syncContext";
 
 type UseReturn = {
   value?: string;
@@ -64,10 +63,14 @@ const useValueSub = (trackableId: string, date: Date) => {
         setValue(v?.value || "");
       });
 
-    const unsub = dbSub.subscribeToValue(trackableId, Number(date), setValue);
+    const unsub = dbSub.subscribeToTrackableValue(
+      trackableId,
+      Number(date),
+      setValue,
+    );
 
     return () => {
-      dbSub.unsubscribe(trackableId, Number(date), unsub);
+      dbSub.unsubscribeFromTrackableValue(trackableId, Number(date), unsub);
     };
   });
 
@@ -81,8 +84,6 @@ export const TrackableProvider = ({
   trackable: ITrackableFromAppDB;
   children: ReactNode;
 }) => {
-  const { updateTrackableRecord } = useSync();
-
   const parsedSettings = useMemo(
     () => makeTrackableSettings(trackable),
     [trackable.settings],

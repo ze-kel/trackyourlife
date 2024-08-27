@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "7892603d-4eea-4869-af75-2e3eac95409a",
+  "id": "1544226e-63c9-4003-8733-f6dfc2a5d8e4",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "meta": {
@@ -17,6 +17,14 @@
         "updated": {
           "name": "updated",
           "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(current_timestamp)"
+        },
+        "settings": {
+          "name": "settings",
+          "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false

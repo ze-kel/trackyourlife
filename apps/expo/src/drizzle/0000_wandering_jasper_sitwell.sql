@@ -1,6 +1,7 @@
 CREATE TABLE `meta` (
 	`user` text PRIMARY KEY NOT NULL,
-	`updated` integer
+	`updated` integer DEFAULT (current_timestamp) NOT NULL,
+	`settings` text
 );
 --> statement-breakpoint
 CREATE TABLE `trackable` (

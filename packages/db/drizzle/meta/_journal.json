@@ -71,6 +71,13 @@
       "when": 1724367554995,
       "tag": "0009_graceful_rage",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1724788814646,
+      "tag": "0010_tiny_sleeper",
+      "breakpoints": true
     }
   ]
 }

@@ -38,6 +38,6 @@ export const ZUserSettings = z.object({
 
 export type IUserSettings = z.infer<typeof ZUserSettings>;
 
-export const UserSettingsFallback: IUserSettings = {
+export const UserSettingsFallback: NonNullable<IUserSettings> = {
   favorites: [],
 };

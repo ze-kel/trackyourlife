@@ -14,7 +14,6 @@ import { useDeviceContext } from "twrnc";
 
 import { SessionProvider } from "~/app/authContext";
 import { db } from "~/db";
-import { SyncContextProvider } from "~/db/syncContext";
 import migrations from "~/drizzle/migrations";
 import { tw, tws } from "~/utils/tw";
 
@@ -66,18 +65,14 @@ export default function RootLayout() {
       <PortalProvider>
         <BottomSheetModalProvider>
           <SessionProvider>
-            <QueryProvider>
-              <SyncContextProvider>
-                <PortalHost name="rangePortal" />
-                <Stack
-                  screenOptions={{
-                    headerShown: false,
-                    contentStyle: tws("bg-neutral-50 dark:bg-neutral-950"),
-                  }}
-                />
-                <StatusBar />
-              </SyncContextProvider>
-            </QueryProvider>
+            <PortalHost name="rangePortal" />
+            <Stack
+              screenOptions={{
+                headerShown: false,
+                contentStyle: tws("bg-neutral-50 dark:bg-neutral-950"),
+              }}
+            />
+            <StatusBar />
           </SessionProvider>
         </BottomSheetModalProvider>
       </PortalProvider>

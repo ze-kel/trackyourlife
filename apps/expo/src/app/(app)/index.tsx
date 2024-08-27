@@ -9,6 +9,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FlashList } from "@shopify/flash-list";
 import { eachDayOfInterval, format, sub } from "date-fns";
+import { asc } from "drizzle-orm";
 import { useLiveQuery } from "drizzle-orm/expo-sqlite";
 
 import { chunk } from "@tyl/helpers";
@@ -18,6 +19,8 @@ import DayCellWrapper from "~/app/_components/dayCell";
 import { TrackableProvider } from "~/app/_components/trackableProvider";
 import { Button } from "~/app/_ui/button";
 import { db } from "~/db";
+import { trackable } from "~/db/schema";
+import { useUserSettings } from "~/db/userSettings";
 import { tws } from "~/utils/tw";
 
 export const makeTrackableSettings = (trackable: unknown) => {
@@ -40,7 +43,14 @@ const Today = () => {
 };
 
 const DateView = ({ date }: { date: Date }) => {
-  const { data } = useLiveQuery(db.query.trackable.findMany());
+  const { data } = useLiveQuery(
+    db.query.trackable.findMany({ orderBy: [asc(trackable.name)] }),
+  );
+
+  const s = useUserSettings();
+
+  console.log(s);
+
   const { height, width } = useWindowDimensions();
 
   const columns = chunk(data, Math.ceil(data.length / 2));

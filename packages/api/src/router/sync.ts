@@ -2,7 +2,8 @@ import type { TRPCRouterRecord } from "@trpc/server";
 import { z } from "zod";
 
 import { and, eq, gte, lte, sql } from "@tyl/db";
-import { trackable, trackableRecord } from "@tyl/db/schema";
+import { auth_user, trackable, trackableRecord } from "@tyl/db/schema";
+import { ZUserSettings } from "@tyl/validators/user";
 
 import { protectedProcedure } from "../trpc";
 
@@ -60,5 +61,35 @@ export const syncRouter = {
             sql.raw(`excluded.${trackableRecord.updated.name}`),
           ),
         });
+    }),
+
+  pushSettingsUpdates: protectedProcedure
+    .input(z.object({ settings: ZUserSettings, updated: z.date() }))
+    .query(async ({ ctx, input }) => {
+      return await ctx.db
+        .update(auth_user)
+        .set({
+          settings: input.settings,
+        })
+        .where(
+          and(
+            eq(auth_user.id, ctx.user.id),
+            lte(auth_user.updated, input.updated),
+          ),
+        );
+    }),
+  getSettingsUpdates: protectedProcedure
+    .input(z.date().optional())
+    .query(async ({ ctx, input }) => {
+      return ctx.db.query.auth_user.findFirst({
+        columns: {
+          updated: true,
+          settings: true,
+          username: true,
+        },
+        where: input
+          ? and(gte(auth_user.updated, input), eq(auth_user.id, ctx.user.id))
+          : eq(auth_user.id, ctx.user.id),
+      });
     }),
 } satisfies TRPCRouterRecord;
