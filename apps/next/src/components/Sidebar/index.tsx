@@ -19,8 +19,8 @@ import { Spinner } from "@tyl/ui/spinner";
 
 import { CoreLinks } from "~/components/Header";
 import { userUserContext } from "~/components/Providers/UserProvider";
-import { sortTrackableList } from "~/components/TrackablesList/helper";
 import { api } from "~/trpc/react";
+import { sortTrackableList } from "@tyl/helpers/trackables";
 
 const iconsMap: Record<ITrackable["type"], ReactNode> = {
   boolean: <ValueIcon />,

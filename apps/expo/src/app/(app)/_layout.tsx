@@ -1,13 +1,18 @@
 import { useEffect, useState } from "react";
 import { Text, useColorScheme, View } from "react-native";
+import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
 import { Redirect, Stack, Tabs } from "expo-router";
 import { RadixIcon } from "radix-ui-react-native-icons";
 
-import { useSession } from "~/app/authContext";
+import { useSession } from "~/data/authContext";
+import { useSyncInterval } from "~/data/syncContext";
+import { expoDb } from "~/db";
 import { tws } from "~/utils/tw";
 
 export default function AppLayout() {
   const { userData } = useSession();
+  useDrizzleStudio(expoDb);
+  useSyncInterval();
 
   const colorScheme = useColorScheme();
   if (!userData) {

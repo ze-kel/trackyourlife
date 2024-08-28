@@ -168,6 +168,31 @@ export const ZTrackable = z
     }),
   );
 
+export const ZTrackableFromDb = z.discriminatedUnion("type", [
+  z.object({
+    settings: ZTrackableSettingsBoolean,
+    type: z.literal("boolean"),
+    name: z.string(),
+    id: z.string(),
+    userId: z.string(),
+  }),
+  z.object({
+    settings: ZTrackableSettingsNumber,
+    type: z.literal("number"),
+    name: z.string(),
+    id: z.string(),
+    userId: z.string(),
+  }),
+  z.object({
+    settings: ZTrackableSettingsRange,
+    type: z.literal("range"),
+    name: z.string(),
+    id: z.string(),
+    userId: z.string(),
+  }),
+]);
+
+export type ITrackableFromDB = z.infer<typeof ZTrackableFromDb>;
 export type ITrackable = z.infer<typeof ZTrackable>;
 export type ITrackableBase = Omit<ITrackable, "data">;
 export type ITrackableFromList = Omit<ITrackableBase, "settings">;

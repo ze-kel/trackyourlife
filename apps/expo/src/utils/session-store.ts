@@ -6,11 +6,9 @@ const zUserData = z.object({
   token: z.string(),
   host: z.string(),
   userId: z.string(),
-  email: z.string(),
-  username: z.string(),
 });
 
-export type IUserData = z.infer<typeof zUserData>;
+export type ISessionData = z.infer<typeof zUserData>;
 
 export const getUserData = () => {
   try {
@@ -23,7 +21,7 @@ export const getUserData = () => {
   }
 };
 
-export const setUserData = async (data: IUserData) => {
+export const setUserData = async (data: ISessionData) => {
   await SecureStore.setItemAsync(key, JSON.stringify(data));
 };
 

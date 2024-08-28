@@ -1,17 +1,38 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "1544226e-63c9-4003-8733-f6dfc2a5d8e4",
+  "id": "3ef879e6-fc69-43df-8fef-e62adaba83fc",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
-    "meta": {
-      "name": "meta",
+    "auth_user": {
+      "name": "auth_user",
       "columns": {
-        "user": {
-          "name": "user",
+        "id": {
+          "name": "id",
           "type": "text",
           "primaryKey": true,
           "notNull": true,
+          "autoincrement": false
+        },
+        "settings": {
+          "name": "settings",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "username": {
+          "name": "username",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
           "autoincrement": false
         },
         "updated": {
@@ -21,10 +42,26 @@
           "notNull": true,
           "autoincrement": false,
           "default": "(current_timestamp)"
-        },
-        "settings": {
-          "name": "settings",
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "meta": {
+      "name": "meta",
+      "columns": {
+        "user_id": {
+          "name": "user_id",
           "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated": {
+          "name": "updated",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false

@@ -87,6 +87,12 @@ importers:
       '@gorhom/portal':
         specifier: ^1.0.14
         version: 1.0.14(react-native@0.74.5(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2))(@types/react@18.3.3)(react@18.2.0))(react@18.2.0)
+      '@hookstate/core':
+        specifier: ^4.0.1
+        version: 4.0.1(react@18.2.0)
+      '@hookstate/subscribable':
+        specifier: ^4.0.0
+        version: 4.0.0(@hookstate/core@4.0.1(react@18.2.0))
       '@shopify/flash-list':
         specifier: 1.7.1
         version: 1.7.1(@babel/runtime@7.25.0)(react-native@0.74.5(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2))(@types/react@18.3.3)(react@18.2.0))(react@18.2.0)
@@ -2425,6 +2431,16 @@ packages:
     resolution: {integrity: sha512-FuzFN+BsHa+7OxbvAERtgBTNeZpUjgM/MIizfVkSCL2/edriN0Hx/DWRCR//aPYwO5QX/YlgLGXk+E3PcfZwjA==}
     peerDependencies:
       react: '>= 16'
+
+  '@hookstate/core@4.0.1':
+    resolution: {integrity: sha512-Uh2D8Z0z/pqOJ7t+SfC+2sj13JQcB4yFhtL+T1choCaBxTSlgOS/CKRBohgJ4cjTKoxOmTT8uSQysu3gUjX+Gw==}
+    peerDependencies:
+      react: ^16.8.6 || ^17.0.0 || ^18.0.0
+
+  '@hookstate/subscribable@4.0.0':
+    resolution: {integrity: sha512-IBvb4sfQ99cUmHpPjLbM0u4jluU6Ou0e9hUGvk9vHYPK8zbQmvUV+uz0KfV1wqGow3YqIrtiUJ4Jjebeg57JVw==}
+    peerDependencies:
+      '@hookstate/core': ^4.0.0
 
   '@humanwhocodes/config-array@0.11.14':
     resolution: {integrity: sha512-3T8LkOmg45BV5FICb15QQMsyUSWrQ8AygVfC7ZG32zOalnqrilm018ZVCw0eapXux8FtA33q8PSRSstjee3jSg==}
@@ -11339,6 +11355,14 @@ snapshots:
   '@heroicons/react@2.1.5(react@18.2.0)':
     dependencies:
       react: 18.2.0
+
+  '@hookstate/core@4.0.1(react@18.2.0)':
+    dependencies:
+      react: 18.2.0
+
+  '@hookstate/subscribable@4.0.0(@hookstate/core@4.0.1(react@18.2.0))':
+    dependencies:
+      '@hookstate/core': 4.0.1(react@18.2.0)
 
   '@humanwhocodes/config-array@0.11.14':
     dependencies:

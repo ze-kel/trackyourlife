@@ -15,10 +15,10 @@ import {
 } from "@tyl/validators/trackable";
 
 import { MemoDayCellProvider } from "~/app/_components/DayCellProvider";
+import { TrackableRecordSub } from "~/data/dbWatcher";
+import { updateTrackableRecord } from "~/data/syncContext";
 import { db } from "~/db";
-import { dbSub } from "~/db/dbSub";
 import { trackableRecord } from "~/db/schema";
-import { updateTrackableRecord } from "~/db/syncContext";
 
 type UseReturn = {
   value?: string;
@@ -63,15 +63,9 @@ const useValueSub = (trackableId: string, date: Date) => {
         setValue(v?.value || "");
       });
 
-    const unsub = dbSub.subscribeToTrackableValue(
-      trackableId,
-      Number(date),
-      setValue,
-    );
-
-    return () => {
-      dbSub.unsubscribeFromTrackableValue(trackableId, Number(date), unsub);
-    };
+    return TrackableRecordSub.subscribe({ date, trackableId }, (v) => {
+      setValue(v.value);
+    });
   });
 
   return { value };

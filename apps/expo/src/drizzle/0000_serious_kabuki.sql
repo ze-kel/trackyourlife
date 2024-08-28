@@ -1,7 +1,14 @@
+CREATE TABLE `auth_user` (
+	`id` text PRIMARY KEY NOT NULL,
+	`settings` text,
+	`username` text,
+	`email` text,
+	`updated` integer DEFAULT (current_timestamp) NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE `meta` (
-	`user` text PRIMARY KEY NOT NULL,
-	`updated` integer DEFAULT (current_timestamp) NOT NULL,
-	`settings` text
+	`user_id` text PRIMARY KEY NOT NULL,
+	`updated` integer
 );
 --> statement-breakpoint
 CREATE TABLE `trackable` (

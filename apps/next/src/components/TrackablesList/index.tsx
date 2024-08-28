@@ -18,12 +18,10 @@ import DayCellWrapper from "~/components/DayCell";
 import TrackableProvider from "~/components/Providers/TrackableProvider";
 import { userUserContext } from "~/components/Providers/UserProvider";
 import { TrackableNameText } from "~/components/TrackableName";
-import {
-  generateDates,
-  sortTrackableList,
-} from "~/components/TrackablesList/helper";
+import { generateDates } from "~/components/TrackablesList/helper";
 import { api } from "~/trpc/react";
 import MiniTrackable from "./miniTrackable";
+import { sortTrackableList } from "@tyl/helpers/trackables";
 
 const EmptyList = () => {
   return (

@@ -11,13 +11,15 @@ import { ITrackable } from "@tyl/validators/trackable";
 import { IUserSettings } from "@tyl/validators/user";
 
 export const meta = sqliteTable("meta", {
-  user: text("user").primaryKey(),
+  userId: text("user_id").primaryKey(),
   lastSync: integer("updated", { mode: "timestamp_ms" }),
 });
 
-export const userData = sqliteTable("userData", {
-  user: text("user").primaryKey(),
+export const authUser = sqliteTable("auth_user", {
+  id: text("id").primaryKey(),
   settings: text("settings", { mode: "json" }).$type<IUserSettings>(),
+  username: text("username"),
+  email: text("email"),
   updated: integer("updated", { mode: "timestamp_ms" })
     .notNull()
     .default(sql`(current_timestamp)`)
@@ -74,6 +76,9 @@ export const recordRelations = relations(trackableRecord, ({ one }) => ({
 
 export type LDbTrackableSelect = typeof trackable.$inferSelect;
 export type LDbTrackableInsert = typeof trackable.$inferInsert;
+
+export type LDbUserDataSelect = typeof authUser.$inferSelect;
+export type LDbUserDataInsert = typeof authUser.$inferInsert;
 
 export type LDbTrackableRecordSelect = typeof trackableRecord.$inferSelect;
 export type LDbTrackableRecordInsert = typeof trackableRecord.$inferInsert;

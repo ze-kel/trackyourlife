@@ -3,6 +3,7 @@ import { z } from "zod";
 
 import { and, eq, gte, lte, sql } from "@tyl/db";
 import { auth_user, trackable, trackableRecord } from "@tyl/db/schema";
+import { ZTrackable, ZTrackableFromDb } from "@tyl/validators/trackable";
 import { ZUserSettings } from "@tyl/validators/user";
 
 import { protectedProcedure } from "../trpc";
@@ -40,6 +41,22 @@ export const syncRouter = {
           : eq(trackableRecord.userId, ctx.user.id),
       });
     }),
+  getUserUpdates: protectedProcedure
+    .input(z.date().optional())
+    .query(async ({ ctx, input }) => {
+      return ctx.db.query.auth_user.findFirst({
+        columns: {
+          updated: true,
+          settings: true,
+          username: true,
+          email: true,
+          id: true,
+        },
+        where: input
+          ? and(gte(auth_user.updated, input), eq(auth_user.id, ctx.user.id))
+          : eq(auth_user.id, ctx.user.id),
+      });
+    }),
   pushRecordUpdates: protectedProcedure
     .input(z.array(ZRecordUpdate))
     .query(async ({ ctx, input }) => {
@@ -63,13 +80,40 @@ export const syncRouter = {
         });
     }),
 
-  pushSettingsUpdates: protectedProcedure
-    .input(z.object({ settings: ZUserSettings, updated: z.date() }))
+  pushTrackableUpdates: protectedProcedure
+    .input(z.array(ZTrackableFromDb))
+    .query(async ({ ctx, input }) => {
+      return ctx.db
+        .insert(trackable)
+        .values(input)
+        .onConflictDoUpdate({
+          target: [trackable.id],
+          set: {
+            name: sql.raw(`excluded.${trackable.name.name}`),
+            settings: sql.raw(`excluded.${trackable.settings.name}`),
+            updated: sql.raw(`excluded.${trackable.updated.name}`),
+          },
+          setWhere: lte(
+            trackable.updated,
+            sql.raw(`excluded.${trackable.updated.name}`),
+          ),
+        });
+    }),
+
+  pushUserUpdates: protectedProcedure
+    .input(
+      z.object({
+        settings: ZUserSettings.optional(),
+        updated: z.date(),
+        username: z.string(),
+      }),
+    )
     .query(async ({ ctx, input }) => {
       return await ctx.db
         .update(auth_user)
         .set({
           settings: input.settings,
+          username: input.username,
         })
         .where(
           and(
@@ -77,19 +121,5 @@ export const syncRouter = {
             lte(auth_user.updated, input.updated),
           ),
         );
-    }),
-  getSettingsUpdates: protectedProcedure
-    .input(z.date().optional())
-    .query(async ({ ctx, input }) => {
-      return ctx.db.query.auth_user.findFirst({
-        columns: {
-          updated: true,
-          settings: true,
-          username: true,
-        },
-        where: input
-          ? and(gte(auth_user.updated, input), eq(auth_user.id, ctx.user.id))
-          : eq(auth_user.id, ctx.user.id),
-      });
     }),
 } satisfies TRPCRouterRecord;

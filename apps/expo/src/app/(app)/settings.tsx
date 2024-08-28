@@ -1,23 +1,25 @@
 import { ScrollView, Text, View, ViewStyle } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useHookstate } from "@hookstate/core";
 
 import { Button } from "~/app/_ui/button";
-import { useSession } from "~/app/authContext";
-import { sync, useSyncState } from "~/db/syncContext";
+import { currentUser, currentUserInfo, useSession } from "~/data/authContext";
+import { isSyncing, lastSync, sync } from "~/data/syncContext";
 import { tws } from "~/utils/tw";
 
 const SyncInfo = ({ style }: { style?: ViewStyle }) => {
-  const syncState = useSyncState();
+  const ls = useHookstate(lastSync);
+  const isInProgress = useHookstate(isSyncing);
 
   return (
     <View style={[tws("w-full"), style]}>
       <Text style={tws("text-sm text-neutral-700 dark:text-neutral-300")}>
-        Last sync: {syncState.lastSync.toLocaleString()}
+        Last sync: {ls.get().toLocaleString()}
       </Text>
       <View style={tws("flex flex-row gap-2 mt-2")}>
         <Button
           style={tws("grow")}
-          loading={syncState.isSyncing}
+          loading={isInProgress.get()}
           variant={"outline"}
           onPress={() => sync()}
         >
@@ -25,7 +27,7 @@ const SyncInfo = ({ style }: { style?: ViewStyle }) => {
         </Button>
 
         <Button
-          loading={syncState.isSyncing}
+          loading={isInProgress.get()}
           variant={"destructive"}
           onPress={() => sync(true)}
         >
@@ -37,6 +39,7 @@ const SyncInfo = ({ style }: { style?: ViewStyle }) => {
 };
 
 const UserInfo = () => {
+  const uState = useHookstate(currentUserInfo);
   const { signOut, userData } = useSession();
   return (
     <>
@@ -46,11 +49,13 @@ const UserInfo = () => {
       </Text>
       <Text style={tws("text-color-base font-bold")}>
         Username:{" "}
-        <Text style={tws("font-medium opacity-70")}>{userData?.username}</Text>
+        <Text style={tws("font-medium opacity-70")}>
+          {uState.username.get()}
+        </Text>
       </Text>
       <Text style={tws("text-color-base font-bold")}>
         Email:{" "}
-        <Text style={tws("font-medium opacity-70")}>{userData?.email}</Text>
+        <Text style={tws("font-medium opacity-70")}>{uState.email.get()}</Text>
       </Text>
       <Text style={tws("text-color-base font-bold")}>
         ID:{" "}

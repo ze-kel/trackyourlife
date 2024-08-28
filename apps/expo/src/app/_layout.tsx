@@ -12,7 +12,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
 import { useDeviceContext } from "twrnc";
 
-import { SessionProvider } from "~/app/authContext";
+import { SessionProvider } from "~/data/authContext";
 import { db } from "~/db";
 import migrations from "~/drizzle/migrations";
 import { tw, tws } from "~/utils/tw";

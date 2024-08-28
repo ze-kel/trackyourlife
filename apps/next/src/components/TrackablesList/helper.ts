@@ -1,6 +1,5 @@
 import { getDaysInMonth } from "date-fns";
 
-import { ITrackableFromList } from "@tyl/validators/trackable";
 
 export const generateDates = (days: number, nowDate: Date) => {
   const today = nowDate;
@@ -27,23 +26,4 @@ export const generateDates = (days: number, nowDate: Date) => {
     }
   }
   return dates;
-};
-
-export const sortTrackableList = (
-  list: ITrackableFromList[],
-  favorites: string[],
-) => {
-  const favSet = new Set(favorites);
-
-  const newList = list.sort((a, b) => {
-    if (favSet.has(a.id) && !favSet.has(b.id)) return -1;
-    if (!favSet.has(a.id) && favSet.has(b.id)) return 1;
-
-    const aName = a.name || "";
-    const bName = b.name || "";
-
-    return aName.localeCompare(bName);
-  });
-
-  return newList;
 };

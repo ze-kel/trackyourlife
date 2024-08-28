@@ -21,6 +21,8 @@
     "@floating-ui/react-native": "^0.10.6",
     "@gorhom/bottom-sheet": "^4.6.4",
     "@gorhom/portal": "^1.0.14",
+    "@hookstate/core": "^4.0.1",
+    "@hookstate/subscribable": "^4.0.0",
     "@shopify/flash-list": "1.7.1",
     "@tanstack/react-query": "catalog:",
     "@trpc/client": "catalog:",

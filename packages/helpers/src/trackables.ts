@@ -1,9 +1,10 @@
 import { isAfter, isBefore, isSameDay } from "date-fns";
 
-import {
+import type {
   IBooleanSettings,
   INumberSettings,
   IRangeSettings,
+  ITrackableFromList,
   ITrackableSettings,
 } from "@tyl/validators/trackable";
 
@@ -43,7 +44,7 @@ export const getRangeLabelMapping = (settings: IRangeSettings) => {
   const map: Record<string, string> = {};
   if (!settings.labels) return map;
   settings.labels.forEach((v) => {
-    map[v.internalKey] = v.emoji || "";
+    map[v.internalKey] = v.emoji ?? "";
   });
 
   return map;
@@ -88,16 +89,16 @@ export const getDayCellBooleanColors = (settings: IBooleanSettings) => {
   const themeActive = settings.activeColor;
   const themeInactive = settings.inactiveColor;
   const themeActiveLight = makeColorString(
-    themeActive?.lightMode || presetsMap.green.lightMode,
+    themeActive?.lightMode ?? presetsMap.green.lightMode,
   );
   const themeActiveDark = makeColorString(
-    themeActive?.darkMode || presetsMap.green.darkMode,
+    themeActive?.darkMode ?? presetsMap.green.darkMode,
   );
   const themeInactiveLight = makeColorString(
-    themeInactive?.lightMode || presetsMap.neutral.lightMode,
+    themeInactive?.lightMode ?? presetsMap.neutral.lightMode,
   );
   const themeInactiveDark = makeColorString(
-    themeInactive?.darkMode || presetsMap.neutral.darkMode,
+    themeInactive?.darkMode ?? presetsMap.neutral.darkMode,
   );
 
   return {
@@ -106,4 +107,23 @@ export const getDayCellBooleanColors = (settings: IBooleanSettings) => {
     themeInactiveDark,
     themeInactiveLight,
   };
+};
+
+export const sortTrackableList = <T extends ITrackableFromList>(
+  list: T[],
+  favorites: string[],
+) => {
+  const favSet = new Set(favorites);
+
+  const newList = list.sort((a, b) => {
+    if (favSet.has(a.id) && !favSet.has(b.id)) return -1;
+    if (!favSet.has(a.id) && favSet.has(b.id)) return 1;
+
+    const aName = a.name || "";
+    const bName = b.name || "";
+
+    return aName.localeCompare(bName);
+  });
+
+  return newList;
 };

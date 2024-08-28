@@ -5,7 +5,7 @@ import { router, Stack } from "expo-router";
 
 import { Button } from "~/app/_ui/button";
 import { Input } from "~/app/_ui/input";
-import { useSession } from "~/app/authContext";
+import { useSession } from "~/data/authContext";
 import { getHostLink } from "~/utils/api";
 import { tws } from "~/utils/tw";
 
