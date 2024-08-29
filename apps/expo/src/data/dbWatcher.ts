@@ -148,8 +148,6 @@ const UserDataSub = new Subscribable(authUser, userDataKey);
 export const allTrackables = new Map<string, LDbTrackableSelect>();
 
 const updateAllTrackables = async () => {
-  const uId = currentUser.get()?.userId;
-
   const r = await db.query.trackable.findMany({});
 
   allTrackables.clear();

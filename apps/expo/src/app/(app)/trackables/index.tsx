@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef } from "react";
 import {
   FlatList,
   LayoutAnimation,
@@ -12,7 +12,6 @@ import Animated, { LinearTransition } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Link } from "expo-router";
 import { useHookstate } from "@hookstate/core";
-import { subscribable } from "@hookstate/subscribable";
 import { FlashList } from "@shopify/flash-list";
 import { eachDayOfInterval, sub } from "date-fns";
 import { asc } from "drizzle-orm";
@@ -34,57 +33,28 @@ import { db } from "~/db";
 import { trackable } from "~/db/schema";
 import { tws } from "~/utils/tw";
 
-const DAYS = 7;
+const DAYS = 31;
 
 export default function Index() {
   const { data } = useLiveQuery(
     db.query.trackable.findMany({ orderBy: [asc(trackable.name)] }),
   );
 
-  const [dd, setDD] = useState([
-    "2aadab69-ec4e-4c89-8170-ae1d3bfa7f18",
-    "020180b0-c3e7-47c6-b51f-504dda87bd46",
-    "18aa61f9-b0bc-4ae2-a0d3-596fab40640e",
-  ]);
+  const favorites = useHookstate(currentUserSettings.favorites);
 
-  useEffect(() => {
-    setDD(data.map((v) => v.id));
-  }, [data]);
+  const { height, width } = useWindowDimensions();
 
-  useEffect(() => {
-    currentUserSettings.favorites.subscribe((v) => {
-      setFavorites(v);
-    });
-  }, []);
+  const sorted = useMemo(() => {
+    const s = sortTrackableList(data, favorites.get() as string[]);
+    return s;
+  }, [favorites, data]);
 
-  const [favorites, setFavorites] = useState([
-    "2aadab69-ec4e-4c89-8170-ae1d3bfa7f18",
-  ]);
-
-  const sorted = dd.sort((a, b) => {
-    const at = favorites.includes(a);
-    const bt = favorites.includes(b);
-    if (at && !bt) return -1;
-    if (bt && !at) return 1;
-    return a.localeCompare(b);
-  });
+  const date = new Date();
 
   const dates = eachDayOfInterval({
     start: new Date(),
     end: sub(new Date(), { days: DAYS }),
   });
-
-  const addToFavorite = (id: string) => {
-    const n = [...favorites, id];
-    setFavorites(n);
-    //setUserFavorites(n);
-  };
-
-  const removeFromFavorites = (id: string) => {
-    const n = [...favorites.filter((v) => v !== id)];
-    setFavorites(n);
-    // setUserFavorites(n);
-  };
 
   return (
     <>
@@ -100,66 +70,42 @@ export default function Index() {
       <FlatList
         // ref={listRef}
         data={sorted}
-        keyExtractor={(v) => v}
+        keyExtractor={(v) => v.id}
         //  itemLayoutAnimation={LinearTransition}
         contentContainerStyle={tws("pb-4")}
         renderItem={(v) => (
           <View style={[tws("py-1 w-full")]}>
-            <View
-              style={[tws("flex px-4 flex-row justify-between items-center")]}
+            <Link
+              style={[tws("w-full")]}
+              href={{
+                pathname: "/(app)/trackables/[trackableId]",
+                params: { trackableId: v.item.id },
+              }}
             >
-              <Link
-                href={{
-                  pathname: "/(app)/trackables/[trackableId]",
-                  params: { trackableId: v.item },
-                }}
+              <View
+                style={[
+                  tws("flex px-4 w-full flex-row justify-between items-center"),
+                ]}
               >
                 <Text
                   numberOfLines={1}
-                  ellipsizeMode="tail"
-                  style={tws(
-                    "text-xl font-semibold py-1.5 text-neutral-900  dark:text-neutral-50",
-                  )}
+                  style={[
+                    tws(
+                      "text-xl font-semibold py-1.5 text-neutral-900  dark:text-neutral-50",
+                    ),
+                    { width: width - 32 - 18 - 8 },
+                  ]}
                 >
-                  {v.item}
+                  {v.item.name}
                 </Text>
-              </Link>
 
-              <View>
-                <Pressable
-                  onPress={
-                    favorites.includes(v.item)
-                      ? () => removeFromFavorites(v.item)
-                      : () => addToFavorite(v.item)
-                  }
-                >
-                  <RadixIcon
-                    name={favorites.includes(v.item) ? "heart-filled" : "heart"}
-                    size={18}
-                    color="white"
-                  />
-                </Pressable>
+                {favorites.get().includes(v.item.id) && (
+                  <RadixIcon name={"heart-filled"} size={18} color="white" />
+                )}
               </View>
-            </View>
-            <Text
-              numberOfLines={1}
-              ellipsizeMode="tail"
-              style={tws(
-                "text-xs font-semibold py-1.5 text-neutral-900  dark:text-neutral-50",
-              )}
-            >
-              {v.item}
-            </Text>
-          </View>
-        )}
-      />
-    </>
-  );
-}
-
-/*
- <TrackableProvider trackable={v.item}></TrackableProvider>
- <FlashList
+            </Link>
+            <TrackableProvider trackable={v.item}>
+              <FlashList
                 contentContainerStyle={tws("px-4")}
                 estimatedItemSize={128}
                 ItemSeparatorComponent={() => (
@@ -178,4 +124,10 @@ export default function Index() {
                 horizontal={true}
                 inverted={true}
               />
-*/
+            </TrackableProvider>
+          </View>
+        )}
+      />
+    </>
+  );
+}
