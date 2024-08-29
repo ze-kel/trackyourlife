@@ -1,5 +1,6 @@
 import { Fragment, useMemo, useState } from "react";
 import {
+  FlatList,
   ScrollView,
   Text,
   useColorScheme,
@@ -7,6 +8,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { offset } from "@floating-ui/react-native";
 import { useHookstate } from "@hookstate/core";
 import { FlashList } from "@shopify/flash-list";
 import { eachDayOfInterval, format, sub } from "date-fns";
@@ -53,9 +55,9 @@ const DateView = ({ date }: { date: Date }) => {
 
   const settings = useHookstate(currentUserSettings);
 
-  const { height, width } = useWindowDimensions();
+  const { width } = useWindowDimensions();
 
-  const sortedChunked = useMemo(() => {
+  const sorted = useMemo(() => {
     const s = sortTrackableList(data, settings.get().favorites as string[]);
     return s;
   }, [settings.favorites, data]);
@@ -83,7 +85,7 @@ const DateView = ({ date }: { date: Date }) => {
 
       <ScrollView>
         <FlashList
-          data={sortedChunked}
+          data={sorted}
           estimatedItemSize={150}
           keyExtractor={(v) => v.id}
           numColumns={2}
@@ -111,6 +113,7 @@ const DateView = ({ date }: { date: Date }) => {
               </View>
               <TrackableProvider trackable={v.item}>
                 <DayCellWrapper
+                  labelType="none"
                   day={date.getDate()}
                   month={date.getMonth()}
                   year={date.getFullYear()}
@@ -130,8 +133,8 @@ export default function Index() {
   const { height, width } = useWindowDimensions();
 
   const dates = eachDayOfInterval({
-    start: sub(new Date(), { days: DAYS }),
-    end: new Date(),
+    start: new Date(),
+    end: sub(new Date(), { days: DAYS }),
   });
 
   return (
@@ -142,11 +145,11 @@ export default function Index() {
         data={dates}
         nestedScrollEnabled={true}
         renderItem={(i) => <DateView date={i.item} />}
-        estimatedItemSize={width}
         snapToAlignment="center"
         decelerationRate="fast"
         showsHorizontalScrollIndicator={false}
-        initialScrollIndex={dates.length - 1}
+        estimatedItemSize={width}
+        inverted={true}
       ></FlashList>
     </>
   );

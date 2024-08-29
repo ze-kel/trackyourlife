@@ -115,7 +115,7 @@ const DayCellWrapper = ({
         <Text
           style={[
             tws(
-              "mr-1 text-right text-xs text-neutral-800",
+              "mr-1 mb-0.5 text-right font-semibold text-neutral-800 dark:text-neutral-400",
               isToday ? "font-normal underline" : "font-light",
             ),
           ]}

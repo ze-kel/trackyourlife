@@ -2,10 +2,11 @@ import {
   addDatabaseChangeListener,
   DatabaseChangeEvent,
 } from "expo-sqlite/next";
-import { getTableName } from "drizzle-orm";
+import { eq, getTableName } from "drizzle-orm";
 import { SQLiteTable, TableConfig } from "drizzle-orm/sqlite-core";
 
-import { expoDb } from "../db/index";
+import { currentUser } from "~/data/authContext";
+import { db, expoDb } from "../db/index";
 import {
   authUser,
   LDbTrackableRecordSelect,
@@ -70,7 +71,6 @@ class Subscribable<
   subscribe(vk: Parameters<typeof this.keyFunction>[0], cb: (v: SEL) => void) {
     const key = this.keyFunction(vk);
     addSubscrption(this.map, key, cb);
-    console.log("ADD SBUSCRIPTION", this.tableName, key);
 
     return () => removeSubscription(this.map, key, cb);
   }
@@ -140,6 +140,32 @@ const userDataKey = (v: Pick<LDbUserDataSelect, "id">) => {
 };
 
 const UserDataSub = new Subscribable(authUser, userDataKey);
+
+//
+// Trackables list
+//
+
+export const allTrackables = new Map<string, LDbTrackableSelect>();
+
+const updateAllTrackables = async () => {
+  const uId = currentUser.get()?.userId;
+
+  const r = await db.query.trackable.findMany({});
+
+  allTrackables.clear();
+
+  r.forEach((v) => {
+    allTrackables.set(v.id, v);
+  });
+};
+
+updateAllTrackables();
+
+const allTrackablesHook = (v: DatabaseChangeEvent) => {
+  if (v.tableName === getTableName(trackable)) {
+    //TODO
+  }
+};
 
 const listenerRouter = async (v: DatabaseChangeEvent) => {
   await Promise.all(

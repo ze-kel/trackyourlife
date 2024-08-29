@@ -43,7 +43,6 @@ export const BackupAndRestore = () => {
   return (
     <div>
       <h2 className="mt-4 text-xl">Backup and Restore Trackables</h2>
-      <p className="text-xs">User settings and favorites are not backed up</p>
 
       <div className="mt-2 flex flex-col gap-4 md:flex-row md:items-center">
         <Button variant={"outline"} onClick={() => getBackup()}>
@@ -78,6 +77,10 @@ export const BackupAndRestore = () => {
           }}
         />
       </div>
+
+      <p className="mt-2 text-xs opacity-50">
+        User settings and favorites are not backed up
+      </p>
 
       {fileData[1] && (
         <div className="mt-4">

@@ -52,7 +52,7 @@ export const BetterNumberInput = ({
           setIsError(true);
           return;
         }
-
+        setIsError(false);
         onChange(clamped);
       }}
       onBlur={() => {

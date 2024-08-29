@@ -4,6 +4,7 @@ import { hookstate, useHookstate } from "@hookstate/core";
 import { subscribable } from "@hookstate/subscribable";
 import { eq } from "drizzle-orm";
 
+import { ITrackableSettings } from "@tyl/validators/trackable";
 import {
   IUserSettings,
   UserSettingsFallback,
@@ -12,7 +13,7 @@ import {
 
 import { UserDataSub } from "~/data/dbWatcher";
 import { db } from "~/db";
-import { authUser } from "~/db/schema";
+import { authUser, trackable } from "~/db/schema";
 import { updateTrpcClient } from "~/utils/api";
 import {
   clearUserData,
@@ -23,8 +24,10 @@ import {
 
 export const currentUser = hookstate(getUserData(), subscribable());
 
-export const currentUserSettings =
-  hookstate<IUserSettings>(UserSettingsFallback);
+export const currentUserSettings = hookstate(
+  UserSettingsFallback as IUserSettings,
+  subscribable(),
+);
 
 export const currentUserInfo = hookstate<{ username?: string; email?: string }>(
   { username: "", email: "" },
@@ -83,6 +86,46 @@ currentUser.subscribe((v) => {
   }
   subscribeToSettingsUpdates(v?.userId);
 });
+
+export const setUserFavorites = async (v: IUserSettings["favorites"]) => {
+  const userId = currentUser.get()?.userId;
+  if (!userId) return;
+
+  currentUserSettings.favorites.set(v);
+
+  try {
+    await db
+      .update(authUser)
+      .set({
+        settings: currentUserSettings.get() as IUserSettings,
+      })
+      .where(eq(authUser.id, userId));
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+export const setUserSettings = async (v: Partial<IUserSettings>) => {
+  const userId = currentUser.get()?.userId;
+  if (!userId) return;
+
+  const old = currentUserSettings.get() as IUserSettings;
+  const newOne = { ...old, ...v };
+
+  currentUserSettings.set(newOne);
+
+  try {
+    await db
+      .update(authUser)
+      .set({
+        settings: newOne,
+      })
+      .where(eq(authUser.id, userId));
+  } catch (e) {
+    console.log(e);
+    currentUserSettings.set(old);
+  }
+};
 
 const AuthContext = createContext<{
   signIn: (data: ISessionData) => void;
