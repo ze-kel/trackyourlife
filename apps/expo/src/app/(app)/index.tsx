@@ -23,8 +23,10 @@ import { ZTrackableSettings } from "@tyl/validators/trackable";
 import DayCellWrapper from "~/app/_components/dayCell";
 import { TrackableProvider } from "~/app/_components/trackableProvider";
 import { Button } from "~/app/_ui/button";
+import Spinner from "~/app/_ui/spinner";
 import { currentUserSettings } from "~/data/authContext";
 import { TrackableRecordSub } from "~/data/dbWatcher";
+import { isSyncing, lastSync, syncError } from "~/data/syncContext";
 import { db } from "~/db";
 import { trackable } from "~/db/schema";
 import { tws } from "~/utils/tw";
@@ -53,9 +55,11 @@ const DateView = ({ date }: { date: Date }) => {
     db.query.trackable.findMany({ orderBy: [asc(trackable.name)] }),
   );
 
+  const colorScheme = useColorScheme();
+
   const settings = useHookstate(currentUserSettings);
 
-  const { width } = useWindowDimensions();
+  const { width, height } = useWindowDimensions();
 
   const sorted = useMemo(() => {
     const s = sortTrackableList(data, settings.get().favorites as string[]);
@@ -68,7 +72,7 @@ const DateView = ({ date }: { date: Date }) => {
       <View
         style={[
           tws(
-            "px-4 flex flex-row items-center justify-between pb-2 overflow-hidden",
+            " px-4 flex flex-row items-center justify-between pb-2 overflow-hidden",
           ),
           { width: width },
         ]}
@@ -82,14 +86,16 @@ const DateView = ({ date }: { date: Date }) => {
 
         <View style={[tws("flex flex-row gap-2")]}></View>
       </View>
-
-      <ScrollView>
+      <View style={{ flex: 1 }}>
         <FlashList
           data={sorted}
           estimatedItemSize={150}
           keyExtractor={(v) => v.id}
           numColumns={2}
           contentContainerStyle={tws("px-4 pb-4")}
+          ListHeaderComponent={() => {
+            return <></>;
+          }}
           renderItem={(v) => (
             <View
               style={[tws("py-1 w-full", v.index % 2 == 0 ? "pr-2" : "pl-2")]}
@@ -107,7 +113,11 @@ const DateView = ({ date }: { date: Date }) => {
                 </Text>
                 <View>
                   {settings.get().favorites.includes(v.item.id) && (
-                    <RadixIcon name="heart-filled" size={12} color="white" />
+                    <RadixIcon
+                      name="heart-filled"
+                      size={12}
+                      color={colorScheme === "light" ? "#525252" : "#d4d4d4"}
+                    />
                   )}
                 </View>
               </View>
@@ -122,7 +132,7 @@ const DateView = ({ date }: { date: Date }) => {
             </View>
           )}
         />
-      </ScrollView>
+      </View>
     </>
   );
 };
@@ -137,20 +147,61 @@ export default function Index() {
     end: sub(new Date(), { days: DAYS }),
   });
 
+  const ls = useHookstate(lastSync);
+
+  const isInProgress = useHookstate(isSyncing);
+
+  const err = useHookstate(syncError);
+
+  if (!ls.get()) {
+    return (
+      <View>
+        <View style={tws("flex h-full items-center justify-center")}>
+          <View style={tws("flex flex-col  items-center justify-center px-4")}>
+            {isInProgress.get() ? (
+              <Text style={tws("text-color-base font-bold")}>
+                Syncing data, please wait...
+              </Text>
+            ) : (
+              <View>
+                <Text style={tws("text-color-base font-bold text-center")}>
+                  {err.get()
+                    ? err.get()
+                    : " Data is outdated and sync is not running.\n This is unusual error."}
+                </Text>
+                <Button style={tws("mt-4")} variant={"outline"}>
+                  Sync
+                </Button>
+              </View>
+            )}
+          </View>
+        </View>
+      </View>
+    );
+  }
+
+  return <DateView date={new Date()} />;
+
   return (
     <>
-      <FlashList
-        snapToInterval={width}
-        horizontal={true}
-        data={dates}
-        nestedScrollEnabled={true}
-        renderItem={(i) => <DateView date={i.item} />}
-        snapToAlignment="center"
-        decelerationRate="fast"
-        showsHorizontalScrollIndicator={false}
-        estimatedItemSize={width}
-        inverted={true}
-      ></FlashList>
+      <View style={{ width, height }}>
+        <FlashList
+          snapToInterval={width}
+          horizontal={true}
+          data={dates}
+          nestedScrollEnabled={true}
+          renderItem={(i) => (
+            <View style={{ width, height }}>
+              <DateView date={i.item} />
+            </View>
+          )}
+          snapToAlignment="center"
+          decelerationRate="fast"
+          showsHorizontalScrollIndicator={false}
+          estimatedItemSize={width}
+          inverted={true}
+        ></FlashList>
+      </View>
     </>
   );
 }

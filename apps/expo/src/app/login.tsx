@@ -21,9 +21,9 @@ const LoginForm = () => {
   const [loading, setLoading] = useState(false);
   const [token, setToken] = useState("");
 
-  const host = useRef("");
-  const email = useRef("");
-  const password = useRef("");
+  const host = useRef("http://localhost:3000");
+  const email = useRef("k.kelolov@gmail.com");
+  const password = useRef("flier-omelette-deponent-vintage");
 
   const logIn = async () => {
     setLoading(true);
@@ -47,11 +47,11 @@ const LoginForm = () => {
           setError(j.error);
         }
       } else {
-        const { token, userId, username, email } = j;
+        const { token, userId } = j;
 
-        if (token && userId && username && email) {
+        if (token && userId) {
           setToken(token);
-          signIn({ token, host: host.current, userId, username, email });
+          await signIn({ token, host: host.current, userId });
 
           router.replace("/");
         } else {
@@ -83,6 +83,7 @@ const LoginForm = () => {
 
       <Text style={tws("text-lg text-color-base")}>Host</Text>
       <Input
+        defaultValue={host.current}
         autoCapitalize="none"
         placeholder="https://tyl.zekel.io"
         style={tws("mt-2")}
@@ -90,6 +91,7 @@ const LoginForm = () => {
       />
       <Text style={tws("mt-6 text-lg text-color-base")}>Email</Text>
       <Input
+        defaultValue={email.current}
         placeholder="kel@gmail.com"
         autoCapitalize="none"
         autoComplete="email"
@@ -98,6 +100,7 @@ const LoginForm = () => {
       />
       <Text style={tws("mt-2 text-lg text-color-base")}>Password</Text>
       <Input
+        defaultValue={password.current}
         autoCapitalize="none"
         autoComplete="current-password"
         style={tws("mt-1")}

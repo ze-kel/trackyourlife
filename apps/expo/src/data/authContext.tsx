@@ -1,5 +1,6 @@
 import type { PropsWithChildren } from "react";
 import { createContext, useContext, useState } from "react";
+import { Text } from "react-native";
 import { hookstate, useHookstate } from "@hookstate/core";
 import { subscribable } from "@hookstate/subscribable";
 import { eq } from "drizzle-orm";
@@ -12,7 +13,7 @@ import {
 } from "@tyl/validators/user";
 
 import { UserDataSub } from "~/data/dbWatcher";
-import { db } from "~/db";
+import { clearDB, db } from "~/db";
 import { authUser, trackable } from "~/db/schema";
 import { updateTrpcClient } from "~/utils/api";
 import {
@@ -156,9 +157,9 @@ export function SessionProvider({ children }: PropsWithChildren) {
         },
         signOut: async () => {
           await clearUserData();
+          await clearDB();
           user.set(undefined);
         },
-        userData: user.get(),
       }}
     >
       {children}

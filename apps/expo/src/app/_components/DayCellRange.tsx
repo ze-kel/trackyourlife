@@ -24,7 +24,7 @@ import { clamp } from "@tyl/helpers";
 import { range } from "@tyl/helpers/animation";
 import { IRangeSettings } from "@tyl/validators/trackable";
 
-import { useDayCellContextRange } from "~/app/_components/DayCellProvider";
+import { useDayCellContextRange } from "~/app/_components/dayCellProvider";
 import { tws } from "~/utils/tw";
 
 const SelectorItemSize = 40;

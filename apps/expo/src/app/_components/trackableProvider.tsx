@@ -14,7 +14,7 @@ import {
   ZTrackableSettings,
 } from "@tyl/validators/trackable";
 
-import { MemoDayCellProvider } from "~/app/_components/DayCellProvider";
+import { MemoDayCellProvider } from "~/app/_components/dayCellProvider";
 import { TrackableRecordSub } from "~/data/dbWatcher";
 import { updateTrackableRecord } from "~/data/syncContext";
 import { db } from "~/db";

@@ -29,7 +29,7 @@ import {
 
 import { makeColorString } from "@tyl/helpers/colorTools";
 
-import { useDayCellContextNumber } from "~/app/_components/DayCellProvider";
+import { useDayCellContextNumber } from "~/app/_components/dayCellProvider";
 import { Input, InputStyle } from "~/app/_ui/input";
 import { twColors } from "~/utils/tailwindColors";
 import { tw, tws } from "~/utils/tw";
@@ -186,6 +186,7 @@ export const DayCellNumber = ({
         <BottomSheetView style={tws("flex items-center ")}>
           <BottomSheetTextInput
             value={rawInput}
+            keyboardType="numeric"
             autoFocus
             selectionColor={
               colorScheme === "dark"

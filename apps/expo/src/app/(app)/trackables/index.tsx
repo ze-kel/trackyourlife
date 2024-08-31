@@ -5,6 +5,7 @@ import {
   Pressable,
   ScrollView,
   Text,
+  useColorScheme,
   useWindowDimensions,
   View,
 } from "react-native";
@@ -42,6 +43,7 @@ export default function Index() {
 
   const favorites = useHookstate(currentUserSettings.favorites);
 
+  const colorScheme = useColorScheme();
   const { height, width } = useWindowDimensions();
 
   const sorted = useMemo(() => {
@@ -73,60 +75,68 @@ export default function Index() {
         keyExtractor={(v) => v.id}
         //  itemLayoutAnimation={LinearTransition}
         contentContainerStyle={tws("pb-4")}
-        renderItem={(v) => (
-          <View style={[tws("py-1 w-full")]}>
-            <Link
-              style={[tws("w-full")]}
-              href={{
-                pathname: "/(app)/trackables/[trackableId]",
-                params: { trackableId: v.item.id },
-              }}
-            >
-              <View
-                style={[
-                  tws("flex px-4 w-full flex-row justify-between items-center"),
-                ]}
+        renderItem={(v) => {
+          return (
+            <View style={[tws("py-1 w-full")]}>
+              <Link
+                style={[tws("w-full")]}
+                href={{
+                  pathname: "/(app)/trackables/[trackableId]",
+                  params: { trackableId: v.item.id },
+                }}
               >
-                <Text
-                  numberOfLines={1}
+                <View
                   style={[
                     tws(
-                      "text-xl font-semibold py-1.5 text-neutral-900  dark:text-neutral-50",
+                      "flex px-4 w-full flex-row justify-between items-center",
                     ),
-                    { width: width - 32 - 18 - 8 },
                   ]}
                 >
-                  {v.item.name}
-                </Text>
+                  <Text
+                    numberOfLines={1}
+                    style={[
+                      tws(
+                        "text-xl font-semibold py-1.5 text-neutral-900  dark:text-neutral-50",
+                      ),
+                      { width: width - 32 - 18 - 8 },
+                    ]}
+                  >
+                    {v.item.name}
+                  </Text>
 
-                {favorites.get().includes(v.item.id) && (
-                  <RadixIcon name={"heart-filled"} size={18} color="white" />
-                )}
-              </View>
-            </Link>
-            <TrackableProvider trackable={v.item}>
-              <FlashList
-                contentContainerStyle={tws("px-4")}
-                estimatedItemSize={128}
-                ItemSeparatorComponent={() => (
-                  <View style={{ width: 4 }}></View>
-                )}
-                data={dates}
-                renderItem={(v) => (
-                  <DayCellWrapper
-                    labelType="outside"
-                    style={tws("w-40 h-20")}
-                    day={v.item.getDate()}
-                    month={v.item.getMonth()}
-                    year={v.item.getFullYear()}
-                  ></DayCellWrapper>
-                )}
-                horizontal={true}
-                inverted={true}
-              />
-            </TrackableProvider>
-          </View>
-        )}
+                  {favorites.get().includes(v.item.id) && (
+                    <RadixIcon
+                      name={"heart-filled"}
+                      size={18}
+                      color={colorScheme === "light" ? "#525252" : "#d4d4d4"}
+                    />
+                  )}
+                </View>
+              </Link>
+              <TrackableProvider trackable={v.item}>
+                <FlashList
+                  contentContainerStyle={tws("px-4")}
+                  estimatedItemSize={128}
+                  ItemSeparatorComponent={() => (
+                    <View style={{ width: 4 }}></View>
+                  )}
+                  data={dates}
+                  renderItem={(v) => (
+                    <DayCellWrapper
+                      labelType="outside"
+                      style={tws("w-40 h-20")}
+                      day={v.item.getDate()}
+                      month={v.item.getMonth()}
+                      year={v.item.getFullYear()}
+                    ></DayCellWrapper>
+                  )}
+                  horizontal={true}
+                  inverted={true}
+                />
+              </TrackableProvider>
+            </View>
+          );
+        }}
       />
     </>
   );

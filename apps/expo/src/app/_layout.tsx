@@ -1,14 +1,11 @@
 import "@bacons/text-decoder/install";
 
-import type { ReactNode } from "react";
-import { useState } from "react";
 import { Text, useColorScheme, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { PortalHost, PortalProvider } from "@gorhom/portal";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
 import { useDeviceContext } from "twrnc";
 
@@ -17,28 +14,10 @@ import { db } from "~/db";
 import migrations from "~/drizzle/migrations";
 import { tw, tws } from "~/utils/tw";
 
-function QueryProvider({ children }: { children: ReactNode }) {
-  const [queryClient] = useState(
-    () =>
-      new QueryClient({
-        defaultOptions: {
-          queries: {
-            staleTime: 60 * 1000,
-          },
-        },
-      }),
-  );
-
-  return (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-  );
-}
-
 // This is the main layout of the app
 // It wraps your pages with the providers they need
 export default function RootLayout() {
   useDeviceContext(tw);
-  const colorScheme = useColorScheme();
   const { success, error } = useMigrations(db, migrations);
 
   if (error) {

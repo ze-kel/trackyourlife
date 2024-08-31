@@ -11,10 +11,12 @@ const SyncInfo = ({ style }: { style?: ViewStyle }) => {
   const ls = useHookstate(lastSync);
   const isInProgress = useHookstate(isSyncing);
 
+  const lsTime = ls.get();
+
   return (
     <View style={[tws("w-full"), style]}>
       <Text style={tws("text-sm text-neutral-700 dark:text-neutral-300")}>
-        Last sync: {ls.get().toLocaleString()}
+        Last sync: {lsTime ? lsTime.toLocaleString() : "never"}
       </Text>
       <View style={tws("flex flex-row gap-2 mt-2")}>
         <Button
@@ -39,13 +41,13 @@ const SyncInfo = ({ style }: { style?: ViewStyle }) => {
 };
 
 const UserInfo = () => {
+  const u = useHookstate(currentUser);
   const uState = useHookstate(currentUserInfo);
-  const { signOut, userData } = useSession();
+  const { signOut } = useSession();
   return (
     <>
       <Text style={tws("text-color-base font-bold")}>
-        Host:{" "}
-        <Text style={tws("font-medium opacity-70")}>{userData?.host}</Text>
+        Host: <Text style={tws("font-medium opacity-70")}>{u.get()?.host}</Text>
       </Text>
       <Text style={tws("text-color-base font-bold")}>
         Username:{" "}
@@ -58,8 +60,7 @@ const UserInfo = () => {
         <Text style={tws("font-medium opacity-70")}>{uState.email.get()}</Text>
       </Text>
       <Text style={tws("text-color-base font-bold")}>
-        ID:{" "}
-        <Text style={tws("font-medium opacity-70")}>{userData?.userId}</Text>
+        ID: <Text style={tws("font-medium opacity-70")}>{u.get()?.userId}</Text>
       </Text>
       <Button style={tws("mt-2")} variant={"outline"} onPress={signOut}>
         Log Out

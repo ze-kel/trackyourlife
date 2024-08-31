@@ -2,7 +2,7 @@ import { ReactNode, useEffect, useLayoutEffect, useState } from "react";
 import { Pressable, useColorScheme, ViewStyle } from "react-native";
 import Animated, { Easing, ZoomIn } from "react-native-reanimated";
 
-import { useDayCellContextBoolean } from "~/app/_components/DayCellProvider";
+import { useDayCellContextBoolean } from "~/app/_components/dayCellProvider";
 import { tws } from "~/utils/tw";
 
 const CustomIN = ZoomIn.duration(300).easing(Easing.out(Easing.cubic));

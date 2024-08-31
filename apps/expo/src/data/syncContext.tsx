@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { AppState } from "react-native";
 import { hookstate } from "@hookstate/core";
+import { sub } from "date-fns";
 import { and, eq, gte, sql } from "drizzle-orm";
 
 import { debounce } from "@tyl/helpers";
@@ -18,7 +19,7 @@ import {
 } from "~/db/schema";
 import { api } from "~/utils/api";
 
-const lastSync = hookstate(new Date(1970));
+const lastSync = hookstate<Date | null>(null);
 const isSyncing = hookstate(false);
 const isSyncEnabled = hookstate(false);
 const syncError = hookstate("");
@@ -26,7 +27,12 @@ const syncError = hookstate("");
 const updateLastSyncFromDb = () => {
   const userId = currentUser.get()?.userId;
 
-  if (!userId) return;
+  if (!userId) {
+    lastSync.set(null);
+    isSyncEnabled.set(false);
+    return;
+  }
+
   db.query.meta.findFirst({ where: eq(meta.userId, userId) }).then((v) => {
     if (v?.lastSync) {
       lastSync.set(v.lastSync);
@@ -149,7 +155,8 @@ const sync = async (clear?: boolean) => {
   isSyncing.set(true);
   syncError.set("");
 
-  let ls = lastSync.get();
+  let ls = lastSync.get() || new Date(1971);
+  ls = sub(ls, { minutes: 1 });
 
   try {
     const nowDate = new Date();
@@ -188,17 +195,26 @@ const updateTrackableRecord = async (v: LDbTrackableRecordInsert) => {
 
 const useSyncInterval = () => {
   useEffect(() => {
-    const i = setInterval(() => {
+    const fsync = () => {
+      const ls = lastSync.get();
+      if (!ls) {
+        sync();
+        return;
+      }
+
       const date = new Date();
-      const secondsSinceLast =
-        (date.getTime() - lastSync.get().getTime()) / 1000;
+      const secondsSinceLast = (date.getTime() - ls.getTime()) / 1000;
 
       const diffToSync = AppState.currentState === "active" ? 15 : 60 * 10;
 
       if (secondsSinceLast > diffToSync) {
         debouncedSync();
       }
-    }, 5000);
+    };
+
+    fsync();
+
+    const i = setInterval(fsync, 5000);
 
     return () => clearInterval(i);
   });
