@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { AppState } from "react-native";
 import { hookstate } from "@hookstate/core";
-import { sub } from "date-fns";
+import { differenceInSeconds, sub } from "date-fns";
 import { and, eq, gte, sql } from "drizzle-orm";
 
 import { debounce } from "@tyl/helpers";
@@ -60,6 +60,13 @@ const pushChanges = async (ls: Date, userId: string) => {
     where: and(eq(trackable.userId, userId), gte(trackable.updated, ls)),
   });
 
+  console.log("updated records", updatedRecords.length);
+
+  console.log(
+    "sending updates trackabalbes",
+    updatedTrackables.map((v) => [v.name, differenceInSeconds(v.updated, ls)]),
+  );
+
   const updatedUser = await db.query.authUser.findFirst({
     where: and(eq(authUser.id, userId), gte(authUser.updated, ls)),
   });
@@ -83,12 +90,23 @@ const pushChanges = async (ls: Date, userId: string) => {
   }
 };
 
-const pullChanges = async (ls: Date, userId: string, nowDate: Date) => {
+const pullChanges = async (ls: Date) => {
   const trackablesUpdates = await api.syncRouter.getTrackableUpdates.query(ls);
 
   const recordsUpdates = await api.syncRouter.getRecordUpdates.query(ls);
 
   const userUpdates = await api.syncRouter.getUserUpdates.query(ls);
+
+  return { trackablesUpdates, recordsUpdates, userUpdates };
+};
+
+const applyPulledChanges = async (
+  ls: Date,
+  userId: string,
+  nowDate: Date,
+  u: Awaited<ReturnType<typeof pullChanges>>,
+) => {
+  const { trackablesUpdates, recordsUpdates, userUpdates } = u;
 
   if (trackablesUpdates.length) {
     await db
@@ -102,6 +120,7 @@ const pullChanges = async (ls: Date, userId: string, nowDate: Date) => {
           updated: sql.raw(`excluded.${trackable.updated.name}`),
           name: sql.raw(`excluded.${trackable.name.name}`),
           userId: sql.raw(`excluded.${trackable.userId.name}`),
+          isDeleted: sql.raw(`excluded.${trackable.isDeleted.name}`),
         },
       });
   }
@@ -156,7 +175,6 @@ const sync = async (clear?: boolean) => {
   syncError.set("");
 
   let ls = lastSync.get() || new Date(1971);
-  ls = sub(ls, { minutes: 1 });
 
   try {
     const nowDate = new Date();
@@ -164,11 +182,13 @@ const sync = async (clear?: boolean) => {
       ls = new Date(1970);
     }
 
+    const p = await pullChanges(ls);
+
     if (!clear && ls) {
       await pushChanges(ls, userId);
     }
 
-    await pullChanges(ls, userId, nowDate);
+    await applyPulledChanges(ls, userId, nowDate, p);
 
     lastSync.set(nowDate);
   } catch (e) {
@@ -194,6 +214,7 @@ const updateTrackableRecord = async (v: LDbTrackableRecordInsert) => {
 };
 
 const useSyncInterval = () => {
+  return;
   useEffect(() => {
     const fsync = () => {
       const ls = lastSync.get();

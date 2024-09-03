@@ -24,7 +24,10 @@ import { protectedProcedure } from "../trpc";
 export const trackablesRouter = {
   getTrackableIdList: protectedProcedure.query(async ({ ctx }) => {
     return ctx.db.query.trackable.findMany({
-      where: eq(trackable.userId, ctx.user.id),
+      where: and(
+        eq(trackable.userId, ctx.user.id),
+        eq(trackable.isDeleted, false),
+      ),
       columns: {
         id: true,
         name: true,
@@ -40,7 +43,10 @@ export const trackablesRouter = {
       const bounds = getDateBounds(input.limits ?? { type: "last", days: 31 });
 
       const raw = await ctx.db.query.trackable.findMany({
-        where: eq(trackable.userId, ctx.user.id),
+        where: and(
+          eq(trackable.userId, ctx.user.id),
+          eq(trackable.isDeleted, false),
+        ),
         with: {
           data: {
             where: between(trackableRecord.date, bounds.from, bounds.to),
@@ -68,7 +74,7 @@ export const trackablesRouter = {
         },
       });
 
-      if (!tr) {
+      if (!tr || tr.isDeleted) {
         throw new Error(`Unable to find trackable with id: ${input.id}`);
       }
 
@@ -130,7 +136,10 @@ export const trackablesRouter = {
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
       await ctx.db
-        .delete(trackable)
+        .update(trackable)
+        .set({
+          isDeleted: true,
+        })
         .where(
           and(eq(trackable.userId, ctx.user.id), eq(trackable.id, input.id)),
         );
@@ -207,7 +216,7 @@ export const trackablesRouter = {
         ),
       });
 
-      if (!tr) {
+      if (!tr || tr.isDeleted) {
         throw new Error(`No trackable with id ${input.id}`);
       }
 

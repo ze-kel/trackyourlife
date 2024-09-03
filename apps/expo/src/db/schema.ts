@@ -37,6 +37,10 @@ export const trackable = sqliteTable("trackable", {
   userId: text("user_id").notNull(),
   type: text("type").notNull().$type<ITrackable["type"]>(),
 
+  isDeleted: integer("is_deleted", { mode: "boolean" })
+    .notNull()
+    .default(false),
+
   settings: text("settings", { mode: "json" }).default({}),
 });
 

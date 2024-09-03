@@ -15,7 +15,7 @@ import { Link } from "expo-router";
 import { useHookstate } from "@hookstate/core";
 import { FlashList } from "@shopify/flash-list";
 import { eachDayOfInterval, sub } from "date-fns";
-import { asc } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import { useLiveQuery } from "drizzle-orm/expo-sqlite";
 import { RadixIcon } from "radix-ui-react-native-icons";
 import { date } from "zod";
@@ -38,7 +38,10 @@ const DAYS = 31;
 
 export default function Index() {
   const { data } = useLiveQuery(
-    db.query.trackable.findMany({ orderBy: [asc(trackable.name)] }),
+    db.query.trackable.findMany({
+      orderBy: [asc(trackable.name)],
+      where: eq(trackable.isDeleted, false),
+    }),
   );
 
   const favorites = useHookstate(currentUserSettings.favorites);

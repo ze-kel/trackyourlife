@@ -100,7 +100,15 @@ const Button = React.forwardRef<View, ButtonProps>(
           <></>
         )}
 
-        <View style={{ opacity: loading ? 0 : 1 }}>
+        <View
+          style={{
+            opacity: loading ? 0 : 1,
+            flex: 1,
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 6,
+          }}
+        >
           {leftIcon ? leftIcon : <></>}
 
           <>

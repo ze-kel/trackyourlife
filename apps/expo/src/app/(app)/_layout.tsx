@@ -7,12 +7,14 @@ import { RadixIcon } from "radix-ui-react-native-icons";
 
 import { currentUser, useSession } from "~/data/authContext";
 import { useSyncInterval } from "~/data/syncContext";
+import { db, expoDb } from "~/db";
 import { tws } from "~/utils/tw";
 
 export default function AppLayout() {
   const user = useHookstate(currentUser);
 
   useSyncInterval();
+  useDrizzleStudio(expoDb);
 
   const colorScheme = useColorScheme();
   if (!user.get()) {

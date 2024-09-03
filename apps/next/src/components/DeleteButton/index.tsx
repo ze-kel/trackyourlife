@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { TrashIcon } from "@radix-ui/react-icons";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { cn } from "@tyl/ui";
 import {
@@ -23,10 +23,15 @@ import { api } from "~/trpc/react";
 const DeleteButton = ({ id }: { id: string }) => {
   const router = useRouter();
 
+  const qc = useQueryClient();
+
   const mutation = useMutation({
     mutationFn: api.trackablesRouter.deleteTrackable.mutate,
     onSuccess: () => {
-      router.push("/trackables/");
+      qc.invalidateQueries({
+        queryKey: ["trackables", "list"],
+      });
+      router.push("/app/trackables/");
     },
   });
 

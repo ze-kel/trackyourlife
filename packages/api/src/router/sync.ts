@@ -92,6 +92,7 @@ export const syncRouter = {
             name: sql.raw(`excluded.${trackable.name.name}`),
             settings: sql.raw(`excluded.${trackable.settings.name}`),
             updated: sql.raw(`excluded.${trackable.updated.name}`),
+            isDeleted: sql.raw(`excluded.${trackable.isDeleted.name}`),
           },
           setWhere: lte(
             trackable.updated,

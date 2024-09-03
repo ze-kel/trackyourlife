@@ -8,24 +8,20 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { offset } from "@floating-ui/react-native";
 import { useHookstate } from "@hookstate/core";
 import { FlashList } from "@shopify/flash-list";
 import { eachDayOfInterval, format, sub } from "date-fns";
-import { asc } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import { useLiveQuery } from "drizzle-orm/expo-sqlite";
 import { RadixIcon } from "radix-ui-react-native-icons";
 
-import { chunk } from "@tyl/helpers";
 import { sortTrackableList } from "@tyl/helpers/trackables";
 import { ZTrackableSettings } from "@tyl/validators/trackable";
 
 import DayCellWrapper from "~/app/_components/dayCell";
 import { TrackableProvider } from "~/app/_components/trackableProvider";
 import { Button } from "~/app/_ui/button";
-import Spinner from "~/app/_ui/spinner";
 import { currentUserSettings } from "~/data/authContext";
-import { TrackableRecordSub } from "~/data/dbWatcher";
 import { isSyncing, lastSync, syncError } from "~/data/syncContext";
 import { db } from "~/db";
 import { trackable } from "~/db/schema";
@@ -52,19 +48,22 @@ const Today = () => {
 
 const DateView = ({ date }: { date: Date }) => {
   const { data } = useLiveQuery(
-    db.query.trackable.findMany({ orderBy: [asc(trackable.name)] }),
+    db.query.trackable.findMany({
+      orderBy: [asc(trackable.name)],
+      where: eq(trackable.isDeleted, false),
+    }),
   );
 
   const colorScheme = useColorScheme();
 
-  const settings = useHookstate(currentUserSettings);
+  const favorites = useHookstate(currentUserSettings.favorites);
 
   const { width, height } = useWindowDimensions();
 
   const sorted = useMemo(() => {
-    const s = sortTrackableList(data, settings.get().favorites as string[]);
+    const s = sortTrackableList(data, favorites.get() as string[]);
     return s;
-  }, [settings.favorites, data]);
+  }, [favorites, data]);
 
   return (
     <>
@@ -87,9 +86,8 @@ const DateView = ({ date }: { date: Date }) => {
         <View style={[tws("flex flex-row gap-2")]}></View>
       </View>
       <View style={{ flex: 1 }}>
-        <FlashList
+        <FlatList
           data={sorted}
-          estimatedItemSize={150}
           keyExtractor={(v) => v.id}
           numColumns={2}
           contentContainerStyle={tws("px-4 pb-4")}
@@ -98,7 +96,7 @@ const DateView = ({ date }: { date: Date }) => {
           }}
           renderItem={(v) => (
             <View
-              style={[tws("py-1 w-full", v.index % 2 == 0 ? "pr-2" : "pl-2")]}
+              style={[tws("py-1 flex-1", v.index % 2 == 0 ? "pr-2" : "pl-2")]}
               key={v.item.id}
             >
               <View style={[tws("flex flex-row justify-between items-center")]}>
@@ -112,7 +110,7 @@ const DateView = ({ date }: { date: Date }) => {
                   {v.item.name}
                 </Text>
                 <View>
-                  {settings.get().favorites.includes(v.item.id) && (
+                  {favorites.get().includes(v.item.id) && (
                     <RadixIcon
                       name="heart-filled"
                       size={12}

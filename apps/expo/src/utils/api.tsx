@@ -21,7 +21,7 @@ const makeTrpcClient = () => {
     links: [
       loggerLink({
         enabled: (opts) =>
-          process.env.NODE_ENV === "development" ||
+          process.env.NODE_ENV === "developmenta" ||
           (opts.direction === "down" && opts.result instanceof Error),
         colorMode: "ansi",
       }),

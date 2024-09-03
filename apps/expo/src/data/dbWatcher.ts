@@ -85,9 +85,6 @@ class Subscribable<
 
       const subs = this.map.get(key);
 
-      console.log("LISTENER HOOK", key, subs?.length, subs);
-      console.log("keys", this.map.keys());
-
       if (subs && subs.length) {
         subs.forEach((v) => v(u));
       }
@@ -148,7 +145,9 @@ const UserDataSub = new Subscribable(authUser, userDataKey);
 export const allTrackables = new Map<string, LDbTrackableSelect>();
 
 const updateAllTrackables = async () => {
-  const r = await db.query.trackable.findMany({});
+  const r = await db.query.trackable.findMany({
+    where: eq(trackable.isDeleted, false),
+  });
 
   allTrackables.clear();
 

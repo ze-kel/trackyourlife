@@ -1,5 +1,6 @@
 import { relations } from "drizzle-orm";
 import {
+  boolean,
   date,
   json,
   pgEnum,
@@ -51,6 +52,8 @@ export const trackable = pgTable("trackable", {
     .defaultNow()
     .notNull()
     .$onUpdate(() => new Date()),
+
+  isDeleted: boolean("is_deleted").notNull().default(false),
 
   id: uuid("id").defaultRandom().primaryKey(),
   name: varchar("name").notNull(),
