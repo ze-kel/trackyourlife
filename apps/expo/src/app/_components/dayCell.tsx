@@ -11,7 +11,7 @@ import { DayCellBoolean } from "./dayCellBoolean";
 import { DayCellNumber } from "./dayCellNumber";
 import { DayCellRange } from "./dayCellRange";
 
-export const DayCellBaseClasses = "relative rounded-sm";
+export const DayCellBaseClasses = "relative rounded-sm h-[80px]";
 
 const DayCellInner = ({
   type,
@@ -21,6 +21,7 @@ const DayCellInner = ({
   style,
   dateDay,
   onChange,
+  size,
 }: {
   children?: ReactNode;
   type: ITrackable["type"];
@@ -29,6 +30,7 @@ const DayCellInner = ({
   disabled?: boolean;
   style?: ViewStyle;
   dateDay: Date;
+  size: DayCellSize;
   onChange: (v: string) => void | Promise<void>;
 }) => {
   if (outOfRange)
@@ -53,6 +55,7 @@ const DayCellInner = ({
         value={value}
         onChange={onChange}
         dateDay={dateDay}
+        size={size}
       >
         {children}
       </DayCellNumber>
@@ -75,18 +78,24 @@ const DayCellInner = ({
   throw new Error("Unsupported trackable type");
 };
 
+export type DayCellSize = "s" | "m";
+
 const DayCellWrapper = ({
   day,
   month,
   year,
   style,
+  styleWrapper,
+  size = "m",
   labelType = "inside",
 }: {
   day: number;
   month: number;
   year: number;
   style?: ViewStyle;
+  styleWrapper?: ViewStyle;
   noLabel?: boolean;
+  size?: DayCellSize;
   labelType?: "inside" | "outside" | "none";
 }) => {
   const { type, settings, setValue, useValue } = useTrackableContextSafe();
@@ -110,7 +119,7 @@ const DayCellWrapper = ({
   };
 
   return (
-    <View style={tws("flex flex-col")}>
+    <View style={[tws("flex flex-col"), styleWrapper]}>
       {labelType === "outside" && (
         <Text
           style={[
@@ -130,6 +139,7 @@ const DayCellWrapper = ({
         dateDay={dateDay}
         value={value}
         onChange={updateHandler}
+        size={size}
       >
         {labelType === "inside" && (
           <Text

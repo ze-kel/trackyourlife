@@ -51,7 +51,6 @@ export const DayCellBoolean = ({
           display: "flex",
           position: "relative",
           flexGrow: 1,
-          height: 80,
           backgroundColor: isActive ? colorInactive : colorActive,
         },
         style,

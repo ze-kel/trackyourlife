@@ -29,6 +29,7 @@ import {
 
 import { makeColorString } from "@tyl/helpers/colorTools";
 
+import { DayCellSize } from "~/app/_components/dayCell";
 import { useDayCellContextNumber } from "~/app/_components/dayCellProvider";
 import { Input, InputStyle } from "~/app/_ui/input";
 import { twColors } from "~/utils/tailwindColors";
@@ -39,6 +40,18 @@ const getNumberSafe = (v: string | undefined) => {
   const n = Number(v);
   return Number.isNaN(n) ? 0 : n;
 };
+
+function customCompactFormat(number: number) {
+  if (number < 1e3) {
+    return number.toString();
+  } else if (number < 1e6) {
+    return Math.floor(number / 1e2) / 10 + "K"; // Formats thousands
+  } else if (number < 1e9) {
+    return Math.floor(number / 1e5) / 10 + "M"; // Formats millions
+  } else {
+    return Math.floor(number / 1e8) / 10 + "B"; // Formats billions
+  }
+}
 
 export const NumberFormatter = new Intl.NumberFormat("en-US", {
   compactDisplay: "short",
@@ -51,12 +64,14 @@ export const DayCellNumber = ({
   children,
   dateDay,
   style,
+  size,
 }: {
   value?: string;
   onChange?: (v: string) => Promise<void> | void;
   children?: ReactNode;
   dateDay: Date;
   style?: ViewStyle;
+  size: DayCellSize;
 }) => {
   const colorScheme = useColorScheme();
 
@@ -85,7 +100,7 @@ export const DayCellNumber = ({
   const isBigNumber = internalNumber >= 10000;
 
   const displayedValue = isBigNumber
-    ? NumberFormatter.format(internalNumber)
+    ? customCompactFormat(internalNumber)
     : internalNumber;
 
   const internalUpdate = async (val: number) => {
@@ -139,7 +154,7 @@ export const DayCellNumber = ({
   return (
     <View>
       <Pressable
-        style={[tws("h-[80px] w-full flex"), style]}
+        style={[tws("w-full flex"), style]}
         onPress={() => {
           setIsEditing(true);
           bottomSheetModalRef.current?.present();
@@ -155,13 +170,14 @@ export const DayCellNumber = ({
         >
           <Text
             style={tws(
-              "z-2 text-xl font-bold text-center",
+              "z-2 font-bold text-center",
+              size === "m" ? "text-xl" : "text-xs",
               internalNumber === 0
                 ? "text-neutral-50 dark:text-neutral-900"
                 : "text-neutral-800 dark:text-neutral-300",
             )}
           >
-            {internalNumber}
+            {displayedValue}
           </Text>
 
           {typeof progress === "number" && (

@@ -326,7 +326,7 @@ export const DayCellRange = ({
     <View
       style={[
         tws(
-          "h-[80px] w-full  border-2  flex items-center justify-center border-neutral-200 dark:border-neutral-900",
+          "w-full  border-2  flex items-center justify-center border-neutral-200 dark:border-neutral-900",
         ),
         style,
       ]}
