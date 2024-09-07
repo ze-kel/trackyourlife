@@ -18,6 +18,7 @@ import { RadixIcon } from "radix-ui-react-native-icons";
 import { sortTrackableList } from "@tyl/helpers/trackables";
 import { ZTrackableSettings } from "@tyl/validators/trackable";
 
+import { CustomDateController } from "~/app/_components/dateController";
 import DayCellWrapper from "~/app/_components/dayCell";
 import { TrackableProvider } from "~/app/_components/trackableProvider";
 import { Button } from "~/app/_ui/button";

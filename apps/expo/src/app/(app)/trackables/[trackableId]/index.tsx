@@ -1,9 +1,18 @@
-import { useState } from "react";
-import { Text, useWindowDimensions, View } from "react-native";
+import { useLayoutEffect, useState } from "react";
+import {
+  Text,
+  useAnimatedValue,
+  useWindowDimensions,
+  View,
+} from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
+  Easing,
+  LayoutAnimationConfig,
+  runOnJS,
   useAnimatedStyle,
   useSharedValue,
+  withTiming,
 } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams } from "expo-router";
@@ -21,6 +30,7 @@ import { and, eq } from "drizzle-orm";
 import { useLiveQuery } from "drizzle-orm/expo-sqlite";
 import { RadixIcon } from "radix-ui-react-native-icons";
 
+import { CustomDateController } from "~/app/_components/dateController";
 import DayCellWrapper from "~/app/_components/dayCell";
 import { TrackableProvider } from "~/app/_components/trackableProvider";
 import { Button } from "~/app/_ui/button";
@@ -28,89 +38,6 @@ import { db } from "~/db";
 import { trackable } from "~/db/schema";
 import { tws } from "~/utils/tw";
 
-export const CustomDateController = () => {
-  const nd = new Date();
-  const [date, setDate] = useState(startOfMonth(new Date()));
-  const { height, width } = useWindowDimensions();
-
-  const pan = Gesture.Pan()
-    .onChange((v) => {
-      fromLeft.value = fromLeft.value + v.changeX;
-    })
-    .runOnJS(true);
-
-  const visible = eachMonthOfInterval({
-    start: sub(date, { months: 10 }),
-    end: add(date, { months: 10 }),
-  });
-
-  const itemW = 40;
-
-  const totalW = visible.length * itemW;
-
-  const fromLeft = useSharedValue(-totalW / 2 + width / 2);
-
-  const animatedStyles = useAnimatedStyle(() => {
-    return {
-      transform: [{ translateX: fromLeft.value }],
-    };
-  });
-
-  return (
-    <GestureDetector gesture={pan}>
-      <View
-        style={[
-          tws("flex flex-col justify-center items-center relative"),
-          { width },
-        ]}
-      >
-        <View
-          style={[tws("bg-red-500 w-0.5 h-6 absolute left-1/2 -top-4")]}
-        ></View>
-        <Animated.View
-          style={[tws("flex flex-row absolute left-0 gap-0"), animatedStyles]}
-        >
-          {visible.map((v, i) => {
-            return (
-              <View
-                key={i}
-                style={[
-                  tws(
-                    "flex flex-col items-center justify-center",
-                    isAfter(v, nd) ? "opacity-20" : "",
-                  ),
-                  { width: itemW },
-                ]}
-              >
-                <Text style={[tws("text-color-base font-bold text-center ")]}>
-                  {format(v, "MMM")}
-                </Text>
-                <Text
-                  style={[
-                    tws("text-color-base font-light text-center w-10 text-xs"),
-                  ]}
-                  key={i}
-                >
-                  {format(v, "yy")}
-                </Text>
-                <Text
-                  style={[
-                    tws("text-color-base font-light text-center w-10 text-xs"),
-                  ]}
-                  key={i}
-                >
-                  {i}
-                </Text>
-              </View>
-            );
-          })}
-        </Animated.View>
-      </View>
-    </GestureDetector>
-  );
-};
-
-//{i + 1}/{visible.length}
 const MonthView = ({ date }: { date: Date }) => {
   const d = getDaysInMonth(date);
 
@@ -118,7 +45,7 @@ const MonthView = ({ date }: { date: Date }) => {
     .fill(0)
     .map((_, i) => i + 1);
 
-  const firstDayDate = startOfMonth(d);
+  const firstDayDate = startOfMonth(date);
   const prefaceWith = getISODay(firstDayDate) - 1;
   const prepend = Array(prefaceWith).fill(0);
   const { height, width } = useWindowDimensions();
@@ -170,12 +97,37 @@ export default function Index() {
     }),
   );
 
+  const isSelecting = useSharedValue(false);
+
   const [currentDate, setDate] = useState(new Date(2024, 7, 1));
+
+  const animatedSelection = useAnimatedStyle(() => {
+    return {
+      opacity: withTiming(isSelecting.value ? 0.2 : 1, {
+        duration: 300,
+        easing: Easing.out(Easing.cubic),
+      }),
+      transform: [
+        {
+          translateY: withTiming(isSelecting.value ? 50 : 0, {
+            duration: 300,
+            easing: Easing.out(Easing.cubic),
+          }),
+        },
+        {
+          scale: withTiming(isSelecting.value ? 0.8 : 1, {
+            duration: 300,
+            easing: Easing.out(Easing.cubic),
+          }),
+        },
+      ],
+    };
+  });
 
   if (!data) {
     return (
       <View>
-        <Text>aaa</Text>
+        <Text>No data</Text>
       </View>
     );
   }
@@ -184,34 +136,37 @@ export default function Index() {
     <>
       <View style={[tws("relative h-full w-full z-20")]}>
         <SafeAreaView edges={["top"]} />
-        <TrackableProvider trackable={data}>
-          <MonthView date={currentDate} />
-        </TrackableProvider>
+
+        <Animated.View
+          style={[tws(""), { transformOrigin: "bottom" }, animatedSelection]}
+        >
+          <View
+            style={[tws("px-4 py-4 w-full flex flex-row items-baseline gap-2")]}
+          >
+            <Text style={[tws("font-bold text-color-base text-2xl")]}>
+              {format(currentDate, "MMMM")}
+            </Text>
+            <Text style={[tws(" text-color-base text-xl")]}>
+              {format(currentDate, "yyyy")}
+            </Text>
+          </View>
+          <LayoutAnimationConfig skipEntering>
+            <TrackableProvider trackable={data}>
+              <MonthView date={currentDate} />
+            </TrackableProvider>
+          </LayoutAnimationConfig>
+        </Animated.View>
 
         <View
           style={[
-            tws(
-              "absolute bottom-0 w-full py-2 flex flex-col justify-center gap-4",
-            ),
+            tws("absolute bottom-0 w-full flex flex-col justify-center gap-4"),
           ]}
         >
-          <CustomDateController />
-
-          <View style={[tws("w-full py-2 flex flex-row justify-center gap-4")]}>
-            <View style={[tws(" flex flex-row gap-2 items-center")]}>
-              <Button variant={"outline"}>{currentDate.getFullYear()}</Button>
-              <Button variant={"outline"}>{format(currentDate, "MMMM")}</Button>
-            </View>
-
-            <Button
-              variant={"ghost"}
-              leftIcon={
-                <RadixIcon name="double-arrow-right" color="white" size={14} />
-              }
-            >
-              Today
-            </Button>
-          </View>
+          <CustomDateController
+            onChange={setDate}
+            onStart={() => (isSelecting.value = true)}
+            onEnd={() => (isSelecting.value = false)}
+          />
         </View>
       </View>
     </>

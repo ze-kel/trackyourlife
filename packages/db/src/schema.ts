@@ -22,10 +22,7 @@ export const auth_user = pgTable("auth_user", {
 
   hashedPassword: varchar("hashed_password").notNull(),
 
-  updated: timestamp("updated")
-    .defaultNow()
-    .notNull()
-    .$onUpdate(() => new Date()),
+  updated: timestamp("updated").defaultNow().notNull(),
 
   settings: json("settings").default({}).$type<Record<string, unknown>>(),
   // Currently only used to identify users created by e2e testing
@@ -48,10 +45,7 @@ export const user_session = pgTable("user_session", {
 export const trackableTypeEnum = pgEnum("type", ["boolean", "number", "range"]);
 
 export const trackable = pgTable("trackable", {
-  updated: timestamp("updated")
-    .defaultNow()
-    .notNull()
-    .$onUpdate(() => new Date()),
+  updated: timestamp("updated").defaultNow().notNull(),
 
   isDeleted: boolean("is_deleted").notNull().default(false),
 
@@ -73,10 +67,7 @@ export const trackableRelations = relations(trackable, ({ many }) => ({
 export const trackableRecord = pgTable(
   "trackableRecord",
   {
-    updated: timestamp("updated")
-      .defaultNow()
-      .notNull()
-      .$onUpdate(() => new Date()),
+    updated: timestamp("updated").defaultNow().notNull(),
 
     trackableId: uuid("trackableId")
       .notNull()

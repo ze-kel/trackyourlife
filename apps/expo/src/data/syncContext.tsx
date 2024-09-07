@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { AppState } from "react-native";
 import { hookstate } from "@hookstate/core";
 import { differenceInSeconds, sub } from "date-fns";
-import { and, eq, gte, sql } from "drizzle-orm";
+import { and, eq, gte, lte, sql } from "drizzle-orm";
 
 import { debounce } from "@tyl/helpers";
 import { ITrackableFromDB } from "@tyl/validators/trackable";
@@ -48,70 +48,37 @@ currentUser.subscribe((v) => {
   updateLastSyncFromDb();
 });
 
-const pushChanges = async (ls: Date, userId: string) => {
-  const updatedRecords = await db.query.trackableRecord.findMany({
+const getChangesFromDb = async (ls: Date, userId: string) => {
+  const recordUpdates = await db.query.trackableRecord.findMany({
     where: and(
       eq(trackableRecord.userId, userId),
       gte(trackableRecord.updated, ls),
     ),
   });
 
-  const updatedTrackables = await db.query.trackable.findMany({
+  const trackableUpdates = await db.query.trackable.findMany({
     where: and(eq(trackable.userId, userId), gte(trackable.updated, ls)),
   });
 
-  console.log("updated records", updatedRecords.length);
-
-  console.log(
-    "sending updates trackabalbes",
-    updatedTrackables.map((v) => [v.name, differenceInSeconds(v.updated, ls)]),
-  );
-
-  const updatedUser = await db.query.authUser.findFirst({
+  const userUpdates = await db.query.authUser.findFirst({
     where: and(eq(authUser.id, userId), gte(authUser.updated, ls)),
   });
 
-  if (updatedRecords && updatedRecords.length) {
-    await api.syncRouter.pushRecordUpdates.query(updatedRecords);
-  }
-
-  if (updatedTrackables && updatedTrackables.length) {
-    await api.syncRouter.pushTrackableUpdates.query(
-      updatedTrackables as ITrackableFromDB[],
-    );
-  }
-
-  if (updatedUser) {
-    await api.syncRouter.pushUserUpdates.query({
-      updated: updatedUser.updated,
-      settings: updatedUser.settings || undefined,
-      username: updatedUser.username || "",
-    });
-  }
+  return { recordUpdates, trackableUpdates, userUpdates };
 };
 
-const pullChanges = async (ls: Date) => {
-  const trackablesUpdates = await api.syncRouter.getTrackableUpdates.query(ls);
-
-  const recordsUpdates = await api.syncRouter.getRecordUpdates.query(ls);
-
-  const userUpdates = await api.syncRouter.getUserUpdates.query(ls);
-
-  return { trackablesUpdates, recordsUpdates, userUpdates };
-};
-
-const applyPulledChanges = async (
-  ls: Date,
+const applyChangesToDb = async (
   userId: string,
   nowDate: Date,
-  u: Awaited<ReturnType<typeof pullChanges>>,
+  u: Awaited<ReturnType<typeof api.syncRouter.syncv2.query>>,
+  overwrite?: boolean,
 ) => {
-  const { trackablesUpdates, recordsUpdates, userUpdates } = u;
+  const { trackables, records, user } = u;
 
-  if (trackablesUpdates.length) {
+  if (trackables.length) {
     await db
       .insert(trackable)
-      .values(trackablesUpdates)
+      .values(trackables)
       .onConflictDoUpdate({
         target: [trackable.id],
         set: {
@@ -122,26 +89,38 @@ const applyPulledChanges = async (
           userId: sql.raw(`excluded.${trackable.userId.name}`),
           isDeleted: sql.raw(`excluded.${trackable.isDeleted.name}`),
         },
+        setWhere: overwrite
+          ? undefined
+          : lte(
+              trackable.updated,
+              sql.raw(`excluded.${trackable.updated.name}`),
+            ),
       });
   }
 
-  if (recordsUpdates.length) {
+  if (records.length) {
     await db
       .insert(trackableRecord)
-      .values(recordsUpdates)
+      .values(records)
       .onConflictDoUpdate({
         target: [trackableRecord.trackableId, trackableRecord.date],
         set: {
           value: sql.raw(`excluded.${trackableRecord.value.name}`),
           updated: sql.raw(`excluded.${trackableRecord.updated.name}`),
         },
+        setWhere: overwrite
+          ? undefined
+          : lte(
+              trackableRecord.updated,
+              sql.raw(`excluded.${trackableRecord.updated.name}`),
+            ),
       });
   }
 
-  if (userUpdates) {
+  if (user) {
     await db
       .insert(authUser)
-      .values(userUpdates as typeof userUpdates & { settings: IUserSettings })
+      .values(user as typeof user & { settings: IUserSettings })
       .onConflictDoUpdate({
         target: [authUser.id],
         set: {
@@ -150,6 +129,9 @@ const applyPulledChanges = async (
           settings: sql.raw(`excluded.${authUser.settings.name}`),
           email: sql.raw(`excluded.${authUser.email.name}`),
         },
+        setWhere: overwrite
+          ? eq(authUser.id, userId)
+          : and(eq(authUser.id, userId), lte(authUser.updated, user.updated)),
       });
   }
 
@@ -182,13 +164,37 @@ const sync = async (clear?: boolean) => {
       ls = new Date(1970);
     }
 
-    const p = await pullChanges(ls);
+    const localUpdates = await getChangesFromDb(ls, userId);
 
-    if (!clear && ls) {
-      await pushChanges(ls, userId);
-    }
+    console.log("\n\n");
+    console.log("SYNC UP");
+    console.log(
+      "recordUpdates",
+      localUpdates.recordUpdates.length,
+      localUpdates.recordUpdates.map((v) => v.updated.toDateString()),
+    );
+    console.log("trackableUpdates", localUpdates.trackableUpdates.length);
+    console.log("userUpdates", localUpdates.userUpdates);
 
-    await applyPulledChanges(ls, userId, nowDate, p);
+    const syncRes = await api.syncRouter.syncv2.query({
+      lastSync: ls,
+      trackableUpdates: localUpdates.trackableUpdates as ITrackableFromDB[],
+      recordUpdates: localUpdates.recordUpdates,
+      userUpdates: localUpdates.userUpdates
+        ? {
+            username: localUpdates.userUpdates.username || "",
+            settings: localUpdates.userUpdates.settings as IUserSettings,
+            updated: localUpdates.userUpdates.updated,
+          }
+        : undefined,
+    });
+
+    console.log("SYNC RES");
+    console.log("trackables", syncRes.trackables.length);
+    console.log("records", syncRes.records.length);
+    console.log("user", syncRes.user);
+
+    await applyChangesToDb(userId, nowDate, syncRes);
 
     lastSync.set(nowDate);
   } catch (e) {
@@ -207,10 +213,11 @@ const updateTrackableRecord = async (v: LDbTrackableRecordInsert) => {
     .onConflictDoUpdate({
       target: [trackableRecord.trackableId, trackableRecord.date],
       set: {
+        updated: new Date(),
         value: sql.raw(`excluded.${trackableRecord.value.name}`),
       },
     });
-  debouncedSync();
+  //  debouncedSync();
 };
 
 const useSyncInterval = () => {

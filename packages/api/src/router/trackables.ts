@@ -122,6 +122,7 @@ export const trackablesRouter = {
         .values({
           ...input,
           userId: ctx.user.id,
+          updated: new Date(),
         })
         .returning();
 
@@ -139,6 +140,7 @@ export const trackablesRouter = {
         .update(trackable)
         .set({
           isDeleted: true,
+          updated: new Date(),
         })
         .where(
           and(eq(trackable.userId, ctx.user.id), eq(trackable.id, input.id)),
@@ -162,7 +164,7 @@ export const trackablesRouter = {
         .values(toInsert)
         .onConflictDoUpdate({
           target: [trackableRecord.trackableId, trackableRecord.date],
-          set: { value: input.value },
+          set: { value: input.value, updated: new Date() },
         })
         .returning();
 
@@ -176,6 +178,7 @@ export const trackablesRouter = {
         value: i.value,
         date: new Date(Date.UTC(i.year, i.month, i.day, 0, 0, 0, 0)),
         userId: ctx.user.id,
+        updated: new Date(),
       }));
 
       await ctx.db
@@ -198,7 +201,7 @@ export const trackablesRouter = {
     .mutation(async ({ ctx, input }) => {
       await ctx.db
         .update(trackable)
-        .set({ name: input.newName })
+        .set({ name: input.newName, updated: new Date() })
         .where(
           and(eq(trackable.id, input.id), eq(trackable.userId, ctx.user.id)),
         );
@@ -231,7 +234,7 @@ export const trackablesRouter = {
 
       await ctx.db
         .update(trackable)
-        .set({ settings: parsed.data })
+        .set({ settings: parsed.data, updated: new Date() })
         .where(
           and(eq(trackable.id, input.id), eq(trackable.userId, ctx.user.id)),
         );

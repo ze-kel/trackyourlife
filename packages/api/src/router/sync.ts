@@ -3,10 +3,10 @@ import { z } from "zod";
 
 import { and, eq, gte, lte, sql } from "@tyl/db";
 import { auth_user, trackable, trackableRecord } from "@tyl/db/schema";
-import { ZTrackable, ZTrackableFromDb } from "@tyl/validators/trackable";
+import { ZTrackableFromDb } from "@tyl/validators/trackable";
 import { ZUserSettings } from "@tyl/validators/user";
 
-import { protectedProcedure } from "../trpc";
+import { createTRPCContext, protectedProcedure } from "../trpc";
 
 const ZRecordUpdate = z.object({
   date: z.date(),
@@ -16,7 +16,150 @@ const ZRecordUpdate = z.object({
   trackableId: z.string(),
 });
 
+type IRecordUpdate = z.infer<typeof ZRecordUpdate>;
+
+const ZSyncInput = z.object({
+  lastSync: z.date(),
+  trackableUpdates: z.array(ZTrackableFromDb),
+  recordUpdates: z.array(ZRecordUpdate),
+  userUpdates: z
+    .object({
+      settings: ZUserSettings.optional(),
+      updated: z.date(),
+      username: z.string(),
+    })
+    .optional(),
+});
+
+type ISyncInput = z.infer<typeof ZSyncInput>;
+
+type TRPCCtx = ReturnType<typeof createTRPCContext>;
+
+const getTrackableUpdates = (
+  db: TRPCCtx["db"],
+  userId: string,
+  lastSync: Date,
+) => {
+  return db.query.trackable.findMany({
+    where: and(gte(trackable.updated, lastSync), eq(trackable.userId, userId)),
+  });
+};
+
+const getRecordUpdates = (
+  db: TRPCCtx["db"],
+  userId: string,
+  lastSync: Date,
+) => {
+  return db.query.trackableRecord.findMany({
+    where: and(
+      gte(trackableRecord.updated, lastSync),
+      eq(trackableRecord.userId, userId),
+    ),
+  });
+};
+
+const getUserUpdates = (db: TRPCCtx["db"], userId: string, lastSync: Date) => {
+  return db.query.auth_user.findFirst({
+    columns: {
+      updated: true,
+      settings: true,
+      username: true,
+      email: true,
+      id: true,
+    },
+    where: and(gte(auth_user.updated, lastSync), eq(auth_user.id, userId)),
+  });
+};
+
+const setRecordUpdates = (
+  db: TRPCCtx["db"],
+  userId: string,
+  updates: ISyncInput["recordUpdates"],
+) => {
+  console.log("SET RECORD UPDATES", updates);
+  const filteredRecordUpdates = updates.filter((v) => v.userId === userId);
+  if (filteredRecordUpdates.length === 0) return;
+
+  console.log("FILTERED", filteredRecordUpdates);
+
+  return db
+    .insert(trackableRecord)
+    .values(filteredRecordUpdates)
+    .onConflictDoUpdate({
+      target: [trackableRecord.trackableId, trackableRecord.date],
+      set: {
+        value: sql.raw(`excluded.${trackableRecord.value.name}`),
+        updated: sql.raw(`excluded.${trackableRecord.updated.name}`),
+      },
+      setWhere: lte(
+        trackableRecord.updated,
+        sql.raw(`excluded.${trackableRecord.updated.name}`),
+      ),
+    });
+};
+
+const setTrackableUpdates = (
+  db: TRPCCtx["db"],
+  userId: string,
+  updates: ISyncInput["trackableUpdates"],
+) => {
+  const filteredTrackableUpdates = updates.filter((v) => v.userId === userId);
+  if (filteredTrackableUpdates.length === 0) return;
+
+  return db
+    .insert(trackable)
+    .values(updates)
+    .onConflictDoUpdate({
+      target: [trackable.id],
+      set: {
+        name: sql.raw(`excluded.${trackable.name.name}`),
+        settings: sql.raw(`excluded.${trackable.settings.name}`),
+        updated: sql.raw(`excluded.${trackable.updated.name}`),
+        isDeleted: sql.raw(`excluded.${trackable.isDeleted.name}`),
+      },
+      setWhere: lte(
+        trackable.updated,
+        sql.raw(`excluded.${trackable.updated.name}`),
+      ),
+    });
+};
+
+const setUserUpdates = (
+  db: TRPCCtx["db"],
+  userId: string,
+  updates: ISyncInput["userUpdates"],
+) => {
+  if (!updates) return;
+
+  return db
+    .update(auth_user)
+    .set({
+      settings: updates.settings,
+      username: updates.username,
+    })
+    .where(
+      and(eq(auth_user.id, userId), lte(auth_user.updated, updates.updated)),
+    );
+};
+
 export const syncRouter = {
+  syncv2: protectedProcedure.input(ZSyncInput).query(async ({ ctx, input }) => {
+    console.log("SYNCV2", input);
+    const trackables = await getTrackableUpdates(
+      ctx.db,
+      ctx.user.id,
+      input.lastSync,
+    );
+    const records = await getRecordUpdates(ctx.db, ctx.user.id, input.lastSync);
+    const user = await getUserUpdates(ctx.db, ctx.user.id, input.lastSync);
+
+    await setTrackableUpdates(ctx.db, ctx.user.id, input.trackableUpdates);
+    await setRecordUpdates(ctx.db, ctx.user.id, input.recordUpdates);
+    await setUserUpdates(ctx.db, ctx.user.id, input.userUpdates);
+
+    return { trackables, records, user };
+  }),
+
   getTrackableUpdates: protectedProcedure
     .input(z.date().optional())
     .query(async ({ ctx, input }) => {

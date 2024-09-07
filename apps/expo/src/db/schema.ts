@@ -22,16 +22,13 @@ export const authUser = sqliteTable("auth_user", {
   email: text("email"),
   updated: integer("updated", { mode: "timestamp_ms" })
     .notNull()
-    .default(sql`(current_timestamp)`)
-    .$onUpdate(() => new Date()),
+    .default(sql`(current_timestamp)`),
 });
 
 export const trackable = sqliteTable("trackable", {
   updated: integer("updated", { mode: "timestamp_ms" })
     .notNull()
-    .default(sql`(current_timestamp)`)
-    .$onUpdate(() => new Date()),
-
+    .default(sql`(current_timestamp)`),
   id: text("id").primaryKey(),
   name: text("name").notNull(),
   userId: text("user_id").notNull(),
@@ -53,8 +50,7 @@ export const trackableRecord = sqliteTable(
   {
     updated: integer("updated", { mode: "timestamp_ms" })
       .notNull()
-      .default(sql`(current_timestamp)`)
-      .$onUpdate(() => new Date()),
+      .default(sql`(current_timestamp)`),
 
     trackableId: text("trackableId")
       .notNull()

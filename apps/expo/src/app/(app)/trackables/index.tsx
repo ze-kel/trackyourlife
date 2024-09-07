@@ -34,7 +34,7 @@ import { db } from "~/db";
 import { trackable } from "~/db/schema";
 import { tws } from "~/utils/tw";
 
-const DAYS = 31;
+const DAYS = 7;
 
 export default function Index() {
   const { data } = useLiveQuery(
