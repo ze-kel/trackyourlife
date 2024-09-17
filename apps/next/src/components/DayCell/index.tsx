@@ -145,6 +145,9 @@ const DayCellWrapper = ({
           {day}
         </div>
       )}
+
+        <Day
+
       <DayCellInner
         className={cn(DayCellBaseClasses, className)}
         type={trackable.type}

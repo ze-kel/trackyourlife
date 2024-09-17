@@ -4,11 +4,17 @@
   "version": "0.1.0",
   "type": "module",
   "exports": {
-    ".": "./src/index.ts",
-    "./*": [
-      "./src/*.tsx",
-      "./src/*.ts"
-    ]
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "default": "./src/index.ts"
+    },
+    "./*": {
+      "types": "./dist/src/*.d.ts",
+      "default": [
+        "./src/*.ts",
+        "./src/*.tsx"
+      ]
+    }
   },
   "license": "MIT",
   "scripts": {
