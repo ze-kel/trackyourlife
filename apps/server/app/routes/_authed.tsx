@@ -57,6 +57,7 @@ export const loginFn = createServerFn(
 
 export const Route = createFileRoute("/_authed")({
   beforeLoad: ({ context }) => {
+    console.log("CONTEXT", context);
     if (!context.user) {
       throw new Error("Not authenticated");
     }
