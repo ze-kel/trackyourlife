@@ -1,66 +1,71 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { createServerFn, json } from '@tanstack/start'
-import { Auth } from '../components/Auth'
-import { hashPassword, prismaClient } from '~/utils/prisma'
-import { Login } from '~/components/Login'
-import { useAppSession } from '~/utils/session'
+import { createFileRoute } from "@tanstack/react-router";
+import { createServerFn, json } from "@tanstack/start";
+
+import { Argon2id, lucia } from "@tyl/auth";
+import { db, eq } from "@tyl/db";
+import { auth_user } from "@tyl/db/schema";
+
+import { Login } from "~/components/Login";
+import { useAppSession } from "~/utils/session";
 
 export const loginFn = createServerFn(
-  'POST',
+  "POST",
   async (
     payload: {
-      email: string
-      password: string
+      email: string;
+      password: string;
     },
     { request },
   ) => {
     // Find the user
-    const user = await prismaClient.user.findUnique({
-      where: {
-        email: payload.email,
-      },
-    })
+    const user = await db.query.auth_user.findFirst({
+      where: eq(auth_user.email, payload.email.toLowerCase()),
+    });
 
     // Check if the user exists
     if (!user) {
       return {
         error: true,
         userNotFound: true,
-        message: 'User not found',
-      }
+        message: "User not found",
+      };
     }
 
     // Check if the password is correct
-    const hashedPassword = await hashPassword(payload.password)
+    const validPassword = await new Argon2id().verify(
+      user.hashedPassword,
+      payload.password,
+    );
 
-    if (user.password !== hashedPassword) {
+    if (!validPassword) {
       return {
         error: true,
-        message: 'Incorrect password',
-      }
+        message: "Incorrect password",
+      };
     }
 
     // Create a session
-    const session = await useAppSession()
+    const session = await useAppSession();
 
     // Store the user's email in the session
     await session.update({
-      userEmail: user.email,
-    })
+      id: user.id,
+      email: user.email,
+    });
   },
-)
+);
 
-export const Route = createFileRoute('/_authed')({
+export const Route = createFileRoute("/_authed")({
   beforeLoad: ({ context }) => {
     if (!context.user) {
-      throw new Error('Not authenticated')
+      throw new Error("Not authenticated");
     }
   },
   errorComponent: ({ error }) => {
-    if (error.message === 'Not authenticated') {
-      return <Login />
+    if (error.message === "Not authenticated") {
+      return <Login />;
     }
 
-    throw error
+    throw error;
   },
-})
+});

@@ -5,7 +5,6 @@
   "compilerOptions": {
     "jsx": "react-jsx",
     "baseUrl": ".",
-    "module": "esnext",
     "paths": {
       "~/*": ["./app/*"]
     },

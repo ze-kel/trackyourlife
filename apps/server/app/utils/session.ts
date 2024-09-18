@@ -1,13 +1,8 @@
 // app/services/session.server.ts
-import { useSession } from 'vinxi/http'
-import type { User } from '@prisma/client'
-
-type SessionUser = {
-  userEmail: User['email']
-}
+import { useSession } from "vinxi/http";
 
 export function useAppSession() {
-  return useSession<SessionUser>({
-    password: 'ChangeThisBeforeShippingToProdOrYouWillBeFired',
-  })
+  return useSession({
+    password: "ChangeThisBeforeShippingToProdOrYouWillBeFired",
+  });
 }

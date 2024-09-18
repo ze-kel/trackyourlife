@@ -2,10 +2,9 @@ import { log } from "console";
 import type { NextRequest } from "next/server";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { eq } from "drizzle-orm";
 
 import { Argon2id, lucia } from "@tyl/auth";
-import { db } from "@tyl/db";
+import { db, eq } from "@tyl/db";
 import { auth_user } from "@tyl/db/schema";
 import { ZLogin } from "@tyl/validators/user";
 
