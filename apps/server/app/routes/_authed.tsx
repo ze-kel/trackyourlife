@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createServerFn, json } from "@tanstack/start";
 
-import { Argon2id, lucia } from "@tyl/auth";
+import { Argon2id } from "oslo/password";
 import { db, eq } from "@tyl/db";
 import { auth_user } from "@tyl/db/schema";
 

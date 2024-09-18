@@ -1,6 +1,8 @@
 import * as React from "react";
+import { QueryClient } from "@tanstack/react-query";
 import {
   createRootRoute,
+  createRootRouteWithContext,
   Link,
   Outlet,
   ScrollRestoration,
@@ -35,7 +37,9 @@ const fetchUser = createServerFn("GET", async () => {
   };
 });
 
-export const Route = createRootRoute({
+export const Route = createRootRouteWithContext<{
+  queryClient: QueryClient;
+}>()({
   meta: () => [
     {
       charSet: "utf-8",

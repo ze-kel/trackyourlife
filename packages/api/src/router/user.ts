@@ -4,9 +4,13 @@ import { eq } from "@tyl/db";
 import { auth_user } from "@tyl/db/schema";
 import { UserSettingsFallback, ZUserSettings } from "@tyl/validators/user";
 
-import { protectedProcedure } from "../trpc";
+import { protectedProcedure, publicProcedure } from "../trpc";
 
 export const userRouter = {
+  getMe: publicProcedure.query(async ({ ctx }) => {
+    return ctx.user;
+  }),
+
   getUserSettings: protectedProcedure.query(async ({ ctx }) => {
     const user = await ctx.db.query.auth_user.findFirst({
       where: eq(auth_user.id, ctx.user.id),

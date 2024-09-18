@@ -27,7 +27,6 @@
     "@trpc/react-query": "catalog:",
     "@trpc/server": "catalog:",
     "@tyl/api": "workspace:*",
-    "@tyl/auth": "workspace:*",
     "@tyl/db": "workspace:*",
     "@tyl/ui": "workspace:*",
     "@tyl/helpers": "workspace:*",
