@@ -17,11 +17,11 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@tyl/db": "workspace:*",
     "@lucia-auth/adapter-drizzle": "^1.1.0",
+    "@tyl/db": "workspace:*",
     "lucia": "^3.2.0",
-    "oslo": "^1.2.1",
     "next": "^14.2.5",
+    "oslo": "^1.2.1",
     "react": "catalog:react18",
     "react-dom": "catalog:react18",
     "zod": "catalog:"

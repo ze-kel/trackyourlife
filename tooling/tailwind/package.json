@@ -14,10 +14,10 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@tailwindcss/container-queries": "^0.1.1",
     "postcss": "^8.4.41",
     "tailwindcss": "catalog:",
-    "tailwindcss-animate": "^1.0.7",
-    "@tailwindcss/container-queries": "^0.1.1"
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "@tyl/eslint-config": "workspace:*",
