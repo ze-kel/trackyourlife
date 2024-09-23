@@ -40,7 +40,7 @@ const SettingsWrapper = () => {
 
   return (
     <TrackableSettings
-      isLoadingButton={settingsMutation.isPending}
+      isLoadingButton={settingsMutation.isPending || settingsMutation.isSuccess}
       trackableType={trackable.type}
       trackableSettings={settings}
       handleSave={async (v: ITrackableSettings) => {
