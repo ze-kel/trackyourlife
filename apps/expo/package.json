@@ -35,7 +35,7 @@
     "class-variance-authority": "^0.7.0",
     "date-fns": "catalog:",
     "date-fns-tz": "catalog:",
-    "drizzle-orm": "^0.33.0",
+    "drizzle-orm": "^0.36.4",
     "expo": "~51.0.30",
     "expo-constants": "~16.0.2",
     "expo-dev-client": "~4.0.23",

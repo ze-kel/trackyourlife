@@ -1,25 +1,26 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createServerFn, json } from "@tanstack/start";
-
 import { Argon2id } from "oslo/password";
+import { z } from "zod";
+
 import { db, eq } from "@tyl/db";
 import { auth_user } from "@tyl/db/schema";
 
 import { Login } from "~/components/Login";
 import { useAppSession } from "~/utils/session";
 
-export const loginFn = createServerFn(
-  "POST",
-  async (
-    payload: {
-      email: string;
-      password: string;
-    },
-    { request },
-  ) => {
+export const loginFn = createServerFn({ method: "POST" })
+  .validator(
+    z.object({
+      email: z.string().email(),
+      password: z.string(),
+    }),
+  )
+  .handler(async ({ data }) => {
+    // Find the user
     // Find the user
     const user = await db.query.auth_user.findFirst({
-      where: eq(auth_user.email, payload.email.toLowerCase()),
+      where: eq(auth_user.email, data.email.toLowerCase()),
     });
 
     // Check if the user exists
@@ -34,7 +35,7 @@ export const loginFn = createServerFn(
     // Check if the password is correct
     const validPassword = await new Argon2id().verify(
       user.hashedPassword,
-      payload.password,
+      data.password,
     );
 
     if (!validPassword) {
@@ -52,12 +53,10 @@ export const loginFn = createServerFn(
       id: user.id,
       email: user.email,
     });
-  },
-);
+  });
 
 export const Route = createFileRoute("/_authed")({
   beforeLoad: ({ context }) => {
-    console.log("CONTEXT", context);
     if (!context.user) {
       throw new Error("Not authenticated");
     }

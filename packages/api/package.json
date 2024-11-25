@@ -19,14 +19,14 @@
     "typecheck": "tsc --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
+    "@trpc/server": "11.0.0-rc.403",
     "@tyl/auth": "workspace:*",
     "@tyl/db": "workspace:*",
-    "@tyl/validators": "workspace:*",
     "@tyl/helpers": "workspace:*",
-    "@trpc/server": "11.0.0-rc.403",
-    "superjson": "2.2.1",
+    "@tyl/validators": "workspace:*",
     "date-fns": "catalog:",
     "date-fns-tz": "catalog:",
+    "superjson": "2.2.1",
     "timezones-list": "^3.0.3",
     "zod": "catalog:"
   },
@@ -36,7 +36,7 @@
     "@tyl/tsconfig": "workspace:*",
     "eslint": "^8.57.0",
     "prettier": "^3.3.3",
-    "typescript": "^5.5.4"
+    "typescript": "catalog:"
   },
   "prettier": "@tyl/prettier-config"
 }

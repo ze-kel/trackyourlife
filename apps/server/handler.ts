@@ -1,14 +1,12 @@
 import { createHTTPHandler } from "@trpc/server/adapters/standalone";
 import { eventHandler } from "vinxi/http";
 
-import { appRouter, createTRPCContext } from "@tyl/api";
+import { appRouter, createCaller, createTRPCContext } from "@tyl/api";
 
 import { useAppSession } from "./app/utils/session";
 
 const createContext = async () => {
   const s = await useAppSession();
-
-  console.log("APP SESSION", s.data);
 
   return createTRPCContext({
     user: s.data.id

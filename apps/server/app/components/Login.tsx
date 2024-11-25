@@ -9,7 +9,16 @@ export function Login() {
   const router = useRouter();
 
   const loginMutation = useMutation({
-    mutationFn: loginFn,
+    mutationFn: async ({
+      email,
+      password,
+    }: {
+      email: string;
+      password: string;
+    }) => {
+      console.log("hello");
+      await loginFn({ data: { email, password } });
+    },
     onSuccess: async (ctx) => {
       await router.invalidate();
       router.navigate({ to: "/" });
@@ -23,6 +32,8 @@ export function Login() {
         actionText="Login"
         status={loginMutation.status}
         onSubmit={(e) => {
+          console.log("aaaa");
+          e.preventDefault();
           const formData = new FormData(e.target as HTMLFormElement);
 
           loginMutation.mutate({

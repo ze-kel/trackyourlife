@@ -1,19 +1,20 @@
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/start";
 
 import { api } from "~/trpc/react";
 import { apiS } from "~/trpc/server";
 
+const sf = createServerFn().handler(() => apiS.userRouter.getMe());
+
 export const Route = createFileRoute("/_authed/posts")({
   component: PostsComponent,
+
   loader: async ({ context }) => {
-    context.queryClient.ensureQueryData({
+    await context.queryClient.ensureQueryData({
       queryKey: ["user"],
       queryFn: async () => {
-        console.log("server call");
-        const r = await apiS.userRouter.getMe();
-        console.log("server call res", r);
+        const r = await sf();
 
         return r;
       },
@@ -30,5 +31,5 @@ function PostsComponent() {
     staleTime: Infinity,
   });
 
-  return <div>hello auth. user is {JSON.stringify(u.data)}</div>;
+  return <div>hello auth. user is {JSON.stringify(u)}</div>;
 }

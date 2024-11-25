@@ -1,18 +1,19 @@
-import { createFileRoute, redirect } from '@tanstack/react-router'
-import { createServerFn } from '@tanstack/start'
-import { useAppSession } from '~/utils/session'
+import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/start";
 
-const logoutFn = createServerFn('POST', async () => {
-  const session = await useAppSession()
+import { useAppSession } from "~/utils/session";
 
-  session.clear()
+const logoutFn = createServerFn({ method: "POST" }).handler(async () => {
+  const session = await useAppSession();
+
+  session.clear();
 
   throw redirect({
-    href: '/',
-  })
-})
+    href: "/",
+  });
+});
 
-export const Route = createFileRoute('/logout')({
+export const Route = createFileRoute("/logout")({
   preload: false,
   loader: () => logoutFn(),
-})
+});
