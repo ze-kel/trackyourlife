@@ -1,5 +1,3 @@
-"use client";
-
 import type { ReactNode } from "react";
 import { useMemo } from "react";
 
@@ -9,8 +7,11 @@ import { computeDayCellHelpers } from "@tyl/helpers/trackables";
 
 import { cn } from "~/@shad";
 import { Skeleton } from "~/@shad/skeleton";
-import { useTrackableContextSafe } from "~/components/Providers/TrackableProvider";
-import { userUserContext } from "~/components/Providers/UserProvider";
+import {
+  useTrackableContextSafe,
+  useTrackableQueryByMonth,
+} from "~/components/Providers/TrackableProvider";
+import { useUserSettings } from "~/query/userSettings";
 import { DayCellBoolean } from "./DayCellBoolean";
 import { DayCellNumber } from "./DayCellNumber";
 import { DayCellRange } from "./DayCellRange";
@@ -107,12 +108,17 @@ const DayCellWrapper = ({
   noLabel?: boolean;
   labelType?: "auto" | "outside" | "none";
 }) => {
-  const { trackable, settings, update, useTrackableQueryByMonth } =
-    useTrackableContextSafe();
+  const { trackable, settings, update } = useTrackableContextSafe();
 
-  const { data, isLoading } = useTrackableQueryByMonth({ month, year });
+  if (!trackable) return <></>;
 
-  const u = userUserContext();
+  const { data, isLoading } = useTrackableQueryByMonth({
+    month,
+    year,
+    id: trackable.id,
+  });
+
+  const uSettings = useUserSettings();
 
   const { inTrackRange, isToday, dateDay } = useMemo(
     () =>
@@ -121,9 +127,9 @@ const DayCellWrapper = ({
         month,
         year,
         startDate: settings?.startDate,
-        dateNow: getNowInTimezone(u.settings.timezone),
+        dateNow: getNowInTimezone(uSettings.timezone),
       }),
-    [day, month, year, settings?.startDate, u.settings.timezone],
+    [day, month, year, settings?.startDate, uSettings.timezone],
   );
 
   if (!trackable) return <></>;

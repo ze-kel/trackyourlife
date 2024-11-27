@@ -2,13 +2,36 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  html,
-  body {
-    @apply text-gray-900 bg-gray-50 dark:bg-gray-950 dark:text-gray-200;
+@layer components {
+  .content-container {
+    @apply container mx-auto max-w-4xl px-4;
   }
 
-  .using-mouse * {
-    outline: none !important;
+  .customScrollBar::-webkit-scrollbar {
+    @apply w-1 bg-transparent;
   }
+
+  .customScrollBarBig::-webkit-scrollbar {
+    @apply w-2 bg-transparent;
+  }
+
+  .customScrollBar::-webkit-scrollbar-thumb {
+    @apply bg-neutral-200 dark:bg-neutral-700;
+  }
+}
+
+body {
+  scrollbar-gutter: stable;
+  overflow-y: scroll;
+}
+
+/* Removes arrows from input number */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
 }

@@ -31,11 +31,11 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "~/@shad/drawer";
-import { userUserContext } from "~/components/Providers/UserProvider";
+import { useUserSettings } from "~/query/userSettings";
 import {
   Button,
   buttonVariants,
-} from "../../../../../packages/ui/dist/~/@shad/button";
+} from "~/@shad/button";
 import { Dropdown, DropdownContent, DropdownTrigger } from "../Dropdown";
 
 const DatePicker = ({
@@ -55,7 +55,7 @@ const DatePicker = ({
   };
   className?: string;
 }) => {
-  const { settings } = userUserContext();
+  const settings = useUserSettings();
   const dateNow = getNowInTimezone(settings.timezone);
 
   const [innerDate, setInnerDate] = useState(date);

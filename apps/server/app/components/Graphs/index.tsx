@@ -1,5 +1,5 @@
 /*
-"use client";
+;
 
 import { useMemo, useRef, useState } from "react";
 import { useQueries, useQuery } from "@tanstack/react-query";
@@ -15,7 +15,7 @@ import {
   isLastDayOfMonth,
   isSameMonth,
 } from "date-fns";
-import { useTheme } from "next-themes";
+import { useTheme } from "~/components/Providers/ThemeProvider";
 import { makeColorString } from "@tyl/helpers/colorTools";
 import { getNowInTimezone } from "@tyl/helpers/timezone";
 import { useResizeObserver } from "usehooks-ts";
@@ -189,7 +189,7 @@ export const Graph = ({
 
   const limits = settings.progressEnabled && settings.progress;
 
-  const { resolvedTheme } = useTheme();
+  const { theme } = useTheme();
 
   const wrapperRef = useRef<HTMLDivElement>(null);
 
@@ -273,8 +273,8 @@ export const Graph = ({
     round: true,
   });
 
-  const detailsColor = resolvedTheme === "dark" ? "#525252" : "black";
-  const textColor = resolvedTheme === "dark" ? "#e5e5e5" : "black";
+  const detailsColor = theme === "dark" ? "#525252" : "black";
+  const textColor = theme === "dark" ? "#e5e5e5" : "black";
 
   return (
     <div ref={wrapperRef}>
@@ -295,7 +295,7 @@ export const Graph = ({
               data-date={i + 1}
               data-value={ent}
               fill={makeColorString(
-                resolvedTheme === "dark" ? color.darkMode : color.lightMode,
+                theme === "dark" ? color.darkMode : color.lightMode,
               )}
               x={barX}
               width={barWidth}

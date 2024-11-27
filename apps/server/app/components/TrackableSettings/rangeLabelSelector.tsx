@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import {
   Cross1Icon,
@@ -13,15 +11,15 @@ import { v4 as uuidv4 } from "uuid";
 import type { ArrayElement } from "@tyl/validators/helpers";
 import type { IColorValue, IRangeSettings } from "@tyl/validators/trackable";
 import { cloneDeep } from "@tyl/helpers";
+
+import { Button } from "~/@shad/button";
 import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
 } from "~/@shad/hover-card";
 import { Input } from "~/@shad/input";
-
 import ColorInput from "~/components/Colors/colorInput";
-import { Button } from "~/@shad/button";";
 
 export interface IRangeLabelSelector {
   initialValue: IRangeSettings["labels"];

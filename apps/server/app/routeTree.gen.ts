@@ -11,19 +11,14 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as LogoutImport } from './routes/logout'
 import { Route as LoginImport } from './routes/login'
 import { Route as AppImport } from './routes/app'
 import { Route as IndexImport } from './routes/index'
 import { Route as AppIndexImport } from './routes/app/index'
+import { Route as AppTrackablesIndexImport } from './routes/app/trackables/index'
+import { Route as AppTrackablesIdImport } from './routes/app/trackables/$id'
 
 // Create/Update Routes
-
-const LogoutRoute = LogoutImport.update({
-  id: '/logout',
-  path: '/logout',
-  getParentRoute: () => rootRoute,
-} as any)
 
 const LoginRoute = LoginImport.update({
   id: '/login',
@@ -46,6 +41,18 @@ const IndexRoute = IndexImport.update({
 const AppIndexRoute = AppIndexImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AppRoute,
+} as any)
+
+const AppTrackablesIndexRoute = AppTrackablesIndexImport.update({
+  id: '/trackables/',
+  path: '/trackables/',
+  getParentRoute: () => AppRoute,
+} as any)
+
+const AppTrackablesIdRoute = AppTrackablesIdImport.update({
+  id: '/trackables/$id',
+  path: '/trackables/$id',
   getParentRoute: () => AppRoute,
 } as any)
 
@@ -74,18 +81,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginImport
       parentRoute: typeof rootRoute
     }
-    '/logout': {
-      id: '/logout'
-      path: '/logout'
-      fullPath: '/logout'
-      preLoaderRoute: typeof LogoutImport
-      parentRoute: typeof rootRoute
-    }
     '/app/': {
       id: '/app/'
       path: '/'
       fullPath: '/app/'
       preLoaderRoute: typeof AppIndexImport
+      parentRoute: typeof AppImport
+    }
+    '/app/trackables/$id': {
+      id: '/app/trackables/$id'
+      path: '/trackables/$id'
+      fullPath: '/app/trackables/$id'
+      preLoaderRoute: typeof AppTrackablesIdImport
+      parentRoute: typeof AppImport
+    }
+    '/app/trackables/': {
+      id: '/app/trackables/'
+      path: '/trackables'
+      fullPath: '/app/trackables'
+      preLoaderRoute: typeof AppTrackablesIndexImport
       parentRoute: typeof AppImport
     }
   }
@@ -95,10 +109,14 @@ declare module '@tanstack/react-router' {
 
 interface AppRouteChildren {
   AppIndexRoute: typeof AppIndexRoute
+  AppTrackablesIdRoute: typeof AppTrackablesIdRoute
+  AppTrackablesIndexRoute: typeof AppTrackablesIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppIndexRoute: AppIndexRoute,
+  AppTrackablesIdRoute: AppTrackablesIdRoute,
+  AppTrackablesIndexRoute: AppTrackablesIndexRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
@@ -107,15 +125,17 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
-  '/logout': typeof LogoutRoute
   '/app/': typeof AppIndexRoute
+  '/app/trackables/$id': typeof AppTrackablesIdRoute
+  '/app/trackables': typeof AppTrackablesIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
-  '/logout': typeof LogoutRoute
   '/app': typeof AppIndexRoute
+  '/app/trackables/$id': typeof AppTrackablesIdRoute
+  '/app/trackables': typeof AppTrackablesIndexRoute
 }
 
 export interface FileRoutesById {
@@ -123,16 +143,30 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
-  '/logout': typeof LogoutRoute
   '/app/': typeof AppIndexRoute
+  '/app/trackables/$id': typeof AppTrackablesIdRoute
+  '/app/trackables/': typeof AppTrackablesIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/app' | '/login' | '/logout' | '/app/'
+  fullPaths:
+    | '/'
+    | '/app'
+    | '/login'
+    | '/app/'
+    | '/app/trackables/$id'
+    | '/app/trackables'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/logout' | '/app'
-  id: '__root__' | '/' | '/app' | '/login' | '/logout' | '/app/'
+  to: '/' | '/login' | '/app' | '/app/trackables/$id' | '/app/trackables'
+  id:
+    | '__root__'
+    | '/'
+    | '/app'
+    | '/login'
+    | '/app/'
+    | '/app/trackables/$id'
+    | '/app/trackables/'
   fileRoutesById: FileRoutesById
 }
 
@@ -140,14 +174,12 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
   LoginRoute: typeof LoginRoute
-  LogoutRoute: typeof LogoutRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
   LoginRoute: LoginRoute,
-  LogoutRoute: LogoutRoute,
 }
 
 export const routeTree = rootRoute
@@ -162,8 +194,7 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/app",
-        "/login",
-        "/logout"
+        "/login"
       ]
     },
     "/": {
@@ -172,17 +203,24 @@ export const routeTree = rootRoute
     "/app": {
       "filePath": "app.tsx",
       "children": [
-        "/app/"
+        "/app/",
+        "/app/trackables/$id",
+        "/app/trackables/"
       ]
     },
     "/login": {
       "filePath": "login.tsx"
     },
-    "/logout": {
-      "filePath": "logout.tsx"
-    },
     "/app/": {
       "filePath": "app/index.tsx",
+      "parent": "/app"
+    },
+    "/app/trackables/$id": {
+      "filePath": "app/trackables/$id.tsx",
+      "parent": "/app"
+    },
+    "/app/trackables/": {
+      "filePath": "app/trackables/index.tsx",
       "parent": "/app"
     }
   }

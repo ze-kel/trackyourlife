@@ -1,8 +1,6 @@
-"use client";
-
-import { useRouter } from "next/navigation";
 import { TrashIcon } from "@radix-ui/react-icons";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "@tanstack/react-router";
 
 import { cn } from "~/@shad";
 import {
@@ -16,8 +14,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "~/@shad/alert-dialog";
+import { buttonVariants } from "~/@shad/button";
 import { api } from "~/trpc/react";
-import { buttonVariants } from "../../../../../packages/ui/dist/~/@shad/button";
 
 const DeleteButton = ({ id }: { id: string }) => {
   const router = useRouter();
@@ -30,7 +28,7 @@ const DeleteButton = ({ id }: { id: string }) => {
       qc.invalidateQueries({
         queryKey: ["trackables", "list"],
       });
-      router.push("/app/trackables/");
+      router.navigate("/app/trackables/");
     },
   });
 

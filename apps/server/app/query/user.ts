@@ -1,17 +1,12 @@
 import { QueryClient, useQuery } from "@tanstack/react-query";
 import { createServerFn } from "@tanstack/start";
 
-import { useAppSession } from "~/auth/session";
-
-export const getUser = createServerFn({ method: "GET" }).handler(async () => {
-  const a = await useAppSession();
-
-  return a.data;
-});
+import { getUserFn } from "~/auth/authOperations";
 
 const q = {
   queryKey: ["user"],
-  queryFn: async () => await getUser(),
+  queryFn: async () => await getUserFn(),
+  refetchOnWindowFocus: false,
 };
 
 export const ensureUser = async (qc: QueryClient) => {
@@ -19,5 +14,7 @@ export const ensureUser = async (qc: QueryClient) => {
 };
 
 export const useUser = () => {
-  return useQuery(q);
+  const r = useQuery(q);
+  if (!r.data) throw new Error("User not found");
+  return r.data;
 };

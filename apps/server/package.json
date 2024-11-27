@@ -26,7 +26,6 @@
     "@tyl/api": "workspace:*",
     "@tyl/db": "workspace:*",
     "@tyl/helpers": "workspace:*",
-    "~/@shad": "workspace:*",
     "@tyl/validators": "workspace:*",
     "@visx/visx": "^3.12.0",
     "@vitejs/plugin-react": "^4.3.3",

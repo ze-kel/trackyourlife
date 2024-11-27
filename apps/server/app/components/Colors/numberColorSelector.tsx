@@ -1,7 +1,6 @@
 import type { TouchEvent } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Cross1Icon, PlusCircledIcon } from "@radix-ui/react-icons";
-import { useTheme } from "next-themes";
 import { v4 as uuidv4 } from "uuid";
 
 import type { IColorCodingValue, IColorValue } from "@tyl/validators/trackable";
@@ -24,6 +23,7 @@ import { Switch } from "~/@shad/switch";
 import ColorPicker, { BetterNumberInput } from "~/components/Colors";
 import { ColorDisplay } from "~/components/Colors/colorDisplay";
 import { useRefSize } from "~/components/Colors/contoller";
+import { useTheme } from "~/components/Providers/ThemeProvider";
 
 const getActualMin = (
   firstVal: number | undefined,
@@ -207,12 +207,12 @@ const ControllerGradient = ({
     onChange(newVal);
   };
 
-  const { resolvedTheme } = useTheme();
+  const { theme } = useTheme();
   const [gradientPreviewTheme, setGradientPreviewTheme] = useState("dark");
 
   useEffect(() => {
-    setGradientPreviewTheme(resolvedTheme || "");
-  }, [resolvedTheme]);
+    setGradientPreviewTheme(theme || "");
+  }, [theme]);
 
   return (
     <>

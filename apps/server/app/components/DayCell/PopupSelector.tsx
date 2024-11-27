@@ -1,5 +1,3 @@
-"use client";
-
 import { AnimatePresence, m } from "framer-motion";
 
 import type { IRangeSettings } from "@tyl/validators/trackable";

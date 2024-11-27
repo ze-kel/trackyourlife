@@ -1,5 +1,3 @@
-"use client";
-
 import type { MouseEvent, ReactNode } from "react";
 import { useRef, useState } from "react";
 import { AnimatePresence, m } from "framer-motion";

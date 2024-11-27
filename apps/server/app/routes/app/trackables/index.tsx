@@ -1,11 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/start";
 
-import { DailyList } from "~/components/TrackablesList";
+import TrackablesList from "~/components/TrackablesList";
 import { apiS } from "~/trpc/server";
 import { fillPrefetchedTrackablesList } from "~/utils/fillPrefetched";
 
-const SHOW_DAYS = 7;
+const SHOW_DAYS = 6;
 
 const sf = createServerFn({ method: "GET" }).handler(async () => {
   const a = await apiS.trackablesRouter.getAllTrackables({
@@ -18,7 +18,7 @@ const sf = createServerFn({ method: "GET" }).handler(async () => {
   return a;
 });
 
-export const Route = createFileRoute("/app/")({
+export const Route = createFileRoute("/app/trackables/")({
   component: PostsComponent,
 
   loader: async ({ context }) => {
@@ -30,7 +30,12 @@ export const Route = createFileRoute("/app/")({
 function PostsComponent() {
   return (
     <div className="content-container flex w-full flex-col">
-      <DailyList daysToShow={SHOW_DAYS} />
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-semibold lg:text-3xl">Your Trackables</h2>
+      </div>
+      <div className="mt-2">
+        <TrackablesList daysToShow={SHOW_DAYS}></TrackablesList>
+      </div>
     </div>
   );
 }

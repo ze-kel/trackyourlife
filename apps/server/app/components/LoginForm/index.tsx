@@ -14,73 +14,62 @@ import {
 } from "~/@shad/card";
 import { Input } from "~/@shad/input";
 import { RadioTabItem, RadioTabs } from "~/@shad/radio-tabs";
-import { loginFn } from "~/auth/auth";
+import { loginFn, registerFn } from "~/auth/authOperations";
 
 type ActionState = "login" | "register";
 
 const Register = () => {
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-
   const router = useRouter();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [username, setUsername] = useState("");
-
-  const onSubmit = async () => {
-    setLoading(true);
-    const res = await fetch("api/user/create", {
-      method: "POST",
-      body: JSON.stringify({
-        email,
-        password,
-        username,
-      }),
-      credentials: "include",
-    });
-
-    if (!res.ok) {
-      const j = (await res.json()) as Record<string, string>;
-      if (j.error) {
-        setError(j.error);
+  const registerMutation = useMutation({
+    mutationFn: async ({
+      email,
+      password,
+      username,
+    }: {
+      email: string;
+      password: string;
+      username: string;
+    }) => {
+      const r = await registerFn({ data: { email, password, username } });
+      if (!r.ok) {
+        throw new Error(r.message);
       }
-      setLoading(false);
-      return;
-    }
-  };
+    },
+    onSuccess: async () => {
+      await router.invalidate();
+      router.navigate({ to: "/" });
+    },
+  });
 
   return (
     <form
       onSubmit={(e) => {
         e.preventDefault();
-        void onSubmit();
+        const formData = new FormData(e.target as HTMLFormElement);
+        registerMutation.mutate({
+          email: formData.get("email") as string,
+          password: formData.get("password") as string,
+          username: formData.get("username") as string,
+        });
       }}
     >
       <h4 className="mb-2">Email</h4>
       <Input
         type="email"
-        value={email}
+        name="email"
+        id="email"
         placeholder="person@somemail.com"
-        onChange={(e) => setEmail(e.target.value)}
       />
 
       <h4 className="mb-2 mt-4">Name</h4>
-      <Input
-        type="text"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-      />
+      <Input type="text" name="username" id="username" placeholder="John Doe" />
 
       <h4 className="mb-2 mt-4">Password</h4>
-      <Input
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
+      <Input name="password" id="password" type="password" />
 
       <Button
-        isLoading={loading}
+        isLoading={registerMutation.isPending}
         size={"lg"}
         type="submit"
         variant="outline"
@@ -88,10 +77,10 @@ const Register = () => {
       >
         Create Account
       </Button>
-      {error && (
+      {registerMutation.error && (
         <Alert variant="destructive" className="mt-4">
           <AlertTitle className="font-bold">Something is wrong</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
+          <AlertDescription>{registerMutation.error.message}</AlertDescription>
         </Alert>
       )}
     </form>

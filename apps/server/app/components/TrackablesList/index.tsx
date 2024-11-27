@@ -1,8 +1,6 @@
-"use client";
-
 import { Fragment, useMemo, useState } from "react";
-import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import { format, isLastDayOfMonth } from "date-fns";
 import { AnimatePresence, m } from "framer-motion";
 
@@ -17,9 +15,9 @@ import { Input } from "~/@shad/input";
 import { Spinner } from "~/@shad/spinner";
 import DayCellWrapper from "~/components/DayCell";
 import TrackableProvider from "~/components/Providers/TrackableProvider";
-import { userUserContext } from "~/components/Providers/UserProvider";
 import { TrackableNameText } from "~/components/TrackableName";
 import { generateDates } from "~/components/TrackablesList/helper";
+import { useUserSettings } from "~/query/userSettings";
 import { api } from "~/trpc/react";
 import MiniTrackable from "./miniTrackable";
 
@@ -59,7 +57,7 @@ const filterTrackables = (
 };
 
 const TrackablesList = ({ daysToShow }: { daysToShow: number }) => {
-  const { settings } = userUserContext();
+  const settings = useUserSettings();
 
   const { data, isLoading } = useQuery({
     queryKey: ["trackables", "list"],
@@ -160,7 +158,7 @@ export const DailyList = ({ daysToShow }: { daysToShow: number }) => {
     },
   });
 
-  const { settings } = userUserContext();
+  const settings = useUserSettings();
 
   const daysToRender = useMemo(
     () =>
@@ -207,7 +205,7 @@ export const DailyList = ({ daysToShow }: { daysToShow: number }) => {
                 <div key={index}>
                   <TrackableProvider id={tr.id}>
                     <Link
-                      href={`/app/trackables/${tr.id}/${date.year}/${date.month + 1}`}
+                      href={`/app/trackables/${tr.id}/`}
                       className={cn(
                         "mb-1 block w-full truncate text-xl text-neutral-950 opacity-20 dark:text-neutral-50",
                       )}

@@ -1,6 +1,4 @@
 import { useState } from "react";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
 import {
   ActivityLogIcon,
   CalendarIcon,
@@ -8,7 +6,7 @@ import {
   GearIcon,
   PlusCircledIcon,
 } from "@radix-ui/react-icons";
-import { useTheme } from "next-themes";
+import { Link, useRouter } from "@tanstack/react-router";
 import { useMediaQuery } from "usehooks-ts";
 
 import type { ButtonProps } from "~/@shad/button";
@@ -22,12 +20,14 @@ import {
   DrawerTrigger,
 } from "~/@shad/drawer";
 import { RadioTabItem, RadioTabs } from "~/@shad/radio-tabs";
+import { logoutFn } from "~/auth/authOperations";
 import { SessionUser } from "~/auth/session";
 import {
   Dropdown,
   DropdownContent,
   DropdownTrigger,
 } from "~/components/Dropdown";
+import { useTheme } from "~/components/Providers/ThemeProvider";
 
 const SigOutButton = () => {
   const router = useRouter();
@@ -36,8 +36,8 @@ const SigOutButton = () => {
 
   const signOut = async () => {
     setLoading(true);
-    await fetch("/api/user/logout", { method: "POST", credentials: "include" });
-    router.refresh();
+    await logoutFn();
+    router.navigate({ to: "/login" });
     setLoading(false);
   };
 
@@ -85,7 +85,8 @@ const Links = ({
   variantActive: ButtonProps["variant"];
   onClick?: () => void;
 }) => {
-  const pathName = usePathname();
+  const router = useRouter();
+  const pathName = router.basepath;
 
   return (
     <div className="flex w-full flex-col items-center gap-2 font-medium md:w-fit md:flex-row">

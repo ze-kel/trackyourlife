@@ -1,9 +1,5 @@
-"use client";
-
 import type { ReactNode } from "react";
 import { useMemo } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import {
   BarChartIcon,
   HeartFilledIcon,
@@ -11,16 +7,17 @@ import {
   ValueIcon,
 } from "@radix-ui/react-icons";
 import { useQuery } from "@tanstack/react-query";
+import { Link, useRouter } from "@tanstack/react-router";
 import { useIsClient } from "usehooks-ts";
 
 import type { ITrackable } from "@tyl/validators/trackable";
 import { sortTrackableList } from "@tyl/helpers/trackables";
-import { Spinner } from "~/@shad/spinner";
 
+import { Button } from "~/@shad/button";
+import { Spinner } from "~/@shad/spinner";
 import { CoreLinks } from "~/components/Header";
-import { userUserContext } from "~/components/Providers/UserProvider";
+import { useUserSettings } from "~/query/userSettings";
 import { api } from "~/trpc/react";
-import { Button } from "~/@shad/button";";
 
 const iconsMap: Record<ITrackable["type"], ReactNode> = {
   boolean: <ValueIcon />,
@@ -36,9 +33,10 @@ const TrackablesMiniList = () => {
     },
   });
 
-  const pathname = usePathname();
+  const router = useRouter();
+  const pathname = router.basepath;
 
-  const { settings } = userUserContext();
+  const settings = useUserSettings();
 
   const favsSet = useMemo(() => {
     return new Set(settings.favorites);
@@ -60,7 +58,7 @@ const TrackablesMiniList = () => {
     <div className="flex flex-col gap-2">
       {sorted.map((tr) => {
         return (
-          <Link key={tr.id} href={`/app/trackables/${tr.id}/today`}>
+          <Link key={tr.id} href={`/app/trackables/${tr.id}/`}>
             <Button
               variant={pathname.includes(tr.id) ? "secondary" : "ghost"}
               size={"lg"}
@@ -80,7 +78,8 @@ const TrackablesMiniList = () => {
 };
 
 export const Sidebar = () => {
-  const pathName = usePathname();
+  const router = useRouter();
+  const pathName = router.basepath;
 
   const isClient = useIsClient();
 

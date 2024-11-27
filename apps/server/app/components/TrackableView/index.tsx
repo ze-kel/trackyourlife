@@ -1,17 +1,15 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
 import { format, getDaysInMonth, getISODay, getMonth, getYear } from "date-fns";
 import { ErrorBoundary } from "react-error-boundary";
 
 import { getNowInTimezone } from "@tyl/helpers/timezone";
-import { cn } from "~/@shad";
 
+import { cn } from "~/@shad";
+import { Button } from "~/@shad/button";
 import { useTrackableContextSafe } from "~/components/Providers/TrackableProvider";
-import { userUserContext } from "~/components/Providers/UserProvider";
 import { YearSelector } from "~/components/TrackableView/yearSelector";
-import { Button } from "~/@shad/button";";
+import { useUserSettings } from "~/query/userSettings";
 import DayCellWrapper from "../DayCell";
 
 const Month = ({
@@ -76,7 +74,7 @@ const Year = ({
   year: number;
   openMonth: (n: number) => void;
 }) => {
-  const { settings } = userUserContext();
+  const settings = useUserSettings();
 
   const active = activeMonths(year, getNowInTimezone(settings.timezone));
   const toRender = 12;
@@ -108,25 +106,28 @@ const ViewController = ({
   year,
   setYear,
   month,
+  setMonth,
   increment,
   view,
-  setView,
   isCurrentMonth,
   openCurrentMonth,
 }: {
-  setYear: (v: number) => void;
-  year?: number;
-  month?: number;
+  setYear: (v: TVDateValue) => void;
+  year: TVDateValue;
+  month: TVDateValue;
+  setMonth: (v: TVDateValue) => void;
   isCurrentMonth: boolean;
   view: TView;
-  setView: (v: TView) => void;
   increment: (v: number) => void;
   openCurrentMonth: () => void;
 }) => {
   return (
     <div className="mb-4 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
       <div className="flex items-baseline gap-2 self-center">
-        <YearSelector value={year} onChange={(v) => setYear(v)} />
+        <YearSelector
+          value={typeof year === "number" ? year : undefined}
+          onChange={(v) => setYear(v)}
+        />
 
         {view === "days" &&
           typeof year === "number" &&
@@ -138,7 +139,7 @@ const ViewController = ({
               <Button
                 name="months"
                 variant="ghost"
-                onClick={() => setView("months")}
+                onClick={() => setMonth("list")}
               >
                 {format(new Date(year, month, 1), "MMMM")}
               </Button>
@@ -177,27 +178,35 @@ const ViewController = ({
 
 type TView = "days" | "months";
 
-const TrackableView = ({ y, m }: { y?: number; m?: number }) => {
-  const { settings } = userUserContext();
+export type TVDateValue = number | "list";
+
+const TrackableView = ({
+  year,
+  month,
+  setYear,
+  setMonth,
+}: {
+  year: TVDateValue;
+  month: TVDateValue;
+  setYear: (v: TVDateValue) => void;
+  setMonth: (v: TVDateValue) => void;
+}) => {
+  const settings = useUserSettings();
 
   const now = getNowInTimezone(settings.timezone);
-  const [year, setYear] = useState(
-    typeof y === "number" ? y : now.getFullYear(),
-  );
-  const [month, setMonth] = useState(
-    typeof m === "number" ? m : now.getMonth(),
-  );
-  const [view, setView] = useState<TView>(
-    typeof m !== "number" && typeof y === "number" ? "months" : "days",
-  );
+
+  const view =
+    typeof month !== "number" && typeof year === "number" ? "months" : "days";
 
   const isCurrentMonth = now.getMonth() === month && now.getFullYear() === year;
 
   const increment = (add: number) => {
     if (view === "months") {
+      if (year === "list") return;
       setYear(year + add);
       return;
     }
+    if (year === "list" || month === "list") return;
 
     let newMonth = month + add;
     let newYear = year;
@@ -215,39 +224,14 @@ const TrackableView = ({ y, m }: { y?: number; m?: number }) => {
 
   const openMonth = (m: number) => {
     setMonth(m);
-    setView("days");
   };
 
   const openCurrentMonth = () => {
     const now = getNowInTimezone(settings.timezone);
     setYear(now.getFullYear());
     setMonth(now.getMonth());
-    setView("days");
   };
   const { trackable } = useTrackableContextSafe();
-
-  const [appliedInitialTrasform, setAppliedInitialTrasform] = useState(false);
-
-  useEffect(() => {
-    let url;
-    switch (view) {
-      case "days":
-        url = `/app/trackables/${trackable?.id || ""}/${year}/${month + 1}`;
-        break;
-      case "months":
-        url = `/app/trackables/${trackable?.id || ""}/${year}`;
-        break;
-    }
-    if (url && url !== window.location.pathname) {
-      if (appliedInitialTrasform) {
-        window.history.pushState({}, "", url);
-      } else {
-        window.history.replaceState({}, "", url);
-      }
-    }
-    setAppliedInitialTrasform(true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [view, year, month, trackable]);
 
   if (!trackable) {
     return <div></div>;
@@ -260,9 +244,9 @@ const TrackableView = ({ y, m }: { y?: number; m?: number }) => {
         month={month}
         isCurrentMonth={isCurrentMonth}
         view={view}
-        setView={setView}
         openCurrentMonth={openCurrentMonth}
         setYear={setYear}
+        setMonth={setMonth}
         increment={increment}
       />
       <ErrorBoundary
@@ -270,8 +254,12 @@ const TrackableView = ({ y, m }: { y?: number; m?: number }) => {
           return <div>{error.message}</div>;
         }}
       >
-        {view === "days" && <Month year={year} month={month} />}
-        {view === "months" && <Year year={year} openMonth={openMonth} />}
+        {view === "days" && (
+          <Month year={year as number} month={month as number} />
+        )}
+        {view === "months" && (
+          <Year year={year as number} openMonth={openMonth} />
+        )}
       </ErrorBoundary>
 
       <ErrorBoundary fallback={<div></div>}></ErrorBoundary>

@@ -1,13 +1,10 @@
-"use client";
-
 import { useState } from "react";
 import { useMediaQuery } from "usehooks-ts";
 
+import { Button } from "~/@shad/button";
 import { Drawer, DrawerContent } from "~/@shad/drawer";
 import { Input } from "~/@shad/input";
-
 import { useTrackableContextSafe } from "~/components/Providers/TrackableProvider";
-import { Button } from "~/@shad/button";";
 
 export const TrackableNameEditable = () => {
   const { trackable, updateName } = useTrackableContextSafe();

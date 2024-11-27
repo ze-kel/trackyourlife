@@ -11,25 +11,15 @@ import {
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 import { createServerFn, Meta, Scripts } from "@tanstack/start";
 
+import { getUserFn } from "~/auth/authOperations";
 import { useAppSession } from "~/auth/session.js";
 import { DefaultCatchBoundary } from "~/components/DefaultCatchBoundary.js";
 import { NotFound } from "~/components/NotFound.js";
+import { LazyMotionProvider } from "~/components/Providers/lazyFramerMotionProvider";
+import { ThemeProvider } from "~/components/Providers/ThemeProvider";
 //@ts-expect-error css import
 import appCss from "~/styles/app.css?url";
 import { seo } from "~/utils/seo.js";
-
-const fetchUser = createServerFn({ method: "GET" }).handler(async () => {
-  // We need to auth on the server so we have access to secure cookies
-  const session = await useAppSession();
-
-  if (!session.data.id) {
-    return null;
-  }
-
-  return {
-    id: session.data.id,
-  };
-});
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
@@ -74,11 +64,8 @@ export const Route = createRootRouteWithContext<{
   }),
 
   beforeLoad: async () => {
-    const user = await fetchUser();
-
-    return {
-      user,
-    };
+    const user = await getUserFn();
+    return { user };
   },
   errorComponent: (props) => {
     return (
@@ -106,11 +93,15 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <Meta />
       </head>
       <body>
-        {children}
-        <ScrollRestoration />
-        <TanStackRouterDevtools position="bottom-right" />
-        <ReactQueryDevtools buttonPosition="bottom-left" />
-        <Scripts />
+        <LazyMotionProvider>
+          <ThemeProvider>
+            {children}
+            <ScrollRestoration />
+            <TanStackRouterDevtools position="bottom-right" />
+            <ReactQueryDevtools buttonPosition="bottom-left" />
+            <Scripts />
+          </ThemeProvider>
+        </LazyMotionProvider>
       </body>
     </html>
   );

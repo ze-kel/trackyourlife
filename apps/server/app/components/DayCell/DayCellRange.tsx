@@ -1,7 +1,5 @@
-"use client";
-
 import type { ReactNode } from "react";
-import { useOptimistic, useState } from "react";
+import { useState } from "react";
 import { m } from "framer-motion";
 
 import { cn } from "~/@shad";
@@ -28,9 +26,7 @@ export const DayCellRange = ({
 
   const [isSelecting, setIsSelecting] = useState(false);
 
-  const [dayValue, setIsActive] = useOptimistic(value, (_, value: string) => {
-    return value;
-  });
+  const [dayValue, setIsActive] = useState(value);
 
   const em = dayValue ? (labelMapping[dayValue] as string) : "❓";
 

@@ -1,5 +1,3 @@
-"use client";
-
 import type { MutableRefObject } from "react";
 import { useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
@@ -12,11 +10,12 @@ import type {
 } from "@tyl/validators/trackable";
 import { presetsMap } from "@tyl/helpers/colorPresets";
 import { getNowInTimezone } from "@tyl/helpers/timezone";
+
 import { cn } from "~/@shad";
+import { Button } from "~/@shad/button";
 import { DrawerMobileTitleProvider } from "~/@shad/drawer";
 import { Label } from "~/@shad/label";
 import { Switch } from "~/@shad/switch";
-
 import ColorInput from "~/components/Colors/colorInput";
 import DatePicker from "~/components/DatePicker";
 import { DayCellBaseClasses } from "~/components/DayCell";
@@ -24,8 +23,7 @@ import { DayCellBoolean } from "~/components/DayCell/DayCellBoolean";
 import { DayCellNumber } from "~/components/DayCell/DayCellNumber";
 import { DayCellRange } from "~/components/DayCell/DayCellRange";
 import { DayCellProvider } from "~/components/Providers/DayCellProvider";
-import { userUserContext } from "~/components/Providers/UserProvider";
-import { Button } from "~/@shad/button";";
+import { useUserSettings } from "~/query/userSettings";
 import NumberColorSelector from "../Colors/numberColorSelector";
 import NumberLimitsSelector from "./numberLimitsSelector";
 import RangeLabelSelector from "./rangeLabelSelector";
@@ -260,7 +258,7 @@ const TrackableSettings = ({
   const signal = useRef(new TinySignal());
   const settings = useRef(trackableSettings);
 
-  const u = userUserContext();
+  const uSettings = useUserSettings();
 
   return (
     <div className="flex flex-col gap-4">
@@ -293,7 +291,7 @@ const TrackableSettings = ({
             onChange={(v) => (settings.current.startDate = String(v))}
             limits={{
               start: new Date(1990, 0, 1),
-              end: getNowInTimezone(u.settings.timezone),
+              end: getNowInTimezone(uSettings.timezone),
             }}
             className="mt-2"
           />

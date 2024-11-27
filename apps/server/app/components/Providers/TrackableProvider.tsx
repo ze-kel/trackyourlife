@@ -1,5 +1,3 @@
-"use client";
-
 import type {
   QueryClient,
   UseMutationResult,
@@ -59,13 +57,6 @@ interface ITrackableContext {
   settingsMutation: MutationSettings;
   settingsUpdate: MutationSettings["mutateAsync"];
   settingsUpdatePartial: (v: Partial<ITrackableSettings>) => Promise<void>;
-  useTrackableQueryByMonth: ({
-    month,
-    year,
-  }: {
-    month: number;
-    year: number;
-  }) => UseQueryResult<ITrackableDataMonth, Error>;
 }
 
 const TrackableContext = createContext<ITrackableContext | null>(null);
@@ -149,6 +140,43 @@ const makeUseTrackableQueryByMonth = ({
   };
 };
 
+export const useTrackableQueryByMonth = ({
+  month,
+  year,
+  id,
+}: {
+  id: string;
+  month: number;
+  year: number;
+}) => {
+  const queryClient = useQueryClient();
+  return useQuery({
+    queryKey: ["trackable", id, year, month],
+    queryFn: async () => {
+      const trackable = await api.trackablesRouter.getTrackableById.query({
+        id,
+        limits: {
+          type: "month",
+          year,
+          month,
+        },
+      });
+
+      queryClient.setQueryData(["trackable", id], {
+        ...trackable,
+        data: {},
+        settings: {},
+      });
+      queryClient.setQueryData(
+        ["trackable", id, "settings"],
+        trackable.settings,
+      );
+
+      return trackable.data[year]?.[month] || {};
+    },
+  });
+};
+
 const TrackableProvider = ({
   id,
   children,
@@ -157,11 +185,6 @@ const TrackableProvider = ({
   children: ReactNode;
 }) => {
   const queryClient = useQueryClient();
-
-  const useTrackableQueryByMonth = makeUseTrackableQueryByMonth({
-    id,
-    queryClient,
-  });
 
   // This only contains trackable basic info(right now only the name)
   const query = useQuery({
@@ -313,7 +336,6 @@ const TrackableProvider = ({
         settingsMutation,
         settingsUpdate: settingsMutation.mutateAsync,
         settingsUpdatePartial,
-        useTrackableQueryByMonth,
       }}
     >
       <MemoDayCellProvider type={query.data?.type} settings={settings.data}>

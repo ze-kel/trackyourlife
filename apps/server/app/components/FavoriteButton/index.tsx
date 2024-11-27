@@ -1,12 +1,10 @@
-"use client";
-
 import { useMemo } from "react";
 import { HeartFilledIcon, HeartIcon } from "@radix-ui/react-icons";
 
-import type { ButtonProps } from "../../../../../packages/ui/dist/~/@shad/button";
+import type { ButtonProps } from "~/@shad/button";
+import { Button } from "~/@shad/button";
 import { useTrackableContextSafe } from "~/components/Providers/TrackableProvider";
-import { userUserContext } from "~/components/Providers/UserProvider";
-import { Button } from "~/@shad/button";";
+import { useUserSettings, useUserSettingsMutation } from "~/query/userSettings";
 
 export const FavoriteButton = ({
   variant = "ghost",
@@ -14,7 +12,8 @@ export const FavoriteButton = ({
   variant?: ButtonProps["variant"];
 }) => {
   const { trackable } = useTrackableContextSafe();
-  const { settings, updateSettingsPartial } = userUserContext();
+  const settings = useUserSettings();
+  const { updateSettingsPartial } = useUserSettingsMutation();
 
   const settingsSet = useMemo(() => {
     return new Set(settings.favorites);
