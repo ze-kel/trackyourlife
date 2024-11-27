@@ -11,12 +11,12 @@ import {
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 import { createServerFn, Meta, Scripts } from "@tanstack/start";
 
+import { useAppSession } from "~/auth/session.js";
 import { DefaultCatchBoundary } from "~/components/DefaultCatchBoundary.js";
 import { NotFound } from "~/components/NotFound.js";
 //@ts-expect-error css import
 import appCss from "~/styles/app.css?url";
 import { seo } from "~/utils/seo.js";
-import { useAppSession } from "~/utils/session.js";
 
 const fetchUser = createServerFn({ method: "GET" }).handler(async () => {
   // We need to auth on the server so we have access to secure cookies
@@ -100,44 +100,12 @@ function RootComponent() {
 }
 
 function RootDocument({ children }: { children: React.ReactNode }) {
-  const { user } = Route.useRouteContext();
-
   return (
     <html>
       <head>
         <Meta />
       </head>
       <body>
-        <div className="flex gap-2 p-2 text-lg">
-          <Link
-            to="/"
-            activeProps={{
-              className: "font-bold",
-            }}
-            activeOptions={{ exact: true }}
-          >
-            Home
-          </Link>{" "}
-          <Link
-            to="/posts"
-            activeProps={{
-              className: "font-bold",
-            }}
-          >
-            Posts
-          </Link>
-          <div className="ml-auto">
-            {user ? (
-              <>
-                <span className="mr-2">{user.id}</span>
-                <Link to="/logout">Logout</Link>
-              </>
-            ) : (
-              <Link to="/login">Login</Link>
-            )}
-          </div>
-        </div>
-        <hr />
         {children}
         <ScrollRestoration />
         <TanStackRouterDevtools position="bottom-right" />

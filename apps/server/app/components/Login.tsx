@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/start";
 
-import { loginFn } from "../routes/_authed";
+import { loginFn } from "../routes/app";
 import { Auth } from "./Auth";
 
 export function Login() {
@@ -16,7 +16,6 @@ export function Login() {
       email: string;
       password: string;
     }) => {
-      console.log("hello");
       await loginFn({ data: { email, password } });
     },
     onSuccess: async (ctx) => {
