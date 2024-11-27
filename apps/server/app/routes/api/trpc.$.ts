@@ -1,17 +1,19 @@
 import { createAPIFileRoute } from "@tanstack/start/api";
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 
-import { appRouter, createCaller, createTRPCContext } from "@tyl/api";
+import { appRouter, createTRPCContext } from "@tyl/api";
 
-import { useAppSession } from "~/auth/session";
+import { getAuthSession } from "~/auth/auth";
 
 const createContext = async () => {
-  const s = await useAppSession();
+  const s = await getAuthSession();
+
+  console.log("creating context", s);
 
   return createTRPCContext({
-    user: s.data.id
+    user: s.session
       ? {
-          id: s.data.id as string,
+          id: s.session?.userId as string,
         }
       : null,
     source: "",
@@ -22,7 +24,6 @@ function handler({ request }: { request: Request }) {
   return fetchRequestHandler({
     req: request,
     createContext,
-    //@ts-expect-error
     router: appRouter,
     endpoint: "/api/trpc",
   });

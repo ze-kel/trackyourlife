@@ -7,24 +7,10 @@ import { fillPrefetchedTrackablesList } from "~/utils/fillPrefetched";
 
 const SHOW_DAYS = 6;
 
-const sf = createServerFn({ method: "GET" }).handler(async () => {
-  const a = await apiS.trackablesRouter.getAllTrackables({
-    limits: {
-      type: "last",
-      days: SHOW_DAYS,
-    },
-  });
-
-  return a;
-});
-
 export const Route = createFileRoute("/app/trackables/")({
   component: PostsComponent,
 
-  loader: async ({ context }) => {
-    const trackables = await sf();
-    await fillPrefetchedTrackablesList(context.queryClient, trackables);
-  },
+  loader: async ({ context }) => {},
 });
 
 function PostsComponent() {

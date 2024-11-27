@@ -1,14 +1,14 @@
 import { createCaller, createTRPCContext } from "@tyl/api";
 
-import { useAppSession } from "../auth/session";
+import { getAuthSession } from "~/auth/auth";
 
 const createContext = async () => {
-  const s = await useAppSession();
+  const s = await getAuthSession();
 
   return createTRPCContext({
-    user: s.data.id
+    user: s.session
       ? {
-          id: s.data.id as string,
+          id: s.session?.userId as string,
         }
       : null,
     source: "",

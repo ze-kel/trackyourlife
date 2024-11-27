@@ -15,6 +15,7 @@ import { Route as LoginImport } from './routes/login'
 import { Route as AppImport } from './routes/app'
 import { Route as IndexImport } from './routes/index'
 import { Route as AppIndexImport } from './routes/app/index'
+import { Route as AppTestImport } from './routes/app/test'
 import { Route as AppTrackablesIndexImport } from './routes/app/trackables/index'
 import { Route as AppTrackablesIdImport } from './routes/app/trackables/$id'
 
@@ -41,6 +42,12 @@ const IndexRoute = IndexImport.update({
 const AppIndexRoute = AppIndexImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AppRoute,
+} as any)
+
+const AppTestRoute = AppTestImport.update({
+  id: '/test',
+  path: '/test',
   getParentRoute: () => AppRoute,
 } as any)
 
@@ -81,6 +88,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginImport
       parentRoute: typeof rootRoute
     }
+    '/app/test': {
+      id: '/app/test'
+      path: '/test'
+      fullPath: '/app/test'
+      preLoaderRoute: typeof AppTestImport
+      parentRoute: typeof AppImport
+    }
     '/app/': {
       id: '/app/'
       path: '/'
@@ -108,12 +122,14 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 interface AppRouteChildren {
+  AppTestRoute: typeof AppTestRoute
   AppIndexRoute: typeof AppIndexRoute
   AppTrackablesIdRoute: typeof AppTrackablesIdRoute
   AppTrackablesIndexRoute: typeof AppTrackablesIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppTestRoute: AppTestRoute,
   AppIndexRoute: AppIndexRoute,
   AppTrackablesIdRoute: AppTrackablesIdRoute,
   AppTrackablesIndexRoute: AppTrackablesIndexRoute,
@@ -125,6 +141,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
+  '/app/test': typeof AppTestRoute
   '/app/': typeof AppIndexRoute
   '/app/trackables/$id': typeof AppTrackablesIdRoute
   '/app/trackables': typeof AppTrackablesIndexRoute
@@ -133,6 +150,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/app/test': typeof AppTestRoute
   '/app': typeof AppIndexRoute
   '/app/trackables/$id': typeof AppTrackablesIdRoute
   '/app/trackables': typeof AppTrackablesIndexRoute
@@ -143,6 +161,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
+  '/app/test': typeof AppTestRoute
   '/app/': typeof AppIndexRoute
   '/app/trackables/$id': typeof AppTrackablesIdRoute
   '/app/trackables/': typeof AppTrackablesIndexRoute
@@ -154,16 +173,24 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/login'
+    | '/app/test'
     | '/app/'
     | '/app/trackables/$id'
     | '/app/trackables'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/app' | '/app/trackables/$id' | '/app/trackables'
+  to:
+    | '/'
+    | '/login'
+    | '/app/test'
+    | '/app'
+    | '/app/trackables/$id'
+    | '/app/trackables'
   id:
     | '__root__'
     | '/'
     | '/app'
     | '/login'
+    | '/app/test'
     | '/app/'
     | '/app/trackables/$id'
     | '/app/trackables/'
@@ -203,6 +230,7 @@ export const routeTree = rootRoute
     "/app": {
       "filePath": "app.tsx",
       "children": [
+        "/app/test",
         "/app/",
         "/app/trackables/$id",
         "/app/trackables/"
@@ -210,6 +238,10 @@ export const routeTree = rootRoute
     },
     "/login": {
       "filePath": "login.tsx"
+    },
+    "/app/test": {
+      "filePath": "app/test.tsx",
+      "parent": "/app"
     },
     "/app/": {
       "filePath": "app/index.tsx",

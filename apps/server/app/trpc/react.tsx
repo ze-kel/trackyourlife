@@ -1,11 +1,12 @@
 import { createTRPCClient, httpBatchLink, loggerLink } from "@trpc/client";
 import SuperJSON from "superjson";
+import { getHeaders } from "vinxi/http";
 
 import type { AppRouter } from "@tyl/api";
 
 const getBaseUrl = () => {
   if (typeof window !== "undefined") return window.location.origin;
-  return `http://localhost:${process.env.PORT ?? 3001}`;
+  return `http://localhost:${process.env.PORT ?? 3000}`;
 };
 
 export const api = createTRPCClient<AppRouter>({

@@ -19,8 +19,7 @@
     "typecheck": "tsc --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
-    "@trpc/server": "11.0.0-rc.403",
-    "@tyl/auth": "workspace:*",
+    "@trpc/server": "catalog:",
     "@tyl/db": "workspace:*",
     "@tyl/helpers": "workspace:*",
     "@tyl/validators": "workspace:*",

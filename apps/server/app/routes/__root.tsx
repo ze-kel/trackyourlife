@@ -9,10 +9,9 @@ import {
   ScrollRestoration,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
-import { createServerFn, Meta, Scripts } from "@tanstack/start";
+import { Meta, Scripts } from "@tanstack/start";
 
 import { getUserFn } from "~/auth/authOperations";
-import { useAppSession } from "~/auth/session.js";
 import { DefaultCatchBoundary } from "~/components/DefaultCatchBoundary.js";
 import { NotFound } from "~/components/NotFound.js";
 import { LazyMotionProvider } from "~/components/Providers/lazyFramerMotionProvider";
