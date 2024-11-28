@@ -6,7 +6,12 @@ import {
   GearIcon,
   PlusCircledIcon,
 } from "@radix-ui/react-icons";
-import { Link, useRouter } from "@tanstack/react-router";
+import {
+  Link,
+  linkOptions,
+  useLocation,
+  useRouter,
+} from "@tanstack/react-router";
 import { useTheme } from "next-themes";
 import { useMediaQuery } from "usehooks-ts";
 
@@ -53,26 +58,43 @@ const SigOutButton = () => {
 };
 
 export const CoreLinks = [
-  {
-    icon: CalendarIcon,
-    name: "Today",
-    link: "/app",
-  },
-  {
-    icon: ActivityLogIcon,
-    name: "Trackables",
-    link: "/app/trackables",
-  },
-  {
-    icon: PlusCircledIcon,
-    name: "Create",
-    link: "/app/create",
-  },
-  {
-    icon: GearIcon,
-    name: "Settings",
-    link: "/app/settings",
-  },
+  linkOptions({
+    to: "/app",
+    label: (
+      <>
+        <CalendarIcon />
+        Today
+      </>
+    ),
+  }),
+  linkOptions({
+    to: "/app/trackables",
+    label: (
+      <>
+        <ActivityLogIcon />
+        Trackables
+      </>
+    ),
+  }),
+  linkOptions({
+    to: "/app/create",
+    label: (
+      <>
+        <PlusCircledIcon />
+        Create
+      </>
+    ),
+    variant: "ghost",
+  }),
+  linkOptions({
+    to: "/app/settings",
+    label: (
+      <>
+        <GearIcon />
+        Settings
+      </>
+    ),
+  }),
 ];
 
 const Links = ({
@@ -84,23 +106,16 @@ const Links = ({
   variantActive: ButtonProps["variant"];
   onClick?: () => void;
 }) => {
-  const router = useRouter();
-  const pathName = router.basepath;
-
+  const loc = useLocation();
   return (
     <div className="flex w-full flex-col items-center gap-2 font-medium md:w-fit md:flex-row">
       {CoreLinks.map((v) => (
-        <Link
-          key={v.link}
-          href={v.link}
-          className="block w-full"
-          onClick={onClick}
-        >
+        <Link key={v.to} {...v} className="block w-full" onClick={onClick}>
           <Button
+            variant={loc.pathname === v.to ? variantActive : variant}
             className="w-full"
-            variant={v.link === pathName ? variantActive : variant}
           >
-            {v.name}
+            {v.label}
           </Button>
         </Link>
       ))}
@@ -193,7 +208,7 @@ const Header = () => {
   return (
     <div className="flex h-full w-full items-center justify-between px-0">
       <Link
-        href={"/app/"}
+        to={"/app"}
         className="flex h-full items-center justify-center px-4 xl:px-6"
       >
         <h2 className="text-2xl font-bold tracking-wider">TYL</h2>

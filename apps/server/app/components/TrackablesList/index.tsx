@@ -27,7 +27,7 @@ const EmptyList = () => {
         You do not have any trackables yet.
       </h2>
 
-      <Link className="mt-4" href={"/app/create"}>
+      <Link className="mt-4" to={"/app/create"}>
         <Button variant="outline">Create Trackable</Button>
       </Link>
     </div>
@@ -194,7 +194,7 @@ export const DailyList = ({ daysToShow }: { daysToShow: number }) => {
                 <div key={index}>
                   <TrackableProvider id={tr.id}>
                     <Link
-                      href={`/app/trackables/${tr.id}/`}
+                      to={`/app/trackables/${tr.id}/`}
                       className={cn(
                         "mb-1 block w-full truncate text-xl text-neutral-950 opacity-20 dark:text-neutral-50",
                       )}

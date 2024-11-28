@@ -1,5 +1,10 @@
 import { CalendarIcon, GearIcon } from "@radix-ui/react-icons";
-import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  Link,
+  Outlet,
+  useLocation,
+} from "@tanstack/react-router";
 import { z } from "zod";
 
 import { Button } from "~/@shad/button";
@@ -89,6 +94,7 @@ export const Route = createFileRoute("/app/trackables/$id")({
 
 function RouteComponent() {
   const params = Route.useParams();
+  const loc = useLocation();
 
   return (
     <TrackableProvider id={params.id}>
@@ -97,26 +103,19 @@ function RouteComponent() {
           <TrackableNameEditable />
           <div className="flex gap-2">
             <FavoriteButton variant={"outline"} />
-            <Link
-              to={`/app/trackables/${params.id}/settings`}
-              activeProps={{
-                className: "hidden",
-              }}
-            >
-              <Button name="settings" variant="outline" size="icon">
-                <GearIcon className="h-4 w-4" />
-              </Button>
-            </Link>
-            <Link
-              to={`/app/trackables/${params.id}/view`}
-              activeProps={{
-                className: "hidden",
-              }}
-            >
-              <Button variant="outline" size="icon">
-                <CalendarIcon className="h-4 w-4" />
-              </Button>
-            </Link>
+            {loc.pathname !== `/app/trackables/${params.id}/settings` ? (
+              <Link to={`/app/trackables/${params.id}/settings`}>
+                <Button name="settings" variant="outline" size="icon">
+                  <GearIcon className="h-4 w-4" />
+                </Button>
+              </Link>
+            ) : (
+              <Link to={`/app/trackables/${params.id}/view`}>
+                <Button variant="outline" size="icon">
+                  <CalendarIcon className="h-4 w-4" />
+                </Button>
+              </Link>
+            )}
             <DeleteButton id={params.id} />
           </div>
         </div>

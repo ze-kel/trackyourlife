@@ -21,7 +21,7 @@ const MiniTrackable = ({
     <div className={className}>
       <div className="flex items-center justify-between">
         <Link
-          href={`/app/trackables/${trackable?.id}/`}
+          to={`/app/trackables/${trackable?.id}/`}
           className={cn(
             "mb-1 block w-full text-xl font-light text-neutral-950 dark:text-neutral-50",
           )}

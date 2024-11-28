@@ -1,12 +1,12 @@
 import type { ReactNode } from "react";
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 import {
   BarChartIcon,
   HeartFilledIcon,
   MixIcon,
   ValueIcon,
 } from "@radix-ui/react-icons";
-import { Link, useRouter } from "@tanstack/react-router";
+import { Link, useLocation } from "@tanstack/react-router";
 
 import type { ITrackable } from "@tyl/validators/trackable";
 import { sortTrackableList } from "@tyl/helpers/trackables";
@@ -26,9 +26,7 @@ const iconsMap: Record<ITrackable["type"], ReactNode> = {
 const TrackablesMiniList = () => {
   const { data, isPending } = useTrackablesList();
 
-  const router = useRouter();
-  const pathname = router.basepath;
-
+  const loc = useLocation();
   const settings = useUserSettings();
 
   const favsSet = useMemo(() => {
@@ -51,9 +49,9 @@ const TrackablesMiniList = () => {
     <div className="flex flex-col gap-2">
       {sorted.map((tr) => {
         return (
-          <Link key={tr.id} href={`/app/trackables/${tr.id}/`}>
+          <Link key={tr.id} to={`/app/trackables/${tr.id}/`}>
             <Button
-              variant={pathname.includes(tr.id) ? "secondary" : "ghost"}
+              variant={loc.pathname.includes(tr.id) ? "secondary" : "ghost"}
               size={"lg"}
               className="w-full justify-between px-3"
             >
@@ -71,21 +69,19 @@ const TrackablesMiniList = () => {
 };
 
 export const Sidebar = () => {
-  const router = useRouter();
-  const pathName = router.basepath;
+  const loc = useLocation();
 
   return (
     <div>
       <div className="flex flex-col gap-2">
         {CoreLinks.map((v) => (
-          <Link key={v.link} href={v.link} className="block w-full">
+          <Link key={v.to} {...v} className="block w-full">
             <Button
+              variant={v.to === loc.pathname ? "secondary" : "ghost"}
               className="w-full justify-start gap-4 px-3"
               size={"lg"}
-              variant={v.link === pathName ? "secondary" : "ghost"}
             >
-              <v.icon className="" />
-              <div className="">{v.name}</div>
+              {v.label}
             </Button>
           </Link>
         ))}

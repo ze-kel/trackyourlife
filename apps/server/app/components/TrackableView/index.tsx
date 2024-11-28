@@ -20,6 +20,7 @@ const Month = ({
   year: number;
   mini?: boolean;
 }) => {
+  const { trackable } = useTrackableContextSafe();
   const toRender = getDaysInMonth(new Date(year, month));
   const dates = Array(toRender)
     .fill(0)
@@ -44,7 +45,7 @@ const Month = ({
       ))}
       {dates.map((el) => (
         <DayCellWrapper
-          key={`${month}-${el}`}
+          key={`${trackable?.id}-${month}-${el}`}
           year={year}
           month={month}
           day={el}
