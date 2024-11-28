@@ -10,7 +10,7 @@ import { ZLogin } from "@tyl/validators/user";
 import { createSession, generateSessionToken } from "~/auth/auth";
 
 export const Route = createAPIFileRoute("/api/user/logintoken")({
-  GET: async ({ request, params }) => {
+  GET: async ({ request }) => {
     const data = (await request.json()) as unknown;
 
     try {
@@ -59,6 +59,7 @@ export const Route = createAPIFileRoute("/api/user/logintoken")({
       });
     } catch (e) {
       setResponseStatus(500);
+      console.error(e);
       return json({
         error: "An unknown error occurred",
       });

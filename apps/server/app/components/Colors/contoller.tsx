@@ -3,12 +3,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { range } from "@tyl/helpers/animation";
 
-type IUseRefSizeReturn = {
+interface IUseRefSizeReturn {
   width: number;
   height: number;
   top: number;
   left: number;
-};
+}
 
 // Note that when we access properties on render we can use regular data to rerender on change
 // But when we access stuff in handlers(i.e mousemove\touchmove) we should use ref to guarantee up to date values

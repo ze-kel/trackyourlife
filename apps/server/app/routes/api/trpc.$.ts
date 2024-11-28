@@ -13,7 +13,7 @@ const createContext = async () => {
   return createTRPCContext({
     user: s.session
       ? {
-          id: s.session?.userId as string,
+          id: s.session.userId,
         }
       : null,
     source: "",

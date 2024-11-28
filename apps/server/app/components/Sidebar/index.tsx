@@ -26,7 +26,7 @@ const iconsMap: Record<ITrackable["type"], ReactNode> = {
 };
 
 const TrackablesMiniList = () => {
-  const { data, isLoading } = useQuery({
+  const { data, isPending } = useQuery({
     queryKey: ["trackables", "list"],
     queryFn: async () => {
       return await trpc.trackablesRouter.getTrackableIdList.query();
@@ -42,7 +42,7 @@ const TrackablesMiniList = () => {
     return new Set(settings.favorites);
   }, [settings]);
 
-  if (isLoading || !data) {
+  if (isPending) {
     return (
       <div className="flex h-64 w-full items-center justify-center">
         <Spinner />
@@ -50,9 +50,9 @@ const TrackablesMiniList = () => {
     );
   }
 
-  if (data.length === 0) return <div></div>;
+  if (!data || data.length === 0) return <div></div>;
 
-  const sorted = sortTrackableList(data || [], settings.favorites);
+  const sorted = sortTrackableList(data, settings.favorites);
 
   return (
     <div className="flex flex-col gap-2">

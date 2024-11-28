@@ -167,7 +167,7 @@ const ControllerGradient = ({
 
   const removeColor = (id: string) => {
     const newVal = [...value].filter((v) => v.id !== id);
-    setSelectedColor(newVal[0]?.id || "");
+    setSelectedColor(newVal[0]?.id ?? "");
     onChange(newVal);
   };
 
@@ -183,7 +183,7 @@ const ControllerGradient = ({
     onChange(r);
   };
 
-  const [selectedColor, setSelectedColor] = useState(value[0]?.id || "");
+  const [selectedColor, setSelectedColor] = useState(value[0]?.id ?? "");
 
   const selectedColorIndex = useMemo(() => {
     return value.findIndex((v) => v.id === selectedColor);
@@ -206,12 +206,13 @@ const ControllerGradient = ({
   const [gradientPreviewTheme, setGradientPreviewTheme] = useState("dark");
 
   useEffect(() => {
-    setGradientPreviewTheme(theme || "");
+    setGradientPreviewTheme(theme ?? "");
   }, [theme]);
 
   return (
     <>
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-[min-content_1fr_min-content_min-content]">
+        {/* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition */}
         {isDragging && false && (
           <div
             className={cn(
@@ -330,7 +331,6 @@ const ControllerGradient = ({
             className="w-16"
           />
         </div>
-
         <RadioTabs
           suppressHydrationWarning={true}
           value={gradientPreviewTheme}
@@ -422,9 +422,9 @@ const NumberColorSelector = ({
   value: IColorCodingValue[];
   onChange: (v: NonNullable<IColorCodingValue[]>) => void;
 }) => {
-  const [innerEnabled, setInnerEnabled] = useState(enabled || false);
+  const [innerEnabled, setInnerEnabled] = useState(enabled ?? false);
   const [innerValue, setInnerValue] = useState(
-    value && value.length
+    value.length
       ? value
       : [
           { point: 0, color: presetsMap.red, id: uuidv4() },
@@ -443,9 +443,7 @@ const NumberColorSelector = ({
           onCheckedChange={(v) => {
             setInnerEnabled(v);
             onEnabledChange(v);
-            if (true && !value) {
-              onChange(innerValue);
-            }
+            onChange(innerValue);
           }}
         />
         <Label htmlFor="color-coding">Use color coding</Label>

@@ -49,8 +49,8 @@ const getUserSettingsFromDb = async (userId?: string) => {
   }
 
   currentUserInfo.set({
-    username: res?.username || undefined,
-    email: res?.email || undefined,
+    username: res?.username ?? undefined,
+    email: res?.email ?? undefined,
   });
 
   return;
@@ -73,8 +73,8 @@ const subscribeToSettingsUpdates = (userId?: string) => {
     }
 
     currentUserInfo.set({
-      username: a.username || undefined,
-      email: a.email || undefined,
+      username: a.username ?? undefined,
+      email: a.email ?? undefined,
     });
   });
 };

@@ -74,7 +74,7 @@ export const trackablesRouter = {
         },
       });
 
-      if (!tr || tr.isDeleted) {
+      if (!tr ?? tr.isDeleted) {
         throw new Error(`Unable to find trackable with id: ${input.id}`);
       }
 
@@ -219,7 +219,7 @@ export const trackablesRouter = {
         ),
       });
 
-      if (!tr || tr.isDeleted) {
+      if (!tr ?? tr.isDeleted) {
         throw new Error(`No trackable with id ${input.id}`);
       }
 

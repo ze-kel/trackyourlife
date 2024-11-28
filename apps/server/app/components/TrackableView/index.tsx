@@ -1,13 +1,5 @@
-import { useEffect, useState } from "react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
-import {
-  format,
-  getDaysInMonth,
-  getISODay,
-  getMonth,
-  getYear,
-  setYear,
-} from "date-fns";
+import { format, getDaysInMonth, getISODay, getMonth, getYear } from "date-fns";
 import { ErrorBoundary } from "react-error-boundary";
 
 import { getNowInTimezone } from "@tyl/helpers/timezone";

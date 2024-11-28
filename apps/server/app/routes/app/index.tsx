@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/start";
 
 import { DailyList } from "~/components/TrackablesList";
 import { trpc } from "~/trpc/react";
@@ -17,7 +16,7 @@ export const Route = createFileRoute("/app/")({
         days: SHOW_DAYS,
       },
     });
-    await fillPrefetchedTrackablesList(context.queryClient, trackables);
+    fillPrefetchedTrackablesList(context.queryClient, trackables);
   },
 });
 

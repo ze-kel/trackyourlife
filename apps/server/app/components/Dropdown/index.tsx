@@ -1,4 +1,3 @@
-/* eslint-disable react/display-name */
 import type {
   FloatingContext,
   Placement,
@@ -20,7 +19,7 @@ import { AnimatePresence, m } from "framer-motion";
 
 import { cn } from "~/@shad";
 
-export type IDropdown = {
+export interface IDropdown {
   open?: boolean;
   onOpenChange?: (v: boolean) => void;
   background?: boolean;
@@ -28,7 +27,7 @@ export type IDropdown = {
   placeCenter?: boolean;
   offset?: number;
   children: ReactNode;
-};
+}
 
 const DropdownContext = createContext<{
   background?: boolean;
@@ -98,8 +97,8 @@ const DropdownContent = ({
           transition={{ duration: 0.1 }}
           style={{
             position: context.strategy,
-            top: context.y ?? 0,
-            left: context.x ?? 0,
+            top: context.y || 0,
+            left: context.x || 0,
             width: "max-content",
           }}
           className={cn(
@@ -131,7 +130,7 @@ const Dropdown = ({
     open: typeof onOpenChange === "function" ? open : internalOpen,
     onOpenChange:
       typeof onOpenChange === "function" ? onOpenChange : internalSetOpen,
-    placement: placeCenter ? "bottom" : placement || "bottom-start",
+    placement: placeCenter ? "bottom" : (placement ?? "bottom-start"),
     middleware: [
       offsetMiddleware(
         placeCenter

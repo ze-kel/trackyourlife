@@ -15,14 +15,14 @@ const AF = 1;
 
 const EMOJI_H = 45;
 
-type MakerProps<T> = {
+interface MakerProps<T> {
   center: T;
   oneOff: T;
   twoOff: T;
   oneOffR?: T;
   twoOffR?: T;
   len: number;
-};
+}
 type IndexGetter<T> = (i: number) => T;
 
 // Might be better to use Framer Motion Variants
@@ -43,19 +43,19 @@ function makeIndexGetter<T>({
   let arr: T[] = [];
   switch (len) {
     case 2: {
-      arr = [oneOff, oneOffR || oneOff];
+      arr = [oneOff, oneOffR ?? oneOff];
       break;
     }
     case 3: {
-      arr = [oneOff, center, oneOffR || oneOff];
+      arr = [oneOff, center, oneOffR ?? oneOff];
       break;
     }
     case 4: {
-      arr = [twoOff, oneOff, oneOffR || oneOff, twoOffR || twoOff];
+      arr = [twoOff, oneOff, oneOffR ?? oneOff, twoOffR ?? twoOff];
       break;
     }
     default: {
-      arr = [twoOff, oneOff, center, oneOffR || oneOff, twoOffR || twoOff];
+      arr = [twoOff, oneOff, center, oneOffR ?? oneOff, twoOffR ?? twoOff];
     }
   }
 
@@ -68,7 +68,7 @@ export const PopupSelector = ({
   rangeMapping,
   onSelect,
 }: PopupSelectorProps) => {
-  if (!rangeMapping || !rangeMapping.length) return <></>;
+  if (!rangeMapping?.length) return <></>;
 
   const getDelayByIndex = makeIndexGetter({
     center: 0 * AF,

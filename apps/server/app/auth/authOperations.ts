@@ -1,5 +1,5 @@
-import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
-import { createServerFn, json } from "@tanstack/start";
+import { redirect } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/start";
 import { Argon2id } from "oslo/password";
 import { deleteCookie } from "vinxi/http";
 import { z } from "zod";
@@ -81,7 +81,7 @@ export const registerFn = createServerFn({ method: "POST" })
       id: userId,
       email: data.email.toLowerCase(),
       hashedPassword,
-      username: data.username || "unknown user",
+      username: data.username.length > 0 ? data.username : "unknown user",
       role: "user",
       settings: {},
     });

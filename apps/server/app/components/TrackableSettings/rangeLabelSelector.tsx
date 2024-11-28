@@ -136,7 +136,7 @@ const RangeLabelSelector = ({
   initialValue,
   onChange,
 }: IRangeLabelSelector) => {
-  const [value, updateValue] = useState(addIds(initialValue) || []);
+  const [value, updateValue] = useState(addIds(initialValue));
   const [error, updateError] = useState<string>();
 
   const checkDuplicates = (index: number) => {
@@ -174,13 +174,9 @@ const RangeLabelSelector = ({
   const changeByIndex = (index: number, v: IRangeLabel) => {
     const upd = cloneDeep(value);
 
-    try {
-      upd[index] = v;
-      updateValue(upd);
-      pushUpdates(upd);
-    } catch (e) {
-      throw e;
-    }
+    upd[index] = v;
+    updateValue(upd);
+    pushUpdates(upd);
   };
 
   const addNewProperty = () => {

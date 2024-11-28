@@ -10,7 +10,7 @@ import { getTimezones } from "~/components/Settings/timzones";
 
 export const Route = createFileRoute("/app/settings")({
   component: RouteComponent,
-  loader: async ({}) => {
+  loader: async () => {
     return await getTimezones();
   },
 });

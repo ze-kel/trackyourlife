@@ -69,7 +69,7 @@ export default function Spinner({
         ]}
       >
         <Image
-          source={colors[color][colorScheme || "light"]}
+          source={colors[color][colorScheme ?? "light"]}
           style={{ width, resizeMode: "contain", display: "flex" }}
         />
       </Animated.View>

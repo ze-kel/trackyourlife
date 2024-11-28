@@ -41,7 +41,7 @@ export const YearSelector = ({
   const handleRealSave = () => {
     const n = Number(valueInternal);
 
-    if (Number.isNaN(n) || n < 1970 || n > 2100) {
+    if (Number.isNaN(n) || n < 1970 || n > 3000) {
       setValueInternal(String(value));
       return;
     }

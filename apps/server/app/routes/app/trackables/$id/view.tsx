@@ -2,7 +2,6 @@ import * as React from "react";
 import { createFileRoute } from "@tanstack/react-router";
 
 import TrackableView from "~/components/TrackableView";
-import { Route as PRoute } from "../$id";
 
 export const Route = createFileRoute("/app/trackables/$id/view")({
   component: RouteComponent,
@@ -17,7 +16,7 @@ function RouteComponent() {
       month={month}
       year={year}
       setDates={(y, m) => {
-        navigate({
+        void navigate({
           search: (prev) => ({ ...prev, year: y, month: m }),
         });
       }}

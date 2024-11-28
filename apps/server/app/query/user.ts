@@ -1,5 +1,5 @@
-import { QueryClient, useQuery } from "@tanstack/react-query";
-import { createServerFn } from "@tanstack/start";
+import type { QueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 
 import { getUserFn } from "~/auth/authOperations";
 
@@ -13,8 +13,6 @@ export const ensureUser = async (qc: QueryClient) => {
   await qc.prefetchQuery(q);
 };
 
-export const useUser = () => {
-  const r = useQuery(q);
-  if (!r.data) throw new Error("User not found");
-  return r.data;
+export const useUserQuery = () => {
+  return useQuery(q);
 };

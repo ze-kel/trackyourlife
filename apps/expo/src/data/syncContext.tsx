@@ -156,7 +156,7 @@ const sync = async (clear?: boolean) => {
   isSyncing.set(true);
   syncError.set("");
 
-  let ls = lastSync.get() || new Date(1971);
+  let ls = lastSync.get() ?? new Date(1971);
 
   try {
     const nowDate = new Date();
@@ -182,7 +182,7 @@ const sync = async (clear?: boolean) => {
       recordUpdates: localUpdates.recordUpdates,
       userUpdates: localUpdates.userUpdates
         ? {
-            username: localUpdates.userUpdates.username || "",
+            username: localUpdates.userUpdates.username ?? "",
             settings: localUpdates.userUpdates.settings as IUserSettings,
             updated: localUpdates.userUpdates.updated,
           }

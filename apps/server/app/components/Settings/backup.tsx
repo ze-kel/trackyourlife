@@ -1,11 +1,8 @@
 import { useState } from "react";
 import { z } from "zod";
 
-import {
-  ITrackable,
-  ITrackableUpdate,
-  ZTrackable,
-} from "@tyl/validators/trackable";
+import type { ITrackable, ITrackableUpdate } from "@tyl/validators/trackable";
+import { ZTrackable } from "@tyl/validators/trackable";
 
 import { Button } from "~/@shad/button";
 import { Input } from "~/@shad/input";
@@ -63,13 +60,13 @@ export const BackupAndRestore = () => {
             if (!firstFile) return;
 
             const name = firstFile.name;
-            let reader = new FileReader();
+            const reader = new FileReader();
 
             reader.readAsText(firstFile);
 
             reader.onload = () => {
               if (typeof reader.result === "string") {
-                setFileData([name, reader.result as string]);
+                setFileData([name, reader.result]);
               }
             };
           }}
@@ -93,16 +90,16 @@ const backupZ = z.array(ZTrackable);
 
 const parseContentJson = (content: string) => {
   try {
-    return { result: JSON.parse(content) };
+    return { result: JSON.parse(content) as unknown };
   } catch (e) {
-    return { error: "Error when parsing JSON: " + e };
+    return { error: "Error when parsing JSON: " + String(e) };
   }
 };
 
 const FileParser = ({ content }: { content?: string }) => {
   const [prefix, setPrefix] = useState("");
 
-  if (!content || !content.length) return;
+  if (!content?.length) return;
 
   const objectFromJson = parseContentJson(content);
 

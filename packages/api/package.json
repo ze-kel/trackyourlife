@@ -33,7 +33,7 @@
     "@tyl/eslint-config": "workspace:*",
     "@tyl/prettier-config": "workspace:*",
     "@tyl/tsconfig": "workspace:*",
-    "eslint": "^8.57.0",
+    "eslint": "catalog:",
     "prettier": "^3.3.3",
     "typescript": "catalog:"
   },

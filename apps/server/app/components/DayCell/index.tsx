@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { useMemo } from "react";
 
-import type { ITrackable, ITrackableSettings } from "@tyl/validators/trackable";
+import type { ITrackable } from "@tyl/validators/trackable";
 import { getNowInTimezone } from "@tyl/helpers/timezone";
 import { computeDayCellHelpers } from "@tyl/helpers/trackables";
 
@@ -83,6 +83,7 @@ const DayCellInner = ({
     );
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (type === "range") {
     return (
       <DayCellRange className={className} value={value} onChange={onChange}>
@@ -110,7 +111,7 @@ const DayCellWrapper = ({
 }) => {
   const { trackable, settings, update } = useTrackableContextSafe();
 
-  if (!trackable) return <></>;
+  if (!trackable) throw new Error("Trackable not found in context");
 
   const { data, isLoading } = useTrackableQueryByMonth({
     month,
@@ -131,8 +132,6 @@ const DayCellWrapper = ({
       }),
     [day, month, year, settings?.startDate, uSettings.timezone],
   );
-
-  if (!trackable) return <></>;
 
   const updateHandler = async (value: string) => {
     await update({ value, day, month, year });

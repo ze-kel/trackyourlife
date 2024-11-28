@@ -28,7 +28,7 @@ export const DayCellRange = ({
 
   const [dayValue, setIsActive] = useState(value);
 
-  const em = dayValue ? (labelMapping[dayValue] as string) : "❓";
+  const em = dayValue ? labelMapping[dayValue] : "❓";
 
   const handleSelect = async (v: string) => {
     setIsSelecting(false);
@@ -39,19 +39,21 @@ export const DayCellRange = ({
   };
 
   const cycleNext = async () => {
-    if (!labels || !labels.length || !onChange) return;
+    if (!labels?.length || !onChange) return;
 
     const totalLabels = labels.length;
     const currentIndex = labels.findIndex((v) => v.internalKey === dayValue);
 
     if (!dayValue) {
-      await onChange(labels[0]?.internalKey || "");
+      await onChange(labels[0]?.internalKey ?? "");
     } else if (currentIndex < 0) {
-      await onChange(labels[0]?.internalKey || "");
+      await onChange(labels[0]?.internalKey ?? "");
     } else if (currentIndex === totalLabels - 1) {
-      await onChange(settings.cycleToEmpty ? "" : labels[0]?.internalKey || "");
+      await onChange(
+        settings.cycleToEmpty ? "" : (labels[0]?.internalKey ?? ""),
+      );
     } else {
-      await onChange(labels[currentIndex + 1]?.internalKey || "");
+      await onChange(labels[currentIndex + 1]?.internalKey ?? "");
     }
   };
 

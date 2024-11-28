@@ -16,11 +16,10 @@ import { Controller, Controller2D } from "./contoller";
 
 export const BetterNumberInput = ({
   value,
-  soft,
+
   onChange,
   limits = { min: 0, max: 255 },
 }: {
-  soft?: boolean;
   value: number;
   limits?: { min: number; max: number };
   onChange: (v: number) => void;
@@ -327,7 +326,7 @@ export const ColorPicker = ({
     setMode(
       JSON.stringify(color.lightMode) === JSON.stringify(color.darkMode)
         ? "universal"
-        : theme || "dark",
+        : (theme ?? "dark"),
     );
   };
 
@@ -342,7 +341,7 @@ export const ColorPicker = ({
     setMode(
       JSON.stringify(lightMode) === JSON.stringify(darkMode)
         ? "universal"
-        : theme || "dark",
+        : (theme ?? "dark"),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [theme]);

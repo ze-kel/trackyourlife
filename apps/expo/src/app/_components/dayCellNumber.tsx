@@ -218,7 +218,7 @@ export const DayCellNumber = ({
               setIsEditing(false);
             }}
             onFocus={(e) => {
-              if (!rawInput || rawInput === "0") {
+              if (!rawInput ?? rawInput === "0") {
                 // @ts-expect-error wrong typing
                 e.target.setSelection(0, String(rawInput).length);
               }

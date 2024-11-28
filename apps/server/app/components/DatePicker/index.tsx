@@ -23,6 +23,7 @@ import { useMediaQuery, useResizeObserver } from "usehooks-ts";
 import { getNowInTimezone } from "@tyl/helpers/timezone";
 
 import { cn } from "~/@shad";
+import { Button, buttonVariants } from "~/@shad/button";
 import {
   Drawer,
   DrawerContent,
@@ -32,10 +33,6 @@ import {
   DrawerTrigger,
 } from "~/@shad/drawer";
 import { useUserSettings } from "~/query/userSettings";
-import {
-  Button,
-  buttonVariants,
-} from "~/@shad/button";
 import { Dropdown, DropdownContent, DropdownTrigger } from "../Dropdown";
 
 const DatePicker = ({
@@ -63,7 +60,7 @@ const DatePicker = ({
   const calRef = useRef<HTMLDivElement>(null);
   const [isOpened, setIsOpened] = useState(false);
 
-  const [cursor, setCursor] = useState(startOfMonth(innerDate || dateNow));
+  const [cursor, setCursor] = useState(startOfMonth(innerDate ?? dateNow));
 
   const wrapRef = useRef(null);
 

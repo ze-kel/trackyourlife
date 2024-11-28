@@ -1,12 +1,7 @@
-import type {
-  QueryClient,
-  UseMutationResult,
-  UseQueryResult,
-} from "@tanstack/react-query";
+import type { UseMutationResult, UseQueryResult } from "@tanstack/react-query";
 import type { ReactNode } from "react";
-import { createContext, useContext, useMemo } from "react";
+import { createContext, useContext } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { create, windowScheduler } from "@yornaath/batshit";
 
 import type {
   ITrackable,
@@ -61,85 +56,6 @@ interface ITrackableContext {
 
 const TrackableContext = createContext<ITrackableContext | null>(null);
 
-/*
-  !--Storing & refetching trackable data--!
-  For convenience in navigation we store info(id, name, type), settings and each months data separately.
-  This means that when user navigates from trackables list to individual trackable we can reuse data that already was fetched.
-
-  This introduces a problem of too much refetching. Because for each trackable we get 3 queries that become stale and want to refetch.
-  To prevent that by default refetching is only enabled on month's query.
-  When we fetch month we also get fresh info and settings, which are being updated explicitly.
-*/
-type Inp = { year: number; month: number };
-
-const makeUseTrackableQueryByMonth = ({
-  id,
-  queryClient,
-}: {
-  id: string;
-  queryClient: QueryClient;
-}) => {
-  // This batches requests for multiple months(i.e when we show graph for a year) into a single request
-  const batcher = create({
-    fetcher: async (dates: Inp[]) => {
-      if (dates.length === 1) {
-        const { year, month } = dates[0] as Inp;
-        return await trpc.trackablesRouter.getTrackableById.query({
-          id,
-          limits: {
-            type: "month",
-            year,
-            month,
-          },
-        });
-      }
-      dates.sort((a, b) => {
-        const r = a.year - b.year;
-        if (r !== 0) {
-          return r;
-        }
-        return a.month - b.month;
-      });
-
-      const from = dates[0] as Inp;
-      const to = dates[dates.length - 1] as Inp;
-      return await trpc.trackablesRouter.getTrackableById.query({
-        id,
-        limits: {
-          type: "range",
-          from,
-          to,
-        },
-      });
-    },
-    resolver: (data) => {
-      return data;
-    },
-    scheduler: windowScheduler(30),
-  });
-
-  return ({ month, year }: { month: number; year: number }) => {
-    return useQuery({
-      queryKey: ["trackable", id, year, month],
-      queryFn: async () => {
-        const trackable = await batcher.fetch({ year, month });
-
-        queryClient.setQueryData(["trackable", id], {
-          ...trackable,
-          data: {},
-          settings: {},
-        });
-        queryClient.setQueryData(
-          ["trackable", id, "settings"],
-          trackable.settings,
-        );
-
-        return trackable.data[year]?.[month] || {};
-      },
-    });
-  };
-};
-
 export const useTrackableQueryByMonth = ({
   month,
   year,
@@ -172,7 +88,7 @@ export const useTrackableQueryByMonth = ({
         trackable.settings,
       );
 
-      return trackable.data[year]?.[month] || {};
+      return trackable.data[year]?.[month] ?? {};
     },
   });
 };
@@ -265,12 +181,11 @@ const TrackableProvider = ({
       await queryClient.cancelQueries({
         queryKey: ["trackable", id, "settings"],
       });
-
-      const previous = queryClient.getQueryData([
+      const previous = queryClient.getQueryData<ITrackableSettings>([
         "trackable",
         id,
         "settings",
-      ]) as ITrackableSettings;
+      ]);
       queryClient.setQueryData(["trackable", id, "settings"], upd);
       return { previous };
     },
@@ -285,11 +200,11 @@ const TrackableProvider = ({
   });
 
   const settingsUpdatePartial = async (update: Partial<ITrackableSettings>) => {
-    const previous = queryClient.getQueryData([
+    const previous = queryClient.getQueryData<ITrackableSettings>([
       "trackable",
       id,
       "settings",
-    ]) as ITrackable["settings"];
+    ]);
 
     if (!previous) throw new Error("settingsUpdatePartial: no present data");
 
@@ -304,10 +219,7 @@ const TrackableProvider = ({
       await trpc.trackablesRouter.updateTrackableName.mutate({ id, newName });
     },
     onMutate: (upd) => {
-      const previous = queryClient.getQueryData([
-        "trackable",
-        id,
-      ]) as ITrackable;
+      const previous = queryClient.getQueryData<ITrackable>(["trackable", id]);
 
       queryClient.setQueryData(["trackable", id], { ...previous, name: upd });
 

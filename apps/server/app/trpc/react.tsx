@@ -5,7 +5,7 @@ import type { AppRouter } from "@tyl/api";
 
 const getBaseUrl = () => {
   if (typeof window !== "undefined") return window.location.origin;
-  return `http://localhost:${process.env.PORT ?? 3000}`;
+  return `http://localhost:3000`;
 };
 
 export const trpc = createTRPCClient<AppRouter>({
@@ -20,6 +20,7 @@ export const trpc = createTRPCClient<AppRouter>({
       transformer: SuperJSON,
       url: getBaseUrl() + "/api/trpc",
       async headers() {
+        // eslint-disable-next-line turbo/no-undeclared-env-vars
         if (import.meta.env.SSR) {
           try {
             const { getHeaders } = await import("vinxi/http");

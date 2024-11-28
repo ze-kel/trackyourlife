@@ -93,7 +93,7 @@ export const GraphYear = ({ year }: { year: number }) => {
           return res;
         },
         resolver: (data, requestedMonth) => {
-          return data?.[year]?.[requestedMonth] || {};
+          return data?.[year]?.[requestedMonth]??{};
         },
         scheduler: windowScheduler(10), // Default and can be omitted.
       }),
@@ -119,11 +119,11 @@ export const GraphYear = ({ year }: { year: number }) => {
     .map((month) => {
       const days = getDaysInMonth(new Date(year, month, 1));
 
-      const data = qq?.[month]?.data || {};
+      const data = qq?.[month]?.data??{};
 
       return Array(days)
         .fill(days)
-        .map((_, i) => Number(data[i + 1] || 0));
+        .map((_, i) => Number(data[i + 1]??0));
     })
     .flat();
 
@@ -157,7 +157,7 @@ export const GraphMonths = ({
 
   const datapoints = Array(daysInMonth)
     .fill(null)
-    .map((_, i) => Number(data?.[i + 1] || 0));
+    .map((_, i) => Number(data?.[i + 1]??0));
 
   return (
     <Graph
@@ -197,7 +197,7 @@ export const Graph = ({
 
   const { valueToColor } = useDayCellContextNumber();
 
-  if (!width || isLoading)
+  if (!width??isLoading)
     return (
       <div
         ref={wrapperRef}
@@ -247,7 +247,7 @@ export const Graph = ({
         acc[v] = format(date, "MMM");
       }
 
-      if (isFirstDayOfMonth(date) || isLastDayOfMonth(date)) {
+      if (isFirstDayOfMonth(date)??isLastDayOfMonth(date)) {
         acc[v] = "|";
       }
 
@@ -256,12 +256,12 @@ export const Graph = ({
     {} as Record<string, string>,
   );
 
-  const maxY = (limits && limits.max) || Math.max(...datapoints);
-  const minY = (limits && limits.min) || Math.min(...datapoints);
+  const maxY = (limits && limits.max)??Math.max(...datapoints);
+  const minY = (limits && limits.min)??Math.min(...datapoints);
 
   // scales
   const xScale = scaleBand<number>({
-    range: [LEFT_OFFSET, width || 600],
+    range: [LEFT_OFFSET, width??600],
     padding: 0.2,
     round: true,
     domain: daysIndexes,
@@ -280,9 +280,9 @@ export const Graph = ({
     <div ref={wrapperRef}>
       <svg width={width} height={GRAPH_HEIGHT + 50} className="">
         {datapoints.map((ent, i) => {
-          const barHeight = yScale(Number(ent) || 0);
+          const barHeight = yScale(Number(ent)??0);
           const barWidth = xScale.bandwidth();
-          const barX = xScale(i) || 0;
+          const barX = xScale(i)??0;
 
           const color = valueToColor(ent);
 

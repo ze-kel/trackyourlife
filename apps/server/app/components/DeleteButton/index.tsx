@@ -24,11 +24,11 @@ const DeleteButton = ({ id }: { id: string }) => {
 
   const mutation = useMutation({
     mutationFn: trpc.trackablesRouter.deleteTrackable.mutate,
-    onSuccess: () => {
-      qc.invalidateQueries({
+    onSuccess: async () => {
+      await qc.invalidateQueries({
         queryKey: ["trackables", "list"],
       });
-      router.navigate("/app/trackables/");
+      await router.navigate({ to: "/app/trackables" });
     },
   });
 

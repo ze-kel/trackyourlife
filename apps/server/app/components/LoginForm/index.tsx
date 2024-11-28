@@ -38,7 +38,7 @@ const Register = () => {
     },
     onSuccess: async () => {
       await router.invalidate();
-      router.navigate({ to: "/" });
+      await router.navigate({ to: "/" });
     },
   });
 
@@ -105,7 +105,7 @@ const Login = () => {
     },
     onSuccess: async () => {
       await router.invalidate();
-      router.navigate({ to: "/" });
+      await router.navigate({ to: "/" });
     },
   });
   return (

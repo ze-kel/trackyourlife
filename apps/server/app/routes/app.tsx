@@ -3,7 +3,7 @@ import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { cn } from "~/@shad";
 import Header from "~/components/Header";
 import { Sidebar } from "~/components/Sidebar";
-import { ensureUser, useUser } from "~/query/user";
+import { ensureUser } from "~/query/user";
 import { ensureUserSettings } from "~/query/userSettings";
 
 export const Route = createFileRoute("/app")({
@@ -19,7 +19,6 @@ export const Route = createFileRoute("/app")({
   },
 
   component: () => {
-    const u = useUser();
     return (
       <div
         className={cn(
@@ -28,7 +27,7 @@ export const Route = createFileRoute("/app")({
         )}
       >
         <div className="bg sticky top-0 z-[999] col-span-2 flex h-14 justify-center border-b-2 border-neutral-300 bg-neutral-100 font-bold text-neutral-800 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-100">
-          <Header user={u} />
+          <Header />
         </div>
         <div className="sidebar customScrollBar customScrollBarBig sticky top-14 hidden h-full max-h-[calc(100vh-3.5rem)] overflow-auto border-r-2 border-neutral-300 bg-neutral-100 px-3 py-6 dark:border-neutral-800 dark:bg-neutral-900 xl:block">
           <Sidebar />

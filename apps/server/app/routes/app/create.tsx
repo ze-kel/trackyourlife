@@ -40,21 +40,19 @@ function RouteComponent() {
   const mutation = useMutation({
     mutationFn: trpc.trackablesRouter.createTrackable.mutate,
     onSuccess: (data) => {
-      router.navigate({
+      void router.navigate({
         to: `/app/trackables/${data.id}`,
       });
     },
   });
 
   const createTrackable = async (settings: ITrackableSettings) => {
-    await mutation.mutate({
+    await mutation.mutateAsync({
       ...newOne,
       name: nameRef.current || "",
       settings,
     });
   };
-
-  const [isLoading, setIsLoading] = useState(false);
 
   return (
     <div className="content-container flex flex-col gap-2 pb-6">

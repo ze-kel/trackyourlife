@@ -24,8 +24,8 @@ export const CurrentTime = () => {
 
   useEffect(() => {
     const timeout = setInterval(() => {
-      setValue(format(getNowInTimezone(settings.timezone), "HH:mm:ss")), 1000;
-    });
+      setValue(format(getNowInTimezone(settings.timezone), "HH:mm:ss"));
+    }, 1000);
     return () => clearTimeout(timeout);
   });
 
@@ -59,7 +59,7 @@ const SearchableList = ({
 
   const commitSelected = () => {
     if (fList[selectOffset]) {
-      update(fList[selectOffset] as TimeZone);
+      update(fList[selectOffset]);
     }
   };
 

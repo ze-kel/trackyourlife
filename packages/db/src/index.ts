@@ -8,7 +8,7 @@ import * as schema from "./schema";
 export * from "drizzle-orm/sql";
 export { alias } from "drizzle-orm/pg-core";
 
-const connectionString = process.env.DATABASE_URL || "";
+const connectionString = process.env.DATABASE_URL ?? "";
 
 const pool = new PG.Pool({
   connectionString: connectionString,

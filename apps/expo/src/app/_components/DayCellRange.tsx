@@ -160,7 +160,7 @@ const StateSelector = ({
               selectedIndex={SI}
               key={i}
               selectedScale={selectedItemSize / itemSize}
-              emoji={v.emoji || "❓"}
+              emoji={v.emoji ?? "❓"}
               selectedSize={selectedItemSize}
               size={itemSize}
             />
@@ -265,7 +265,7 @@ export const DayCellRange = ({
       setIsEditing(true);
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
 
-      const desW = (labels?.length || 0) * SelectorItemSize;
+      const desW = (labels?.length ?? 0) * SelectorItemSize;
 
       setPosition(
         computePosition({
@@ -273,7 +273,7 @@ export const DayCellRange = ({
           height,
           x: e.absoluteX,
           y: e.absoluteY,
-          labelsLength: labels?.length || 1,
+          labelsLength: labels?.length ?? 1,
         }),
       );
 

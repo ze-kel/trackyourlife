@@ -14,20 +14,19 @@ import type { ButtonProps } from "~/@shad/button";
 import { Button } from "~/@shad/button";
 import {
   Drawer,
-  DrawerClose,
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
 } from "~/@shad/drawer";
 import { RadioTabItem, RadioTabs } from "~/@shad/radio-tabs";
-import { SessionUser } from "~/auth/auth";
 import { logoutFn } from "~/auth/authOperations";
 import {
   Dropdown,
   DropdownContent,
   DropdownTrigger,
 } from "~/components/Dropdown";
+import { useUserQuery } from "~/query/user";
 
 const SigOutButton = () => {
   const router = useRouter();
@@ -37,7 +36,7 @@ const SigOutButton = () => {
   const signOut = async () => {
     setLoading(true);
     await logoutFn();
-    router.navigate({ to: "/login" });
+    void router.navigate({ to: "/login" });
     setLoading(false);
   };
 
@@ -136,7 +135,7 @@ const HeaderMenu = ({ username }: { username?: string }) => {
 
   const Trigger = (
     <div className="relative flex cursor-pointer items-center px-4 transition-colors hover:text-neutral-600 dark:hover:text-neutral-50">
-      <p className="font-medium">{username || ""}</p>
+      <p className="font-medium">{username ?? ""}</p>
       <ChevronDownIcon className={"w-6 transition-transform"} />
     </div>
   );
@@ -169,7 +168,7 @@ const HeaderMenu = ({ username }: { username?: string }) => {
           <DrawerTrigger>{Trigger}</DrawerTrigger>
           <DrawerContent className="flex flex-col items-center gap-2">
             <DrawerHeader>
-              <DrawerTitle>{username || ""}</DrawerTitle>
+              <DrawerTitle>{username ?? ""}</DrawerTitle>
             </DrawerHeader>
 
             <div className="m-auto flex w-full max-w-80 flex-col gap-2 px-4 pb-4">
@@ -188,7 +187,9 @@ const HeaderMenu = ({ username }: { username?: string }) => {
   );
 };
 
-const Header = ({ user }: { user?: SessionUser }) => {
+const Header = () => {
+  const { data } = useUserQuery();
+
   return (
     <div className="flex h-full w-full items-center justify-between px-0">
       <Link
@@ -198,7 +199,7 @@ const Header = ({ user }: { user?: SessionUser }) => {
         <h2 className="text-2xl font-bold tracking-wider">TYL</h2>
       </Link>
 
-      {user && <HeaderMenu username={user.username}></HeaderMenu>}
+      {data ? <HeaderMenu username={data.username} /> : <></>}
     </div>
   );
 };

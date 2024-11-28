@@ -22,6 +22,7 @@ export const DayCellBoolean = ({
   className?: string;
 }) => {
   // Even though we're not using any values from context it's useful to check whether it's provided
+  // eslint-disable-next-line no-empty-pattern
   const {} = useDayCellContextBoolean();
 
   const isActive = value === "true";
@@ -112,7 +113,7 @@ export const DayCellBoolean = ({
           )}
           style={{
             transformOrigin: `
-              ${clickPoint[0] || 50}% ${clickPoint[1] || 50}%`,
+              ${clickPoint[0] ?? 50}% ${clickPoint[1] ?? 50}%`,
           }}
         />
       </AnimatePresence>

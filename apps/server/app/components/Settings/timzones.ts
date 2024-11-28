@@ -1,10 +1,8 @@
 import { createServerFn } from "@tanstack/start";
 
-export const getTimezones = createServerFn({ method: "GET" }).handler(
-  async () => {
-    return tz;
-  },
-);
+export const getTimezones = createServerFn({ method: "GET" }).handler(() => {
+  return tz;
+});
 
 const tz = [
   {

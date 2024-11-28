@@ -18,7 +18,7 @@ export const TrackableNameEditable = () => {
   });
 
   const saveHandler = () => {
-    void updateName(internalValue || "");
+    void updateName(internalValue);
     setIsEditing(false);
   };
 
@@ -56,7 +56,7 @@ export const TrackableNameEditable = () => {
             setIsEditing(true);
           }}
         >
-          {trackable?.name || `Unnamed ${trackable?.type || ""}`}
+          {trackable?.name ?? `Unnamed ${trackable?.type ?? ""}`}
         </h2>
         <Drawer open={isEditing} onClose={() => setIsEditing(false)}>
           <DrawerContent className="py-4">
@@ -77,10 +77,10 @@ export const TrackableNameEditable = () => {
       className="w-fit w-full bg-inherit text-xl font-semibold md:text-2xl"
       onClick={() => {
         setIsEditing(true);
-        setInternalValue(trackable?.name || "");
+        setInternalValue(trackable?.name ?? "");
       }}
     >
-      {trackable?.name || `Unnamed ${trackable?.type || ""}`}
+      {trackable?.name ?? `Unnamed ${trackable?.type ?? ""}`}
     </h2>
   );
 };
@@ -88,5 +88,5 @@ export const TrackableNameEditable = () => {
 export const TrackableNameText = () => {
   const { trackable } = useTrackableContextSafe();
 
-  return <> {trackable?.name || `Unnamed ${trackable?.type || ""}`}</>;
+  return <> {trackable?.name ?? `Unnamed ${trackable?.type ?? ""}`}</>;
 };

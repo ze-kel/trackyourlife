@@ -1,12 +1,5 @@
-import * as React from "react";
 import { CalendarIcon, GearIcon } from "@radix-ui/react-icons";
-import {
-  createFileRoute,
-  Link,
-  Outlet,
-  redirect,
-  useNavigate,
-} from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
 import { z } from "zod";
 
 import { Button } from "~/@shad/button";
@@ -14,7 +7,6 @@ import DeleteButton from "~/components/DeleteButton";
 import { FavoriteButton } from "~/components/FavoriteButton";
 import TrackableProvider from "~/components/Providers/TrackableProvider";
 import { TrackableNameEditable } from "~/components/TrackableName";
-import TrackableView from "~/components/TrackableView";
 import { trpc } from "~/trpc/react";
 import { fillPrefetchedTrackable } from "~/utils/fillPrefetched";
 
@@ -89,7 +81,7 @@ export const Route = createFileRoute("/app/trackables/$id")({
   loaderDeps: ({ search: { month, year } }) => ({ month, year }),
   loader: async ({ context, deps: { month, year }, params }) => {
     const d = await getDataForTrackable(params.id, year, month);
-    await fillPrefetchedTrackable(context.queryClient, d.trackable);
+    fillPrefetchedTrackable(context.queryClient, d.trackable);
 
     return { month, year };
   },

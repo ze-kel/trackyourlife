@@ -41,7 +41,7 @@ export const SettingsBoolean = ({
         <h3 className="mb-2 text-xl">Checked color</h3>
         <DrawerMobileTitleProvider title="Checked color">
           <ColorInput
-            value={settings.current.activeColor || presetsMap.green}
+            value={settings.current.activeColor ?? presetsMap.green}
             onChange={(v) => {
               settings.current.activeColor = v;
               notifyAboutChange();
@@ -54,7 +54,7 @@ export const SettingsBoolean = ({
         <h3 className="mb-2 text-xl">Unchecked color</h3>
         <DrawerMobileTitleProvider title="Unchecked color">
           <ColorInput
-            value={settings.current.inactiveColor || presetsMap.neutral}
+            value={settings.current.inactiveColor ?? presetsMap.neutral}
             onChange={(v) => {
               settings.current.inactiveColor = v;
               notifyAboutChange();
@@ -101,7 +101,7 @@ export const SettingsNumber = ({
             settings.current.colorCodingEnabled = v;
             notifyAboutChange();
           }}
-          value={settings.current.colorCoding || []}
+          value={settings.current.colorCoding ?? []}
           onChange={(v) => {
             settings.current.colorCoding = v;
             notifyAboutChange();
@@ -317,16 +317,14 @@ const TrackableSettings = ({
         />
       )}
 
-      {handleSave && (
-        <Button
-          isLoading={isLoadingButton}
-          className="mt-2"
-          variant={"outline"}
-          onClick={() => void handleSave(settings.current)}
-        >
-          {customSaveButtonText || "Save"}
-        </Button>
-      )}
+      <Button
+        isLoading={isLoadingButton}
+        className="mt-2"
+        variant={"outline"}
+        onClick={() => void handleSave(settings.current)}
+      >
+        {customSaveButtonText ?? "Save"}
+      </Button>
     </div>
   );
 };

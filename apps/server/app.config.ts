@@ -3,6 +3,7 @@ import tsConfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
   server: {
+    preset: "node",
     watchOptions: {
       ignored: ["**/node_modules/@tyl*/**"],
     },

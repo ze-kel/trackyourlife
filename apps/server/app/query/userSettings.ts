@@ -1,12 +1,9 @@
-import {
-  QueryClient,
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import type { QueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createServerFn } from "@tanstack/start";
 
-import { IUserSettings, UserSettingsFallback } from "@tyl/validators/user";
+import type { IUserSettings } from "@tyl/validators/user";
+import { UserSettingsFallback } from "@tyl/validators/user";
 
 import { trpc } from "~/trpc/react";
 
@@ -56,7 +53,7 @@ export const useUserSettingsMutation = () => {
   });
 
   const updateSettingsPartial = async (update: Partial<IUserSettings>) => {
-    const previous = queryClient.getQueryData([QUERY_KEY]) || {};
+    const previous = queryClient.getQueryData([QUERY_KEY]) ?? {};
 
     await settingsMutation.mutateAsync({
       ...UserSettingsFallback,

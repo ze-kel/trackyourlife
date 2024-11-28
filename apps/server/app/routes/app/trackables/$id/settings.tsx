@@ -1,6 +1,6 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 
-import { ITrackableSettings } from "@tyl/validators/trackable";
+import type { ITrackableSettings } from "@tyl/validators/trackable";
 
 import { Spinner } from "~/@shad/spinner";
 import { useTrackableContextSafe } from "~/components/Providers/TrackableProvider";
@@ -38,7 +38,7 @@ function RouteComponent() {
         handleSave={async (v: ITrackableSettings) => {
           await settingsMutation.mutateAsync(v, {
             onSuccess: () => {
-              router.navigate({
+              void router.navigate({
                 to: `/app/trackables/${trackable.id}`,
               });
             },

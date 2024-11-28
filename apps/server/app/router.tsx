@@ -1,12 +1,7 @@
 import { QueryClient } from "@tanstack/react-query";
 import { createRouter as createTanStackRouter } from "@tanstack/react-router";
 import { routerWithQueryClient } from "@tanstack/react-router-with-query";
-import { createTRPCClient, unstable_httpBatchStreamLink } from "@trpc/client";
-import superjson from "superjson";
 
-import { AppRouter } from "@tyl/api";
-
-import { trpc } from "~/trpc/init";
 import { DefaultCatchBoundary } from "./components/DefaultCatchBoundary";
 import { NotFound } from "./components/NotFound";
 import { routeTree } from "./routeTree.gen";

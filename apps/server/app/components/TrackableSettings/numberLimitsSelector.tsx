@@ -22,9 +22,9 @@ const NumberLimitsSelector = ({
   onChange,
   className,
 }: IRangeLabelSelector) => {
-  const [innerEnabled, setInnerEnabled] = useState(enabled || false);
-  const [innerMin, setInnerMin] = useState(String(value?.min || "0"));
-  const [innerMax, setInnerMax] = useState(String(value?.max || "100"));
+  const [innerEnabled, setInnerEnabled] = useState(enabled ?? false);
+  const [innerMin, setInnerMin] = useState(String(value?.min ?? "0"));
+  const [innerMax, setInnerMax] = useState(String(value?.max ?? "100"));
 
   const [isError, setIsError] = useState(false);
 
@@ -52,7 +52,7 @@ const NumberLimitsSelector = ({
           onCheckedChange={(v) => {
             setInnerEnabled(v);
             onEnabledChange(v);
-            if (true && !value) {
+            if (!value) {
               onChange({ min: 0, max: 100 });
             }
           }}

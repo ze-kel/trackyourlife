@@ -1,10 +1,8 @@
+import type { QueryClient } from "@tanstack/react-query";
 import * as React from "react";
-import { QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import {
-  createRootRoute,
   createRootRouteWithContext,
-  Link,
   Outlet,
   ScrollRestoration,
 } from "@tanstack/react-router";

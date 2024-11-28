@@ -2,7 +2,7 @@ import { Fragment, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { format, isLastDayOfMonth } from "date-fns";
-import { AnimatePresence, m } from "framer-motion";
+import { m } from "framer-motion";
 
 import type { ITrackable, ITrackableFromList } from "@tyl/validators/trackable";
 import { getNowInTimezone } from "@tyl/helpers/timezone";
@@ -52,14 +52,14 @@ const filterTrackables = (
     })
     .filter((v) => {
       if (!filterByType) return true;
-      return types[v.type as keyof TrackableTypeFilterState];
+      return types[v.type];
     });
 };
 
 const TrackablesList = ({ daysToShow }: { daysToShow: number }) => {
   const settings = useUserSettings();
 
-  const { data, isLoading } = useQuery({
+  const { data, isPending } = useQuery({
     queryKey: ["trackables", "list"],
     queryFn: async () => {
       return await trpc.trackablesRouter.getTrackableIdList.query();
@@ -74,7 +74,7 @@ const TrackablesList = ({ daysToShow }: { daysToShow: number }) => {
   });
 
   const filtered = useMemo(
-    () => filterTrackables(searchQ, filterTypes, data || []),
+    () => filterTrackables(searchQ, filterTypes, data ?? []),
     [data, filterTypes, searchQ],
   );
 
@@ -88,7 +88,7 @@ const TrackablesList = ({ daysToShow }: { daysToShow: number }) => {
     [daysToShow, settings.timezone],
   );
 
-  if (!data || isLoading) {
+  if (isPending) {
     return (
       <div className="flex h-64 w-full items-center justify-center">
         <Spinner />
@@ -96,7 +96,7 @@ const TrackablesList = ({ daysToShow }: { daysToShow: number }) => {
     );
   }
 
-  if (data.length === 0) return <EmptyList />;
+  if (!data || data.length === 0) return <EmptyList />;
 
   return (
     <>
@@ -151,7 +151,7 @@ const TrackablesList = ({ daysToShow }: { daysToShow: number }) => {
 };
 
 export const DailyList = ({ daysToShow }: { daysToShow: number }) => {
-  const { data, isLoading } = useQuery({
+  const { data, isPending } = useQuery({
     queryKey: ["trackables", "list"],
     queryFn: async () => {
       return await trpc.trackablesRouter.getTrackableIdList.query();
@@ -166,7 +166,7 @@ export const DailyList = ({ daysToShow }: { daysToShow: number }) => {
     [daysToShow, settings.timezone],
   );
 
-  if (!data || isLoading) {
+  if (isPending) {
     return (
       <div className="flex h-64 w-full items-center justify-center">
         <Spinner />
@@ -174,7 +174,7 @@ export const DailyList = ({ daysToShow }: { daysToShow: number }) => {
     );
   }
 
-  if (data.length === 0) return <EmptyList />;
+  if (!data || data.length === 0) return <EmptyList />;
 
   const sorted = sortTrackableList(data, settings.favorites);
 

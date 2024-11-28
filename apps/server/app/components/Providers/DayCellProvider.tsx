@@ -93,8 +93,10 @@ const DayCellNumberProvider = ({
   settings: INumberSettings;
   children: ReactNode;
 }) => {
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const valueToColor = useCallback(getValueToColorFunc(settings), [settings]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const valueToProgressPercentage = useCallback(
     getValueToProgressPercentage(settings),
     [settings],
@@ -173,6 +175,7 @@ export const DayCellProvider = ({
     );
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (type === "range") {
     return (
       <DayCellRangeProvider settings={settings}>
