@@ -1,28 +1,25 @@
-import { ReactNode, useEffect, useLayoutEffect, useState } from "react";
-import {
-  Pressable,
-  Text,
-  useWindowDimensions,
-  View,
-  ViewStyle,
-} from "react-native";
+import type { ReactNode } from "react";
+import type { ViewStyle } from "react-native";
+import type {
+  EntryAnimationsValues,
+  LayoutAnimation,
+} from "react-native-reanimated";
+import { useLayoutEffect, useState } from "react";
+import { Pressable, Text, useWindowDimensions, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   Easing,
-  EntryAnimationsValues,
-  LayoutAnimation,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
 import { FullWindowOverlay } from "react-native-screens";
 import * as Haptics from "expo-haptics";
-import { flip, offset, shift, useFloating } from "@floating-ui/react-native";
 import { Portal } from "@gorhom/portal";
 
+import type { IRangeSettings } from "@tyl/validators/trackable";
 import { clamp } from "@tyl/helpers";
 import { range } from "@tyl/helpers/animation";
-import { IRangeSettings } from "@tyl/validators/trackable";
 
 import { useDayCellContextRange } from "~/app/_components/dayCellProvider";
 import { tws } from "~/utils/tw";
@@ -33,7 +30,7 @@ const SelectorItemSizeSelected = 60;
 const ENTER_DURATION = 300;
 
 const makeEnters = (labelsLength: number) => {
-  const functions: Array<(v: EntryAnimationsValues) => LayoutAnimation> = [];
+  const functions: ((v: EntryAnimationsValues) => LayoutAnimation)[] = [];
 
   const center = (labelsLength - 1) / 2;
 
@@ -153,14 +150,14 @@ const StateSelector = ({
         ]}
       ></View>
       <View style={[tws("flex flex-row relative")]}>
-        {labels?.map((v, i) => {
+        {labels.map((v, i) => {
           return (
             <ScaledItem
               myIndex={i}
               selectedIndex={SI}
               key={i}
               selectedScale={selectedItemSize / itemSize}
-              emoji={v.emoji || "❓"}
+              emoji={v.emoji ?? "❓"}
               selectedSize={selectedItemSize}
               size={itemSize}
             />
@@ -242,7 +239,7 @@ export const DayCellRange = ({
     setInternalValue(value);
   }, [value]);
 
-  const em = internalValue ? (labelMapping[internalValue] as string) : "❓";
+  const em = internalValue ? labelMapping[internalValue]! : "❓";
 
   const [isEditing, setIsEditing] = useState(false);
 
@@ -265,7 +262,7 @@ export const DayCellRange = ({
       setIsEditing(true);
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
 
-      const desW = (labels?.length || 0) * SelectorItemSize;
+      const desW = (labels?.length ?? 0) * SelectorItemSize;
 
       setPosition(
         computePosition({
@@ -273,7 +270,7 @@ export const DayCellRange = ({
           height,
           x: e.absoluteX,
           y: e.absoluteY,
-          labelsLength: labels?.length || 1,
+          labelsLength: labels?.length ?? 1,
         }),
       );
 

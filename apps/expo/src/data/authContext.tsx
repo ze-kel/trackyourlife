@@ -1,32 +1,23 @@
 import type { PropsWithChildren } from "react";
-import { createContext, useContext, useState } from "react";
-import { Text } from "react-native";
+import { createContext, useContext } from "react";
 import { hookstate, useHookstate } from "@hookstate/core";
 import { subscribable } from "@hookstate/subscribable";
 import { eq } from "drizzle-orm";
 
-import { ITrackableSettings } from "@tyl/validators/trackable";
-import {
-  IUserSettings,
-  UserSettingsFallback,
-  ZUserSettings,
-} from "@tyl/validators/user";
+import type { IUserSettings } from "@tyl/validators/user";
+import { UserSettingsFallback, ZUserSettings } from "@tyl/validators/user";
 
+import type { ISessionData } from "~/utils/session-store";
 import { UserDataSub } from "~/data/dbWatcher";
 import { clearDB, db } from "~/db";
-import { authUser, trackable } from "~/db/schema";
+import { authUser } from "~/db/schema";
 import { updateTrpcClient } from "~/utils/api";
-import {
-  clearUserData,
-  getUserData,
-  ISessionData,
-  setUserData,
-} from "~/utils/session-store";
+import { clearUserData, getUserData, setUserData } from "~/utils/session-store";
 
 export const currentUser = hookstate(getUserData(), subscribable());
 
 export const currentUserSettings = hookstate(
-  UserSettingsFallback as IUserSettings,
+  UserSettingsFallback,
   subscribable(),
 );
 
@@ -49,8 +40,8 @@ const getUserSettingsFromDb = async (userId?: string) => {
   }
 
   currentUserInfo.set({
-    username: res?.username || undefined,
-    email: res?.email || undefined,
+    username: res?.username ?? undefined,
+    email: res?.email ?? undefined,
   });
 
   return;
@@ -73,8 +64,8 @@ const subscribeToSettingsUpdates = (userId?: string) => {
     }
 
     currentUserInfo.set({
-      username: a.username || undefined,
-      email: a.email || undefined,
+      username: a.username ?? undefined,
+      email: a.email ?? undefined,
     });
   });
 };

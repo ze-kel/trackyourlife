@@ -60,7 +60,7 @@ const useValueSub = (trackableId: string, date: Date) => {
         ),
       })
       .then((v) => {
-        setValue(v?.value || "");
+        setValue(v?.value ?? "");
       });
 
     return TrackableRecordSub.subscribe({ date, trackableId }, (v) => {

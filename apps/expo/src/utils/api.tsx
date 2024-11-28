@@ -32,7 +32,7 @@ const makeTrpcClient = () => {
           const headers = new Map<string, string>();
           headers.set("x-trpc-source", "expo-react");
 
-          const { token } = getUserData() || {};
+          const { token } = getUserData() ?? {};
           if (token) {
             headers.set("Cookie", `auth_session=${token}`);
           }

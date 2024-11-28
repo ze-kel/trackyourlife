@@ -7,8 +7,8 @@ import {
   unique,
 } from "drizzle-orm/sqlite-core";
 
-import { ITrackable } from "@tyl/validators/trackable";
-import { IUserSettings } from "@tyl/validators/user";
+import type { ITrackable } from "@tyl/validators/trackable";
+import type { IUserSettings } from "@tyl/validators/user";
 
 export const meta = sqliteTable("meta", {
   userId: text("user_id").primaryKey(),

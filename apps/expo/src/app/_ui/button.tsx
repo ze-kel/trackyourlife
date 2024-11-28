@@ -94,7 +94,7 @@ const Button = React.forwardRef<View, ButtonProps>(
               `absolute flex h-full w-full items-center justify-center`,
             )}
           >
-            <Spinner color={spinnerColors[variant || "default"]} width={20} />
+            <Spinner color={spinnerColors[variant ?? "default"]} width={20} />
           </View>
         ) : (
           <></>

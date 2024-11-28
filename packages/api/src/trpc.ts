@@ -10,7 +10,6 @@ import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
 
-import type { Session, User } from "@tyl/auth";
 import { db } from "@tyl/db";
 
 /**
@@ -26,16 +25,14 @@ import { db } from "@tyl/db";
  * @see https://trpc.io/docs/server/context
  */
 export const createTRPCContext = (opts: {
-  headers: Headers;
-  session: Session | null;
-  user: User | null;
+  source: string;
+  user: {
+    id: string;
+  } | null;
 }) => {
-  const source = opts.headers.get("x-trpc-source") ?? "unknown";
-
-  console.log(">>> tRPC Request from", source, "by", opts.user);
+  console.log(">>> tRPC Request from", opts.source, "by", opts.user);
 
   return {
-    session: opts.session,
     user: opts.user,
     db,
   };
@@ -100,9 +97,7 @@ export const protectedProcedure = t.procedure.use(({ ctx, next }) => {
   }
   return next({
     ctx: {
-      // infers session\user as non-nullable
-      session: { ...ctx.session },
-      user: { ...ctx.user },
+      user: ctx.user,
     },
   });
 });

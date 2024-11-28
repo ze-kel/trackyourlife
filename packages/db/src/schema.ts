@@ -1,7 +1,6 @@
 import { relations } from "drizzle-orm";
 import {
   boolean,
-  date,
   json,
   pgEnum,
   pgTableCreator,
@@ -96,6 +95,7 @@ export const recordRelations = relations(trackableRecord, ({ one }) => ({
 }));
 
 export type DbUserSelect = typeof auth_user.$inferSelect;
+export type DbSessionSelect = typeof user_session.$inferSelect;
 
 export type DbTrackableSelect = typeof trackable.$inferSelect;
 export type DbTrackableInsert = typeof trackable.$inferInsert;

@@ -61,7 +61,7 @@ const LoginForm = () => {
     } catch (e) {
       console.log(e);
       if (e instanceof Error) {
-        setError(String(e.message + errorInfo[e.message] || ""));
+        setError(String(e.message + errorInfo[e.message] ?? ""));
 
         return;
       }

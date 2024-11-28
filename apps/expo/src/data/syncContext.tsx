@@ -1,22 +1,14 @@
-import { useEffect } from "react";
-import { AppState } from "react-native";
 import { hookstate } from "@hookstate/core";
-import { differenceInSeconds, sub } from "date-fns";
 import { and, eq, gte, lte, sql } from "drizzle-orm";
 
+import type { ITrackableFromDB } from "@tyl/validators/trackable";
+import type { IUserSettings } from "@tyl/validators/user";
 import { debounce } from "@tyl/helpers";
-import { ITrackableFromDB } from "@tyl/validators/trackable";
-import { IUserSettings } from "@tyl/validators/user";
 
+import type { LDbTrackableRecordInsert } from "~/db/schema";
 import { currentUser } from "~/data/authContext";
 import { db } from "~/db";
-import {
-  authUser,
-  LDbTrackableRecordInsert,
-  meta,
-  trackable,
-  trackableRecord,
-} from "~/db/schema";
+import { authUser, meta, trackable, trackableRecord } from "~/db/schema";
 import { api } from "~/utils/api";
 
 const lastSync = hookstate<Date | null>(null);
@@ -33,7 +25,7 @@ const updateLastSyncFromDb = () => {
     return;
   }
 
-  db.query.meta.findFirst({ where: eq(meta.userId, userId) }).then((v) => {
+  void db.query.meta.findFirst({ where: eq(meta.userId, userId) }).then((v) => {
     if (v?.lastSync) {
       lastSync.set(v.lastSync);
     }
@@ -44,7 +36,7 @@ const updateLastSyncFromDb = () => {
 
 updateLastSyncFromDb();
 
-currentUser.subscribe((v) => {
+currentUser.subscribe(() => {
   updateLastSyncFromDb();
 });
 
@@ -156,7 +148,7 @@ const sync = async (clear?: boolean) => {
   isSyncing.set(true);
   syncError.set("");
 
-  let ls = lastSync.get() || new Date(1971);
+  let ls = lastSync.get() ?? new Date(1971);
 
   try {
     const nowDate = new Date();
@@ -182,8 +174,8 @@ const sync = async (clear?: boolean) => {
       recordUpdates: localUpdates.recordUpdates,
       userUpdates: localUpdates.userUpdates
         ? {
-            username: localUpdates.userUpdates.username || "",
-            settings: localUpdates.userUpdates.settings as IUserSettings,
+            username: localUpdates.userUpdates.username ?? "",
+            settings: localUpdates.userUpdates.settings ?? {},
             updated: localUpdates.userUpdates.updated,
           }
         : undefined,
@@ -222,6 +214,7 @@ const updateTrackableRecord = async (v: LDbTrackableRecordInsert) => {
 
 const useSyncInterval = () => {
   return;
+  /*
   useEffect(() => {
     const fsync = () => {
       const ls = lastSync.get();
@@ -246,6 +239,7 @@ const useSyncInterval = () => {
 
     return () => clearInterval(i);
   });
+  */
 };
 
 export {

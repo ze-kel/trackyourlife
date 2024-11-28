@@ -1,5 +1,0 @@
-.wrapperGrid {
-  display: grid;
-  grid-template-columns: 256px 1fr;
-  grid-template-rows: min-content;
-}

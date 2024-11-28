@@ -100,7 +100,7 @@ export const getColorAtPosition = ({
   let rightSide: IColorCodingValue | undefined = undefined;
 
   for (const v of value) {
-    if (!leftSide || (leftSide && v.point <= point)) {
+    if (!leftSide || v.point <= point) {
       leftSide = v;
     }
     if (!rightSide && v.point >= point) {
