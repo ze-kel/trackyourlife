@@ -15,6 +15,7 @@ import {
   AlertDialogTrigger,
 } from "~/@shad/alert-dialog";
 import { buttonVariants } from "~/@shad/button";
+import { invalidateTrackablesList } from "~/query/trackablesList";
 import { trpc } from "~/trpc/react";
 
 const DeleteButton = ({ id }: { id: string }) => {
@@ -25,9 +26,7 @@ const DeleteButton = ({ id }: { id: string }) => {
   const mutation = useMutation({
     mutationFn: trpc.trackablesRouter.deleteTrackable.mutate,
     onSuccess: async () => {
-      await qc.invalidateQueries({
-        queryKey: ["trackables", "list"],
-      });
+      await invalidateTrackablesList(qc);
       await router.navigate({ to: "/app/trackables" });
     },
   });

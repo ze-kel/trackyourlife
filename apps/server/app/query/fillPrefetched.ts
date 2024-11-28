@@ -2,6 +2,8 @@ import type { QueryClient } from "@tanstack/react-query";
 
 import type { ITrackable } from "@tyl/validators/trackable";
 
+import { QUERY_KEY as TRACKABLES_LIST_QUERY_KEY } from "./trackablesList";
+
 export const fillPrefetchedTrackable = (
   queryClient: QueryClient,
   trackable: ITrackable,
@@ -32,7 +34,7 @@ export const fillPrefetchedTrackablesList = (
   trackables: ITrackable[],
 ) => {
   queryClient.setQueryData(
-    ["trackables", "list"],
+    TRACKABLES_LIST_QUERY_KEY,
     trackables.map((v) => ({ name: v.name, id: v.id, type: v.type })),
   );
 

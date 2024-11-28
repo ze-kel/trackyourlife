@@ -1,6 +1,5 @@
 import type { QueryClient } from "@tanstack/react-query";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createServerFn } from "@tanstack/start";
 
 import type { IUserSettings } from "@tyl/validators/user";
 import { UserSettingsFallback } from "@tyl/validators/user";
@@ -9,13 +8,9 @@ import { trpc } from "~/trpc/react";
 
 const QUERY_KEY = ["user", "settings"];
 
-const sf = createServerFn({ method: "GET" }).handler(async () => {
-  return await trpc.userRouter.getUserSettings.query();
-});
-
 const q = {
   queryKey: QUERY_KEY,
-  queryFn: async () => await sf(),
+  queryFn: async () => await trpc.userRouter.getUserSettings.query(),
   refetchOnWindowFocus: false,
 };
 

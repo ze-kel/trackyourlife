@@ -1,5 +1,6 @@
-import { Fragment, useEffect, useLayoutEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useTheme } from "next-themes";
+import { useIsomorphicLayoutEffect } from "usehooks-ts";
 
 import type {
   IColorHSL,
@@ -26,7 +27,7 @@ export const BetterNumberInput = ({
 }) => {
   const [internalValue, setInternalVal] = useState<number | string>(value);
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     setInternalVal(value);
   }, [value]);
 

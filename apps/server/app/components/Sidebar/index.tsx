@@ -6,9 +6,7 @@ import {
   MixIcon,
   ValueIcon,
 } from "@radix-ui/react-icons";
-import { useQuery } from "@tanstack/react-query";
 import { Link, useRouter } from "@tanstack/react-router";
-import { useIsClient } from "usehooks-ts";
 
 import type { ITrackable } from "@tyl/validators/trackable";
 import { sortTrackableList } from "@tyl/helpers/trackables";
@@ -16,8 +14,8 @@ import { sortTrackableList } from "@tyl/helpers/trackables";
 import { Button } from "~/@shad/button";
 import { Spinner } from "~/@shad/spinner";
 import { CoreLinks } from "~/components/Header";
+import { useTrackablesList } from "~/query/trackablesList";
 import { useUserSettings } from "~/query/userSettings";
-import { trpc } from "~/trpc/react";
 
 const iconsMap: Record<ITrackable["type"], ReactNode> = {
   boolean: <ValueIcon />,
@@ -26,12 +24,7 @@ const iconsMap: Record<ITrackable["type"], ReactNode> = {
 };
 
 const TrackablesMiniList = () => {
-  const { data, isPending } = useQuery({
-    queryKey: ["trackables", "list"],
-    queryFn: async () => {
-      return await trpc.trackablesRouter.getTrackableIdList.query();
-    },
-  });
+  const { data, isPending } = useTrackablesList();
 
   const router = useRouter();
   const pathname = router.basepath;
@@ -81,8 +74,6 @@ export const Sidebar = () => {
   const router = useRouter();
   const pathName = router.basepath;
 
-  const isClient = useIsClient();
-
   return (
     <div>
       <div className="flex flex-col gap-2">
@@ -102,7 +93,9 @@ export const Sidebar = () => {
 
       <hr className="my-6 h-[1px] border-none bg-neutral-200 outline-none dark:bg-neutral-800" />
 
-      <div>{isClient && <TrackablesMiniList />}</div>
+      <div>
+        <TrackablesMiniList />
+      </div>
     </div>
   );
 };

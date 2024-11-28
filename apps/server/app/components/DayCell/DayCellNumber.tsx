@@ -1,8 +1,8 @@
 import type React from "react";
 import type { CSSProperties, ReactNode } from "react";
-import { useCallback, useLayoutEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { format } from "date-fns";
-import { useMediaQuery } from "usehooks-ts";
+import { useIsomorphicLayoutEffect, useMediaQuery } from "usehooks-ts";
 
 import { debounce } from "@tyl/helpers";
 import { makeColorString } from "@tyl/helpers/colorTools";
@@ -51,14 +51,13 @@ export const DayCellNumber = ({
 
   const [isEditing, setIsEditing] = useState(false);
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (internalNumber !== getNumberSafe(value)) {
       setInternalNumber(getNumberSafe(value));
       if (!isEditing) {
         setRawInput(String(internalNumber));
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
   const internalUpdate = (val: number) => {

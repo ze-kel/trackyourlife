@@ -11,6 +11,7 @@ import type {
 } from "@tyl/validators/trackable";
 
 import { MemoDayCellProvider } from "~/components/Providers/DayCellProvider";
+import { invalidateTrackablesList } from "~/query/trackablesList";
 import { trpc } from "~/trpc/react";
 
 type MutationTrackable = UseMutationResult<
@@ -226,7 +227,7 @@ const TrackableProvider = ({
       return { previous };
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["trackables", "list"] });
+      await invalidateTrackablesList(queryClient);
     },
     onError: (_, update, context) => {
       if (!context) return;

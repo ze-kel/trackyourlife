@@ -83,7 +83,7 @@ function RootComponent() {
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html>
+    <html suppressHydrationWarning={true}>
       <head>
         <Meta />
       </head>

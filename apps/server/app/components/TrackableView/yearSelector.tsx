@@ -1,6 +1,6 @@
-import { useLayoutEffect, useState } from "react";
+import { useState } from "react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
-import { useMediaQuery } from "usehooks-ts";
+import { useIsomorphicLayoutEffect, useMediaQuery } from "usehooks-ts";
 
 import { cn } from "~/@shad";
 import { Button } from "~/@shad/button";
@@ -26,11 +26,10 @@ export const YearSelector = ({
 
   const [valueInternal, setValueInternal] = useState(String(value));
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (String(value) !== valueInternal) {
       setValueInternal(String(value));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
   const blurHander = () => {

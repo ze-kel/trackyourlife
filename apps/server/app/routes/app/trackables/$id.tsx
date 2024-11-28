@@ -7,8 +7,8 @@ import DeleteButton from "~/components/DeleteButton";
 import { FavoriteButton } from "~/components/FavoriteButton";
 import TrackableProvider from "~/components/Providers/TrackableProvider";
 import { TrackableNameEditable } from "~/components/TrackableName";
+import { fillPrefetchedTrackable } from "~/query/fillPrefetched";
 import { trpc } from "~/trpc/react";
-import { fillPrefetchedTrackable } from "~/utils/fillPrefetched";
 
 const getDataForTrackable = async (
   id: string,

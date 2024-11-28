@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import TrackablesList from "~/components/TrackablesList";
+import { fillPrefetchedTrackablesList } from "~/query/fillPrefetched";
 import { trpc } from "~/trpc/react";
-import { fillPrefetchedTrackablesList } from "~/utils/fillPrefetched";
 
 const SHOW_DAYS = 6;
 

@@ -1,5 +1,4 @@
 import { Fragment, useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { format, isLastDayOfMonth } from "date-fns";
 import { m } from "framer-motion";
@@ -17,8 +16,8 @@ import DayCellWrapper from "~/components/DayCell";
 import TrackableProvider from "~/components/Providers/TrackableProvider";
 import { TrackableNameText } from "~/components/TrackableName";
 import { generateDates } from "~/components/TrackablesList/helper";
+import { useTrackablesList } from "~/query/trackablesList";
 import { useUserSettings } from "~/query/userSettings";
-import { trpc } from "~/trpc/react";
 import MiniTrackable from "./miniTrackable";
 
 const EmptyList = () => {
@@ -59,12 +58,7 @@ const filterTrackables = (
 const TrackablesList = ({ daysToShow }: { daysToShow: number }) => {
   const settings = useUserSettings();
 
-  const { data, isPending } = useQuery({
-    queryKey: ["trackables", "list"],
-    queryFn: async () => {
-      return await trpc.trackablesRouter.getTrackableIdList.query();
-    },
-  });
+  const { data, isPending } = useTrackablesList();
 
   const [searchQ, setSearch] = useState("");
   const [filterTypes, setFilterTypes] = useState<TrackableTypeFilterState>({
@@ -151,12 +145,7 @@ const TrackablesList = ({ daysToShow }: { daysToShow: number }) => {
 };
 
 export const DailyList = ({ daysToShow }: { daysToShow: number }) => {
-  const { data, isPending } = useQuery({
-    queryKey: ["trackables", "list"],
-    queryFn: async () => {
-      return await trpc.trackablesRouter.getTrackableIdList.query();
-    },
-  });
+  const { data, isPending } = useTrackablesList();
 
   const settings = useUserSettings();
 
