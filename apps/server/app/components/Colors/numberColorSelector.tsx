@@ -1,18 +1,14 @@
 import type { TouchEvent } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Cross1Icon, PlusCircledIcon } from "@radix-ui/react-icons";
+import { useTheme } from "next-themes";
 import { v4 as uuidv4 } from "uuid";
 
 import type { IColorCodingValue, IColorValue } from "@tyl/validators/trackable";
 import { clamp } from "@tyl/helpers";
 import { range } from "@tyl/helpers/animation";
 import { presetsMap } from "@tyl/helpers/colorPresets";
-import {
-  getColorAtPosition,
-  InterpolateColors,
-  makeColorString,
-  makeCssGradient,
-} from "@tyl/helpers/colorTools";
+import { getColorAtPosition, makeCssGradient } from "@tyl/helpers/colorTools";
 
 import { cn } from "~/@shad";
 import { Button } from "~/@shad/button";
@@ -23,7 +19,6 @@ import { Switch } from "~/@shad/switch";
 import ColorPicker, { BetterNumberInput } from "~/components/Colors";
 import { ColorDisplay } from "~/components/Colors/colorDisplay";
 import { useRefSize } from "~/components/Colors/contoller";
-import { useTheme } from "~/components/Providers/ThemeProvider";
 
 const getActualMin = (
   firstVal: number | undefined,
@@ -98,7 +93,7 @@ const ControllerGradient = ({
     setSelectedColor(id);
   };
 
-  const [isDragging, setIsDragging] = useState(true);
+  const [isDragging, setIsDragging] = useState(false);
 
   const move = (id: string, clientX: number, clientY: number) => {
     const { width, left, top, height } = dataRef.current;
@@ -207,7 +202,7 @@ const ControllerGradient = ({
     onChange(newVal);
   };
 
-  const { theme } = useTheme();
+  const { resolvedTheme: theme } = useTheme();
   const [gradientPreviewTheme, setGradientPreviewTheme] = useState("dark");
 
   useEffect(() => {
@@ -358,7 +353,6 @@ const ControllerGradient = ({
           </RadioTabItem>
         </RadioTabs>
       </div>
-
       <div className="flex flex-col-reverse gap-4 sm:flex-row">
         <div className="w-full">
           {selectedColorObject && (
@@ -444,7 +438,7 @@ const NumberColorSelector = ({
     <div className="flex flex-col gap-2">
       <div className="mt-1 flex items-center space-x-2">
         <Switch
-          id="show-progress"
+          id="color-coding"
           checked={innerEnabled}
           onCheckedChange={(v) => {
             setInnerEnabled(v);
@@ -454,7 +448,7 @@ const NumberColorSelector = ({
             }
           }}
         />
-        <Label htmlFor="show-progress">Use color coding</Label>
+        <Label htmlFor="color-coding">Use color coding</Label>
       </div>
 
       {innerEnabled && (

@@ -1,4 +1,5 @@
 import { Fragment, useEffect, useLayoutEffect, useState } from "react";
+import { useTheme } from "next-themes";
 
 import type {
   IColorHSL,
@@ -11,7 +12,6 @@ import { HSLToRGB, makeColorString, RGBToHSL } from "@tyl/helpers/colorTools";
 import { Input } from "~/@shad/input";
 import { RadioTabItem, RadioTabs } from "~/@shad/radio-tabs";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/@shad/tabs";
-import { useTheme } from "~/components/Providers/ThemeProvider";
 import { Controller, Controller2D } from "./contoller";
 
 export const BetterNumberInput = ({
@@ -331,7 +331,7 @@ export const ColorPicker = ({
     );
   };
 
-  const { theme } = useTheme();
+  const { resolvedTheme: theme } = useTheme();
   const [mode, setMode] = useState(
     JSON.stringify(lightMode) === JSON.stringify(darkMode)
       ? "universal"

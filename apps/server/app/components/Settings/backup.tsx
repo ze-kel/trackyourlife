@@ -1,20 +1,18 @@
-"use client";
-
 import { useState } from "react";
 import { z } from "zod";
 
-import { Button } from "@tyl/ui/button";
-import { Input } from "@tyl/ui/input";
 import {
   ITrackable,
   ITrackableUpdate,
   ZTrackable,
 } from "@tyl/validators/trackable";
 
-import { api } from "~/trpc/react";
+import { Button } from "~/@shad/button";
+import { Input } from "~/@shad/input";
+import { trpc } from "~/trpc/react";
 
 const getBackup = async () => {
-  const res = await api.trackablesRouter.getAllTrackables.query({
+  const res = await trpc.trackablesRouter.getAllTrackables.query({
     limits: {
       type: "range",
       from: {
@@ -166,7 +164,7 @@ const ParsedItem = ({
 
   const save = async () => {
     setIsLoading(true);
-    const newOne = await api.trackablesRouter.createTrackable.mutate({
+    const newOne = await trpc.trackablesRouter.createTrackable.mutate({
       name: `${namePrefix}${trackable.name}`,
       settings: trackable.settings,
       type: trackable.type,
@@ -191,7 +189,7 @@ const ParsedItem = ({
     });
 
     if (allEntries.length) {
-      await api.trackablesRouter.updateTrackableEntries.mutate(allEntries);
+      await trpc.trackablesRouter.updateTrackableEntries.mutate(allEntries);
     }
 
     setIsLoading(false);

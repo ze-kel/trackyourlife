@@ -7,6 +7,7 @@ import {
   PlusCircledIcon,
 } from "@radix-ui/react-icons";
 import { Link, useRouter } from "@tanstack/react-router";
+import { useTheme } from "next-themes";
 import { useMediaQuery } from "usehooks-ts";
 
 import type { ButtonProps } from "~/@shad/button";
@@ -20,14 +21,13 @@ import {
   DrawerTrigger,
 } from "~/@shad/drawer";
 import { RadioTabItem, RadioTabs } from "~/@shad/radio-tabs";
+import { SessionUser } from "~/auth/auth";
 import { logoutFn } from "~/auth/authOperations";
-import { SessionUser } from "~/auth/session";
 import {
   Dropdown,
   DropdownContent,
   DropdownTrigger,
 } from "~/components/Dropdown";
-import { useTheme } from "~/components/Providers/ThemeProvider";
 
 const SigOutButton = () => {
   const router = useRouter();

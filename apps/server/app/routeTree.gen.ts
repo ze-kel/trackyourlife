@@ -16,6 +16,7 @@ import { Route as AppImport } from './routes/app'
 import { Route as IndexImport } from './routes/index'
 import { Route as AppIndexImport } from './routes/app/index'
 import { Route as AppTestImport } from './routes/app/test'
+import { Route as AppSettingsImport } from './routes/app/settings'
 import { Route as AppCreateImport } from './routes/app/create'
 import { Route as AppTrackablesIndexImport } from './routes/app/trackables/index'
 import { Route as AppTrackablesIdImport } from './routes/app/trackables/$id'
@@ -52,6 +53,12 @@ const AppIndexRoute = AppIndexImport.update({
 const AppTestRoute = AppTestImport.update({
   id: '/test',
   path: '/test',
+  getParentRoute: () => AppRoute,
+} as any)
+
+const AppSettingsRoute = AppSettingsImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => AppRoute,
 } as any)
 
@@ -121,6 +128,13 @@ declare module '@tanstack/react-router' {
       path: '/create'
       fullPath: '/app/create'
       preLoaderRoute: typeof AppCreateImport
+      parentRoute: typeof AppImport
+    }
+    '/app/settings': {
+      id: '/app/settings'
+      path: '/settings'
+      fullPath: '/app/settings'
+      preLoaderRoute: typeof AppSettingsImport
       parentRoute: typeof AppImport
     }
     '/app/test': {
@@ -195,6 +209,7 @@ const AppTrackablesIdRouteWithChildren = AppTrackablesIdRoute._addFileChildren(
 
 interface AppRouteChildren {
   AppCreateRoute: typeof AppCreateRoute
+  AppSettingsRoute: typeof AppSettingsRoute
   AppTestRoute: typeof AppTestRoute
   AppIndexRoute: typeof AppIndexRoute
   AppTrackablesIdRoute: typeof AppTrackablesIdRouteWithChildren
@@ -203,6 +218,7 @@ interface AppRouteChildren {
 
 const AppRouteChildren: AppRouteChildren = {
   AppCreateRoute: AppCreateRoute,
+  AppSettingsRoute: AppSettingsRoute,
   AppTestRoute: AppTestRoute,
   AppIndexRoute: AppIndexRoute,
   AppTrackablesIdRoute: AppTrackablesIdRouteWithChildren,
@@ -216,6 +232,7 @@ export interface FileRoutesByFullPath {
   '/app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
   '/app/create': typeof AppCreateRoute
+  '/app/settings': typeof AppSettingsRoute
   '/app/test': typeof AppTestRoute
   '/app/': typeof AppIndexRoute
   '/app/trackables/$id': typeof AppTrackablesIdRouteWithChildren
@@ -229,6 +246,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/app/create': typeof AppCreateRoute
+  '/app/settings': typeof AppSettingsRoute
   '/app/test': typeof AppTestRoute
   '/app': typeof AppIndexRoute
   '/app/trackables': typeof AppTrackablesIndexRoute
@@ -243,6 +261,7 @@ export interface FileRoutesById {
   '/app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
   '/app/create': typeof AppCreateRoute
+  '/app/settings': typeof AppSettingsRoute
   '/app/test': typeof AppTestRoute
   '/app/': typeof AppIndexRoute
   '/app/trackables/$id': typeof AppTrackablesIdRouteWithChildren
@@ -259,6 +278,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/login'
     | '/app/create'
+    | '/app/settings'
     | '/app/test'
     | '/app/'
     | '/app/trackables/$id'
@@ -271,6 +291,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/app/create'
+    | '/app/settings'
     | '/app/test'
     | '/app'
     | '/app/trackables'
@@ -283,6 +304,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/login'
     | '/app/create'
+    | '/app/settings'
     | '/app/test'
     | '/app/'
     | '/app/trackables/$id'
@@ -327,6 +349,7 @@ export const routeTree = rootRoute
       "filePath": "app.tsx",
       "children": [
         "/app/create",
+        "/app/settings",
         "/app/test",
         "/app/",
         "/app/trackables/$id",
@@ -338,6 +361,10 @@ export const routeTree = rootRoute
     },
     "/app/create": {
       "filePath": "app/create.tsx",
+      "parent": "/app"
+    },
+    "/app/settings": {
+      "filePath": "app/settings.tsx",
       "parent": "/app"
     },
     "/app/test": {

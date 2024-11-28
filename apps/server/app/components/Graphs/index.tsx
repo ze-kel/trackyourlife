@@ -15,7 +15,7 @@ import {
   isLastDayOfMonth,
   isSameMonth,
 } from "date-fns";
-import { useTheme } from "~/components/Providers/ThemeProvider";
+import { useTheme } from "next-themes";
 import { makeColorString } from "@tyl/helpers/colorTools";
 import { getNowInTimezone } from "@tyl/helpers/timezone";
 import { useResizeObserver } from "usehooks-ts";

@@ -147,7 +147,7 @@ export const SettingsRange = ({
         </div>
         <div className="mt-2 flex items-center space-x-2">
           <Switch
-            id="is-cycle"
+            id="cycle-empty"
             defaultChecked={settings.current.cycleToEmpty}
             onCheckedChange={(v) => {
               settings.current.cycleToEmpty = v;

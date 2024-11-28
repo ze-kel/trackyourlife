@@ -1,5 +1,3 @@
-"use client";
-
 import type { TimeZone } from "timezones-list";
 import { useEffect, useState } from "react";
 import { CaretSortIcon } from "@radix-ui/react-icons";
@@ -8,21 +6,21 @@ import { useMediaQuery } from "usehooks-ts";
 
 import { clamp } from "@tyl/helpers";
 import { getNowInTimezone } from "@tyl/helpers/timezone";
-import { cn } from "@tyl/ui";
-import { Button } from "@tyl/ui/button";
-import { Drawer, DrawerContent, DrawerTrigger } from "@tyl/ui/drawer";
 
+import { cn } from "~/@shad";
+import { Button } from "~/@shad/button";
+import { Drawer, DrawerContent, DrawerTrigger } from "~/@shad/drawer";
 import {
   Dropdown,
   DropdownContent,
   DropdownTrigger,
 } from "~/components/Dropdown";
-import { userUserContext } from "~/components/Providers/UserProvider";
+import { useUserSettings, useUserSettingsMutation } from "~/query/userSettings";
 
 export const CurrentTime = () => {
   const [value, setValue] = useState("");
 
-  const { settings } = userUserContext();
+  const settings = useUserSettings();
 
   useEffect(() => {
     const timeout = setInterval(() => {
@@ -111,7 +109,8 @@ const SearchableList = ({
 export const TimezoneSelector = ({ list }: { list: TimeZone[] }) => {
   const [open, setOpen] = useState(false);
 
-  const { settings, updateSettingsPartial } = userUserContext();
+  const settings = useUserSettings();
+  const { updateSettingsPartial } = useUserSettingsMutation();
 
   const value = settings.timezone;
 

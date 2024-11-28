@@ -10,12 +10,12 @@ import {
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 import { Meta, Scripts } from "@tanstack/start";
+import { ThemeProvider } from "next-themes";
 
 import { getUserFn } from "~/auth/authOperations";
 import { DefaultCatchBoundary } from "~/components/DefaultCatchBoundary.js";
 import { NotFound } from "~/components/NotFound.js";
 import { LazyMotionProvider } from "~/components/Providers/lazyFramerMotionProvider";
-import { ThemeProvider } from "~/components/Providers/ThemeProvider";
 import appCss from "~/styles/app.css?url";
 import { seo } from "~/utils/seo.js";
 
@@ -42,7 +42,6 @@ export const Route = createRootRouteWithContext<{
         sizes: "16x16",
         href: "/favicon-16x16.png",
       },
-      { rel: "manifest", href: "/site.webmanifest", color: "#fffff" },
       { rel: "icon", href: "/favicon.ico" },
     ],
     meta: [
@@ -92,7 +91,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <LazyMotionProvider>
-          <ThemeProvider>
+          <ThemeProvider defaultTheme="dark" attribute="class">
             {children}
             <ScrollRestoration />
             <TanStackRouterDevtools position="bottom-right" />
