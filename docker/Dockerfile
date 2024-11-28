@@ -11,7 +11,7 @@ RUN npm install -g turbo@^2
 COPY . .
  
 # Generate a partial monorepo with a pruned lockfile for a target workspace.
-RUN turbo prune @tyl/web --docker
+RUN turbo prune @tyl/server --docker
  
 # Add lockfile and package.json's of isolated subworkspace
 FROM base AS installer
@@ -28,7 +28,7 @@ RUN pnpm install
  
 # Build the project
 COPY --from=builder /app/out/full/ .
-RUN pnpm turbo run build --filter=@tyl/web...
+RUN pnpm turbo run build --filter=@tyl/server...
  
 FROM base AS runner
 WORKDIR /app
