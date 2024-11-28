@@ -33,7 +33,6 @@
     "@tanstack/router-plugin": "^1.81.9",
     "@tanstack/start": "^1.82.9",
     "@trpc/client": "catalog:",
-    "@trpc/react-query": "^11.0.0-rc.648",
     "@trpc/server": "catalog:",
     "@tyl/api": "workspace:*",
     "@tyl/db": "workspace:*",
