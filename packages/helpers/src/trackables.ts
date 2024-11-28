@@ -8,7 +8,7 @@ import type {
   ITrackableSettings,
 } from "@tyl/validators/trackable";
 
-import { clamp } from ".";
+import { range } from "./animation";
 import { presetsMap } from "./colorPresets";
 import { getColorAtPosition, makeColorString } from "./colorTools";
 
@@ -78,10 +78,7 @@ export const getValueToProgressPercentage = (settings: INumberSettings) => {
     ) {
       return null;
     }
-    return Math.round(
-      (clamp(val, progress.min, progress.max) / (progress.max - progress.min)) *
-        100,
-    );
+    return range(progress.min, progress.max, 0, 100, val);
   };
 };
 
