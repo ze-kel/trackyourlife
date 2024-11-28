@@ -7,6 +7,8 @@ import {
   useRouter,
 } from "@tanstack/react-router";
 
+import { Button } from "~/@shad/button";
+
 export function DefaultCatchBoundary({ error }: ErrorComponentProps) {
   const router = useRouter();
   const isRoot = useMatch({
@@ -19,33 +21,30 @@ export function DefaultCatchBoundary({ error }: ErrorComponentProps) {
   return (
     <div className="flex min-w-0 flex-1 flex-col items-center justify-center gap-6 p-4">
       <ErrorComponent error={error} />
-      <div className="flex flex-wrap items-center gap-2">
-        <button
+      <div className="flex w-fit flex-wrap items-center gap-2">
+        <Button
+          variant={"outline"}
           onClick={() => {
             void router.invalidate();
           }}
-          className={`rounded bg-gray-600 px-2 py-1 font-extrabold uppercase text-white dark:bg-gray-700`}
         >
           Try Again
-        </button>
+        </Button>
         {isRoot ? (
-          <Link
-            to="/"
-            className={`rounded bg-gray-600 px-2 py-1 font-extrabold uppercase text-white dark:bg-gray-700`}
-          >
-            Home
-          </Link>
+          <Button asChild variant={"secondary"}>
+            <Link to="/">Home</Link>
+          </Button>
         ) : (
-          <Link
-            to="/"
-            className={`rounded bg-gray-600 px-2 py-1 font-extrabold uppercase text-white dark:bg-gray-700`}
+          <Button
+            asChild
+            variant={"secondary"}
             onClick={(e) => {
               e.preventDefault();
-              //window.history.back()
+              window.history.back();
             }}
           >
-            Go Back
-          </Link>
+            <Link to="/">Home</Link>
+          </Button>
         )}
       </div>
     </div>

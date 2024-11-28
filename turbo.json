@@ -68,7 +68,8 @@
   "globalEnv": [
     "DATABASE_URL",
     "TEST_ENV",
-    "MIGRATE"
+    "MIGRATE",
+    "SITE"
   ],
   "globalPassThroughEnv": [
     "MIGRATE",
