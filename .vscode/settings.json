@@ -3,5 +3,6 @@
   "tailwindCSS.experimental.classRegex": [
     "tw`([^`]*)",
     ["tw.style\\(([^)]*)\\)", "'([^']*)'"]
-  ]
+  ],
+  "typescript.preferences.includePackageJsonAutoImports": "on"
 }
