@@ -1,5 +1,5 @@
 import { create, windowScheduler } from "@yornaath/batshit";
 
-import { api } from "~/trpc/react";
+import { trpc } from "~/trpc/react";
 
 const id = "aa";

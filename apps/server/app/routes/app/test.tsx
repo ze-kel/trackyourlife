@@ -2,11 +2,14 @@ import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useLoaderData } from "@tanstack/react-router";
 
-import { api } from "~/trpc/react";
+import { trpc } from "~/trpc/react";
 
 export const Route = createFileRoute("/app/test")({
   component: RouteComponent,
-  loader: async ({ context }) => {},
+  loader: async ({ context }) => {
+    const a = await trpc.userRouter.getMe.query();
+    return a;
+  },
 });
 
 function RouteComponent() {
@@ -14,7 +17,7 @@ function RouteComponent() {
 
   const a = useQuery({
     queryKey: ["aslkdjaslds"],
-    queryFn: () => api.userRouter.getMe.query(),
+    queryFn: () => trpc.userRouter.getMe.query(),
   });
 
   return (

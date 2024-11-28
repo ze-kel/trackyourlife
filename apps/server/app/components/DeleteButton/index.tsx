@@ -15,7 +15,7 @@ import {
   AlertDialogTrigger,
 } from "~/@shad/alert-dialog";
 import { buttonVariants } from "~/@shad/button";
-import { api } from "~/trpc/react";
+import { trpc } from "~/trpc/react";
 
 const DeleteButton = ({ id }: { id: string }) => {
   const router = useRouter();
@@ -23,7 +23,7 @@ const DeleteButton = ({ id }: { id: string }) => {
   const qc = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: api.trackablesRouter.deleteTrackable.mutate,
+    mutationFn: trpc.trackablesRouter.deleteTrackable.mutate,
     onSuccess: () => {
       qc.invalidateQueries({
         queryKey: ["trackables", "list"],

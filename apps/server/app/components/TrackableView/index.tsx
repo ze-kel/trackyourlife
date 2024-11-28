@@ -1,6 +1,13 @@
 import { useEffect, useState } from "react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
-import { format, getDaysInMonth, getISODay, getMonth, getYear } from "date-fns";
+import {
+  format,
+  getDaysInMonth,
+  getISODay,
+  getMonth,
+  getYear,
+  setYear,
+} from "date-fns";
 import { ErrorBoundary } from "react-error-boundary";
 
 import { getNowInTimezone } from "@tyl/helpers/timezone";
@@ -104,18 +111,16 @@ const Year = ({
 
 const ViewController = ({
   year,
-  setYear,
+  setDates,
   month,
-  setMonth,
   increment,
   view,
   isCurrentMonth,
   openCurrentMonth,
 }: {
-  setYear: (v: TVDateValue) => void;
+  setDates: (year: TVDateValue, month: TVDateValue) => void;
   year: TVDateValue;
   month: TVDateValue;
-  setMonth: (v: TVDateValue) => void;
   isCurrentMonth: boolean;
   view: TView;
   increment: (v: number) => void;
@@ -126,7 +131,7 @@ const ViewController = ({
       <div className="flex items-baseline gap-2 self-center">
         <YearSelector
           value={typeof year === "number" ? year : undefined}
-          onChange={(v) => setYear(v)}
+          onChange={(v) => setDates(v, month)}
         />
 
         {view === "days" &&
@@ -139,7 +144,7 @@ const ViewController = ({
               <Button
                 name="months"
                 variant="ghost"
-                onClick={() => setMonth("list")}
+                onClick={() => setDates(year, "list")}
               >
                 {format(new Date(year, month, 1), "MMMM")}
               </Button>
@@ -183,13 +188,11 @@ export type TVDateValue = number | "list";
 const TrackableView = ({
   year,
   month,
-  setYear,
-  setMonth,
+  setDates,
 }: {
   year: TVDateValue;
   month: TVDateValue;
-  setYear: (v: TVDateValue) => void;
-  setMonth: (v: TVDateValue) => void;
+  setDates: (year: TVDateValue, month: TVDateValue) => void;
 }) => {
   const settings = useUserSettings();
 
@@ -203,7 +206,7 @@ const TrackableView = ({
   const increment = (add: number) => {
     if (view === "months") {
       if (year === "list") return;
-      setYear(year + add);
+      setDates(year + add, month);
       return;
     }
     if (year === "list" || month === "list") return;
@@ -218,18 +221,16 @@ const TrackableView = ({
       newMonth = 0;
       newYear = year + 1;
     }
-    setYear(newYear);
-    setMonth(newMonth);
+    setDates(newYear, newMonth);
   };
 
   const openMonth = (m: number) => {
-    setMonth(m);
+    setDates(year, m);
   };
 
   const openCurrentMonth = () => {
     const now = getNowInTimezone(settings.timezone);
-    setYear(now.getFullYear());
-    setMonth(now.getMonth());
+    setDates(now.getFullYear(), now.getMonth());
   };
   const { trackable } = useTrackableContextSafe();
 
@@ -245,8 +246,7 @@ const TrackableView = ({
         isCurrentMonth={isCurrentMonth}
         view={view}
         openCurrentMonth={openCurrentMonth}
-        setYear={setYear}
-        setMonth={setMonth}
+        setDates={setDates}
         increment={increment}
       />
       <ErrorBoundary

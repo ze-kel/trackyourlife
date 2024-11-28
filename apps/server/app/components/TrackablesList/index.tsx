@@ -18,7 +18,7 @@ import TrackableProvider from "~/components/Providers/TrackableProvider";
 import { TrackableNameText } from "~/components/TrackableName";
 import { generateDates } from "~/components/TrackablesList/helper";
 import { useUserSettings } from "~/query/userSettings";
-import { api } from "~/trpc/react";
+import { trpc } from "~/trpc/react";
 import MiniTrackable from "./miniTrackable";
 
 const EmptyList = () => {
@@ -62,7 +62,7 @@ const TrackablesList = ({ daysToShow }: { daysToShow: number }) => {
   const { data, isLoading } = useQuery({
     queryKey: ["trackables", "list"],
     queryFn: async () => {
-      return await api.trackablesRouter.getTrackableIdList.query();
+      return await trpc.trackablesRouter.getTrackableIdList.query();
     },
   });
 
@@ -154,7 +154,7 @@ export const DailyList = ({ daysToShow }: { daysToShow: number }) => {
   const { data, isLoading } = useQuery({
     queryKey: ["trackables", "list"],
     queryFn: async () => {
-      return await api.trackablesRouter.getTrackableIdList.query();
+      return await trpc.trackablesRouter.getTrackableIdList.query();
     },
   });
 

@@ -17,7 +17,7 @@ import { Button } from "~/@shad/button";
 import { Spinner } from "~/@shad/spinner";
 import { CoreLinks } from "~/components/Header";
 import { useUserSettings } from "~/query/userSettings";
-import { api } from "~/trpc/react";
+import { trpc } from "~/trpc/react";
 
 const iconsMap: Record<ITrackable["type"], ReactNode> = {
   boolean: <ValueIcon />,
@@ -29,7 +29,7 @@ const TrackablesMiniList = () => {
   const { data, isLoading } = useQuery({
     queryKey: ["trackables", "list"],
     queryFn: async () => {
-      return await api.trackablesRouter.getTrackableIdList.query();
+      return await trpc.trackablesRouter.getTrackableIdList.query();
     },
   });
 

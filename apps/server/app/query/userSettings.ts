@@ -8,13 +8,12 @@ import { createServerFn } from "@tanstack/start";
 
 import { IUserSettings, UserSettingsFallback } from "@tyl/validators/user";
 
-import { api } from "~/trpc/react";
-import { apiS } from "~/trpc/server";
+import { trpc } from "~/trpc/react";
 
 const QUERY_KEY = ["user", "settings"];
 
 const sf = createServerFn({ method: "GET" }).handler(async () => {
-  return await apiS.userRouter.getUserSettings();
+  return await trpc.userRouter.getUserSettings.query();
 });
 
 const q = {
@@ -38,7 +37,7 @@ export const useUserSettingsMutation = () => {
 
   const settingsMutation = useMutation({
     mutationKey: [...QUERY_KEY, "update"],
-    mutationFn: api.userRouter.updateUserSettings.mutate,
+    mutationFn: trpc.userRouter.updateUserSettings.mutate,
     onMutate: async (upd) => {
       await queryClient.cancelQueries({
         queryKey: QUERY_KEY,

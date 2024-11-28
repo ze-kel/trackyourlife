@@ -144,7 +144,6 @@ const setUserUpdates = (
 
 export const syncRouter = {
   syncv2: protectedProcedure.input(ZSyncInput).query(async ({ ctx, input }) => {
-    console.log("SYNCV2", input);
     const trackables = await getTrackableUpdates(
       ctx.db,
       ctx.user.id,

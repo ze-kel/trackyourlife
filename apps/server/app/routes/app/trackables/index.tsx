@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/start";
 
 import TrackablesList from "~/components/TrackablesList";
-import { apiS } from "~/trpc/server";
+import { trpc } from "~/trpc/react";
 import { fillPrefetchedTrackablesList } from "~/utils/fillPrefetched";
 
 const SHOW_DAYS = 6;
@@ -10,7 +10,15 @@ const SHOW_DAYS = 6;
 export const Route = createFileRoute("/app/trackables/")({
   component: PostsComponent,
 
-  loader: async ({ context }) => {},
+  loader: async ({ context }) => {
+    const trackables = await trpc.trackablesRouter.getAllTrackables.query({
+      limits: {
+        type: "last",
+        days: SHOW_DAYS,
+      },
+    });
+    await fillPrefetchedTrackablesList(context.queryClient, trackables);
+  },
 });
 
 function PostsComponent() {

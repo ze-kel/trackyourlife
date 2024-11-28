@@ -16,7 +16,7 @@ import type {
 } from "@tyl/validators/trackable";
 
 import { MemoDayCellProvider } from "~/components/Providers/DayCellProvider";
-import { api } from "~/trpc/react";
+import { trpc } from "~/trpc/react";
 
 type MutationTrackable = UseMutationResult<
   ITrackableUpdate,
@@ -84,7 +84,7 @@ const makeUseTrackableQueryByMonth = ({
     fetcher: async (dates: Inp[]) => {
       if (dates.length === 1) {
         const { year, month } = dates[0] as Inp;
-        return await api.trackablesRouter.getTrackableById.query({
+        return await trpc.trackablesRouter.getTrackableById.query({
           id,
           limits: {
             type: "month",
@@ -103,7 +103,7 @@ const makeUseTrackableQueryByMonth = ({
 
       const from = dates[0] as Inp;
       const to = dates[dates.length - 1] as Inp;
-      return await api.trackablesRouter.getTrackableById.query({
+      return await trpc.trackablesRouter.getTrackableById.query({
         id,
         limits: {
           type: "range",
@@ -153,7 +153,7 @@ export const useTrackableQueryByMonth = ({
   return useQuery({
     queryKey: ["trackable", id, year, month],
     queryFn: async () => {
-      const trackable = await api.trackablesRouter.getTrackableById.query({
+      const trackable = await trpc.trackablesRouter.getTrackableById.query({
         id,
         limits: {
           type: "month",
@@ -190,7 +190,7 @@ const TrackableProvider = ({
   const query = useQuery({
     queryKey: ["trackable", id],
     queryFn: async () => {
-      return await api.trackablesRouter.getTrackableById.query({
+      return await trpc.trackablesRouter.getTrackableById.query({
         id,
         limits: { type: "last", days: 7 },
       });
@@ -205,7 +205,7 @@ const TrackableProvider = ({
   const settings = useQuery({
     queryKey: ["trackable", id, "settings"],
     queryFn: async () => {
-      return await api.trackablesRouter.getTrackableSettings.query({ id: id });
+      return await trpc.trackablesRouter.getTrackableSettings.query({ id: id });
     },
     refetchOnReconnect: false,
     staleTime: Infinity,
@@ -214,7 +214,7 @@ const TrackableProvider = ({
   });
 
   const updateHandler = async (update: Omit<ITrackableUpdate, "id">) => {
-    return await api.trackablesRouter.updateTrackableEntry.mutate({
+    return await trpc.trackablesRouter.updateTrackableEntry.mutate({
       ...update,
       id,
     });
@@ -253,7 +253,7 @@ const TrackableProvider = ({
   });
 
   const updateSettingsHandler = async (data: ITrackableSettings) => {
-    await api.trackablesRouter.updateTrackableSettings.mutate({
+    await trpc.trackablesRouter.updateTrackableSettings.mutate({
       id,
       newSettings: data,
     });
@@ -301,7 +301,7 @@ const TrackableProvider = ({
 
   const nameMutation = useMutation({
     mutationFn: async (newName: string) => {
-      await api.trackablesRouter.updateTrackableName.mutate({ id, newName });
+      await trpc.trackablesRouter.updateTrackableName.mutate({ id, newName });
     },
     onMutate: (upd) => {
       const previous = queryClient.getQueryData([

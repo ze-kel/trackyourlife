@@ -1,6 +1,5 @@
 import { createTRPCClient, httpBatchLink, loggerLink } from "@trpc/client";
 import SuperJSON from "superjson";
-import { getHeaders } from "vinxi/http";
 
 import type { AppRouter } from "@tyl/api";
 
@@ -9,7 +8,7 @@ const getBaseUrl = () => {
   return `http://localhost:${process.env.PORT ?? 3000}`;
 };
 
-export const api = createTRPCClient<AppRouter>({
+export const trpc = createTRPCClient<AppRouter>({
   links: [
     loggerLink({
       enabled: (op) =>
@@ -20,6 +19,18 @@ export const api = createTRPCClient<AppRouter>({
     httpBatchLink({
       transformer: SuperJSON,
       url: getBaseUrl() + "/api/trpc",
+      async headers() {
+        if (import.meta.env.SSR) {
+          try {
+            const { getHeaders } = await import("vinxi/http");
+            return getHeaders();
+          } catch (e) {
+            console.error(e);
+          }
+        }
+
+        return {};
+      },
     }),
   ],
 });

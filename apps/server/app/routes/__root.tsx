@@ -16,7 +16,6 @@ import { DefaultCatchBoundary } from "~/components/DefaultCatchBoundary.js";
 import { NotFound } from "~/components/NotFound.js";
 import { LazyMotionProvider } from "~/components/Providers/lazyFramerMotionProvider";
 import { ThemeProvider } from "~/components/Providers/ThemeProvider";
-//@ts-expect-error css import
 import appCss from "~/styles/app.css?url";
 import { seo } from "~/utils/seo.js";
 
