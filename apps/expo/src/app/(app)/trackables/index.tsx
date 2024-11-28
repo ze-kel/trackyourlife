@@ -1,15 +1,11 @@
-import { useMemo, useRef } from "react";
+import { useMemo } from "react";
 import {
   FlatList,
-  LayoutAnimation,
-  Pressable,
-  ScrollView,
   Text,
   useColorScheme,
   useWindowDimensions,
   View,
 } from "react-native";
-import Animated, { LinearTransition } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Link } from "expo-router";
 import { useHookstate } from "@hookstate/core";
@@ -18,18 +14,13 @@ import { eachDayOfInterval, sub } from "date-fns";
 import { asc, eq } from "drizzle-orm";
 import { useLiveQuery } from "drizzle-orm/expo-sqlite";
 import { RadixIcon } from "radix-ui-react-native-icons";
-import { date } from "zod";
 
 import { sortTrackableList } from "@tyl/helpers/trackables";
 
 import DayCellWrapper from "~/app/_components/dayCell";
 import { TrackableProvider } from "~/app/_components/trackableProvider";
 import { Input } from "~/app/_ui/input";
-import {
-  currentUserSettings,
-  setUserFavorites,
-  setUserSettings,
-} from "~/data/authContext";
+import { currentUserSettings } from "~/data/authContext";
 import { db } from "~/db";
 import { trackable } from "~/db/schema";
 import { tws } from "~/utils/tw";
@@ -47,14 +38,14 @@ export default function Index() {
   const favorites = useHookstate(currentUserSettings.favorites);
 
   const colorScheme = useColorScheme();
-  const { height, width } = useWindowDimensions();
+  const { width } = useWindowDimensions();
 
   const sorted = useMemo(() => {
     const s = sortTrackableList(data, favorites.get() as string[]);
     return s;
   }, [favorites, data]);
 
-  const date = new Date();
+  // const date = new Date();
 
   const dates = eachDayOfInterval({
     start: new Date(),

@@ -1,13 +1,12 @@
-import { useEffect, useState } from "react";
-import { Text, useColorScheme, View } from "react-native";
+import { useColorScheme } from "react-native";
 import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
-import { Redirect, Stack, Tabs } from "expo-router";
+import { Redirect, Tabs } from "expo-router";
 import { useHookstate } from "@hookstate/core";
 import { RadixIcon } from "radix-ui-react-native-icons";
 
-import { currentUser, useSession } from "~/data/authContext";
+import { currentUser } from "~/data/authContext";
 import { useSyncInterval } from "~/data/syncContext";
-import { db, expoDb } from "~/db";
+import { expoDb } from "~/db";
 import { tws } from "~/utils/tw";
 
 export default function AppLayout() {

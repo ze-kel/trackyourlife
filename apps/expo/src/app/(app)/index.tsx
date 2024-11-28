@@ -1,7 +1,6 @@
-import { Fragment, useMemo, useState } from "react";
+import { useMemo } from "react";
 import {
   FlatList,
-  ScrollView,
   Text,
   useColorScheme,
   useWindowDimensions,
@@ -18,7 +17,6 @@ import { RadixIcon } from "radix-ui-react-native-icons";
 import { sortTrackableList } from "@tyl/helpers/trackables";
 import { ZTrackableSettings } from "@tyl/validators/trackable";
 
-import { CustomDateController } from "~/app/_components/dateController";
 import DayCellWrapper from "~/app/_components/dayCell";
 import { TrackableProvider } from "~/app/_components/trackableProvider";
 import { Button } from "~/app/_ui/button";
@@ -36,6 +34,7 @@ export const makeTrackableSettings = (trackable: unknown) => {
   return {};
 };
 
+/*
 const Today = () => {
   const now = new Date();
   return (
@@ -46,6 +45,7 @@ const Today = () => {
     ></DayCellWrapper>
   );
 };
+*/
 
 const DateView = ({ date }: { date: Date }) => {
   const { data } = useLiveQuery(
@@ -59,7 +59,7 @@ const DateView = ({ date }: { date: Date }) => {
 
   const favorites = useHookstate(currentUserSettings.favorites);
 
-  const { width, height } = useWindowDimensions();
+  const { width } = useWindowDimensions();
 
   const sorted = useMemo(() => {
     const s = sortTrackableList(data, favorites.get() as string[]);

@@ -1,27 +1,22 @@
-import {
-  addDatabaseChangeListener,
-  DatabaseChangeEvent,
-} from "expo-sqlite/next";
+import type { SQLiteTable, TableConfig } from "drizzle-orm/sqlite-core";
+import type { DatabaseChangeEvent } from "expo-sqlite/next";
+import { addDatabaseChangeListener } from "expo-sqlite/next";
 import { eq, getTableName } from "drizzle-orm";
-import { SQLiteTable, TableConfig } from "drizzle-orm/sqlite-core";
 
-import { currentUser } from "~/data/authContext";
-import { db, expoDb } from "../db/index";
-import {
-  authUser,
+import type {
   LDbTrackableRecordSelect,
   LDbTrackableSelect,
   LDbUserDataSelect,
-  trackable,
-  trackableRecord,
 } from "../db/schema";
+import { db, expoDb } from "../db/index";
+import { authUser, trackable, trackableRecord } from "../db/schema";
 
 const addSubscrption = <T>(
-  m: Map<string, Array<(v: T) => void>>,
+  m: Map<string, ((v: T) => void)[]>,
   key: string,
   cb: (v: T) => void,
 ) => {
-  let v = m.get(key);
+  const v = m.get(key);
   if (!v) {
     m.set(key, [cb]);
   } else {
@@ -29,7 +24,7 @@ const addSubscrption = <T>(
   }
 };
 const removeSubscription = <T>(
-  m: Map<string, Array<(v: T) => void>>,
+  m: Map<string, ((v: T) => void)[]>,
   key: string,
   cb: (v: T) => void,
 ) => {
@@ -43,12 +38,12 @@ const removeSubscription = <T>(
 };
 
 const notify = <T>(
-  m: Map<string, Array<(v: T) => void>>,
+  m: Map<string, ((v: T) => void)[]>,
   key: string,
   value: T,
 ) => {
   const a = m.get(key);
-  if (a && a.length) {
+  if (a?.length) {
     a.forEach((v) => v(value));
   }
 };
@@ -58,7 +53,7 @@ class Subscribable<
   KEY,
   SEL extends KEY & TAB["$inferSelect"],
 > {
-  map: Map<string, Array<(v: SEL) => void>>;
+  map: Map<string, ((v: SEL) => void)[]>;
   keyFunction: (v: KEY) => string;
   tableName: string;
 
@@ -77,15 +72,16 @@ class Subscribable<
 
   async listenerHook(v: DatabaseChangeEvent) {
     if (v.tableName === this.tableName) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const u = (await expoDb.getFirstAsync(
         `SELECT * FROM ${this.tableName} WHERE rowid = ${v.rowId}`,
-      )) as SEL;
+      ))!;
 
       const key = this.keyFunction(u);
 
       const subs = this.map.get(key);
 
-      if (subs && subs.length) {
+      if (subs?.length) {
         subs.forEach((v) => v(u));
       }
 

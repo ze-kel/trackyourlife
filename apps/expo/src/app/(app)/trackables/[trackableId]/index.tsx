@@ -1,39 +1,21 @@
-import { useLayoutEffect, useState } from "react";
-import {
-  Text,
-  useAnimatedValue,
-  useWindowDimensions,
-  View,
-} from "react-native";
-import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import { useState } from "react";
+import { Text, useWindowDimensions, View } from "react-native";
 import Animated, {
   Easing,
   LayoutAnimationConfig,
-  runOnJS,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams } from "expo-router";
-import {
-  add,
-  eachMonthOfInterval,
-  format,
-  getDaysInMonth,
-  getISODay,
-  isAfter,
-  startOfMonth,
-  sub,
-} from "date-fns";
+import { format, getDaysInMonth, getISODay, startOfMonth } from "date-fns";
 import { and, eq } from "drizzle-orm";
 import { useLiveQuery } from "drizzle-orm/expo-sqlite";
-import { RadixIcon } from "radix-ui-react-native-icons";
 
 import { CustomDateController } from "~/app/_components/dateController";
 import DayCellWrapper from "~/app/_components/dayCell";
 import { TrackableProvider } from "~/app/_components/trackableProvider";
-import { Button } from "~/app/_ui/button";
 import { db } from "~/db";
 import { trackable } from "~/db/schema";
 import { tws } from "~/utils/tw";
@@ -48,7 +30,7 @@ const MonthView = ({ date }: { date: Date }) => {
   const firstDayDate = startOfMonth(date);
   const prefaceWith = getISODay(firstDayDate) - 1;
   const prepend = Array(prefaceWith).fill(0);
-  const { height, width } = useWindowDimensions();
+  const { width } = useWindowDimensions();
 
   const p = 8;
   const gap = 2;
