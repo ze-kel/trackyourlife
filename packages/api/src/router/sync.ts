@@ -6,7 +6,8 @@ import { auth_user, trackable, trackableRecord } from "@tyl/db/schema";
 import { ZTrackableFromDb } from "@tyl/validators/trackable";
 import { ZUserSettings } from "@tyl/validators/user";
 
-import { createTRPCContext, protectedProcedure } from "../trpc";
+import type { createTRPCContext } from "../trpc";
+import { protectedProcedure } from "../trpc";
 
 const ZRecordUpdate = z.object({
   date: z.date(),
@@ -15,8 +16,6 @@ const ZRecordUpdate = z.object({
   value: z.string(),
   trackableId: z.string(),
 });
-
-type IRecordUpdate = z.infer<typeof ZRecordUpdate>;
 
 const ZSyncInput = z.object({
   lastSync: z.date(),

@@ -7,7 +7,7 @@ import { UserSettingsFallback, ZUserSettings } from "@tyl/validators/user";
 import { protectedProcedure, publicProcedure } from "../trpc";
 
 export const userRouter = {
-  getMe: publicProcedure.query(async ({ ctx }) => {
+  getMe: publicProcedure.query(({ ctx }) => {
     return ctx.user;
   }),
 

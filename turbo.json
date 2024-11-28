@@ -67,9 +67,11 @@
   },
   "globalEnv": [
     "DATABASE_URL",
-    "TEST_ENV"
+    "TEST_ENV",
+    "MIGRATE"
   ],
   "globalPassThroughEnv": [
+    "MIGRATE",
     "NODE_ENV",
     "CI",
     "VERCEL",

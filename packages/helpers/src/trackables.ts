@@ -32,7 +32,7 @@ export const computeDayCellHelpers = ({
   const startConvented = startDate ? new Date(startDate) : undefined;
 
   const afterLimit = startConvented
-    ? (isSameDay(dateDay, startConvented) ?? isAfter(dateDay, startConvented))
+    ? isSameDay(dateDay, startConvented) || isAfter(dateDay, startConvented)
     : true;
   const inTrackRange = beforeToday && afterLimit;
   const isToday = isSameDay(dateNow, dateDay);
@@ -119,8 +119,8 @@ export const sortTrackableList = <T extends ITrackableFromList>(
     if (favSet.has(a.id) && !favSet.has(b.id)) return -1;
     if (!favSet.has(a.id) && favSet.has(b.id)) return 1;
 
-    const aName = a.name ?? "";
-    const bName = b.name ?? "";
+    const aName = a.name || "";
+    const bName = b.name || "";
 
     return aName.localeCompare(bName);
   });

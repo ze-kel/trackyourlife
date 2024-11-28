@@ -123,7 +123,7 @@ export const makeTrackableData = (
     if (!result[y]) {
       result[y] = {};
     }
-    if (!result[y]?.[m]) {
+    if (!result[y][m]) {
       result[y][m] = {};
     }
 

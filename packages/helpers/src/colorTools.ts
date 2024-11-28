@@ -100,7 +100,7 @@ export const getColorAtPosition = ({
   let rightSide: IColorCodingValue | undefined = undefined;
 
   for (const v of value) {
-    if (!leftSide ?? (leftSide && v.point <= point)) {
+    if (!leftSide || v.point <= point) {
       leftSide = v;
     }
     if (!rightSide && v.point >= point) {
@@ -110,7 +110,7 @@ export const getColorAtPosition = ({
 
   if (!leftSide && rightSide) return rightSide.color;
   if (!rightSide && leftSide) return leftSide.color;
-  if (!leftSide ?? !rightSide) return presetsMap.neutral;
+  if (!leftSide || !rightSide) return presetsMap.neutral;
 
   if (point === leftSide.point) return leftSide.color;
   if (point === rightSide.point) return rightSide.color;

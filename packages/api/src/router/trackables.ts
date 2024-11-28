@@ -4,7 +4,6 @@ import { z } from "zod";
 import type { DbTrackableRecordInsert } from "@tyl/db/schema";
 import { and, between, eq, sql } from "@tyl/db";
 import { trackable, trackableRecord } from "@tyl/db/schema";
-import { getNowInTimezone, getStartOfDayGMT } from "@tyl/helpers/timezone";
 import { ZGETLimits } from "@tyl/validators/api";
 import {
   trackableToCreate,
@@ -14,7 +13,6 @@ import {
 
 import {
   getDateBounds,
-  GetUserSettings,
   makeTrackableData,
   makeTrackableSettings,
   prepareTrackable,
@@ -38,8 +36,6 @@ export const trackablesRouter = {
   getAllTrackables: protectedProcedure
     .input(z.object({ limits: ZGETLimits }))
     .query(async ({ ctx, input }) => {
-      const settings = await GetUserSettings({ userId: ctx.user.id });
-
       const bounds = getDateBounds(input.limits ?? { type: "last", days: 31 });
 
       const raw = await ctx.db.query.trackable.findMany({
@@ -60,7 +56,6 @@ export const trackablesRouter = {
   getTrackableById: protectedProcedure
     .input(z.object({ id: z.string(), limits: ZGETLimits }))
     .query(async ({ ctx, input }) => {
-      const settings = await GetUserSettings({ userId: ctx.user.id });
       const bounds = getDateBounds(input.limits ?? { type: "last", days: 31 });
       const tr = await ctx.db.query.trackable.findFirst({
         where: and(
@@ -74,7 +69,7 @@ export const trackablesRouter = {
         },
       });
 
-      if (!tr ?? tr.isDeleted) {
+      if (!tr || tr.isDeleted) {
         throw new Error(`Unable to find trackable with id: ${input.id}`);
       }
 
@@ -84,7 +79,6 @@ export const trackablesRouter = {
   getTrackableData: protectedProcedure
     .input(z.object({ id: z.string(), limits: ZGETLimits }))
     .query(async ({ ctx, input }) => {
-      const settings = await GetUserSettings({ userId: ctx.user.id });
       const bounds = getDateBounds(input.limits);
 
       const data = await ctx.db.query.trackableRecord.findMany({
@@ -219,7 +213,7 @@ export const trackablesRouter = {
         ),
       });
 
-      if (!tr ?? tr.isDeleted) {
+      if (!tr || tr.isDeleted) {
         throw new Error(`No trackable with id ${input.id}`);
       }
 
