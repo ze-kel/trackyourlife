@@ -509,6 +509,8 @@ importers:
         specifier: ^5.1.3
         version: 5.1.3(typescript@5.5.4)(vite@5.4.11(@types/node@22.9.3)(lightningcss@1.22.0)(terser@5.31.6))
 
+  apps/server: {}
+
   packages/api:
     dependencies:
       '@trpc/server':
@@ -15153,7 +15155,7 @@ snapshots:
       ora: 4.1.1
       picocolors: 1.0.1
       rimraf: 3.0.2
-      semver: 7.6.2
+      semver: 7.6.3
       update-check: 1.5.4
 
   '@tybys/wasm-util@0.8.3':

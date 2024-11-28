@@ -64,8 +64,8 @@ const green = {
   },
   darkMode: {
     h: 73,
-    s: 73,
-    l: 53,
+    s: 100,
+    l: 37,
   },
 };
 
