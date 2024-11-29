@@ -39,7 +39,6 @@
     "@tyl/helpers": "workspace:*",
     "@tyl/validators": "workspace:*",
     "@visx/visx": "^3.12.0",
-    "@vitejs/plugin-react": "^4.3.4",
     "@yornaath/batshit": "^0.10.1",
     "arctic": "^2.3.0",
     "class-variance-authority": "catalog:",
@@ -60,7 +59,7 @@
     "tailwindcss-animate": "^1.0.7",
     "timezones-list": "^3.0.3",
     "usehooks-ts": "^3.1.0",
-    "uuid": "^11.0.3",
+    "uuid": "catalog:",
     "vaul": "^1.1.1",
     "vinxi": "0.4.3",
     "zod": "catalog:"
