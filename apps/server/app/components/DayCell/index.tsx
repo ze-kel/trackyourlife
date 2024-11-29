@@ -8,9 +8,12 @@ import { getNowInTimezone } from "@tyl/helpers/timezone";
 import { computeDayCellHelpers } from "@tyl/helpers/trackables";
 
 import {
-  useTrackableContextSafe,
+  useTrackableIdSafe,
+  useTrackableMeta,
   useTrackableQueryByMonth,
-} from "~/components/Providers/TrackableProvider";
+  useTrackableSettings,
+  useTrackableUpdateMutation,
+} from "~/query/trackable";
 import { useUserSettings } from "~/query/userSettings";
 import { DayCellBoolean } from "./DayCellBoolean";
 import { DayCellNumber } from "./DayCellNumber";
@@ -109,14 +112,17 @@ const DayCellWrapper = ({
   noLabel?: boolean;
   labelType?: "auto" | "outside" | "none";
 }) => {
-  const { trackable, settings, update } = useTrackableContextSafe();
+  const { id } = useTrackableIdSafe();
+  const { data: trackable } = useTrackableMeta({ id });
+  const { data: settings } = useTrackableSettings({ id });
+  const updateMutation = useTrackableUpdateMutation({ id });
 
   if (!trackable) throw new Error("Trackable not found in context");
 
   const { data, isLoading } = useTrackableQueryByMonth({
     month,
     year,
-    id: trackable.id,
+    id: id,
   });
 
   const uSettings = useUserSettings();
@@ -134,7 +140,7 @@ const DayCellWrapper = ({
   );
 
   const updateHandler = async (value: string) => {
-    await update({ value, day, month, year });
+    await updateMutation.mutateAsync({ value, day, month, year });
   };
 
   return (

@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { HeartFilledIcon, HeartIcon } from "@radix-ui/react-icons";
 import { Button } from "@shad/button";
 
-import { useTrackableContextSafe } from "~/components/Providers/TrackableProvider";
+import { useTrackableIdSafe } from "~/query/trackable";
 import { useUserSettings, useUserSettingsMutation } from "~/query/userSettings";
 
 export const FavoriteButton = ({
@@ -13,7 +13,7 @@ export const FavoriteButton = ({
   variant?: ButtonProps["variant"];
   onlyIcon?: boolean;
 }) => {
-  const { trackable } = useTrackableContextSafe();
+  const { id } = useTrackableIdSafe();
   const settings = useUserSettings();
   const { updateSettingsPartial } = useUserSettingsMutation();
 
@@ -21,14 +21,14 @@ export const FavoriteButton = ({
     return new Set(settings.favorites);
   }, [settings]);
 
-  const inFavs = trackable ? settingsSet.has(trackable.id) : false;
+  const inFavs = id ? settingsSet.has(id) : false;
 
   const favHandler = async () => {
-    if (!trackable) return;
+    if (!id) return;
     if (inFavs) {
-      settingsSet.delete(trackable.id);
+      settingsSet.delete(id);
     } else {
-      settingsSet.add(trackable.id);
+      settingsSet.add(id);
     }
     await updateSettingsPartial({
       favorites: Array.from(settingsSet),

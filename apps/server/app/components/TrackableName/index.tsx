@@ -14,11 +14,17 @@ import {
 } from "@shad/drawer";
 import { Input } from "@shad/input";
 
-import { useTrackableContextSafe } from "~/components/Providers/TrackableProvider";
+import {
+  useTrackableIdSafe,
+  useTrackableMeta,
+  useTrackableNameMutation,
+} from "~/query/trackable";
 import { useIsDesktop } from "~/utils/useIsDesktop";
 
 export const TrackableNameEditable = () => {
-  const { trackable, updateName } = useTrackableContextSafe();
+  const { id } = useTrackableIdSafe();
+  const { data: trackable } = useTrackableMeta({ id });
+  const { mutateAsync: updateName } = useTrackableNameMutation(id);
 
   const [isEditing, setIsEditing] = useState(false);
 
@@ -89,7 +95,8 @@ export const TrackableNameEditable = () => {
 };
 
 export const TrackableNameText = () => {
-  const { trackable } = useTrackableContextSafe();
+  const { id } = useTrackableIdSafe();
+  const { data: trackable } = useTrackableMeta({ id });
 
   return <> {trackable?.name ?? `Unnamed ${trackable?.type ?? ""}`}</>;
 };

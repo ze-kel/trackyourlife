@@ -370,6 +370,12 @@ importers:
       framer-motion:
         specifier: ^11.11.17
         version: 11.11.17(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+      jotai:
+        specifier: ^2.9.3
+        version: 2.9.3(@types/react@18.3.3)(react@18.2.0)
+      jotai-tanstack-query:
+        specifier: ^0.9.0
+        version: 0.9.0(@tanstack/query-core@5.51.24)(jotai@2.9.3(@types/react@18.3.3)(react@18.2.0))
       lucia:
         specifier: ^3.2.2
         version: 3.2.2
@@ -7416,6 +7422,12 @@ packages:
 
   join-component@1.1.0:
     resolution: {integrity: sha512-bF7vcQxbODoGK1imE2P9GS9aw4zD0Sd+Hni68IMZLj7zRnquH7dXUmMw9hDI5S/Jzt7q+IyTXN0rSg2GI0IKhQ==}
+
+  jotai-tanstack-query@0.9.0:
+    resolution: {integrity: sha512-8n7/xV14+ZE63dyqngtmqs6aV1bNnQJF9bJN5Bj70USc2cMFRmsVhGGzL1cSvp5E/xXasU37czFFaZ0vavmyfA==}
+    peerDependencies:
+      '@tanstack/query-core': '*'
+      jotai: '>=2.0.0'
 
   jotai@2.9.3:
     resolution: {integrity: sha512-IqMWKoXuEzWSShjd9UhalNsRGbdju5G2FrqNLQJT+Ih6p41VNYe2sav5hnwQx4HJr25jq9wRqvGSWGviGG6Gjw==}
@@ -18372,6 +18384,11 @@ snapshots:
       '@sideway/pinpoint': 2.0.0
 
   join-component@1.1.0: {}
+
+  jotai-tanstack-query@0.9.0(@tanstack/query-core@5.51.24)(jotai@2.9.3(@types/react@18.3.3)(react@18.2.0)):
+    dependencies:
+      '@tanstack/query-core': 5.51.24
+      jotai: 2.9.3(@types/react@18.3.3)(react@18.2.0)
 
   jotai@2.9.3(@types/react@18.3.3)(react@18.2.0):
     optionalDependencies:

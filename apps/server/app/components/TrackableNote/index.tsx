@@ -12,17 +12,19 @@ import { Drawer, DrawerContent, DrawerTitle, DrawerTrigger } from "@shaddrawer";
 
 import { Textarea } from "~/@shad/textarea";
 import {
-  useNoteMutation,
-  useTrackableContextSafe,
-} from "~/components/Providers/TrackableProvider";
+  useTrackableIdSafe,
+  useTrackableMeta,
+  useTrackableNoteMutation,
+} from "~/query/trackable";
 import { useIsDesktop } from "~/utils/useIsDesktop";
 
 export const TrackableNoteEditable = () => {
-  const { trackable } = useTrackableContextSafe();
+  const { id } = useTrackableIdSafe();
+  const { data: trackable } = useTrackableMeta({ id });
 
   const hasNote = Boolean(trackable?.note);
 
-  const noteMutation = useNoteMutation(trackable?.id ?? "");
+  const noteMutation = useTrackableNoteMutation(trackable?.id ?? "");
 
   const [isEditing, setIsEditing] = useState(false);
 
@@ -97,10 +99,4 @@ export const TrackableNoteEditable = () => {
       </DrawerContent>
     </Drawer>
   );
-};
-
-export const TrackableNameText = () => {
-  const { trackable } = useTrackableContextSafe();
-
-  return <> {trackable?.name ?? `Unnamed ${trackable?.type ?? ""}`}</>;
 };

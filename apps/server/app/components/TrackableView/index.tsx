@@ -7,9 +7,9 @@ import { ErrorBoundary } from "react-error-boundary";
 
 import { getNowInTimezone } from "@tyl/helpers/timezone";
 
-import { useTrackableContextSafe } from "~/components/Providers/TrackableProvider";
 import { TrackableNoteEditable } from "~/components/TrackableNote";
 import { YearSelector } from "~/components/TrackableView/yearSelector";
+import { useTrackableIdSafe } from "~/query/trackable";
 import { useUserSettings } from "~/query/userSettings";
 import { Route } from "~/routes/app/trackables/$id/view";
 import DayCellWrapper from "../DayCell";
@@ -23,7 +23,7 @@ const Month = ({
   year: number;
   mini?: boolean;
 }) => {
-  const { trackable } = useTrackableContextSafe();
+  const { id } = useTrackableIdSafe();
   const toRender = getDaysInMonth(new Date(year, month));
   const dates = Array(toRender)
     .fill(0)
@@ -45,7 +45,7 @@ const Month = ({
       ))}
       {dates.map((el) => (
         <DayCellWrapper
-          key={`${trackable?.id}-${month}-${el}`}
+          key={`${id}-${month}-${el}`}
           year={year}
           month={month}
           day={el}
@@ -90,9 +90,11 @@ const Year = ({
           data-upcoming={m > active}
           key={`${year}-${m}`}
           className="cursor-pointer rounded-md border border-transparent px-2 py-1 transition-colors disabled:pointer-events-none disabled:cursor-default data-[upcoming=true]:opacity-50"
-          onClick={() => openMonth(m)}
         >
-          <h5 className={cn("mb-1 text-left font-semibold transition-colors")}>
+          <h5
+            onClick={() => openMonth(m)}
+            className={cn("mb-1 text-left font-semibold transition-colors")}
+          >
             <span>{format(new Date(year, m, 1), "MMMM")}</span>
           </h5>
           <Month year={year} month={m} mini={true} />
@@ -235,12 +237,6 @@ const TrackableView = ({
     setDates(year, m);
   };
 
-  const { trackable } = useTrackableContextSafe();
-
-  if (!trackable) {
-    return <div></div>;
-  }
-
   return (
     <>
       <ViewController year={year} month={month} />
@@ -264,16 +260,5 @@ const TrackableView = ({
     </>
   );
 };
-
-/*
-const StatsRouter = ({ year, month }: { year: number; month: number }) => {
-  const { trackable } = useTrackableContextSafe();
-
-  if (trackable?.type === "number")
-    return <GraphWrapper year={year} month={month} />;
-
-  return <></>;
-};
-*/
 
 export default TrackableView;

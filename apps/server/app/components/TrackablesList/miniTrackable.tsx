@@ -5,8 +5,8 @@ import { ErrorBoundary } from "react-error-boundary";
 
 import DayCellWrapper from "~/components/DayCell";
 import { FavoriteButton } from "~/components/FavoriteButton";
-import { useTrackableContextSafe } from "~/components/Providers/TrackableProvider";
 import { TrackableNameText } from "~/components/TrackableName";
+import { useTrackableIdSafe, useTrackableMeta } from "~/query/trackable";
 
 const MiniTrackable = ({
   className,
@@ -15,7 +15,8 @@ const MiniTrackable = ({
   className?: string;
   daysToRender: { year: number; month: number; day: number }[];
 }) => {
-  const { trackable } = useTrackableContextSafe();
+  const { id } = useTrackableIdSafe();
+  const { data: trackable } = useTrackableMeta({ id });
 
   return (
     <div className={className}>
