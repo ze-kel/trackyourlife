@@ -6,8 +6,8 @@ import { and, between, eq, sql } from "@tyl/db";
 import { trackable, trackableRecord } from "@tyl/db/schema";
 import { ZGETLimits } from "@tyl/validators/api";
 import {
-  trackableToCreate,
   ZTrackableSettings,
+  ZTrackableToCreate,
   ZTrackableUpdate,
 } from "@tyl/validators/trackable";
 
@@ -109,7 +109,7 @@ export const trackablesRouter = {
     }),
 
   createTrackable: protectedProcedure
-    .input(trackableToCreate)
+    .input(ZTrackableToCreate)
     .mutation(async ({ ctx, input }) => {
       const cr = await ctx.db
         .insert(trackable)
@@ -196,6 +196,21 @@ export const trackablesRouter = {
       await ctx.db
         .update(trackable)
         .set({ name: input.newName, updated: new Date() })
+        .where(
+          and(eq(trackable.id, input.id), eq(trackable.userId, ctx.user.id)),
+        );
+    }),
+  updateTrackableNote: protectedProcedure
+    .input(
+      z.object({
+        note: z.string(),
+        id: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db
+        .update(trackable)
+        .set({ note: input.note, updated: new Date() })
         .where(
           and(eq(trackable.id, input.id), eq(trackable.userId, ctx.user.id)),
         );

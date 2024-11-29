@@ -1,8 +1,8 @@
+import { cn } from "@shad/utils";
 import { Link } from "@tanstack/react-router";
 import { format } from "date-fns";
 import { ErrorBoundary } from "react-error-boundary";
 
-import { cn } from "~/@shad";
 import DayCellWrapper from "~/components/DayCell";
 import { FavoriteButton } from "~/components/FavoriteButton";
 import { useTrackableContextSafe } from "~/components/Providers/TrackableProvider";
@@ -29,7 +29,7 @@ const MiniTrackable = ({
           <TrackableNameText />
         </Link>
 
-        <FavoriteButton />
+        <FavoriteButton onlyIcon />
       </div>
 
       <ErrorBoundary

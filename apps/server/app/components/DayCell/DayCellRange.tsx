@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
 import { useState } from "react";
+import { cn } from "@shad/utils";
 import { m } from "framer-motion";
 
-import { cn } from "~/@shad";
 import { PopupSelector } from "~/components/DayCell/PopupSelector";
 import {
   Dropdown,

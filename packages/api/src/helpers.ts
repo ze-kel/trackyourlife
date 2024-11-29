@@ -134,7 +134,7 @@ export const makeTrackableData = (
 };
 
 export const makeTrackableSettings = (
-  trackable: DbTrackableSelect,
+  trackable: Pick<DbTrackableSelect, "type" | "settings">,
 ): ITrackableSettings => {
   const parseRes = ZTrackableSettings.safeParse(trackable);
   if (parseRes.success) {

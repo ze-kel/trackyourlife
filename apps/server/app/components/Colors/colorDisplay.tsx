@@ -1,10 +1,9 @@
 import type { CSSProperties } from "react";
+import { cn } from "@shad/utils";
 
 import type { IColorValue } from "@tyl/validators/trackable";
 import { presetsArray } from "@tyl/helpers/colorPresets";
 import { makeColorString } from "@tyl/helpers/colorTools";
-
-import { cn } from "~/@shad";
 
 export const ColorDisplay = ({
   color,

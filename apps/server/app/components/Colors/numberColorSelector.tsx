@@ -1,6 +1,12 @@
 import type { TouchEvent } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Cross1Icon, PlusCircledIcon } from "@radix-ui/react-icons";
+import { Button } from "@shad/button";
+import { Input } from "@shad/input";
+import { Label } from "@shad/label";
+import { RadioTabItem, RadioTabs } from "@shad/radio-tabs";
+import { Switch } from "@shad/switch";
+import { cn } from "@shad/utils";
 import { useTheme } from "next-themes";
 import { v4 as uuidv4 } from "uuid";
 
@@ -10,12 +16,6 @@ import { range } from "@tyl/helpers/animation";
 import { presetsMap } from "@tyl/helpers/colorPresets";
 import { getColorAtPosition, makeCssGradient } from "@tyl/helpers/colorTools";
 
-import { cn } from "~/@shad";
-import { Button } from "~/@shad/button";
-import { Input } from "~/@shad/input";
-import { Label } from "~/@shad/label";
-import { RadioTabItem, RadioTabs } from "~/@shad/radio-tabs";
-import { Switch } from "~/@shad/switch";
 import ColorPicker, { BetterNumberInput } from "~/components/Colors";
 import { ColorDisplay } from "~/components/Colors/colorDisplay";
 import { useRefSize } from "~/components/Colors/contoller";

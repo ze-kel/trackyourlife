@@ -13,6 +13,6 @@ export default defineConfig({
     optimizeDeps: {
       exclude: ["oslo", "@node-rs/argon2", "@node-rs/bcrypt"],
     },
-    plugins: [tsConfigPaths()],
+    plugins: [tsConfigPaths({ projects: ["./tsconfig.json"] })],
   },
 });

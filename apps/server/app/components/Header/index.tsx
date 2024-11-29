@@ -1,3 +1,4 @@
+import type { ButtonProps } from "@shad/button";
 import { useState } from "react";
 import {
   ActivityLogIcon,
@@ -6,6 +7,15 @@ import {
   GearIcon,
   PlusCircledIcon,
 } from "@radix-ui/react-icons";
+import { Button } from "@shad/button";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@shad/drawer";
+import { RadioTabItem, RadioTabs } from "@shad/radio-tabs";
 import {
   Link,
   linkOptions,
@@ -13,18 +23,7 @@ import {
   useRouter,
 } from "@tanstack/react-router";
 import { useTheme } from "next-themes";
-import { useMediaQuery } from "usehooks-ts";
 
-import type { ButtonProps } from "~/@shad/button";
-import { Button } from "~/@shad/button";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "~/@shad/drawer";
-import { RadioTabItem, RadioTabs } from "~/@shad/radio-tabs";
 import { logoutFn } from "~/auth/authOperations";
 import {
   Dropdown,
@@ -32,6 +31,7 @@ import {
   DropdownTrigger,
 } from "~/components/Dropdown";
 import { useUserQuery } from "~/query/user";
+import { useIsDesktop } from "~/utils/useIsDesktop";
 
 const SigOutButton = () => {
   const router = useRouter();
@@ -113,7 +113,7 @@ const Links = ({
         <Link key={v.to} {...v} className="block w-full" onClick={onClick}>
           <Button
             variant={loc.pathname === v.to ? variantActive : variant}
-            className="w-full"
+            className="flex w-full gap-2"
           >
             {v.label}
           </Button>
@@ -142,9 +142,7 @@ const ThemeSwitcher = () => {
 };
 
 const HeaderMenu = ({ username }: { username?: string }) => {
-  const isDesktop = useMediaQuery("(min-width:768px)", {
-    initializeWithValue: false,
-  });
+  const isDesktop = useIsDesktop();
 
   const [opened, setOpened] = useState(false);
 

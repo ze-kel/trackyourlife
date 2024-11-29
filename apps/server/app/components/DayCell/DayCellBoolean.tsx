@@ -1,10 +1,10 @@
 import type { MouseEvent, ReactNode } from "react";
 import { useRef, useState } from "react";
+import { cn } from "@shad/utils";
 import { AnimatePresence, m } from "framer-motion";
 
 import { clamp } from "@tyl/helpers";
 
-import { cn } from "~/@shad";
 import { useDayCellContextBoolean } from "~/components/Providers/DayCellProvider";
 
 const ANIMATION_TIME = 0.3;

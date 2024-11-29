@@ -1,4 +1,5 @@
 import { CalendarIcon, GearIcon } from "@radix-ui/react-icons";
+import { Button } from "@shad/button";
 import {
   createFileRoute,
   Link,
@@ -7,7 +8,6 @@ import {
 } from "@tanstack/react-router";
 import { z } from "zod";
 
-import { Button } from "~/@shad/button";
 import DeleteButton from "~/components/DeleteButton";
 import { FavoriteButton } from "~/components/FavoriteButton";
 import TrackableProvider from "~/components/Providers/TrackableProvider";
@@ -96,30 +96,39 @@ function RouteComponent() {
   const params = Route.useParams();
   const loc = useLocation();
 
+  const isView = loc.pathname === `/app/trackables/${params.id}/view`;
+
   return (
     <TrackableProvider id={params.id}>
-      <div className="content-container flex h-full max-h-full w-full flex-col">
-        <div className="flex w-full items-center justify-between">
+      <div className="content-container flex h-full max-h-full w-full flex-col pb-6">
+        <div className="grid grid-cols-2 gap-2 max-sm:grid-cols-1">
           <TrackableNameEditable />
-          <div className="flex gap-2">
+          <div className="flex gap-2 justify-self-end">
             <FavoriteButton variant={"outline"} />
-            {loc.pathname !== `/app/trackables/${params.id}/settings` ? (
-              <Link to={`/app/trackables/${params.id}/settings`}>
-                <Button name="settings" variant="outline" size="icon">
-                  <GearIcon className="h-4 w-4" />
-                </Button>
-              </Link>
+            {isView ? (
+              <>
+                <Link to={`/app/trackables/${params.id}/settings`}>
+                  <Button name="settings" variant="outline">
+                    <GearIcon className="h-4 w-4" />
+                    <span className="max-md:hidden">Settings</span>
+                  </Button>
+                </Link>
+              </>
             ) : (
-              <Link to={`/app/trackables/${params.id}/view`}>
-                <Button variant="outline" size="icon">
-                  <CalendarIcon className="h-4 w-4" />
-                </Button>
-              </Link>
+              <>
+                <Link to={`/app/trackables/${params.id}/view`}>
+                  <Button variant="outline">
+                    <CalendarIcon className="h-4 w-4" />
+
+                    <span className="max-md:hidden">Calendar</span>
+                  </Button>
+                </Link>
+              </>
             )}
             <DeleteButton id={params.id} />
           </div>
         </div>
-        <hr className="my-4 opacity-10" />
+        <hr className="my-4 h-[1px] border-none bg-neutral-900 opacity-10 outline-none dark:bg-neutral-50" />
         <Outlet />
       </div>
     </TrackableProvider>

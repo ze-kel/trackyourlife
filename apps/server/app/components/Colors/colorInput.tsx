@@ -1,9 +1,4 @@
 import { useContext, useState } from "react";
-import { useMediaQuery } from "usehooks-ts";
-
-import type { IColorValue } from "@tyl/validators/trackable";
-import { presetsMap } from "@tyl/helpers/colorPresets";
-
 import {
   Drawer,
   DrawerContent,
@@ -11,7 +6,11 @@ import {
   DrawerMobileTitleContext,
   DrawerTitle,
   DrawerTrigger,
-} from "~/@shad/drawer";
+} from "@shad/drawer";
+
+import type { IColorValue } from "@tyl/validators/trackable";
+import { presetsMap } from "@tyl/helpers/colorPresets";
+
 import ColorPicker from "~/components/Colors";
 import { ColorDisplay } from "~/components/Colors/colorDisplay";
 import {
@@ -19,6 +18,7 @@ import {
   DropdownContent,
   DropdownTrigger,
 } from "~/components/Dropdown";
+import { useIsDesktop } from "~/utils/useIsDesktop";
 
 const ColorInput = ({
   value = presetsMap.neutral,
@@ -29,9 +29,7 @@ const ColorInput = ({
 }) => {
   const [color, setColor] = useState(value);
 
-  const isDesktop = useMediaQuery("(min-width:768px)", {
-    initializeWithValue: false,
-  });
+  const isDesktop = useIsDesktop();
 
   const mobileTitle = useContext(DrawerMobileTitleContext);
 

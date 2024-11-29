@@ -10,6 +10,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
 const pgTable = pgTableCreator((name) => `TYL_${name}`);
 
@@ -45,18 +46,25 @@ export const trackableTypeEnum = pgEnum("type", ["boolean", "number", "range"]);
 
 export const trackable = pgTable("trackable", {
   updated: timestamp("updated").defaultNow().notNull(),
-
   isDeleted: boolean("is_deleted").notNull().default(false),
-
-  id: uuid("id").defaultRandom().primaryKey(),
-  name: varchar("name").notNull(),
   userId: varchar("user_id")
     .notNull()
     .references(() => auth_user.id, { onDelete: "cascade" }),
 
-  type: trackableTypeEnum("type").notNull(),
+  id: uuid("id").defaultRandom().primaryKey(),
 
+  name: varchar("name").notNull(),
+  type: trackableTypeEnum("type").notNull(),
+  note: varchar("attached_note"),
   settings: json("settings").default({}),
+});
+
+export const ZTrackableDbSelect = createSelectSchema(trackable);
+export const ZTrackableDbInsert = createInsertSchema(trackable).omit({
+  updated: true,
+  isDeleted: true,
+  id: true,
+  userId: true,
 });
 
 export const trackableRelations = relations(trackable, ({ many }) => ({

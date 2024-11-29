@@ -1,6 +1,8 @@
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
 
+import { ZTrackableDbInsert, ZTrackableDbSelect } from "@tyl/db/schema";
+
 //
 // Settings
 //
@@ -80,22 +82,15 @@ export const ZTrackableSettingsRange = z.object({
   cycleToEmpty: z.boolean().optional(),
 });
 
-export const ZTrackableSettings = z
-  .discriminatedUnion("type", [
-    z.object({
-      settings: ZTrackableSettingsBoolean,
-      type: z.literal("boolean"),
-    }),
-    z.object({
-      settings: ZTrackableSettingsNumber,
-      type: z.literal("number"),
-    }),
-    z.object({
-      settings: ZTrackableSettingsRange,
-      type: z.literal("range"),
-    }),
-  ])
-  .transform((v) => v.settings);
+const typeSettingsUnion = z.discriminatedUnion("type", [
+  z.object({ type: z.literal("boolean"), settings: ZTrackableSettingsBoolean }),
+  z.object({ type: z.literal("number"), settings: ZTrackableSettingsNumber }),
+  z.object({ type: z.literal("range"), settings: ZTrackableSettingsRange }),
+]);
+
+export const ZTrackableSettings = typeSettingsUnion.transform(
+  (v) => v.settings,
+);
 
 export type IBooleanSettings = z.infer<typeof ZTrackableSettingsBoolean>;
 export type INumberSettings = z.infer<typeof ZTrackableSettingsNumber>;
@@ -121,82 +116,17 @@ export type ITrackableDataMonth = z.infer<typeof zTrackableDataMonth>;
 export type ITrackableDataYear = z.infer<typeof zTrackableDataYear>;
 export type ITrackableData = z.infer<typeof zTrackableData>;
 
-export type ITrackableUnsaved =
-  | {
-      name: string;
-      type: "boolean";
-      settings: IBooleanSettings;
-      data: ITrackableData;
-    }
-  | {
-      type: "number";
-      name: string;
-      settings: INumberSettings;
-      data: ITrackableData;
-    }
-  | {
-      type: "range";
-      name: string;
-      settings: IRangeSettings;
-      data: ITrackableData;
-    };
-
-export const ZTrackable = z
-  .object({
-    id: z.string(),
-    name: z.string(),
-    type: z.literal("boolean"),
-    settings: ZTrackableSettingsBoolean,
+export const ZTrackableFromDb = ZTrackableDbSelect.and(typeSettingsUnion);
+export const ZTrackableWithData = ZTrackableFromDb.and(
+  z.object({
     data: zTrackableData,
-  })
-  .or(
-    z.object({
-      id: z.string(),
-      name: z.string(),
-      type: z.literal("number"),
-      settings: ZTrackableSettingsNumber,
-      data: zTrackableData,
-    }),
-  )
-  .or(
-    z.object({
-      id: z.string(),
-      name: z.string(),
-      type: z.literal("range"),
-      settings: ZTrackableSettingsRange,
-      data: zTrackableData,
-    }),
-  );
-
-export const ZTrackableFromDb = z.discriminatedUnion("type", [
-  z.object({
-    settings: ZTrackableSettingsBoolean,
-    type: z.literal("boolean"),
-    name: z.string(),
-    id: z.string(),
-    userId: z.string(),
   }),
-  z.object({
-    settings: ZTrackableSettingsNumber,
-    type: z.literal("number"),
-    name: z.string(),
-    id: z.string(),
-    userId: z.string(),
-  }),
-  z.object({
-    settings: ZTrackableSettingsRange,
-    type: z.literal("range"),
-    name: z.string(),
-    id: z.string(),
-    userId: z.string(),
-  }),
-]);
+);
+export const ZTrackableToCreate = ZTrackableDbInsert.and(typeSettingsUnion);
 
-export type ITrackableFromDB = z.infer<typeof ZTrackableFromDb>;
-export type ITrackable = z.infer<typeof ZTrackable>;
-export type ITrackableBase = Omit<ITrackable, "data">;
-export type ITrackableFromList = Omit<ITrackableBase, "settings">;
-
+export type ITrackableWithoutData = z.infer<typeof ZTrackableFromDb>;
+export type ITrackable = z.infer<typeof ZTrackableWithData>;
+export type ITrackableToCreate = z.infer<typeof ZTrackableToCreate>;
 //
 // Update
 //
@@ -209,25 +139,3 @@ export const ZTrackableUpdate = z.object({
 });
 
 export type ITrackableUpdate = z.infer<typeof ZTrackableUpdate>;
-
-//
-// Create
-//
-
-export const trackableToCreate = z.discriminatedUnion("type", [
-  z.object({
-    settings: ZTrackableSettingsBoolean,
-    type: z.literal("boolean"),
-    name: z.string(),
-  }),
-  z.object({
-    settings: ZTrackableSettingsNumber,
-    type: z.literal("number"),
-    name: z.string(),
-  }),
-  z.object({
-    settings: ZTrackableSettingsRange,
-    type: z.literal("range"),
-    name: z.string(),
-  }),
-]);

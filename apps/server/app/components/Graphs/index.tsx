@@ -20,8 +20,8 @@ import { makeColorString } from "@tyl/helpers/colorTools";
 import { getNowInTimezone } from "@tyl/helpers/timezone";
 import { useResizeObserver } from "usehooks-ts";
 
-import { RadioTabItem, RadioTabs } from "~/@shad/radio-tabs";
-import { Spinner } from "~/@shad/spinner";
+import { RadioTabItem, RadioTabs } from "@shad/radio-tabs";
+import { Spinner } from "@shad/spinner";
 
 import { NumberFormatter } from "~/components/DayCell/DayCellNumber";
 import { useDayCellContextNumber } from "~/components/Providers/DayCellProvider";

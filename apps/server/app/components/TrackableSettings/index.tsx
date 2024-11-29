@@ -1,5 +1,10 @@
 import type { MutableRefObject } from "react";
 import { useEffect, useRef, useState } from "react";
+import { Button } from "@shad/button";
+import { DrawerMobileTitleProvider } from "@shad/drawer";
+import { Label } from "@shad/label";
+import { Switch } from "@shad/switch";
+import { cn } from "@shad/utils";
 import { v4 as uuidv4 } from "uuid";
 
 import type {
@@ -11,11 +16,6 @@ import type {
 import { presetsMap } from "@tyl/helpers/colorPresets";
 import { getNowInTimezone } from "@tyl/helpers/timezone";
 
-import { cn } from "~/@shad";
-import { Button } from "~/@shad/button";
-import { DrawerMobileTitleProvider } from "~/@shad/drawer";
-import { Label } from "~/@shad/label";
-import { Switch } from "~/@shad/switch";
 import ColorInput from "~/components/Colors/colorInput";
 import DatePicker from "~/components/DatePicker";
 import { DayCellBaseClasses } from "~/components/DayCell";

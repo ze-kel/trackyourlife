@@ -1,15 +1,17 @@
+import type { ButtonProps } from "@shad/button";
 import { useMemo } from "react";
 import { HeartFilledIcon, HeartIcon } from "@radix-ui/react-icons";
+import { Button } from "@shad/button";
 
-import type { ButtonProps } from "~/@shad/button";
-import { Button } from "~/@shad/button";
 import { useTrackableContextSafe } from "~/components/Providers/TrackableProvider";
 import { useUserSettings, useUserSettingsMutation } from "~/query/userSettings";
 
 export const FavoriteButton = ({
   variant = "ghost",
+  onlyIcon = false,
 }: {
   variant?: ButtonProps["variant"];
+  onlyIcon?: boolean;
 }) => {
   const { trackable } = useTrackableContextSafe();
   const settings = useUserSettings();
@@ -34,8 +36,18 @@ export const FavoriteButton = ({
   };
 
   return (
-    <Button variant={variant} size={"icon"} onClick={() => void favHandler()}>
-      {inFavs ? <HeartFilledIcon /> : <HeartIcon />}
+    <Button variant={variant} onClick={() => void favHandler()}>
+      {inFavs ? (
+        <>
+          <HeartFilledIcon />
+          {!onlyIcon && <span className="max-md:hidden">Unfavorite</span>}
+        </>
+      ) : (
+        <>
+          <HeartIcon />
+          {!onlyIcon && <span className="max-md:hidden">Favorite</span>}
+        </>
+      )}
     </Button>
   );
 };

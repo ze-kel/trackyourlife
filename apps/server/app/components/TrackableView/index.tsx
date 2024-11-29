@@ -1,14 +1,17 @@
 import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
+import { Button } from "@shad/button";
+import { cn } from "@shad/utils";
+import { Link } from "@tanstack/react-router";
 import { format, getDaysInMonth, getISODay, getMonth, getYear } from "date-fns";
 import { ErrorBoundary } from "react-error-boundary";
 
 import { getNowInTimezone } from "@tyl/helpers/timezone";
 
-import { cn } from "~/@shad";
-import { Button } from "~/@shad/button";
 import { useTrackableContextSafe } from "~/components/Providers/TrackableProvider";
+import { TrackableNoteEditable } from "~/components/TrackableNote";
 import { YearSelector } from "~/components/TrackableView/yearSelector";
 import { useUserSettings } from "~/query/userSettings";
+import { Route } from "~/routes/app/trackables/$id/view";
 import DayCellWrapper from "../DayCell";
 
 const Month = ({
@@ -35,10 +38,7 @@ const Month = ({
   return (
     <div
       id={myId}
-      className={cn(
-        "grid gap-1",
-        mini ? "grid-cols-7 grid-rows-6" : "grid-cols-7 grid-rows-6",
-      )}
+      className={cn("grid gap-1", mini ? "grid-cols-7" : "grid-cols-7")}
     >
       {prepend.map((_, i) => (
         <div key={i}> </div>
@@ -102,79 +102,120 @@ const Year = ({
   );
 };
 
+const getIncrementedDate = (
+  add: number,
+  year: TVDateValue,
+  month: TVDateValue,
+) => {
+  if (month === "list" && year !== "list") {
+    return { year: year + add, month: month };
+  }
+
+  if (month === "list" || year === "list") {
+    return { year, month };
+  }
+
+  let newMonth = month + add;
+  let newYear = year;
+  if (newMonth < 0) {
+    newMonth = 11;
+    newYear = year - 1;
+  }
+
+  if (newMonth > 11) {
+    newMonth = 0;
+    newYear = year + 1;
+  }
+  return { year: newYear, month: newMonth };
+};
+
 const ViewController = ({
   year,
-  setDates,
+
   month,
-  increment,
-  view,
-  isCurrentMonth,
-  openCurrentMonth,
 }: {
-  setDates: (year: TVDateValue, month: TVDateValue) => void;
   year: TVDateValue;
   month: TVDateValue;
-  isCurrentMonth: boolean;
-  view: TView;
-  increment: (v: number) => void;
-  openCurrentMonth: () => void;
 }) => {
+  const settings = useUserSettings();
+  const now = getNowInTimezone(settings.timezone);
+  const navigate = Route.useNavigate();
+
+  const toPrev = getIncrementedDate(-1, year, month);
+  const toNext = getIncrementedDate(1, year, month);
+
   return (
     <div className="mb-4 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
       <div className="flex items-baseline gap-2 self-center">
         <YearSelector
           value={typeof year === "number" ? year : undefined}
-          onChange={(v) => setDates(v, month)}
+          onChange={(v) =>
+            navigate({ search: (prev) => ({ ...prev, year: v }) })
+          }
         />
 
-        {view === "days" &&
-          typeof year === "number" &&
-          typeof month === "number" && (
-            <>
-              <div className="pl-4 text-xl font-light text-neutral-200 dark:text-neutral-800">
-                /
-              </div>
-              <Button
-                name="months"
-                variant="ghost"
-                onClick={() => setDates(year, "list")}
-              >
+        {typeof year === "number" && typeof month === "number" && (
+          <>
+            <div className="pl-4 text-xl font-light text-neutral-200 dark:text-neutral-800">
+              /
+            </div>
+            <Link
+              from={Route.fullPath}
+              search={(prev) => ({
+                ...prev,
+                month: "list",
+              })}
+            >
+              <Button name="months" variant="ghost">
                 {format(new Date(year, month, 1), "MMMM")}
               </Button>
-            </>
-          )}
+            </Link>
+          </>
+        )}
       </div>
       <div className="flex w-fit gap-2 self-end">
         <Button
           aria-label="Previous month"
-          onClick={() => increment(-1)}
           variant="outline"
           size="icon"
+          asChild
         >
-          <ChevronLeftIcon className="h-4 w-4" />
+          <Link
+            from={Route.fullPath}
+            search={(prev) => ({ ...prev, ...toPrev })}
+          >
+            <ChevronLeftIcon className="h-4 w-4" />
+          </Link>
         </Button>
-        <Button
-          aria-label="Next month"
-          onClick={() => increment(1)}
-          variant="outline"
-          size="icon"
-        >
-          <ChevronRightIcon className="h-4 w-4" />
+
+        <Button aria-label="Next month" variant="outline" size="icon" asChild>
+          <Link
+            from={Route.fullPath}
+            search={(prev) => ({ ...prev, ...toNext })}
+          >
+            <ChevronRightIcon className="h-4 w-4" />{" "}
+          </Link>
         </Button>
-        <Button
-          aria-label="Current month"
-          variant="outline"
-          onClick={openCurrentMonth}
-          disabled={isCurrentMonth}
-        >
-          Today
+
+        <Button aria-label="Current month" variant="outline" asChild>
+          <Link
+            from={Route.fullPath}
+            search={(prev) => ({
+              ...prev,
+              month: now.getMonth(),
+              year: now.getFullYear(),
+            })}
+            activeProps={{
+              className: "pointer-events-none opacity-50",
+            }}
+          >
+            Today
+          </Link>
         </Button>
       </div>
     </div>
   );
 };
-
-type TView = "days" | "months";
 
 export type TVDateValue = number | "list";
 
@@ -187,44 +228,13 @@ const TrackableView = ({
   month: TVDateValue;
   setDates: (year: TVDateValue, month: TVDateValue) => void;
 }) => {
-  const settings = useUserSettings();
-
-  const now = getNowInTimezone(settings.timezone);
-
   const view =
     typeof month !== "number" && typeof year === "number" ? "months" : "days";
-
-  const isCurrentMonth = now.getMonth() === month && now.getFullYear() === year;
-
-  const increment = (add: number) => {
-    if (view === "months") {
-      if (year === "list") return;
-      setDates(year + add, month);
-      return;
-    }
-    if (year === "list" || month === "list") return;
-
-    let newMonth = month + add;
-    let newYear = year;
-    if (newMonth < 0) {
-      newMonth = 11;
-      newYear = year - 1;
-    }
-    if (newMonth > 11) {
-      newMonth = 0;
-      newYear = year + 1;
-    }
-    setDates(newYear, newMonth);
-  };
 
   const openMonth = (m: number) => {
     setDates(year, m);
   };
 
-  const openCurrentMonth = () => {
-    const now = getNowInTimezone(settings.timezone);
-    setDates(now.getFullYear(), now.getMonth());
-  };
   const { trackable } = useTrackableContextSafe();
 
   if (!trackable) {
@@ -233,15 +243,8 @@ const TrackableView = ({
 
   return (
     <>
-      <ViewController
-        year={year}
-        month={month}
-        isCurrentMonth={isCurrentMonth}
-        view={view}
-        openCurrentMonth={openCurrentMonth}
-        setDates={setDates}
-        increment={increment}
-      />
+      <ViewController year={year} month={month} />
+
       <ErrorBoundary
         fallbackRender={({ error }: { error: Error }) => {
           return <div>{error.message}</div>;
@@ -255,10 +258,13 @@ const TrackableView = ({
         )}
       </ErrorBoundary>
 
-      <ErrorBoundary fallback={<div></div>}></ErrorBoundary>
+      <hr className="my-4 h-[1px] border-none bg-neutral-900 opacity-10 outline-none dark:bg-neutral-50" />
+
+      <TrackableNoteEditable />
     </>
   );
 };
+
 /*
 const StatsRouter = ({ year, month }: { year: number; month: number }) => {
   const { trackable } = useTrackableContextSafe();

@@ -1,8 +1,4 @@
 import { TrashIcon } from "@radix-ui/react-icons";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "@tanstack/react-router";
-
-import { cn } from "~/@shad";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,8 +9,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "~/@shad/alert-dialog";
-import { buttonVariants } from "~/@shad/button";
+} from "@shad/alert-dialog";
+import { buttonVariants } from "@shad/button";
+import { cn } from "@shad/utils";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "@tanstack/react-router";
+
 import { invalidateTrackablesList } from "~/query/trackablesList";
 import { trpc } from "~/trpc/react";
 

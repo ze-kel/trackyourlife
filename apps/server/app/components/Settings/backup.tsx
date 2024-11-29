@@ -1,11 +1,11 @@
 import { useState } from "react";
+import { Button } from "@shad/button";
+import { Input } from "@shad/input";
 import { z } from "zod";
 
 import type { ITrackable, ITrackableUpdate } from "@tyl/validators/trackable";
-import { ZTrackable } from "@tyl/validators/trackable";
+import { ZTrackableWithData } from "@tyl/validators/trackable";
 
-import { Button } from "~/@shad/button";
-import { Input } from "~/@shad/input";
 import { trpc } from "~/trpc/react";
 
 const getBackup = async () => {
@@ -86,7 +86,7 @@ export const BackupAndRestore = () => {
   );
 };
 
-const backupZ = z.array(ZTrackable);
+const backupZ = z.array(ZTrackableWithData);
 
 const parseContentJson = (content: string) => {
   try {

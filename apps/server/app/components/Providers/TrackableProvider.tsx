@@ -221,9 +221,7 @@ const TrackableProvider = ({
     },
     onMutate: (upd) => {
       const previous = queryClient.getQueryData<ITrackable>(["trackable", id]);
-
       queryClient.setQueryData(["trackable", id], { ...previous, name: upd });
-
       return { previous };
     },
     onSuccess: async () => {
@@ -256,6 +254,24 @@ const TrackableProvider = ({
       </MemoDayCellProvider>
     </TrackableContext.Provider>
   );
+};
+
+export const useNoteMutation = (id: ITrackable["id"]) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (note: string) => {
+      await trpc.trackablesRouter.updateTrackableNote.mutate({ id, note });
+    },
+    onMutate: (upd) => {
+      const previous = queryClient.getQueryData<ITrackable>(["trackable", id]);
+      queryClient.setQueryData(["trackable", id], { ...previous, note: upd });
+      return { previous };
+    },
+    onError: (_, update, context) => {
+      if (!context) return;
+      queryClient.setQueryData(["trackable", id], context.previous);
+    },
+  });
 };
 
 export const useTrackableContextSafe = () => {

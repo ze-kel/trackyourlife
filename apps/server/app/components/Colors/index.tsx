@@ -1,4 +1,7 @@
 import { Fragment, useEffect, useState } from "react";
+import { Input } from "@shad/input";
+import { RadioTabItem, RadioTabs } from "@shad/radio-tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@shad/tabs";
 import { useTheme } from "next-themes";
 import { useIsomorphicLayoutEffect } from "usehooks-ts";
 
@@ -10,9 +13,6 @@ import type {
 import { clamp } from "@tyl/helpers/animation";
 import { HSLToRGB, makeColorString, RGBToHSL } from "@tyl/helpers/colorTools";
 
-import { Input } from "~/@shad/input";
-import { RadioTabItem, RadioTabs } from "~/@shad/radio-tabs";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/@shad/tabs";
 import { Controller, Controller2D } from "./contoller";
 
 export const BetterNumberInput = ({

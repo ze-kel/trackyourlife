@@ -1,12 +1,12 @@
 import type { ReactNode } from "react";
 import { useMemo } from "react";
+import { Skeleton } from "@shad/skeleton";
+import { cn } from "@shad/utils";
 
 import type { ITrackable } from "@tyl/validators/trackable";
 import { getNowInTimezone } from "@tyl/helpers/timezone";
 import { computeDayCellHelpers } from "@tyl/helpers/trackables";
 
-import { cn } from "~/@shad";
-import { Skeleton } from "~/@shad/skeleton";
 import {
   useTrackableContextSafe,
   useTrackableQueryByMonth,

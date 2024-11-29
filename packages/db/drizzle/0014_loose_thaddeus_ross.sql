@@ -1,0 +1,1 @@
+ALTER TABLE "TYL_trackable" ADD COLUMN "attached_note" varchar;

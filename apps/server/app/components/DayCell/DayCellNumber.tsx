@@ -1,20 +1,21 @@
 import type React from "react";
 import type { CSSProperties, ReactNode } from "react";
 import { useCallback, useMemo, useState } from "react";
-import { format } from "date-fns";
-import { useIsomorphicLayoutEffect, useMediaQuery } from "usehooks-ts";
-
-import { debounce } from "@tyl/helpers";
-import { makeColorString } from "@tyl/helpers/colorTools";
-
-import { cn } from "~/@shad";
 import {
   Drawer,
   DrawerContent,
   DrawerTitle,
   DrawerTrigger,
-} from "~/@shad/drawer";
+} from "@shad/drawer";
+import { cn } from "@shad/utils";
+import { format } from "date-fns";
+import { useIsomorphicLayoutEffect } from "usehooks-ts";
+
+import { debounce } from "@tyl/helpers";
+import { makeColorString } from "@tyl/helpers/colorTools";
+
 import { useDayCellContextNumber } from "~/components/Providers/DayCellProvider";
+import { useIsDesktop } from "~/utils/useIsDesktop";
 
 const getNumberSafe = (v: string | undefined) => {
   if (!v) return 0;
@@ -40,9 +41,7 @@ export const DayCellNumber = ({
   dateDay: Date;
   className?: string;
 }) => {
-  const isDesktop = useMediaQuery("(min-width:768px)", {
-    initializeWithValue: false,
-  });
+  const isDesktop = useIsDesktop();
 
   const { valueToColor, valueToProgressPercentage } = useDayCellContextNumber();
 
@@ -223,9 +222,7 @@ export const DayCellNumber = ({
             {displayedValue}
           </DrawerTrigger>
           <DrawerContent>
-            <DrawerTitle className="m-auto mt-5">
-              {format(dateDay, "d MMMM yyyy")}
-            </DrawerTitle>
+            <DrawerTitle>{format(dateDay, "d MMMM yyyy")}</DrawerTitle>
             <div className="p-6">
               <input
                 autoFocus={true}

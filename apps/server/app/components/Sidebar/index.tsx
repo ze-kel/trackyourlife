@@ -6,13 +6,13 @@ import {
   MixIcon,
   ValueIcon,
 } from "@radix-ui/react-icons";
+import { Button } from "@shad/button";
+import { Spinner } from "@shad/spinner";
 import { Link, useLocation } from "@tanstack/react-router";
 
 import type { ITrackable } from "@tyl/validators/trackable";
 import { sortTrackableList } from "@tyl/helpers/trackables";
 
-import { Button } from "~/@shad/button";
-import { Spinner } from "~/@shad/spinner";
 import { CoreLinks } from "~/components/Header";
 import { useTrackablesList } from "~/query/trackablesList";
 import { useUserSettings } from "~/query/userSettings";

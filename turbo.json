@@ -56,6 +56,10 @@
       "cache": false,
       "persistent": true
     },
+    "generate": {
+      "cache": false,
+      "persistent": true
+    },
     "ui-add": {
       "cache": false,
       "interactive": true

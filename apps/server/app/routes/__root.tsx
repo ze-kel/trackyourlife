@@ -18,7 +18,6 @@ import appCss from "~/styles/app.css?url";
 import { seo } from "~/utils/seo.js";
 
 const iconPrefix = (path: string) =>
-  // eslint-disable-next-line turbo/no-undeclared-env-vars
   process.env.SITE === "stage" ? `/stg${path}` : path;
 
 export const Route = createRootRouteWithContext<{

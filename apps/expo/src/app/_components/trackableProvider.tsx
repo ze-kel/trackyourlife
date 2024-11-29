@@ -43,7 +43,9 @@ export const makeTrackableSettings = (trackable: unknown) => {
 
 const TrackableContext = createContext<ITrackableContext | null>(null);
 
-export type ITrackableFromAppDB = ITrackableFromList & {
+// This used to be ITrackableFromList, which was a subset of ITrackable
+// Not sure which type is correct here, I'll deal with app later
+export type ITrackableFromAppDB = ITrackable & {
   settings: unknown;
   userId: string;
 };

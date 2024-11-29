@@ -1,16 +1,17 @@
 import { useState } from "react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
-import { useIsomorphicLayoutEffect, useMediaQuery } from "usehooks-ts";
-
-import { cn } from "~/@shad";
-import { Button } from "~/@shad/button";
+import { Button } from "@shad/button";
 import {
   Drawer,
   DrawerContent,
   DrawerTitle,
   DrawerTrigger,
-} from "~/@shad/drawer";
-import { Input } from "~/@shad/input";
+} from "@shad/drawer";
+import { Input } from "@shad/input";
+import { cn } from "@shad/utils";
+import { useIsomorphicLayoutEffect } from "usehooks-ts";
+
+import { useIsDesktop } from "~/utils/useIsDesktop";
 
 export const YearSelector = ({
   value,
@@ -19,10 +20,7 @@ export const YearSelector = ({
   value?: number;
   onChange: (v: number) => void;
 }) => {
-  const isDesktop = useMediaQuery("(min-width:768px)", {
-    initializeWithValue: false,
-    defaultValue: false,
-  });
+  const isDesktop = useIsDesktop();
 
   const [valueInternal, setValueInternal] = useState(String(value));
 
@@ -98,10 +96,13 @@ export const YearSelector = ({
         onBlur={blurHander}
         onKeyDown={(e) => {
           if (e.key === "Enter") {
+            e.currentTarget.blur();
             handleRealSave();
           }
         }}
-        className="peer relative z-10 w-20 bg-neutral-50 text-center dark:bg-neutral-950"
+        className={cn(
+          "peer relative z-10 w-20 bg-neutral-50 text-center dark:bg-neutral-950",
+        )}
       />
       <>
         <Button

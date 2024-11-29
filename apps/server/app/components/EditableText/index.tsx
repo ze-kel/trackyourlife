@@ -1,7 +1,6 @@
 import type { ChangeEvent, FocusEvent, KeyboardEvent, MouseEvent } from "react";
 import { useEffect, useRef, useState } from "react";
-
-import { cn } from "~/@shad";
+import { cn } from "@shad/utils";
 
 interface IEditableTextBase {
   classNameInput?: string;

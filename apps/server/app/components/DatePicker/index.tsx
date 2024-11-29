@@ -6,6 +6,16 @@ import {
   DoubleArrowLeftIcon,
   DoubleArrowRightIcon,
 } from "@radix-ui/react-icons";
+import { Button, buttonVariants } from "@shad/button";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerMobileTitleContext,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@shad/drawer";
+import { cn } from "@shad/utils";
 import {
   addMonths,
   clamp,
@@ -18,21 +28,12 @@ import {
   startOfMonth,
 } from "date-fns";
 import { AnimatePresence, m } from "framer-motion";
-import { useMediaQuery, useResizeObserver } from "usehooks-ts";
+import { useResizeObserver } from "usehooks-ts";
 
 import { getNowInTimezone } from "@tyl/helpers/timezone";
 
-import { cn } from "~/@shad";
-import { Button, buttonVariants } from "~/@shad/button";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerMobileTitleContext,
-  DrawerTitle,
-  DrawerTrigger,
-} from "~/@shad/drawer";
 import { useUserSettings } from "~/query/userSettings";
+import { useIsDesktop } from "~/utils/useIsDesktop";
 import { Dropdown, DropdownContent, DropdownTrigger } from "../Dropdown";
 
 const DatePicker = ({
@@ -240,9 +241,7 @@ const DatePicker = ({
     </m.div>
   );
 
-  const isDesktop = useMediaQuery("(min-width:768px)", {
-    initializeWithValue: false,
-  });
+  const isDesktop = useIsDesktop();
 
   const mobileTitle = useContext(DrawerMobileTitleContext);
 

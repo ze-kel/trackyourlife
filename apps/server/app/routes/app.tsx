@@ -1,6 +1,6 @@
+import { cn } from "@shad/utils";
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 
-import { cn } from "~/@shad";
 import Header from "~/components/Header";
 import { Sidebar } from "~/components/Sidebar";
 import { ensureUser } from "~/query/user";

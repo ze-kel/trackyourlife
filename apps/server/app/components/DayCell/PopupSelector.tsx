@@ -1,8 +1,8 @@
+import { cn } from "@shad/utils";
 import { AnimatePresence, m } from "framer-motion";
 
 import type { IRangeSettings } from "@tyl/validators/trackable";
 
-import { cn } from "~/@shad";
 import style from "./popupSelector.module.css";
 
 interface PopupSelectorProps {

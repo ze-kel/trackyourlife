@@ -1,7 +1,8 @@
+import { cn } from "@shad/utils";
+
 import type { IColorValue } from "@tyl/validators/trackable";
 import { presetsArray } from "@tyl/helpers/colorPresets";
 
-import { cn } from "~/@shad";
 import { ColorDisplay } from "~/components/Colors/colorDisplay";
 
 export const Presets = ({

@@ -10,8 +10,6 @@ const q = {
   queryFn: async () => await trpc.trackablesRouter.getTrackableIdList.query(),
 };
 
-
-
 export const ensureTrackablesList = async (qc: QueryClient) => {
   await qc.prefetchQuery(q);
 };

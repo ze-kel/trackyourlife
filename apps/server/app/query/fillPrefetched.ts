@@ -9,9 +9,9 @@ export const fillPrefetchedTrackable = (
   trackable: ITrackable,
 ) => {
   queryClient.setQueryData(["trackable", trackable.id], {
-    type: trackable.type,
-    id: trackable.id,
-    name: trackable.name,
+    ...trackable,
+    data: {},
+    settings: {},
   });
 
   queryClient.setQueryData(

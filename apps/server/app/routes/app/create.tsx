@@ -1,16 +1,16 @@
 import * as React from "react";
 import { useRef, useState } from "react";
+import { Input } from "@shad/input";
+import { RadioTabItem, RadioTabs } from "@shad/radio-tabs";
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 
 import type {
   ITrackableSettings,
-  ITrackableUnsaved,
+  ITrackableToCreate,
 } from "@tyl/validators/trackable";
 import { cloneDeep } from "@tyl/helpers";
 
-import { Input } from "~/@shad/input";
-import { RadioTabItem, RadioTabs } from "~/@shad/radio-tabs";
 import TrackableSettings from "~/components/TrackableSettings";
 import { trpc } from "~/trpc/react";
 
@@ -21,16 +21,15 @@ export const Route = createFileRoute("/app/create")({
 function RouteComponent() {
   const router = useRouter();
 
-  const [newOne, setNewOne] = useState<ITrackableUnsaved>({
+  const [newOne, setNewOne] = useState<ITrackableToCreate>({
     type: "boolean",
-    data: {},
     name: "",
     settings: {},
   });
 
   const nameRef = useRef("");
 
-  const setType = (type: ITrackableUnsaved["type"]) => {
+  const setType = (type: ITrackableToCreate["type"]) => {
     // This assumes that all settings fields are optional
     const update = cloneDeep(newOne);
     update.type = type;
@@ -68,7 +67,7 @@ function RouteComponent() {
 
       <RadioTabs
         value={newOne.type}
-        onValueChange={(v) => setType(v as ITrackableUnsaved["type"])}
+        onValueChange={(v) => setType(v as ITrackableToCreate["type"])}
         className="mt-2"
       >
         <RadioTabItem value="boolean" id="boolean" className="w-full">

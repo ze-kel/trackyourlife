@@ -4,7 +4,7 @@ import type {
   IBooleanSettings,
   INumberSettings,
   IRangeSettings,
-  ITrackableFromList,
+  ITrackable,
   ITrackableSettings,
 } from "@tyl/validators/trackable";
 
@@ -106,7 +106,7 @@ export const getDayCellBooleanColors = (settings: IBooleanSettings) => {
   };
 };
 
-export const sortTrackableList = <T extends ITrackableFromList>(
+export const sortTrackableList = <T extends Pick<ITrackable, "id" | "name">>(
   list: T[],
   favorites: string[],
 ) => {

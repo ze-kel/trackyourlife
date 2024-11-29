@@ -1,17 +1,17 @@
 import { Fragment, useMemo, useState } from "react";
+import { Badge } from "@shad/badge";
+import { Button } from "@shad/button";
+import { Input } from "@shad/input";
+import { Spinner } from "@shad/spinner";
+import { cn } from "@shad/utils";
 import { Link } from "@tanstack/react-router";
 import { format, isLastDayOfMonth } from "date-fns";
 import { m } from "framer-motion";
 
-import type { ITrackable, ITrackableFromList } from "@tyl/validators/trackable";
+import type { ITrackable } from "@tyl/validators/trackable";
 import { getNowInTimezone } from "@tyl/helpers/timezone";
 import { sortTrackableList } from "@tyl/helpers/trackables";
 
-import { cn } from "~/@shad";
-import { Badge } from "~/@shad/badge";
-import { Button } from "~/@shad/button";
-import { Input } from "~/@shad/input";
-import { Spinner } from "~/@shad/spinner";
 import DayCellWrapper from "~/components/DayCell";
 import TrackableProvider from "~/components/Providers/TrackableProvider";
 import { TrackableNameText } from "~/components/TrackableName";
@@ -39,7 +39,7 @@ type TrackableTypeFilterState = Record<ITrackable["type"], boolean>;
 const filterTrackables = (
   query: string,
   types: TrackableTypeFilterState,
-  list: ITrackableFromList[],
+  list: Pick<ITrackable, "id" | "name" | "type">[],
 ) => {
   const filterByType = Object.values(types).some((v) => v);
 

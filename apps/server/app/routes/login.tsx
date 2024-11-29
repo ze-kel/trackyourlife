@@ -1,6 +1,6 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
-import { cn } from "~/@shad/index";
+import { cn } from "~/@shad/utils/index";
 import Header from "~/components/Header";
 import LoginForm from "~/components/LoginForm";
 

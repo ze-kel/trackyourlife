@@ -1,7 +1,7 @@
 import { hookstate } from "@hookstate/core";
 import { and, eq, gte, lte, sql } from "drizzle-orm";
 
-import type { ITrackableFromDB } from "@tyl/validators/trackable";
+import type { ITrackableWithoutData } from "@tyl/validators/trackable";
 import type { IUserSettings } from "@tyl/validators/user";
 import { debounce } from "@tyl/helpers";
 
@@ -170,7 +170,8 @@ const sync = async (clear?: boolean) => {
 
     const syncRes = await api.syncRouter.syncv2.query({
       lastSync: ls,
-      trackableUpdates: localUpdates.trackableUpdates as ITrackableFromDB[],
+      trackableUpdates:
+        localUpdates.trackableUpdates as ITrackableWithoutData[],
       recordUpdates: localUpdates.recordUpdates,
       userUpdates: localUpdates.userUpdates
         ? {

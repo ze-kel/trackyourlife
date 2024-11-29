@@ -15,9 +15,8 @@ import {
   useFloating,
   useInteractions,
 } from "@floating-ui/react";
+import { cn } from "@shad/utils";
 import { AnimatePresence, m } from "framer-motion";
-
-import { cn } from "~/@shad";
 
 export interface IDropdown {
   open?: boolean;

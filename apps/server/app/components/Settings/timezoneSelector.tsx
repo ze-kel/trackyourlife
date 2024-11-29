@@ -1,21 +1,21 @@
 import type { TimeZone } from "timezones-list";
 import { useEffect, useState } from "react";
 import { CaretSortIcon } from "@radix-ui/react-icons";
+import { Button } from "@shad/button";
+import { Drawer, DrawerContent, DrawerTrigger } from "@shad/drawer";
+import { cn } from "@shad/utils";
 import { format } from "date-fns";
-import { useMediaQuery } from "usehooks-ts";
 
 import { clamp } from "@tyl/helpers";
 import { getNowInTimezone } from "@tyl/helpers/timezone";
 
-import { cn } from "~/@shad";
-import { Button } from "~/@shad/button";
-import { Drawer, DrawerContent, DrawerTrigger } from "~/@shad/drawer";
 import {
   Dropdown,
   DropdownContent,
   DropdownTrigger,
 } from "~/components/Dropdown";
 import { useUserSettings, useUserSettingsMutation } from "~/query/userSettings";
+import { useIsDesktop } from "~/utils/useIsDesktop";
 
 export const CurrentTime = () => {
   const [value, setValue] = useState("");
@@ -118,9 +118,7 @@ export const TimezoneSelector = ({ list }: { list: TimeZone[] }) => {
     void updateSettingsPartial({ timezone: zone });
   };
 
-  const isDesktop = useMediaQuery("(min-width:768px)", {
-    initializeWithValue: false,
-  });
+  const isDesktop = useIsDesktop();
 
   const Trigger = (
     <div className="flex flex-col gap-4 md:flex-row md:items-center">

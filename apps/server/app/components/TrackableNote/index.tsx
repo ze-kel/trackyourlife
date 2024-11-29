@@ -1,24 +1,28 @@
 import { useState } from "react";
+import { FileTextIcon } from "@radix-ui/react-icons";
+import { Button } from "@shadbutton";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@shad/dialog";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@shad/drawer";
-import { Input } from "@shad/input";
+} from "@shaddialog";
+import { Drawer, DrawerContent, DrawerTitle, DrawerTrigger } from "@shaddrawer";
 
-import { useTrackableContextSafe } from "~/components/Providers/TrackableProvider";
+import { Textarea } from "~/@shad/textarea";
+import {
+  useNoteMutation,
+  useTrackableContextSafe,
+} from "~/components/Providers/TrackableProvider";
 import { useIsDesktop } from "~/utils/useIsDesktop";
 
-export const TrackableNameEditable = () => {
-  const { trackable, updateName } = useTrackableContextSafe();
+export const TrackableNoteEditable = () => {
+  const { trackable } = useTrackableContextSafe();
+
+  const hasNote = Boolean(trackable?.note);
+
+  const noteMutation = useNoteMutation(trackable?.id ?? "");
 
   const [isEditing, setIsEditing] = useState(false);
 
@@ -27,33 +31,40 @@ export const TrackableNameEditable = () => {
   const isDesktop = useIsDesktop();
 
   const saveHandler = () => {
-    void updateName(internalValue);
+    void noteMutation.mutate(internalValue);
     setIsEditing(false);
   };
 
-  const display = (
-    <h2 className="w-full truncate bg-inherit text-left text-xl font-semibold md:text-2xl">
-      {trackable?.name ? trackable.name : `Unnamed ${trackable?.type ?? ""}`}
-    </h2>
+  const display = hasNote ? (
+    <p className="cursor-pointer whitespace-pre-wrap rounded-md bg-inherit px-2 py-1 text-left text-sm dark:text-neutral-300 md:text-base">
+      {trackable?.note}
+    </p>
+  ) : (
+    <Button variant="outline" className="w-fit gap-2">
+      <FileTextIcon />
+      <span className="max-lg:hidden">Add note</span>{" "}
+    </Button>
   );
 
   const openChangeHandler = (v: boolean) => {
     if (v === true) {
-      setInternalValue(trackable?.name ?? "");
+      setInternalValue(trackable?.note ?? "");
     }
     setIsEditing(v);
   };
 
+  const title = <>{hasNote ? "Edit" : "Create"} attached note</>;
+
   return isDesktop ? (
     <Dialog open={isEditing} onOpenChange={openChangeHandler}>
-      <DialogTrigger>{display}</DialogTrigger>
+      <DialogTrigger asChild>{display}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Rename Trackable</DialogTitle>
+          <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
-        <Input
+        <Textarea
           autoFocus
-          className="w-full"
+          className="min-h-64 w-full"
           value={internalValue}
           onChange={(e) => setInternalValue(e.target.value)}
           onKeyDown={(e) => {
@@ -70,14 +81,14 @@ export const TrackableNameEditable = () => {
       onClose={() => setIsEditing(false)}
       onOpenChange={openChangeHandler}
     >
-      <DrawerTrigger>{display}</DrawerTrigger>
+      <DrawerTrigger asChild>{display}</DrawerTrigger>
       <DrawerContent className="py-4">
-        <DrawerTitle>Rename Trackable</DrawerTitle>
+        <DrawerTitle>{title}</DrawerTitle>
 
         <div className="p-6">
-          <Input
+          <Textarea
             autoFocus
-            className="w-full text-center"
+            className="min-h-48 w-full text-left"
             value={internalValue}
             onChange={(e) => setInternalValue(e.target.value)}
             onBlur={saveHandler}
