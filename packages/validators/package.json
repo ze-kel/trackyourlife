@@ -20,7 +20,7 @@
     "typecheck": "tsc --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
-    "uuid": "^10.0.0",
+    "uuid": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
@@ -28,7 +28,6 @@
     "@tyl/eslint-config": "workspace:*",
     "@tyl/prettier-config": "workspace:*",
     "@tyl/tsconfig": "workspace:*",
-    "@types/uuid": "^10.0.0",
     "eslint": "catalog:",
     "prettier": "catalog:",
     "typescript": "catalog:"

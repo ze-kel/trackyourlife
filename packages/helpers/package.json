@@ -19,10 +19,10 @@
     "typecheck": "tsc --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
+    "@date-fns/tz": "catalog:",
     "@tyl/validators": "workspace:*",
     "chroma-js": "^3.0.0",
     "date-fns": "catalog:",
-    "date-fns-tz": "catalog:",
     "lodash-es": "^4.17.21"
   },
   "devDependencies": {

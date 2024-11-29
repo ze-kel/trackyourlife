@@ -24,7 +24,6 @@
     "@tyl/helpers": "workspace:*",
     "@tyl/validators": "workspace:*",
     "date-fns": "catalog:",
-    "date-fns-tz": "catalog:",
     "superjson": "2.2.1",
     "timezones-list": "^3.0.3",
     "zod": "catalog:"
@@ -34,7 +33,7 @@
     "@tyl/prettier-config": "workspace:*",
     "@tyl/tsconfig": "workspace:*",
     "eslint": "catalog:",
-    "prettier": "^3.3.3",
+    "prettier": "catalog:",
     "typescript": "catalog:"
   },
   "prettier": "@tyl/prettier-config"
