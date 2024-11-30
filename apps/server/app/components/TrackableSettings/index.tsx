@@ -10,7 +10,7 @@ import type {
   ITrackable,
 } from "@tyl/validators/trackable";
 import { presetsMap } from "@tyl/helpers/colorPresets";
-import { getNowInTimezone } from "@tyl/helpers/timezone";
+import { getNowWithTimezoneOffset } from "@tyl/helpers/timezone";
 
 import { Button } from "~/@shad/components/button";
 import { DrawerMobileTitleProvider } from "~/@shad/components/drawer";
@@ -291,7 +291,7 @@ const TrackableSettings = ({
             onChange={(v) => (settings.current.startDate = String(v))}
             limits={{
               start: new Date(1990, 0, 1),
-              end: getNowInTimezone(uSettings.timezone),
+              end: getNowWithTimezoneOffset(uSettings.timezone),
             }}
             className="mt-2"
           />

@@ -5,7 +5,7 @@ import { format } from "date-fns";
 import { ChevronsUpDown } from "lucide-react";
 
 import { clamp } from "@tyl/helpers";
-import { getNowInTimezone } from "@tyl/helpers/timezone";
+import { getNowWithTimezoneOffset } from "@tyl/helpers/timezone";
 
 import { Button } from "~/@shad/components/button";
 import {
@@ -28,7 +28,7 @@ export const CurrentTime = () => {
 
   useEffect(() => {
     const timeout = setInterval(() => {
-      setValue(format(getNowInTimezone(settings.timezone), "HH:mm:ss"));
+      setValue(format(getNowWithTimezoneOffset(settings.timezone), "HH:mm:ss"));
     }, 1000);
     return () => clearTimeout(timeout);
   });

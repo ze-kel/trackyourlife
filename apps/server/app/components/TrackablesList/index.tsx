@@ -5,7 +5,7 @@ import { format, isLastDayOfMonth } from "date-fns";
 import { m } from "framer-motion";
 
 import type { ITrackable } from "@tyl/validators/trackable";
-import { getNowInTimezone } from "@tyl/helpers/timezone";
+import { getNowWithTimezoneOffset } from "@tyl/helpers/timezone";
 import { sortTrackableList } from "@tyl/helpers/trackables";
 
 import { Badge } from "~/@shad/components/badge";
@@ -78,7 +78,8 @@ const TrackablesList = ({ daysToShow }: { daysToShow: number }) => {
   );
 
   const daysToRender = useMemo(
-    () => generateDates(daysToShow, getNowInTimezone(settings.timezone)),
+    () =>
+      generateDates(daysToShow, getNowWithTimezoneOffset(settings.timezone)),
     [daysToShow, settings.timezone],
   );
 
@@ -151,7 +152,10 @@ export const DailyList = ({ daysToShow }: { daysToShow: number }) => {
 
   const daysToRender = useMemo(
     () =>
-      generateDates(daysToShow, getNowInTimezone(settings.timezone)).reverse(),
+      generateDates(
+        daysToShow,
+        getNowWithTimezoneOffset(settings.timezone),
+      ).reverse(),
     [daysToShow, settings.timezone],
   );
 

@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { cn } from "@shad/utils";
 
 import type { ITrackable } from "@tyl/validators/trackable";
-import { getNowInTimezone } from "@tyl/helpers/timezone";
+import { getNowWithTimezoneOffset } from "@tyl/helpers/timezone";
 import { computeDayCellHelpers } from "@tyl/helpers/trackables";
 
 import { Skeleton } from "~/@shad/components/skeleton";
@@ -134,7 +134,7 @@ const DayCellWrapper = ({
         month,
         year,
         startDate: settings?.startDate,
-        dateNow: getNowInTimezone(uSettings.timezone),
+        dateNow: getNowWithTimezoneOffset(uSettings.timezone),
       }),
     [day, month, year, settings?.startDate, uSettings.timezone],
   );

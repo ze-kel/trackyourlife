@@ -4,7 +4,7 @@ import { format, getDaysInMonth, getISODay, getMonth, getYear } from "date-fns";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { ErrorBoundary } from "react-error-boundary";
 
-import { getNowInTimezone } from "@tyl/helpers/timezone";
+import { getNowWithTimezoneOffset } from "@tyl/helpers/timezone";
 
 import { Button } from "~/@shad/components/button";
 import { TrackableNoteEditable } from "~/components/TrackableNote";
@@ -76,7 +76,10 @@ const Year = ({
 }) => {
   const settings = useUserSettings();
 
-  const active = activeMonths(year, getNowInTimezone(settings.timezone));
+  const active = activeMonths(
+    year,
+    getNowWithTimezoneOffset(settings.timezone),
+  );
   const toRender = 12;
 
   const months = Array(toRender)
@@ -140,7 +143,7 @@ const ViewController = ({
   month: TVDateValue;
 }) => {
   const settings = useUserSettings();
-  const now = getNowInTimezone(settings.timezone);
+  const now = getNowWithTimezoneOffset(settings.timezone);
   const navigate = Route.useNavigate();
 
   const toPrev = getIncrementedDate(-1, year, month);
