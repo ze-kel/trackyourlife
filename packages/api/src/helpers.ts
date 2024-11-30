@@ -75,7 +75,7 @@ export const getDateBounds = (
 
   return {
     from: startOfMonth(sub(today, { days: limits.days })),
-    to: add(new Date(), { days: 1 }),
+    to: add(today, { days: 1 }),
   };
 };
 
