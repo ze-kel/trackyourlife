@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import { useResizeObserver } from "usehooks-ts";
 
-import { getNowWithTimezoneOffset } from "@tyl/helpers/timezone";
+import { getGMTWithTimezoneOffset } from "@tyl/helpers/timezone";
 
 import { Button, buttonVariants } from "~/@shad/components/button";
 import {
@@ -54,7 +54,7 @@ const DatePicker = ({
   className?: string;
 }) => {
   const settings = useUserSettings();
-  const dateNow = getNowWithTimezoneOffset(settings.timezone);
+  const dateNow = getGMTWithTimezoneOffset(settings.timezone);
 
   const [innerDate, setInnerDate] = useState(date);
 

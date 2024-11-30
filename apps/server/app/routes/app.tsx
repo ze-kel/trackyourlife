@@ -12,7 +12,6 @@ const getSidebarState = async () => {
   if (import.meta.env.SSR) {
     const { getCookie } = await import("vinxi/http");
     const cookie = getCookie("sidebar:state");
-    console.log("cookie", cookie);
     return cookie === "true";
   }
   return true;
