@@ -1,3 +1,4 @@
+import type { TimeZone } from "timezones-list";
 import { add, startOfMonth, sub, subDays } from "date-fns";
 
 import type {
@@ -12,6 +13,7 @@ import type {
 } from "@tyl/validators/trackable";
 import { db, eq } from "@tyl/db";
 import { auth_user } from "@tyl/db/schema";
+import { getNowInTimezone } from "@tyl/helpers/timezone";
 import { ZTrackableSettings } from "@tyl/validators/trackable";
 import { UserSettingsFallback, ZUserSettings } from "@tyl/validators/user";
 
@@ -33,7 +35,10 @@ export const GetUserSettings = async ({ userId }: { userId: string }) => {
 const PG_MINUS_INFINITY = new Date(1970, 0, 1);
 const PG_INFINITY = new Date(new Date().getFullYear() + 100, 0, 1);
 
-export const getDateBounds = (limits: TGETLimits | undefined) => {
+export const getDateBounds = (
+  limits: TGETLimits | undefined,
+  timezone: TimeZone | undefined,
+) => {
   if (!limits) {
     return { from: PG_MINUS_INFINITY, to: PG_INFINITY };
   }
@@ -65,9 +70,11 @@ export const getDateBounds = (limits: TGETLimits | undefined) => {
 
   // limits.type === "last"
   // Note that this will return "full december and full january" for "last 7 days" on jan 3.
-  // This is intentional to not ensure that any month stored on a client has all its data fetched.
+  // This is intentional to ensure that any month stored on a client has all its data fetched.
+  const today = getNowInTimezone(timezone);
+
   return {
-    from: startOfMonth(sub(new Date(), { days: limits.days })),
+    from: startOfMonth(sub(today, { days: limits.days })),
     to: add(new Date(), { days: 1 }),
   };
 };
@@ -75,6 +82,7 @@ export const getDateBounds = (limits: TGETLimits | undefined) => {
 export const makeTrackableData = (
   trackableData: DbTrackableRecordSelect[],
   limits: TGETLimits,
+  timezone: TimeZone | undefined,
 ) => {
   const result: ITrackableData = {};
 
@@ -95,7 +103,7 @@ export const makeTrackableData = (
     }
 
     if (limits.type === "last") {
-      const today = new Date();
+      const today = getNowInTimezone(timezone);
       const start = subDays(today, limits.days);
       const [year, month, year2, month2] = [
         today.getFullYear(),
@@ -146,10 +154,11 @@ export const makeTrackableSettings = (
 export const prepareTrackable = (
   trackable: DbTrackableSelect & { data: DbTrackableRecordSelect[] },
   limits: TGETLimits,
+  timezone: TimeZone | undefined,
 ): ITrackable => {
   return {
     ...trackable,
-    data: makeTrackableData(trackable.data, limits),
+    data: makeTrackableData(trackable.data, limits, timezone),
     settings: makeTrackableSettings(trackable),
   } as ITrackable;
 };

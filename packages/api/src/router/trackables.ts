@@ -13,6 +13,7 @@ import {
 
 import {
   getDateBounds,
+  GetUserSettings,
   makeTrackableData,
   makeTrackableSettings,
   prepareTrackable,
@@ -36,7 +37,11 @@ export const trackablesRouter = {
   getAllTrackables: protectedProcedure
     .input(z.object({ limits: ZGETLimits }))
     .query(async ({ ctx, input }) => {
-      const bounds = getDateBounds(input.limits ?? { type: "last", days: 31 });
+      const userSettings = await GetUserSettings({ userId: ctx.user.id });
+      const bounds = getDateBounds(
+        input.limits ?? { type: "last", days: 31 },
+        userSettings.timezone,
+      );
 
       const raw = await ctx.db.query.trackable.findMany({
         where: and(
@@ -50,13 +55,19 @@ export const trackablesRouter = {
         },
       });
 
-      return raw.map((v) => prepareTrackable(v, input.limits));
+      return raw.map((v) =>
+        prepareTrackable(v, input.limits, userSettings.timezone),
+      );
     }),
 
   getTrackableById: protectedProcedure
     .input(z.object({ id: z.string(), limits: ZGETLimits }))
     .query(async ({ ctx, input }) => {
-      const bounds = getDateBounds(input.limits ?? { type: "last", days: 31 });
+      const userSettings = await GetUserSettings({ userId: ctx.user.id });
+      const bounds = getDateBounds(
+        input.limits ?? { type: "last", days: 31 },
+        userSettings.timezone,
+      );
       const tr = await ctx.db.query.trackable.findFirst({
         where: and(
           eq(trackable.id, input.id),
@@ -73,13 +84,14 @@ export const trackablesRouter = {
         throw new Error(`Unable to find trackable with id: ${input.id}`);
       }
 
-      return prepareTrackable(tr, input.limits);
+      return prepareTrackable(tr, input.limits, userSettings.timezone);
     }),
 
   getTrackableData: protectedProcedure
     .input(z.object({ id: z.string(), limits: ZGETLimits }))
     .query(async ({ ctx, input }) => {
-      const bounds = getDateBounds(input.limits);
+      const userSettings = await GetUserSettings({ userId: ctx.user.id });
+      const bounds = getDateBounds(input.limits, userSettings.timezone);
 
       const data = await ctx.db.query.trackableRecord.findMany({
         where: and(
@@ -89,7 +101,7 @@ export const trackablesRouter = {
         ),
       });
 
-      return makeTrackableData(data, input.limits);
+      return makeTrackableData(data, input.limits, userSettings.timezone);
     }),
 
   getTrackableSettings: protectedProcedure
