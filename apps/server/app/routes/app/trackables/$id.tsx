@@ -1,13 +1,13 @@
-import { CalendarIcon, GearIcon } from "@radix-ui/react-icons";
-import { Button } from "@shad/button";
 import {
   createFileRoute,
   Link,
   Outlet,
   useLocation,
 } from "@tanstack/react-router";
+import { CalendarDaysIcon, SettingsIcon } from "lucide-react";
 import { z } from "zod";
 
+import { Button } from "~/@shad/components/button";
 import DeleteButton from "~/components/DeleteButton";
 import { FavoriteButton } from "~/components/FavoriteButton";
 import TrackableProvider from "~/components/Providers/TrackableProvider";
@@ -109,7 +109,7 @@ function RouteComponent() {
               <>
                 <Link to={`/app/trackables/${params.id}/settings`}>
                   <Button name="settings" variant="outline">
-                    <GearIcon className="h-4 w-4" />
+                    <SettingsIcon className="h-4 w-4" />
                     <span className="max-md:hidden">Settings</span>
                   </Button>
                 </Link>
@@ -118,7 +118,7 @@ function RouteComponent() {
               <>
                 <Link to={`/app/trackables/${params.id}/view`}>
                   <Button variant="outline">
-                    <CalendarIcon className="h-4 w-4" />
+                    <CalendarDaysIcon className="h-4 w-4" />
 
                     <span className="max-md:hidden">Calendar</span>
                   </Button>

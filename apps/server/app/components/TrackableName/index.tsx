@@ -1,19 +1,19 @@
 import { useState } from "react";
+
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@shad/dialog";
+} from "~/@shad/components/dialog";
 import {
   Drawer,
   DrawerContent,
   DrawerTitle,
   DrawerTrigger,
-} from "@shad/drawer";
-import { Input } from "@shad/input";
-
+} from "~/@shad/components/drawer";
+import { Input } from "~/@shad/components/input";
 import {
   useTrackableIdSafe,
   useTrackableMeta,

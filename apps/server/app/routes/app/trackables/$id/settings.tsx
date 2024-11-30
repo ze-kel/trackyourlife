@@ -1,8 +1,8 @@
-import { Spinner } from "@shad/spinner";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 
 import type { ITrackableSettings } from "@tyl/validators/trackable";
 
+import { Spinner } from "~/@shad/components/spinner";
 import TrackableSettings from "~/components/TrackableSettings";
 import {
   useTrackableIdSafe,

@@ -98,10 +98,9 @@ const DropdownContent = ({
             position: context.strategy,
             top: context.y || 0,
             left: context.x || 0,
-            width: "max-content",
           }}
           className={cn(
-            "relative z-50",
+            "relative z-50 w-[max-content]",
             background && defaultBackgroundClasses,
             className,
           )}

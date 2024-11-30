@@ -1,5 +1,4 @@
 import type { ErrorComponentProps } from "@tanstack/react-router";
-import { Button } from "@shad/button";
 import {
   ErrorComponent,
   Link,
@@ -7,6 +6,8 @@ import {
   useMatch,
   useRouter,
 } from "@tanstack/react-router";
+
+import { Button } from "~/@shad/components/button";
 
 export function DefaultCatchBoundary({ error }: ErrorComponentProps) {
   const router = useRouter();

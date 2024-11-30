@@ -5,3 +5,10 @@ export const useIsDesktop = () => {
     initializeWithValue: false,
   });
 };
+
+export const useIsMobile = () => {
+  const isMobile = useMediaQuery("(max-width:767px)", {
+    initializeWithValue: false,
+  });
+  return isMobile;
+};

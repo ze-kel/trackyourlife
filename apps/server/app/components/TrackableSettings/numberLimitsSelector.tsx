@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Input } from "@shad/input";
-import { Label } from "@shad/label";
-import { Switch } from "@shad/switch";
 import { cn } from "@shad/utils";
 
 import type { INumberSettings } from "@tyl/validators/trackable";
+
+import { Input } from "~/@shad/components/input";
+import { Label } from "~/@shad/components/label";
+import { Switch } from "~/@shad/components/switch";
 
 export interface IRangeLabelSelector {
   enabled: INumberSettings["progressEnabled"];

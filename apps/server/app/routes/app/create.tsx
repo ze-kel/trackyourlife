@@ -1,7 +1,5 @@
 import * as React from "react";
 import { useRef, useState } from "react";
-import { Input } from "@shad/input";
-import { RadioTabItem, RadioTabs } from "@shad/radio-tabs";
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 
@@ -11,6 +9,8 @@ import type {
 } from "@tyl/validators/trackable";
 import { cloneDeep } from "@tyl/helpers";
 
+import { Input } from "~/@shad/components/input";
+import { RadioTabItem, RadioTabs } from "~/@shad/components/radio-tabs";
 import TrackableSettings from "~/components/TrackableSettings";
 import { trpc } from "~/trpc/react";
 

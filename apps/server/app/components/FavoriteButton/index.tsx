@@ -1,8 +1,8 @@
-import type { ButtonProps } from "@shad/button";
 import { useMemo } from "react";
-import { HeartFilledIcon, HeartIcon } from "@radix-ui/react-icons";
-import { Button } from "@shad/button";
+import { HeartIcon, HeartOffIcon } from "lucide-react";
 
+import type { ButtonProps } from "~/@shad/components/button";
+import { Button } from "~/@shad/components/button";
 import { useTrackableIdSafe } from "~/query/trackable";
 import { useUserSettings, useUserSettingsMutation } from "~/query/userSettings";
 
@@ -39,12 +39,12 @@ export const FavoriteButton = ({
     <Button variant={variant} onClick={() => void favHandler()}>
       {inFavs ? (
         <>
-          <HeartFilledIcon />
+          <HeartIcon size={16} />
           {!onlyIcon && <span className="max-md:hidden">Unfavorite</span>}
         </>
       ) : (
         <>
-          <HeartIcon />
+          <HeartOffIcon size={16} />
           {!onlyIcon && <span className="max-md:hidden">Favorite</span>}
         </>
       )}

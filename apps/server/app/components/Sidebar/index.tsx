@@ -1,26 +1,46 @@
 import type { ReactNode } from "react";
 import React, { useMemo } from "react";
+import { DropdownMenu } from "@radix-ui/react-dropdown-menu";
+import { Link, useLocation, useRouter } from "@tanstack/react-router";
 import {
-  BarChartIcon,
-  HeartFilledIcon,
-  MixIcon,
-  ValueIcon,
-} from "@radix-ui/react-icons";
-import { Button } from "@shad/button";
-import { Spinner } from "@shad/spinner";
-import { Link, useLocation } from "@tanstack/react-router";
+  ChartColumnIncreasing,
+  ChevronUp,
+  HeartIcon,
+  SmileIcon,
+  ToggleRight,
+  User2,
+} from "lucide-react";
 
 import type { ITrackable } from "@tyl/validators/trackable";
 import { sortTrackableList } from "@tyl/helpers/trackables";
 
+import {
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "~/@shad/components/dropdown-menu";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from "~/@shad/components/sidebar";
+import { Spinner } from "~/@shad/components/spinner";
+import { logoutFn } from "~/auth/authOperations";
 import { CoreLinks } from "~/components/Header";
 import { useTrackablesList } from "~/query/trackablesList";
+import { useUserQuery } from "~/query/user";
 import { useUserSettings } from "~/query/userSettings";
 
 const iconsMap: Record<ITrackable["type"], ReactNode> = {
-  boolean: <ValueIcon />,
-  range: <MixIcon />,
-  number: <BarChartIcon />,
+  boolean: <ToggleRight size={16} />,
+  range: <SmileIcon size={16} />,
+  number: <ChartColumnIncreasing size={16} />,
 };
 
 const TrackablesMiniList = () => {
@@ -46,52 +66,87 @@ const TrackablesMiniList = () => {
   const sorted = sortTrackableList(data, settings.favorites);
 
   return (
-    <div className="flex flex-col gap-2">
+    <SidebarMenu>
       {sorted.map((tr) => {
         return (
-          <Link key={tr.id} to={`/app/trackables/${tr.id}/`}>
-            <Button
-              variant={loc.pathname.includes(tr.id) ? "secondary" : "ghost"}
-              size={"lg"}
-              className="w-full justify-between px-3"
-            >
-              <div className="justify-baseline flex items-center gap-2 truncate">
-                <div className="opacity-70">{iconsMap[tr.type]}</div>
-                <div>{tr.name || "Unnamed"}</div>
-              </div>
-              <div>{favsSet.has(tr.id) && <HeartFilledIcon />}</div>
-            </Button>
-          </Link>
+          <SidebarMenuItem key={tr.id}>
+            <SidebarMenuButton asChild isActive={loc.pathname.includes(tr.id)}>
+              <Link key={tr.id} to={`/app/trackables/${tr.id}/`}>
+                <div className="flex w-full items-center justify-between">
+                  <div className="justify-baseline flex items-center gap-2 truncate">
+                    <div className="opacity-70">{iconsMap[tr.type]}</div>
+                    <div>{tr.name || "Unnamed"}</div>
+                  </div>
+                  <div>{favsSet.has(tr.id) && <HeartIcon size={16} />}</div>
+                </div>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
         );
       })}
-    </div>
+    </SidebarMenu>
   );
 };
 
-export const Sidebar = () => {
+export const AppSidebar = () => {
   const loc = useLocation();
+  const router = useRouter();
+
+  const user = useUserQuery();
 
   return (
-    <div>
-      <div className="flex flex-col gap-2">
-        {CoreLinks.map((v) => (
-          <Link key={v.to} {...v} className="block w-full">
-            <Button
-              variant={v.to === loc.pathname ? "secondary" : "ghost"}
-              className="w-full justify-start gap-4 px-3"
-              size={"lg"}
-            >
-              {v.label}
-            </Button>
-          </Link>
-        ))}
-      </div>
-
-      <hr className="my-6 h-[1px] border-none bg-neutral-200 outline-none dark:bg-neutral-800" />
-
-      <div>
-        <TrackablesMiniList />
-      </div>
-    </div>
+    <Sidebar variant="floating">
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {CoreLinks.map((item) => (
+                <SidebarMenuItem key={item.to}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={loc.pathname === item.to}
+                  >
+                    <Link {...item}>{item.label}</Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel>Trackables</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <TrackablesMiniList />
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton>
+                  <User2 /> {user.data?.username}
+                  <ChevronUp className="ml-auto" />
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                side="top"
+                className="w-[--radix-popper-anchor-width]"
+              >
+                <DropdownMenuItem
+                  onClick={() => {
+                    void logoutFn();
+                    void router.navigate({ to: "/login" });
+                  }}
+                >
+                  <span>Sign out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+    </Sidebar>
   );
 };

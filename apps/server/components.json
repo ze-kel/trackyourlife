@@ -5,13 +5,13 @@
     "tsx": true,
     "tailwind": {
         "config": "./tailwind.config.ts",
-        "css": "unused.css",
+        "css": "./app/styles/app.css",
         "baseColor": "neutral",
         "cssVariables": false
     },
     "aliases": {
         "utils": "@shad/utils",
-        "components": "@shad",
-        "ui": "@shad"
+        "components": "@shad/",
+        "ui": "@shad/components"
     }
 }

@@ -1,5 +1,6 @@
-import { Button } from "@shad/button";
 import { Link } from "@tanstack/react-router";
+
+import { Button } from "~/@shad/components/button";
 
 export function NotFound() {
   return (

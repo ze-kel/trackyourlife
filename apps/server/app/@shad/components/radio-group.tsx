@@ -1,8 +1,8 @@
 import * as React from "react";
-import { CheckIcon } from "@radix-ui/react-icons";
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
+import { CheckIcon } from "lucide-react";
 
-import { cn } from "./utils";
+import { cn } from "../utils";
 
 const RadioGroup = React.forwardRef<
   React.ElementRef<typeof RadioGroupPrimitive.Root>,
@@ -32,7 +32,7 @@ const RadioGroupItem = React.forwardRef<
       {...props}
     >
       <RadioGroupPrimitive.Indicator className="flex items-center justify-center">
-        <CheckIcon className="fill-primary h-3.5 w-3.5" />
+        <CheckIcon size={12} />
       </RadioGroupPrimitive.Indicator>
     </RadioGroupPrimitive.Item>
   );

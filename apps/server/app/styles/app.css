@@ -35,3 +35,26 @@ input::-webkit-inner-spin-button {
 input[type="number"] {
   -moz-appearance: textfield;
 }
+
+@layer base {
+  :root {
+    --sidebar-background: theme(colors.neutral.50);
+    --sidebar-foreground: theme(colors.neutral.950);
+    --sidebar-primary: theme(colors.blue.500);
+    --sidebar-primary-foreground: theme(colors.neutral.950);
+    --sidebar-accent: theme(colors.neutral.200);
+    --sidebar-accent-foreground: theme(colors.neutral.950);
+    --sidebar-border: theme(colors.neutral.300);
+    --sidebar-ring: theme(colors.neutral.300);
+  }
+  .dark {
+    --sidebar-background: theme(colors.neutral.950);
+    --sidebar-foreground: theme(colors.neutral.50);
+    --sidebar-primary: theme(colors.blue.500);
+    --sidebar-primary-foreground: theme(colors.neutral.50);
+    --sidebar-accent: theme(colors.neutral.800);
+    --sidebar-accent-foreground: theme(colors.neutral.50);
+    --sidebar-border: theme(colors.neutral.800);
+    --sidebar-ring: theme(colors.neutral.800);
+  }
+}

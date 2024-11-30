@@ -1,16 +1,16 @@
 import { useState } from "react";
-import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
-import { Button } from "@shad/button";
+import { cn } from "@shad/utils";
+import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+import { useIsomorphicLayoutEffect } from "usehooks-ts";
+
+import { Button } from "~/@shad/components/button";
 import {
   Drawer,
   DrawerContent,
   DrawerTitle,
   DrawerTrigger,
-} from "@shad/drawer";
-import { Input } from "@shad/input";
-import { cn } from "@shad/utils";
-import { useIsomorphicLayoutEffect } from "usehooks-ts";
-
+} from "~/@shad/components/drawer";
+import { Input } from "~/@shad/components/input";
 import { useIsDesktop } from "~/utils/useIsDesktop";
 
 export const YearSelector = ({
@@ -113,7 +113,7 @@ export const YearSelector = ({
           }}
           className="absolute right-[1rem] top-1/2 flex w-12 -translate-y-1/2 translate-x-full items-center justify-end bg-neutral-50 pr-2 opacity-0 transition-opacity group-hover:opacity-100 dark:bg-neutral-950"
         >
-          <ChevronRightIcon />
+          <ChevronRightIcon size={16} />
         </Button>
         <Button
           variant={"outline"}
@@ -123,7 +123,7 @@ export const YearSelector = ({
           }}
           className="absolute left-[1rem] top-1/2 flex w-12 -translate-x-full -translate-y-1/2 items-center justify-start bg-neutral-50 pl-2 opacity-0 transition-opacity group-hover:opacity-100 dark:bg-neutral-950"
         >
-          <ChevronLeftIcon />
+          <ChevronLeftIcon size={16} />
         </Button>
       </>
     </div>

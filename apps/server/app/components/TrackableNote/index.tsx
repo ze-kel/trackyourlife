@@ -1,16 +1,21 @@
 import { useState } from "react";
-import { FileTextIcon } from "@radix-ui/react-icons";
-import { Button } from "@shadbutton";
+import { StickyNoteIcon } from "lucide-react";
+
+import { Button } from "~/@shad/components/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@shaddialog";
-import { Drawer, DrawerContent, DrawerTitle, DrawerTrigger } from "@shaddrawer";
-
-import { Textarea } from "~/@shad/textarea";
+} from "~/@shad/components/dialog";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerTitle,
+  DrawerTrigger,
+} from "~/@shad/components/drawer";
+import { Textarea } from "~/@shad/components/textarea";
 import {
   useTrackableIdSafe,
   useTrackableMeta,
@@ -43,7 +48,7 @@ export const TrackableNoteEditable = () => {
     </p>
   ) : (
     <Button variant="outline" className="w-fit gap-2">
-      <FileTextIcon />
+      <StickyNoteIcon />
       <span className="max-lg:hidden">Add note</span>{" "}
     </Button>
   );

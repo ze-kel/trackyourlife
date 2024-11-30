@@ -6,7 +6,6 @@ import {
   Outlet,
   ScrollRestoration,
 } from "@tanstack/react-router";
-import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 import { Meta, Scripts } from "@tanstack/start";
 import { ThemeProvider } from "next-themes";
 
@@ -87,13 +86,22 @@ function RootComponent() {
   );
 }
 
+const TanStackRouterDevtools =
+  process.env.NODE_ENV === "production"
+    ? () => null // Render nothing in production
+    : React.lazy(() =>
+        import("@tanstack/router-devtools").then((res) => ({
+          default: res.TanStackRouterDevtools,
+        })),
+      );
+
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
     <html suppressHydrationWarning={true}>
       <head>
         <Meta />
       </head>
-      <body>
+      <body className="bg-neutral-50 text-neutral-900 dark:bg-neutral-950 dark:text-neutral-50">
         <LazyMotionProvider>
           <ThemeProvider defaultTheme="dark" attribute="class">
             {children}

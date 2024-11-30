@@ -1,12 +1,12 @@
-import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
-import { Button } from "@shad/button";
 import { cn } from "@shad/utils";
 import { Link } from "@tanstack/react-router";
 import { format, getDaysInMonth, getISODay, getMonth, getYear } from "date-fns";
+import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { ErrorBoundary } from "react-error-boundary";
 
 import { getNowInTimezone } from "@tyl/helpers/timezone";
 
+import { Button } from "~/@shad/components/button";
 import { TrackableNoteEditable } from "~/components/TrackableNote";
 import { YearSelector } from "~/components/TrackableView/yearSelector";
 import { useTrackableIdSafe } from "~/query/trackable";

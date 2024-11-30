@@ -1,14 +1,18 @@
 import type { TimeZone } from "timezones-list";
 import { useEffect, useState } from "react";
-import { CaretSortIcon } from "@radix-ui/react-icons";
-import { Button } from "@shad/button";
-import { Drawer, DrawerContent, DrawerTrigger } from "@shad/drawer";
 import { cn } from "@shad/utils";
 import { format } from "date-fns";
+import { ChevronsUpDown } from "lucide-react";
 
 import { clamp } from "@tyl/helpers";
 import { getNowInTimezone } from "@tyl/helpers/timezone";
 
+import { Button } from "~/@shad/components/button";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerTrigger,
+} from "~/@shad/components/drawer";
 import {
   Dropdown,
   DropdownContent,
@@ -64,7 +68,7 @@ const SearchableList = ({
   };
 
   return (
-    <div>
+    <div className="w-full">
       <input
         type="text"
         placeholder="Search for timezone"
@@ -86,7 +90,7 @@ const SearchableList = ({
         onChange={(e) => setSearch(e.target.value)}
       />
       <div className="h-0.5 w-full bg-neutral-900"></div>
-      <div className="customScrollBar customScrollBarBig max-h-64 overflow-y-scroll">
+      <div className="customScrollBar customScrollBarBig max-h-64 w-full overflow-y-scroll">
         {fList.map((zone, i) => (
           <div
             key={zone.tzCode}
@@ -131,7 +135,7 @@ export const TimezoneSelector = ({ list }: { list: TimeZone[] }) => {
         <span className="truncate">
           {value ? value.name : "Default (UTC+0)"}
         </span>
-        <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
       </Button>
     </div>
   );
@@ -163,7 +167,7 @@ export const TimezoneSelector = ({ list }: { list: TimeZone[] }) => {
     <Dropdown open={open} onOpenChange={setOpen}>
       <DropdownTrigger>{Trigger}</DropdownTrigger>
 
-      <DropdownContent className="max-w-[400px] p-0">
+      <DropdownContent className="w-full max-w-[400px] p-0">
         <SearchableList
           list={list}
           value={value}

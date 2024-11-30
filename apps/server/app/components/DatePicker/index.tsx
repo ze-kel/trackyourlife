@@ -1,20 +1,4 @@
 import { useContext, useEffect, useRef, useState } from "react";
-import {
-  CalendarIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  DoubleArrowLeftIcon,
-  DoubleArrowRightIcon,
-} from "@radix-ui/react-icons";
-import { Button, buttonVariants } from "@shad/button";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerMobileTitleContext,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@shad/drawer";
 import { cn } from "@shad/utils";
 import {
   addMonths,
@@ -28,10 +12,26 @@ import {
   startOfMonth,
 } from "date-fns";
 import { AnimatePresence, m } from "framer-motion";
+import {
+  CalendarIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  ChevronsLeftIcon,
+  ChevronsRightIcon,
+} from "lucide-react";
 import { useResizeObserver } from "usehooks-ts";
 
 import { getNowInTimezone } from "@tyl/helpers/timezone";
 
+import { Button, buttonVariants } from "~/@shad/components/button";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerMobileTitleContext,
+  DrawerTitle,
+  DrawerTrigger,
+} from "~/@shad/components/drawer";
 import { useUserSettings } from "~/query/userSettings";
 import { useIsDesktop } from "~/utils/useIsDesktop";
 import { Dropdown, DropdownContent, DropdownTrigger } from "../Dropdown";
@@ -137,7 +137,7 @@ const DatePicker = ({
       <span className="">
         {innerDate ? format(innerDate, "d MMMM yyyy") : "No date set"}
       </span>
-      <CalendarIcon className="ml-auto h-4 w-4" />
+      <CalendarIcon size={16} className="ml-auto" />
     </div>
   );
 
@@ -156,7 +156,7 @@ const DatePicker = ({
               disabled={isSameMonth(limits.start, cursor)}
               onClick={() => moveCursorMonths(-12)}
             >
-              <DoubleArrowLeftIcon className="w-7" />
+              <ChevronsLeftIcon size={16} />
             </Button>
             <Button
               variant="ghost"
@@ -164,7 +164,7 @@ const DatePicker = ({
               disabled={isSameMonth(limits.start, cursor)}
               onClick={() => moveCursorMonths(-1)}
             >
-              <ChevronLeftIcon className="w-7" />
+              <ChevronLeftIcon size={16} />
             </Button>
           </div>
           <AnimatePresence
@@ -192,7 +192,7 @@ const DatePicker = ({
               disabled={isSameMonth(dateNow, cursor)}
               onClick={() => moveCursorMonths(1)}
             >
-              <ChevronRightIcon className="w-7" />
+              <ChevronRightIcon size={16} />
             </Button>
 
             <Button
@@ -201,7 +201,7 @@ const DatePicker = ({
               disabled={isSameMonth(dateNow, cursor)}
               onClick={() => moveCursorMonths(12)}
             >
-              <DoubleArrowRightIcon className="w-7" />
+              <ChevronsRightIcon size={16} />
             </Button>
           </div>
         </div>

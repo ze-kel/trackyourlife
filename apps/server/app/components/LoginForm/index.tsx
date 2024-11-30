@@ -1,19 +1,19 @@
 import { useState } from "react";
-import { Alert, AlertDescription, AlertTitle } from "@shad/alert";
-import { Button } from "@shad/button";
+import { cn } from "@shad/utils";
+import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "@tanstack/react-router";
+
+import { Alert, AlertDescription, AlertTitle } from "~/@shad/components/alert";
+import { Button } from "~/@shad/components/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@shad/card";
-import { Input } from "@shad/input";
-import { RadioTabItem, RadioTabs } from "@shad/radio-tabs";
-import { cn } from "@shad/utils";
-import { useMutation } from "@tanstack/react-query";
-import { useRouter } from "@tanstack/react-router";
-
+} from "~/@shad/components/card";
+import { Input } from "~/@shad/components/input";
+import { RadioTabItem, RadioTabs } from "~/@shad/components/radio-tabs";
 import { loginFn, registerFn } from "~/auth/authOperations";
 
 type ActionState = "login" | "register";

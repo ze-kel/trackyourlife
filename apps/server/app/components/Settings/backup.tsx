@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { Button } from "@shad/button";
-import { Input } from "@shad/input";
 import { z } from "zod";
 
 import type { ITrackable, ITrackableUpdate } from "@tyl/validators/trackable";
 import { ZTrackableWithData } from "@tyl/validators/trackable";
 
+import { Button } from "~/@shad/components/button";
+import { Input } from "~/@shad/components/input";
 import { trpc } from "~/trpc/react";
 
 const getBackup = async () => {

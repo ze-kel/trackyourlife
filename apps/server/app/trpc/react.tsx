@@ -29,7 +29,6 @@ export const trpc = createTRPCClient<AppRouter>({
             console.error(e);
           }
         }
-
         return {};
       },
     }),

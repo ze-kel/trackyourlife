@@ -1,4 +1,8 @@
-import { TrashIcon } from "@radix-ui/react-icons";
+import { cn } from "@shad/utils";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "@tanstack/react-router";
+import { TrashIcon } from "lucide-react";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -9,12 +13,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@shad/alert-dialog";
-import { buttonVariants } from "@shad/button";
-import { cn } from "@shad/utils";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "@tanstack/react-router";
-
+} from "~/@shad/components/alert-dialog";
+import { buttonVariants } from "~/@shad/components/button";
 import { invalidateTrackablesList } from "~/query/trackablesList";
 import { trpc } from "~/trpc/react";
 
@@ -40,7 +40,7 @@ const DeleteButton = ({ id }: { id: string }) => {
           "shrink-0",
         )}
       >
-        <TrashIcon className="h-4 w-4" />
+        <TrashIcon size={16} />
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
