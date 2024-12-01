@@ -1,7 +1,7 @@
 import { useState } from "react";
 import emojiRegex from "emoji-regex";
 import { AnimatePresence, Reorder, useDragControls } from "framer-motion";
-import { CrossIcon, GripHorizontalIcon, PlusIcon } from "lucide-react";
+import { GripHorizontalIcon, PlusIcon, XIcon } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 
 import type { ArrayElement } from "@tyl/validators/helpers";
@@ -111,7 +111,7 @@ const Entry = ({
         className="flex w-7 cursor-pointer items-center justify-center"
         onClick={remove}
       >
-        <CrossIcon className="text-neutral-300 transition-colors hover:text-neutral-800 dark:text-neutral-700 dark:hover:text-neutral-100" />
+        <XIcon className="text-neutral-300 transition-colors hover:text-neutral-800 dark:text-neutral-700 dark:hover:text-neutral-100" />
       </div>
     </Reorder.Item>
   );

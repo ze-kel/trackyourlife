@@ -55,14 +55,16 @@ export const loginFn = createServerFn({ method: "POST" })
     };
   });
 
+export const registerValidator = z.object({
+  email: z.string().email("Must be a valid email"),
+  password: z.string().min(8, "Must be at least 8 characters"),
+  username: z.string(),
+});
+
+export type RegisterData = z.infer<typeof registerValidator>;
+
 export const registerFn = createServerFn({ method: "POST" })
-  .validator(
-    z.object({
-      email: z.string().email(),
-      password: z.string(),
-      username: z.string(),
-    }),
-  )
+  .validator(registerValidator)
   .handler(async ({ data }) => {
     const user = await db.query.auth_user.findFirst({
       where: eq(auth_user.email, data.email.toLowerCase()),

@@ -304,6 +304,9 @@ importers:
       '@radix-ui/react-tooltip':
         specifier: ^1.1.4
         version: 1.1.4(@types/react-dom@18.3.1)(@types/react@18.3.3)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+      '@tanstack/react-form':
+        specifier: ^0.39.0
+        version: 0.39.0(@tanstack/start@1.85.0(@types/node@22.10.1)(drizzle-orm@0.36.4(@types/pg@8.11.6)(@types/react@18.3.3)(expo-sqlite@14.0.6(expo@51.0.30(@babel/core@7.25.2)))(pg@8.12.0)(react@18.2.0))(ioredis@5.4.1)(lightningcss@1.22.0)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(terser@5.31.6)(vite@5.4.11(@types/node@22.10.1)(lightningcss@1.22.0)(terser@5.31.6)))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(typescript@5.5.4)
       '@tanstack/react-query':
         specifier: 'catalog:'
         version: 5.62.0(react@18.2.0)
@@ -313,6 +316,9 @@ importers:
       '@tanstack/react-router-with-query':
         specifier: ^1.85.0
         version: 1.85.0(@tanstack/react-query@5.62.0(react@18.2.0))(@tanstack/react-router@1.85.0(@tanstack/router-generator@1.84.4)(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+      '@tanstack/react-store':
+        specifier: ^0.6.1
+        version: 0.6.1(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       '@tanstack/router-devtools':
         specifier: ^1.85.0
         version: 1.85.0(@tanstack/react-router@1.85.0(@tanstack/router-generator@1.84.4)(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(csstype@3.1.3)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -322,6 +328,9 @@ importers:
       '@tanstack/start':
         specifier: ^1.85.0
         version: 1.85.0(@types/node@22.10.1)(drizzle-orm@0.36.4(@types/pg@8.11.6)(@types/react@18.3.3)(expo-sqlite@14.0.6(expo@51.0.30(@babel/core@7.25.2)))(pg@8.12.0)(react@18.2.0))(ioredis@5.4.1)(lightningcss@1.22.0)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(terser@5.31.6)(vite@5.4.11(@types/node@22.10.1)(lightningcss@1.22.0)(terser@5.31.6))
+      '@tanstack/zod-form-adapter':
+        specifier: ^0.39.0
+        version: 0.39.0(zod@3.23.8)
       '@trpc/client':
         specifier: 'catalog:'
         version: 11.0.0-rc.621(@trpc/server@11.0.0-rc.621)
@@ -4069,12 +4078,34 @@ packages:
       typescript:
         optional: true
 
+  '@remix-run/node@2.15.0':
+    resolution: {integrity: sha512-tWbR7pQ6gwj+MkGf6WVIYnjgfGfpdU8EOIa6xsCIRlrm0p3BtMz4jA3GvBWEpOuEnN5MV7CarVzhduaRzkZ0SQ==}
+    engines: {node: '>=18.0.0'}
+    peerDependencies:
+      typescript: ^5.1.0
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
   '@remix-run/router@1.19.1':
     resolution: {integrity: sha512-S45oynt/WH19bHbIXjtli6QmwNYvaz+vtnubvNpNDvUOoA/OWh6j1OikIP3G+v5GHdxyC6EXoChG3HgYGEUfcg==}
     engines: {node: '>=14.0.0'}
 
+  '@remix-run/router@1.21.0':
+    resolution: {integrity: sha512-xfSkCAchbdG5PnbrKqFWwia4Bi61nH+wm8wLEqfHDyp7Y3dZzgqS2itV8i4gAq9pC2HsTpwyBC6Ds8VHZ96JlA==}
+    engines: {node: '>=14.0.0'}
+
   '@remix-run/server-runtime@2.11.2':
     resolution: {integrity: sha512-abG6ENj0X3eHqDxqO2thWM2NSEiPnqyt58z1BbiQCv+t8g0Zuqd5QHbB4wzdNvfS0vKhg+jJiigcJneAc4sZzw==}
+    engines: {node: '>=18.0.0'}
+    peerDependencies:
+      typescript: ^5.1.0
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
+  '@remix-run/server-runtime@2.15.0':
+    resolution: {integrity: sha512-FuM8vAg1sPskf4wn0ivbuj/7s9Qdh2wnKu+sVXqYz0a95gH5b73TuMzk6n3NMSkFVKKc6+UmlG1WLYre7L2LTg==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       typescript: ^5.1.0
@@ -4298,6 +4329,9 @@ packages:
     peerDependencies:
       tailwindcss: '>=3.2.0'
 
+  '@tanstack/form-core@0.39.0':
+    resolution: {integrity: sha512-Lebrc3FlKGyqNnTZP9h3UF2gKFyeOr1ORoG+5UCYPxUbHbgjJyp6vEuDHQqpocK1Lyh3zR/o9Ivzu4zEKUFvkg==}
+
   '@tanstack/history@1.81.9':
     resolution: {integrity: sha512-9MPknhhnvZKifK4jSvva6NDqYQwsNaptrRzO4ejk6yCLyi4koVG4u3C4VCeClYZY5etLEQbO8wXU9knEFZpMeg==}
     engines: {node: '>=12'}
@@ -4313,6 +4347,15 @@ packages:
     peerDependencies:
       react: '>=18'
       react-dom: '>=18'
+
+  '@tanstack/react-form@0.39.0':
+    resolution: {integrity: sha512-QyGAAUUB7VR6v6MolsZwCRa+SeF4dgNBR6j76W5STdFB6+sLUh7lSfRHlrRS7lyzf0JcNX3tbJSD8TTzgCcPhQ==}
+    peerDependencies:
+      '@tanstack/start': ^1.43.13
+      react: ^17.0.0 || ^18.0.0 || ^19.0.0
+    peerDependenciesMeta:
+      '@tanstack/start':
+        optional: true
 
   '@tanstack/react-query-devtools@5.62.0':
     resolution: {integrity: sha512-9NWUgpfRPiUpsPdYopddbQLjWXbMBNaxM7K5VXPZIPfcfJJ4mG6VqrEJysL/79zgl7hC9kJlP+zXA0r5niomdg==}
@@ -4344,6 +4387,12 @@ packages:
     peerDependenciesMeta:
       '@tanstack/router-generator':
         optional: true
+
+  '@tanstack/react-store@0.5.8':
+    resolution: {integrity: sha512-G8TFpT/QJv2B2vro4QOUypvMjjSrbLRR8VKNoBByr6gpXAhU7y7mkrsn55Ra6svplVuvF+rAPTvHcUJKtU6geQ==}
+    peerDependencies:
+      react: ^17.0.0 || ^18.0.0
+      react-dom: ^17.0.0 || ^18.0.0
 
   '@tanstack/react-store@0.6.1':
     resolution: {integrity: sha512-6gOopOpPp1cAXkEyTEv6tMbAywwFunvIdCKN/SpEiButUayjXU+Q5Sp5Y3hREN3VMR4OA5+RI5SPhhJoqP9e4w==}
@@ -4389,12 +4438,20 @@ packages:
       react: '>=18.0.0 || >=19.0.0'
       react-dom: '>=18.0.0 || >=19.0.0'
 
+  '@tanstack/store@0.5.5':
+    resolution: {integrity: sha512-EOSrgdDAJExbvRZEQ/Xhh9iZchXpMN+ga1Bnk8Nmygzs8TfiE6hbzThF+Pr2G19uHL6+DTDTHhJ8VQiOd7l4tA==}
+
   '@tanstack/store@0.6.0':
     resolution: {integrity: sha512-+m2OBglsjXcLmmKOX6/9v8BDOCtyxhMmZLsRUDswOOSdIIR9mvv6i0XNKsmTh3AlYU8c1mRcodC8/Vyf+69VlQ==}
 
   '@tanstack/virtual-file-routes@1.81.9':
     resolution: {integrity: sha512-jV5mWJrsh3QXHpb/by6udSqwva0qK50uYHpIXvKsLaxnlbjbLfflfPjFyRWXbMtZsnzCjSUqp5pm5/p+Wpaerg==}
     engines: {node: '>=12'}
+
+  '@tanstack/zod-form-adapter@0.39.0':
+    resolution: {integrity: sha512-r0clT837xCFhPVLy7264P9rEFQOphcCBWUdlNKlumllUOVoQidFdl5gjToGRf3KEJe6+ZLB5qNKLtyyrMItXkQ==}
+    peerDependencies:
+      zod: ^3.x
 
   '@tootallnate/quickjs-emscripten@0.23.0':
     resolution: {integrity: sha512-C5Mc6rdnsaJDjO3UpGW/CQTHtCKaYlScZTly4JIu97Jxo/odCiH0ITnDXSJPTOrEKk/ycSZ0AOgTmkDtkOsvIA==}
@@ -5895,6 +5952,9 @@ packages:
   decamelize@1.2.0:
     resolution: {integrity: sha512-z2S+W9X73hAUUki+N+9Za2lBlun89zigOyGrsax+KUQ6wKW4ZoWpEYBkGhQjwAjjDCkWxhY0VKEhk8wzY7F5cA==}
     engines: {node: '>=0.10.0'}
+
+  decode-formdata@0.8.0:
+    resolution: {integrity: sha512-iUzDgnWsw5ToSkFY7VPFA5Gfph6ROoOxOB7Ybna4miUSzLZ4KaSJk6IAB2AdW6+C9vCVWhjjNA4gjT6wF3eZHQ==}
 
   decode-uri-component@0.2.2:
     resolution: {integrity: sha512-FqUYQ+8o158GyGTrMFJms9qh3CqTKvAqgqsTnkLI8sKu0028orqBhxNMFkFen0zGyg6epACD32pjVk58ngIErQ==}
@@ -9896,6 +9956,9 @@ packages:
 
   turbo-stream@2.3.0:
     resolution: {integrity: sha512-PhEr9mdexoVv+rJkQ3c8TjrN3DUghX37GNJkSMksoPR4KrXIPnM2MnqRt07sViIqX9IdlhrgtTSyjoVOASq6cg==}
+
+  turbo-stream@2.4.0:
+    resolution: {integrity: sha512-FHncC10WpBd2eOmGwpmQsWLDoK4cqsA/UT/GqNoaKOQnT8uzhtCbg3EoUDMvqpOSAI0S26mr0rkjzbOO6S3v1g==}
 
   turbo-windows-64@2.3.1:
     resolution: {integrity: sha512-HDSneq0dNZYZch74c2eygq+OiJE/JYDs7OsGM0yRYVj336383xkUnxz6W2I7qiyMCQXzp4UVUDZXvZhUYcX3BA==}
@@ -14133,16 +14196,16 @@ snapshots:
       '@babel/plugin-proposal-class-properties': 7.18.6(@babel/core@7.26.0)
       '@babel/plugin-proposal-export-default-from': 7.24.7(@babel/core@7.25.2)
       '@babel/plugin-proposal-logical-assignment-operators': 7.20.7(@babel/core@7.25.2)
-      '@babel/plugin-proposal-nullish-coalescing-operator': 7.18.6(@babel/core@7.26.0)
+      '@babel/plugin-proposal-nullish-coalescing-operator': 7.18.6(@babel/core@7.25.2)
       '@babel/plugin-proposal-numeric-separator': 7.18.6(@babel/core@7.25.2)
       '@babel/plugin-proposal-object-rest-spread': 7.20.7(@babel/core@7.25.2)
       '@babel/plugin-proposal-optional-catch-binding': 7.18.6(@babel/core@7.25.2)
-      '@babel/plugin-proposal-optional-chaining': 7.21.0(@babel/core@7.26.0)
+      '@babel/plugin-proposal-optional-chaining': 7.21.0(@babel/core@7.25.2)
       '@babel/plugin-syntax-dynamic-import': 7.8.3(@babel/core@7.25.2)
       '@babel/plugin-syntax-export-default-from': 7.24.7(@babel/core@7.25.2)
       '@babel/plugin-syntax-flow': 7.24.7(@babel/core@7.26.0)
-      '@babel/plugin-syntax-nullish-coalescing-operator': 7.8.3(@babel/core@7.26.0)
-      '@babel/plugin-syntax-optional-chaining': 7.8.3(@babel/core@7.26.0)
+      '@babel/plugin-syntax-nullish-coalescing-operator': 7.8.3(@babel/core@7.25.2)
+      '@babel/plugin-syntax-optional-chaining': 7.8.3(@babel/core@7.25.2)
       '@babel/plugin-transform-arrow-functions': 7.24.7(@babel/core@7.25.2)
       '@babel/plugin-transform-async-to-generator': 7.24.7(@babel/core@7.25.2)
       '@babel/plugin-transform-block-scoping': 7.25.0(@babel/core@7.25.2)
@@ -14477,7 +14540,21 @@ snapshots:
     optionalDependencies:
       typescript: 5.5.4
 
+  '@remix-run/node@2.15.0(typescript@5.5.4)':
+    dependencies:
+      '@remix-run/server-runtime': 2.15.0(typescript@5.5.4)
+      '@remix-run/web-fetch': 4.4.2
+      '@web3-storage/multipart-parser': 1.0.0
+      cookie-signature: 1.2.1
+      source-map-support: 0.5.21
+      stream-slice: 0.1.2
+      undici: 6.19.8
+    optionalDependencies:
+      typescript: 5.5.4
+
   '@remix-run/router@1.19.1': {}
+
+  '@remix-run/router@1.21.0': {}
 
   '@remix-run/server-runtime@2.11.2(typescript@5.5.4)':
     dependencies:
@@ -14488,6 +14565,18 @@ snapshots:
       set-cookie-parser: 2.7.0
       source-map: 0.7.4
       turbo-stream: 2.3.0
+    optionalDependencies:
+      typescript: 5.5.4
+
+  '@remix-run/server-runtime@2.15.0(typescript@5.5.4)':
+    dependencies:
+      '@remix-run/router': 1.21.0
+      '@types/cookie': 0.6.0
+      '@web3-storage/multipart-parser': 1.0.0
+      cookie: 0.6.0
+      set-cookie-parser: 2.7.0
+      source-map: 0.7.4
+      turbo-stream: 2.4.0
     optionalDependencies:
       typescript: 5.5.4
 
@@ -14687,6 +14776,10 @@ snapshots:
     dependencies:
       tailwindcss: 3.4.15(ts-node@10.9.2(@types/node@22.10.1)(typescript@5.5.4))
 
+  '@tanstack/form-core@0.39.0':
+    dependencies:
+      '@tanstack/store': 0.5.5
+
   '@tanstack/history@1.81.9': {}
 
   '@tanstack/query-core@5.62.0': {}
@@ -14697,6 +14790,19 @@ snapshots:
     dependencies:
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
+
+  '@tanstack/react-form@0.39.0(@tanstack/start@1.85.0(@types/node@22.10.1)(drizzle-orm@0.36.4(@types/pg@8.11.6)(@types/react@18.3.3)(expo-sqlite@14.0.6(expo@51.0.30(@babel/core@7.25.2)))(pg@8.12.0)(react@18.2.0))(ioredis@5.4.1)(lightningcss@1.22.0)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(terser@5.31.6)(vite@5.4.11(@types/node@22.10.1)(lightningcss@1.22.0)(terser@5.31.6)))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(typescript@5.5.4)':
+    dependencies:
+      '@remix-run/node': 2.15.0(typescript@5.5.4)
+      '@tanstack/form-core': 0.39.0
+      '@tanstack/react-store': 0.5.8(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+      decode-formdata: 0.8.0
+      react: 18.2.0
+    optionalDependencies:
+      '@tanstack/start': 1.85.0(@types/node@22.10.1)(drizzle-orm@0.36.4(@types/pg@8.11.6)(@types/react@18.3.3)(expo-sqlite@14.0.6(expo@51.0.30(@babel/core@7.25.2)))(pg@8.12.0)(react@18.2.0))(ioredis@5.4.1)(lightningcss@1.22.0)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(terser@5.31.6)(vite@5.4.11(@types/node@22.10.1)(lightningcss@1.22.0)(terser@5.31.6))
+    transitivePeerDependencies:
+      - react-dom
+      - typescript
 
   '@tanstack/react-query-devtools@5.62.0(@tanstack/react-query@5.62.0(react@18.2.0))(react@18.2.0)':
     dependencies:
@@ -14727,6 +14833,13 @@ snapshots:
       tiny-warning: 1.0.3
     optionalDependencies:
       '@tanstack/router-generator': 1.84.4
+
+  '@tanstack/react-store@0.5.8(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
+    dependencies:
+      '@tanstack/store': 0.5.5
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+      use-sync-external-store: 1.2.2(react@18.2.0)
 
   '@tanstack/react-store@0.6.1(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
     dependencies:
@@ -14855,9 +14968,16 @@ snapshots:
       - webpack-sources
       - xml2js
 
+  '@tanstack/store@0.5.5': {}
+
   '@tanstack/store@0.6.0': {}
 
   '@tanstack/virtual-file-routes@1.81.9': {}
+
+  '@tanstack/zod-form-adapter@0.39.0(zod@3.23.8)':
+    dependencies:
+      '@tanstack/form-core': 0.39.0
+      zod: 3.23.8
 
   '@tootallnate/quickjs-emscripten@0.23.0': {}
 
@@ -16770,6 +16890,8 @@ snapshots:
       ms: 2.1.2
 
   decamelize@1.2.0: {}
+
+  decode-formdata@0.8.0: {}
 
   decode-uri-component@0.2.2: {}
 
@@ -21492,6 +21614,8 @@ snapshots:
     optional: true
 
   turbo-stream@2.3.0: {}
+
+  turbo-stream@2.4.0: {}
 
   turbo-windows-64@2.3.1:
     optional: true

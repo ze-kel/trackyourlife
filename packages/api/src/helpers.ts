@@ -13,7 +13,7 @@ import type {
 } from "@tyl/validators/trackable";
 import { db, eq } from "@tyl/db";
 import { auth_user } from "@tyl/db/schema";
-import { getNowWithTimezoneOffset } from "@tyl/helpers/timezone";
+import { getGMTWithTimezoneOffset } from "@tyl/helpers/timezone";
 import { ZTrackableSettings } from "@tyl/validators/trackable";
 import { UserSettingsFallback, ZUserSettings } from "@tyl/validators/user";
 
@@ -71,7 +71,7 @@ export const getDateBounds = (
   // limits.type === "last"
   // Note that this will return "full december and full january" for "last 7 days" on jan 3.
   // This is intentional to ensure that any month stored on a client has all its data fetched.
-  const today = getNowWithTimezoneOffset(timezone);
+  const today = getGMTWithTimezoneOffset(timezone);
 
   return {
     from: startOfMonth(sub(today, { days: limits.days })),
@@ -103,7 +103,7 @@ export const makeTrackableData = (
     }
 
     if (limits.type === "last") {
-      const today = getNowWithTimezoneOffset(timezone);
+      const today = getGMTWithTimezoneOffset(timezone);
       const start = subDays(today, limits.days);
       const [year, month, year2, month2] = [
         today.getFullYear(),

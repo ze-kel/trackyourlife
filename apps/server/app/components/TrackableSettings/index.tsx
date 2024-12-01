@@ -1,7 +1,8 @@
-import type { MutableRefObject } from "react";
-import { useEffect, useRef, useState } from "react";
+import type { ReactFormExtendedApi } from "@tanstack/react-form";
+import { useState } from "react";
 import { cn } from "@shad/utils";
-import { v4 as uuidv4 } from "uuid";
+import { useForm } from "@tanstack/react-form";
+import { useStore } from "@tanstack/react-store";
 
 import type {
   IBooleanSettings,
@@ -28,161 +29,235 @@ import NumberColorSelector from "../Colors/numberColorSelector";
 import NumberLimitsSelector from "./numberLimitsSelector";
 import RangeLabelSelector from "./rangeLabelSelector";
 
-export const SettingsBoolean = ({
-  settings,
-  notifyAboutChange,
+const SettingsTitle = ({ children }: { children: React.ReactNode }) => {
+  return <h3 className="mb-1 mt-3 text-xl">{children}</h3>;
+};
+
+export const SettingsCommon = ({
+  form,
 }: {
-  settings: MutableRefObject<IBooleanSettings>;
-  notifyAboutChange: () => void;
+  form: ReactFormExtendedApi<ITrackable["settings"]>;
+}) => {
+  const uSettings = useUserSettings();
+
+  return (
+    <div>
+      <SettingsTitle>Tracking Start</SettingsTitle>
+      <form.Field
+        name="startDate"
+        children={(field) => (
+          <>
+            <DrawerMobileTitleProvider title="Tracking Start">
+              <DatePicker
+                date={
+                  field.state.value ? new Date(field.state.value) : undefined
+                }
+                onChange={(v) => field.handleChange(String(v))}
+                limits={{
+                  start: new Date(1990, 0, 1),
+                  end: getGMTWithTimezoneOffset(uSettings.timezone),
+                }}
+              />
+            </DrawerMobileTitleProvider>
+          </>
+        )}
+      />
+    </div>
+  );
+};
+
+export const SettingsBoolean = ({
+  form,
+}: {
+  form: ReactFormExtendedApi<IBooleanSettings>;
 }) => {
   return (
     <>
-      <div>
-        <h3 className="mb-2 text-xl">Checked color</h3>
-        <DrawerMobileTitleProvider title="Checked color">
-          <ColorInput
-            value={settings.current.activeColor ?? presetsMap.green}
-            onChange={(v) => {
-              settings.current.activeColor = v;
-              notifyAboutChange();
-            }}
-          />
-        </DrawerMobileTitleProvider>
-      </div>
-
-      <div>
-        <h3 className="mb-2 text-xl">Unchecked color</h3>
-        <DrawerMobileTitleProvider title="Unchecked color">
-          <ColorInput
-            value={settings.current.inactiveColor ?? presetsMap.neutral}
-            onChange={(v) => {
-              settings.current.inactiveColor = v;
-              notifyAboutChange();
-            }}
-          ></ColorInput>
-        </DrawerMobileTitleProvider>
-      </div>
+      <SettingsTitle>Checked color</SettingsTitle>
+      <form.Field
+        name="activeColor"
+        children={(field) => (
+          <>
+            <DrawerMobileTitleProvider title="Checked color">
+              <ColorInput
+                value={field.state.value ?? presetsMap.green}
+                onChange={(v) => {
+                  field.handleChange(v);
+                }}
+              />
+            </DrawerMobileTitleProvider>
+          </>
+        )}
+      />
+      <SettingsTitle>Unchecked color</SettingsTitle>
+      <form.Field
+        name="inactiveColor"
+        children={(field) => (
+          <>
+            <DrawerMobileTitleProvider title="Unchecked color">
+              <ColorInput
+                value={field.state.value ?? presetsMap.neutral}
+                onChange={(v) => {
+                  field.handleChange(v);
+                }}
+              />
+            </DrawerMobileTitleProvider>
+          </>
+        )}
+      />
     </>
   );
 };
 
 export const SettingsNumber = ({
-  settings,
-  notifyAboutChange,
+  form,
 }: {
-  settings: MutableRefObject<INumberSettings>;
-  notifyAboutChange: () => void;
+  form: ReactFormExtendedApi<INumberSettings>;
 }) => {
   return (
     <>
       <div>
-        <h3 className="text-xl">Progress</h3>
-
-        <NumberLimitsSelector
-          enabled={settings.current.progressEnabled}
-          onEnabledChange={(v) => {
-            settings.current.progressEnabled = v;
-            notifyAboutChange();
-          }}
-          value={settings.current.progress}
-          onChange={(v) => {
-            settings.current.progress = v;
-            notifyAboutChange();
-          }}
-          className="mt-2"
+        <SettingsTitle>Progress</SettingsTitle>
+        <form.Field
+          name="progressEnabled"
+          children={(field) => (
+            <div className="mb-2 flex items-center space-x-2">
+              <Switch
+                id="show-progress"
+                checked={field.state.value}
+                onCheckedChange={(v) => {
+                  field.handleChange(v);
+                }}
+              />
+              <Label htmlFor="show-progress">Show progress</Label>
+            </div>
+          )}
+        />
+        <form.Subscribe
+          selector={(state) => [state.values.progressEnabled]}
+          children={([progressEnabled]) =>
+            progressEnabled && (
+              <form.Field
+                name="progress"
+                children={(field) => (
+                  <NumberLimitsSelector
+                    value={field.state.value}
+                    onChange={(v) => {
+                      field.handleChange(v);
+                    }}
+                  />
+                )}
+              />
+            )
+          }
         />
       </div>
 
-      <div>
-        <h3 className="mb-2 text-xl">Color coding</h3>
-        <NumberColorSelector
-          enabled={settings.current.colorCodingEnabled}
-          onEnabledChange={(v) => {
-            settings.current.colorCodingEnabled = v;
-            notifyAboutChange();
-          }}
-          value={settings.current.colorCoding ?? []}
-          onChange={(v) => {
-            settings.current.colorCoding = v;
-            notifyAboutChange();
-          }}
-        />
-      </div>
+      <SettingsTitle>Color coding</SettingsTitle>
+      <form.Field
+        name="colorCodingEnabled"
+        children={(field) => (
+          <div className="mb-2 flex items-center space-x-2">
+            <Switch
+              id="color-coding-enabled"
+              checked={field.state.value}
+              onCheckedChange={(v) => {
+                field.handleChange(v);
+              }}
+            />
+            <Label htmlFor="show-progress">Enable color coding</Label>
+          </div>
+        )}
+      />
+      <form.Subscribe
+        selector={(state) => [state.values.colorCodingEnabled]}
+        children={([colorCodingEnabled]) =>
+          colorCodingEnabled && (
+            <form.Field
+              name="colorCoding"
+              children={(field) => (
+                <NumberColorSelector
+                  value={field.state.value ?? []}
+                  onChange={(v) => {
+                    field.handleChange(v);
+                  }}
+                />
+              )}
+            />
+          )
+        }
+      />
     </>
   );
 };
 
 export const SettingsRange = ({
-  settings,
-  notifyAboutChange,
+  form,
 }: {
-  settings: MutableRefObject<IRangeSettings>;
-  notifyAboutChange: () => void;
+  form: ReactFormExtendedApi<IRangeSettings>;
 }) => {
   return (
     <>
-      <div>
-        <h3 className="mb-2 text-xl">States</h3>
-        <RangeLabelSelector
-          initialValue={settings.current.labels}
-          onChange={(v) => {
-            settings.current.labels = v;
-            notifyAboutChange();
-          }}
-        />
-      </div>
+      <SettingsTitle>States</SettingsTitle>
+      <form.Field
+        name="labels"
+        children={(field) => (
+          <RangeLabelSelector
+            initialValue={field.state.value ?? []}
+            onChange={(v) => {
+              field.handleChange(v);
+            }}
+          />
+        )}
+      />
 
-      <div>
-        <h3 className="mb-2 text-xl">Cycle values</h3>
-        <div className="mt-1 flex items-center space-x-2">
-          <Switch
-            id="is-cycle"
-            defaultChecked={settings.current.isCycle}
-            onCheckedChange={(v) => {
-              settings.current.isCycle = v;
-              notifyAboutChange();
-            }}
-          />
-          <Label htmlFor="is-cycle">Select next label on click</Label>
-        </div>
-        <div className="mt-2 flex items-center space-x-2">
-          <Switch
-            id="cycle-empty"
-            defaultChecked={settings.current.cycleToEmpty}
-            onCheckedChange={(v) => {
-              settings.current.cycleToEmpty = v;
-              notifyAboutChange();
-            }}
-          />
-          <Label htmlFor="is-cycle">Cycle to empty</Label>
-        </div>
-      </div>
+      <SettingsTitle>Cycle values</SettingsTitle>
+      <form.Field
+        name="isCycle"
+        children={(field) => (
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="is-cycle"
+              checked={field.state.value}
+              onCheckedChange={(v) => {
+                field.handleChange(v);
+              }}
+            />
+            <Label htmlFor="is-cycle">Select next label on click</Label>
+          </div>
+        )}
+      />
+      <form.Field
+        name="cycleToEmpty"
+        children={(field) => (
+          <div className="mt-2 flex items-center space-x-2">
+            <Switch
+              id="cycle-empty"
+              checked={field.state.value}
+              onCheckedChange={(v) => {
+                field.handleChange(v);
+              }}
+            />
+            <Label htmlFor="cycle-empty">Cycle to empty</Label>
+          </div>
+        )}
+      />
     </>
   );
 };
 
 const TrackableMock = ({
   type,
-  settings,
-  signal,
+  form,
   mockLabel,
 }: {
   type: ITrackable["type"];
-  settings: ITrackable["settings"];
-  signal: TinySignal;
+  form: ReactFormExtendedApi<ITrackable["settings"]>;
   mockLabel: string;
 }) => {
   const [value, onChange] = useState("");
 
   const classes = cn(DayCellBaseClasses, "h-20");
-
-  const [key, changeKey] = useState(0);
-
-  useEffect(() => {
-    return signal.subscribe(() => {
-      changeKey(key + 1);
-    });
-  });
 
   const Label = (
     <div className="absolute left-0.5 top-0.5 select-none text-neutral-800 sm:left-1 sm:top-0 sm:text-base">
@@ -190,8 +265,10 @@ const TrackableMock = ({
     </div>
   );
 
+  const settings = useStore(form.store, (state) => state.values);
+
   return (
-    <div key={key} className="relative w-full">
+    <div className="relative w-full">
       <DayCellProvider type={type} settings={settings}>
         {type === "boolean" && (
           <DayCellBoolean className={classes} value={value} onChange={onChange}>
@@ -218,110 +295,50 @@ const TrackableMock = ({
   );
 };
 
-export class TinySignal {
-  subscribers: Record<string, () => void>;
-
-  constructor() {
-    this.subscribers = {};
-  }
-
-  subscribe(callback: () => unknown) {
-    const uuid = uuidv4();
-
-    this.subscribers[uuid] = callback;
-
-    return () => {
-      delete this.subscribers[uuid];
-    };
-  }
-
-  notifyAboutChange() {
-    Object.values(this.subscribers).forEach((v) => v());
-  }
-}
-
 const TrackableSettings = ({
   trackableType,
-  trackableSettings,
+  initialSettings,
   handleSave,
   customSaveButtonText,
-  isLoadingButton,
 }: {
   trackableType: ITrackable["type"];
-  trackableSettings: ITrackable["settings"];
+  initialSettings: ITrackable["settings"];
   handleSave: (v: ITrackable["settings"]) => void | Promise<void>;
   customSaveButtonText?: string;
-  isLoadingButton?: boolean;
 }) => {
-  // Settings is a ref to avoid rerendering everything on every change(problematic with color inputs where you drag to change)
-  // However we do need to update preview trackable, so with changing ref we also trigger signal update
-  const signal = useRef(new TinySignal());
-  const settings = useRef(trackableSettings);
-
-  const uSettings = useUserSettings();
+  const form = useForm<ITrackable["settings"]>({
+    defaultValues: initialSettings,
+    onSubmit: async (v) => {
+      await handleSave(v.value);
+    },
+  });
 
   return (
-    <div className="flex flex-col gap-4">
-      <h3 className="text-xl">Preview</h3>
+    <div>
+      <SettingsTitle>Preview</SettingsTitle>
       <div className="grid h-20 grid-cols-3 gap-1 md:grid-cols-6">
         {Array(6)
           .fill("")
           .map((_, i) => {
             return (
               <TrackableMock
-                key={i}
                 mockLabel={String(i + 1)}
-                signal={signal.current}
                 type={trackableType}
-                settings={settings.current}
+                form={form}
               />
             );
           })}
       </div>
 
-      <div>
-        <h3 className="text-xl">Tracking Start</h3>
-        <DrawerMobileTitleProvider title="Tracking Start">
-          <DatePicker
-            date={
-              settings.current.startDate
-                ? new Date(settings.current.startDate)
-                : undefined
-            }
-            onChange={(v) => (settings.current.startDate = String(v))}
-            limits={{
-              start: new Date(1990, 0, 1),
-              end: getGMTWithTimezoneOffset(uSettings.timezone),
-            }}
-            className="mt-2"
-          />
-        </DrawerMobileTitleProvider>
-      </div>
-
-      {trackableType === "boolean" && (
-        <SettingsBoolean
-          notifyAboutChange={() => signal.current.notifyAboutChange()}
-          settings={settings}
-        />
-      )}
-      {trackableType === "number" && (
-        <SettingsNumber
-          settings={settings}
-          notifyAboutChange={() => signal.current.notifyAboutChange()}
-        />
-      )}
-      {trackableType === "range" && (
-        <SettingsRange
-          settings={settings}
-          notifyAboutChange={() => signal.current.notifyAboutChange()}
-        />
-      )}
-
+      <SettingsCommon form={form} />
+      {trackableType === "boolean" && <SettingsBoolean form={form} />}
+      {trackableType === "number" && <SettingsNumber form={form} />}
+      {trackableType === "range" && <SettingsRange form={form} />}
       <Button
-        isLoading={isLoadingButton}
-        className="mt-2"
+        isLoading={form.state.isSubmitting}
+        className="mt-4 w-full"
         variant={"outline"}
-        onClick={() => void handleSave(settings.current)}
+        onClick={() => void form.handleSubmit()}
       >
         {customSaveButtonText ?? "Save"}
       </Button>

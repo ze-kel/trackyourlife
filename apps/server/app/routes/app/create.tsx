@@ -83,7 +83,7 @@ function RouteComponent() {
       <TrackableSettings
         isLoadingButton={mutation.isPending}
         trackableType={newOne.type}
-        trackableSettings={newOne.settings}
+        initialSettings={newOne.settings}
         handleSave={createTrackable}
         customSaveButtonText="Create Trackable"
       />

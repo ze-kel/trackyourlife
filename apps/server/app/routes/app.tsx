@@ -25,11 +25,14 @@ export const Route = createFileRoute("/app")({
   },
 
   loader: async ({ context }) => {
-    await ensureUser(context.queryClient);
-    await ensureUserSettings(context.queryClient);
+    const promises = await Promise.all([
+      ensureUser(context.queryClient),
+      ensureUserSettings(context.queryClient),
+      getSidebarState(),
+    ]);
 
     return {
-      sidebarState: await getSidebarState(),
+      sidebarState: promises[2],
     };
   },
 
@@ -37,10 +40,10 @@ export const Route = createFileRoute("/app")({
 });
 
 const AppComponent = () => {
-  const { sidebarState } = Route.useLoaderData();
+  const loaderData = Route.useLoaderData();
 
   return (
-    <SidebarProvider defaultOpen={sidebarState}>
+    <SidebarProvider defaultOpen={loaderData.sidebarState}>
       <AppSidebar />
       <div className={cn("h-full max-h-full min-h-screen w-full", "")}>
         <Header />

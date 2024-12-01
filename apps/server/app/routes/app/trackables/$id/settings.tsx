@@ -31,9 +31,8 @@ function RouteComponent() {
   return (
     <>
       <TrackableSettings
-        isLoadingButton={settingsMutation.isPending}
         trackableType={trackable.type}
-        trackableSettings={settings}
+        initialSettings={settings}
         handleSave={async (v: ITrackableSettings) => {
           await settingsMutation.mutateAsync(v, {
             onSuccess: () => {

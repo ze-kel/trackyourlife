@@ -1,8 +1,14 @@
+import type { FieldApi } from "@tanstack/react-form";
 import { useState } from "react";
 import { cn } from "@shad/utils";
+import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
+import { zodValidator } from "@tanstack/zod-form-adapter";
+import { m } from "framer-motion";
+import { TriangleAlertIcon } from "lucide-react";
 
+import type { RegisterData } from "~/auth/authOperations";
 import { Alert, AlertDescription, AlertTitle } from "~/@shad/components/alert";
 import { Button } from "~/@shad/components/button";
 import {
@@ -14,23 +20,40 @@ import {
 } from "~/@shad/components/card";
 import { Input } from "~/@shad/components/input";
 import { RadioTabItem, RadioTabs } from "~/@shad/components/radio-tabs";
-import { loginFn, registerFn } from "~/auth/authOperations";
+import { loginFn, registerFn, registerValidator } from "~/auth/authOperations";
 
 type ActionState = "login" | "register";
+
+function FieldInfo({
+  field,
+}: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  field: FieldApi<unknown, string, any, any>;
+}) {
+  return (
+    <>
+      {field.state.meta.isTouched && field.state.meta.errors.length ? (
+        <m.div
+          initial={{ opacity: 0, transform: "translateY(-100%)" }}
+          animate={{ opacity: 1, transform: "translateY(0)" }}
+          exit={{ opacity: 0, transform: "translateY(-100%)" }}
+          layout
+          className="ml-2 flex w-fit items-center gap-2 rounded-b-md border border-t-0 border-neutral-200 px-3 py-1.5 font-light opacity-70 dark:border-neutral-800"
+        >
+          <TriangleAlertIcon size={16} strokeWidth={1.5} />
+          {field.state.meta.errors.join(",")}
+        </m.div>
+      ) : null}
+      {field.state.meta.isValidating ? "Validating..." : null}
+    </>
+  );
+}
 
 const Register = () => {
   const router = useRouter();
 
   const registerMutation = useMutation({
-    mutationFn: async ({
-      email,
-      password,
-      username,
-    }: {
-      email: string;
-      password: string;
-      username: string;
-    }) => {
+    mutationFn: async ({ email, password, username }: RegisterData) => {
       const r = await registerFn({ data: { email, password, username } });
       if (!r.ok) {
         throw new Error(r.message);
@@ -42,34 +65,91 @@ const Register = () => {
     },
   });
 
+  const form = useForm({
+    defaultValues: {
+      username: "",
+      email: "",
+      password: "",
+    } as RegisterData,
+    onSubmit: async ({ value }) => {
+      console.log(value);
+      await registerMutation.mutateAsync(value);
+    },
+
+    validatorAdapter: zodValidator(),
+    validators: {
+      onChange: registerValidator,
+    },
+  });
+
   return (
     <form
       onSubmit={(e) => {
         e.preventDefault();
-        const formData = new FormData(e.target as HTMLFormElement);
-        registerMutation.mutate({
-          email: formData.get("email") as string,
-          password: formData.get("password") as string,
-          username: formData.get("username") as string,
-        });
+        void form.handleSubmit();
       }}
     >
       <h4 className="mb-2">Email</h4>
-      <Input
-        type="email"
+      <form.Field
         name="email"
-        id="email"
-        placeholder="person@somemail.com"
+        children={(field) => (
+          <>
+            <Input
+              value={field.state.value}
+              onChange={(e) => {
+                field.handleChange(e.target.value);
+              }}
+              type="email"
+              name="email"
+              id="email"
+              className="z-2 relative"
+              placeholder="person@somemail.com"
+            />
+            <FieldInfo field={field} />
+          </>
+        )}
       />
 
       <h4 className="mb-2 mt-4">Name</h4>
-      <Input type="text" name="username" id="username" placeholder="John Doe" />
-
+      <form.Field
+        name="username"
+        children={(field) => (
+          <>
+            <Input
+              value={field.state.value}
+              onChange={(e) => {
+                field.handleChange(e.target.value);
+              }}
+              type="text"
+              name="username"
+              id="username"
+              placeholder="John Doe"
+            />
+            <FieldInfo field={field} />
+          </>
+        )}
+      />
       <h4 className="mb-2 mt-4">Password</h4>
-      <Input name="password" id="password" type="password" />
+      <form.Field
+        name="password"
+        children={(field) => (
+          <>
+            <Input
+              value={field.state.value}
+              onChange={(e) => {
+                field.handleChange(e.target.value);
+              }}
+              type="password"
+              name="password"
+              id="password"
+            />
+            <FieldInfo field={field} />
+          </>
+        )}
+      />
 
       <Button
-        isLoading={registerMutation.isPending}
+        isLoading={form.state.isSubmitting}
         size={"lg"}
         type="submit"
         variant="outline"

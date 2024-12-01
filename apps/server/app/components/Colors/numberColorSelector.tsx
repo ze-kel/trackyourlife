@@ -13,9 +13,7 @@ import { getColorAtPosition, makeCssGradient } from "@tyl/helpers/colorTools";
 
 import { Button } from "~/@shad/components/button";
 import { Input } from "~/@shad/components/input";
-import { Label } from "~/@shad/components/label";
 import { RadioTabItem, RadioTabs } from "~/@shad/components/radio-tabs";
-import { Switch } from "~/@shad/components/switch";
 import ColorPicker, { BetterNumberInput } from "~/components/Colors";
 import { ColorDisplay } from "~/components/Colors/colorDisplay";
 import { useRefSize } from "~/components/Colors/contoller";
@@ -413,17 +411,12 @@ const ControllerGradient = ({
 };
 
 const NumberColorSelector = ({
-  enabled,
-  onEnabledChange,
   value,
   onChange,
 }: {
-  enabled?: boolean;
-  onEnabledChange: (v: boolean) => void;
   value: IColorCodingValue[];
   onChange: (v: NonNullable<IColorCodingValue[]>) => void;
 }) => {
-  const [innerEnabled, setInnerEnabled] = useState(enabled ?? false);
   const [innerValue, setInnerValue] = useState(
     value.length
       ? value
@@ -436,30 +429,13 @@ const NumberColorSelector = ({
   const sorted = innerValue.sort((a, b) => a.point - b.point);
 
   return (
-    <div className="flex flex-col gap-2">
-      <div className="mt-1 flex items-center space-x-2">
-        <Switch
-          id="color-coding"
-          checked={innerEnabled}
-          onCheckedChange={(v) => {
-            setInnerEnabled(v);
-            onEnabledChange(v);
-            onChange(innerValue);
-          }}
-        />
-        <Label htmlFor="color-coding">Use color coding</Label>
-      </div>
-
-      {innerEnabled && (
-        <ControllerGradient
-          value={sorted}
-          onChange={(v) => {
-            setInnerValue(v);
-            onChange(v);
-          }}
-        />
-      )}
-    </div>
+    <ControllerGradient
+      value={sorted}
+      onChange={(v) => {
+        setInnerValue(v);
+        onChange(v);
+      }}
+    />
   );
 };
 

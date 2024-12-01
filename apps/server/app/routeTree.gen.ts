@@ -15,6 +15,7 @@ import { Route as LoginImport } from './routes/login'
 import { Route as AppImport } from './routes/app'
 import { Route as IndexImport } from './routes/index'
 import { Route as AppIndexImport } from './routes/app/index'
+import { Route as AppTestingImport } from './routes/app/testing'
 import { Route as AppSettingsImport } from './routes/app/settings'
 import { Route as AppCreateImport } from './routes/app/create'
 import { Route as AppTrackablesIndexImport } from './routes/app/trackables/index'
@@ -46,6 +47,12 @@ const IndexRoute = IndexImport.update({
 const AppIndexRoute = AppIndexImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AppRoute,
+} as any)
+
+const AppTestingRoute = AppTestingImport.update({
+  id: '/testing',
+  path: '/testing',
   getParentRoute: () => AppRoute,
 } as any)
 
@@ -130,6 +137,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSettingsImport
       parentRoute: typeof AppImport
     }
+    '/app/testing': {
+      id: '/app/testing'
+      path: '/testing'
+      fullPath: '/app/testing'
+      preLoaderRoute: typeof AppTestingImport
+      parentRoute: typeof AppImport
+    }
     '/app/': {
       id: '/app/'
       path: '/'
@@ -196,6 +210,7 @@ const AppTrackablesIdRouteWithChildren = AppTrackablesIdRoute._addFileChildren(
 interface AppRouteChildren {
   AppCreateRoute: typeof AppCreateRoute
   AppSettingsRoute: typeof AppSettingsRoute
+  AppTestingRoute: typeof AppTestingRoute
   AppIndexRoute: typeof AppIndexRoute
   AppTrackablesIdRoute: typeof AppTrackablesIdRouteWithChildren
   AppTrackablesIndexRoute: typeof AppTrackablesIndexRoute
@@ -204,6 +219,7 @@ interface AppRouteChildren {
 const AppRouteChildren: AppRouteChildren = {
   AppCreateRoute: AppCreateRoute,
   AppSettingsRoute: AppSettingsRoute,
+  AppTestingRoute: AppTestingRoute,
   AppIndexRoute: AppIndexRoute,
   AppTrackablesIdRoute: AppTrackablesIdRouteWithChildren,
   AppTrackablesIndexRoute: AppTrackablesIndexRoute,
@@ -217,6 +233,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/app/create': typeof AppCreateRoute
   '/app/settings': typeof AppSettingsRoute
+  '/app/testing': typeof AppTestingRoute
   '/app/': typeof AppIndexRoute
   '/app/trackables/$id': typeof AppTrackablesIdRouteWithChildren
   '/app/trackables': typeof AppTrackablesIndexRoute
@@ -230,6 +247,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/app/create': typeof AppCreateRoute
   '/app/settings': typeof AppSettingsRoute
+  '/app/testing': typeof AppTestingRoute
   '/app': typeof AppIndexRoute
   '/app/trackables': typeof AppTrackablesIndexRoute
   '/app/trackables/$id/settings': typeof AppTrackablesIdSettingsRoute
@@ -244,6 +262,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/app/create': typeof AppCreateRoute
   '/app/settings': typeof AppSettingsRoute
+  '/app/testing': typeof AppTestingRoute
   '/app/': typeof AppIndexRoute
   '/app/trackables/$id': typeof AppTrackablesIdRouteWithChildren
   '/app/trackables/': typeof AppTrackablesIndexRoute
@@ -260,6 +279,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/app/create'
     | '/app/settings'
+    | '/app/testing'
     | '/app/'
     | '/app/trackables/$id'
     | '/app/trackables'
@@ -272,6 +292,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/app/create'
     | '/app/settings'
+    | '/app/testing'
     | '/app'
     | '/app/trackables'
     | '/app/trackables/$id/settings'
@@ -284,6 +305,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/app/create'
     | '/app/settings'
+    | '/app/testing'
     | '/app/'
     | '/app/trackables/$id'
     | '/app/trackables/'
@@ -328,6 +350,7 @@ export const routeTree = rootRoute
       "children": [
         "/app/create",
         "/app/settings",
+        "/app/testing",
         "/app/",
         "/app/trackables/$id",
         "/app/trackables/"
@@ -342,6 +365,10 @@ export const routeTree = rootRoute
     },
     "/app/settings": {
       "filePath": "app/settings.tsx",
+      "parent": "/app"
+    },
+    "/app/testing": {
+      "filePath": "app/testing.tsx",
       "parent": "/app"
     },
     "/app/": {
