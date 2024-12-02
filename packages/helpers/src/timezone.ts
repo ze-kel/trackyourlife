@@ -1,10 +1,15 @@
 import type { TimeZone } from "timezones-list";
-import { TZDate } from "@date-fns/tz";
-import { sub } from "date-fns";
+import { TZDate, tzOffset } from "@date-fns/tz";
+import { add } from "date-fns";
 
 export const getGMTWithTimezoneOffset = (timezone?: TimeZone): Date => {
-  const tzDate = new TZDate(Date.now(), timezone?.tzCode ?? "Europe/London");
-  return sub(new Date(), { minutes: tzDate.getTimezoneOffset() });
+  const off =
+    tzOffset(timezone?.tzCode ?? "Europe/London", new Date()) +
+    new Date().getTimezoneOffset();
+
+  return add(new Date(), {
+    minutes: off,
+  });
 };
 
 export const getTimezonedDate = (timezone?: TimeZone): Date => {

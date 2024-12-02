@@ -1,6 +1,5 @@
 import { getDaysInMonth } from "date-fns";
 
-
 export const generateDates = (days: number, nowDate: Date) => {
   const today = nowDate;
 
