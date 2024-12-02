@@ -36,10 +36,10 @@ export const Route = createFileRoute("/app")({
     };
   },
 
-  component: () => <AppComponent />,
+  component: AppComponent,
 });
 
-const AppComponent = () => {
+function AppComponent() {
   const loaderData = Route.useLoaderData();
 
   return (
@@ -53,4 +53,4 @@ const AppComponent = () => {
       </div>
     </SidebarProvider>
   );
-};
+}

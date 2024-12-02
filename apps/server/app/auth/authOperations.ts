@@ -16,13 +16,15 @@ import {
   setSessionTokenCookie,
 } from "~/auth/auth";
 
+export const loginValidator = z.object({
+  email: z.string().email(),
+  password: z.string(),
+});
+
+export type LoginData = z.infer<typeof loginValidator>;
+
 export const loginFn = createServerFn({ method: "POST" })
-  .validator(
-    z.object({
-      email: z.string().email(),
-      password: z.string(),
-    }),
-  )
+  .validator(loginValidator)
   .handler(async ({ data }) => {
     const user = await db.query.auth_user.findFirst({
       where: eq(auth_user.email, data.email.toLowerCase()),
@@ -83,7 +85,7 @@ export const registerFn = createServerFn({ method: "POST" })
       id: userId,
       email: data.email.toLowerCase(),
       hashedPassword,
-      username: data.username.length > 0 ? data.username : "unknown user",
+      username: data.username.length > 0 ? data.username : "user",
       role: "user",
       settings: {},
     });

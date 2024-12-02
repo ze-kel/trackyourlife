@@ -5,10 +5,10 @@ import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { zodValidator } from "@tanstack/zod-form-adapter";
-import { m } from "framer-motion";
-import { TriangleAlertIcon } from "lucide-react";
+import { AnimatePresence, m } from "framer-motion";
+import { XCircleIcon } from "lucide-react";
 
-import type { RegisterData } from "~/auth/authOperations";
+import type { LoginData, RegisterData } from "~/auth/authOperations";
 import { Alert, AlertDescription, AlertTitle } from "~/@shad/components/alert";
 import { Button } from "~/@shad/components/button";
 import {
@@ -28,24 +28,26 @@ function FieldInfo({
   field,
 }: {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  field: FieldApi<unknown, string, any, any>;
+  field: FieldApi<any, any, any, any>;
 }) {
   return (
-    <>
-      {field.state.meta.isTouched && field.state.meta.errors.length ? (
+    <AnimatePresence>
+      {field.state.meta.isTouched && field.state.meta.errors.length && (
         <m.div
-          initial={{ opacity: 0, transform: "translateY(-100%)" }}
-          animate={{ opacity: 1, transform: "translateY(0)" }}
-          exit={{ opacity: 0, transform: "translateY(-100%)" }}
+          initial={{ opacity: 0, height: 0 }}
+          animate={{
+            opacity: 1,
+            height: "35px",
+          }}
+          exit={{ opacity: 0, height: 0 }}
           layout
-          className="ml-2 flex w-fit items-center gap-2 rounded-b-md border border-t-0 border-neutral-200 px-3 py-1.5 font-light opacity-70 dark:border-neutral-800"
+          className="font-ligh box-border flex w-fit items-center gap-1 px-3 text-neutral-800 dark:text-neutral-200"
         >
-          <TriangleAlertIcon size={16} strokeWidth={1.5} />
+          <XCircleIcon size={16} strokeWidth={1.5} />
           {field.state.meta.errors.join(",")}
         </m.div>
-      ) : null}
-      {field.state.meta.isValidating ? "Validating..." : null}
-    </>
+      )}
+    </AnimatePresence>
   );
 }
 
@@ -72,7 +74,6 @@ const Register = () => {
       password: "",
     } as RegisterData,
     onSubmit: async ({ value }) => {
-      console.log(value);
       await registerMutation.mutateAsync(value);
     },
 
@@ -171,13 +172,7 @@ const Login = () => {
   const router = useRouter();
 
   const loginMutation = useMutation({
-    mutationFn: async ({
-      email,
-      password,
-    }: {
-      email: string;
-      password: string;
-    }) => {
+    mutationFn: async ({ email, password }: LoginData) => {
       const r = await loginFn({ data: { email, password } });
       if (!r.ok) {
         throw new Error(r.message);
@@ -188,31 +183,64 @@ const Login = () => {
       await router.navigate({ to: "/" });
     },
   });
+
+  const form = useForm({
+    defaultValues: {
+      email: "",
+      password: "",
+    } as LoginData,
+    onSubmit: async ({ value }) => {
+      await loginMutation.mutateAsync(value);
+    },
+  });
+
   return (
     <form
       onSubmit={(e) => {
         e.preventDefault();
-        const formData = new FormData(e.target as HTMLFormElement);
-
-        console.log(formData.get("email"));
-        loginMutation.mutate({
-          email: formData.get("email") as string,
-          password: formData.get("password") as string,
-        });
+        void form.handleSubmit();
       }}
     >
       <h4 className="mb-2">Email</h4>
-      <Input
-        id="email"
+      <form.Field
         name="email"
-        type="email"
-        placeholder="person@somemail.com"
+        children={(field) => (
+          <>
+            <Input
+              value={field.state.value}
+              onChange={(e) => {
+                field.handleChange(e.target.value);
+              }}
+              type="email"
+              name="email"
+              id="email"
+              className="z-2 relative"
+              placeholder="person@somemail.com"
+            />
+            <FieldInfo field={field} />
+          </>
+        )}
       />
       <h4 className="mb-2 mt-4">Password</h4>
-      <Input id="password" name="password" type="password" />
-
+      <form.Field
+        name="password"
+        children={(field) => (
+          <>
+            <Input
+              value={field.state.value}
+              onChange={(e) => {
+                field.handleChange(e.target.value);
+              }}
+              type="password"
+              name="password"
+              id="password"
+            />
+            <FieldInfo field={field} />
+          </>
+        )}
+      />
       <Button
-        isLoading={loginMutation.isPending}
+        isLoading={form.state.isSubmitting}
         type="submit"
         size={"lg"}
         variant="outline"

@@ -10,8 +10,6 @@ import { Meta, Scripts } from "@tanstack/start";
 import { ThemeProvider } from "next-themes";
 
 import { getUserFn } from "~/auth/authOperations";
-import { DefaultCatchBoundary } from "~/components/DefaultCatchBoundary.js";
-import { NotFound } from "~/components/NotFound";
 import { LazyMotionProvider } from "~/components/Providers/lazyFramerMotionProvider";
 import appCss from "~/styles/app.css?url";
 import { seo } from "~/utils/seo.js";
@@ -67,14 +65,6 @@ export const Route = createRootRouteWithContext<{
     const user = await getUserFn();
     return { user };
   },
-  errorComponent: (props) => {
-    return (
-      <RootDocument>
-        <DefaultCatchBoundary {...props} />
-      </RootDocument>
-    );
-  },
-  notFoundComponent: () => <NotFound />,
   component: RootComponent,
 });
 

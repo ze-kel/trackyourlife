@@ -81,7 +81,6 @@ function RouteComponent() {
         </RadioTabItem>
       </RadioTabs>
       <TrackableSettings
-        isLoadingButton={mutation.isPending}
         trackableType={newOne.type}
         initialSettings={newOne.settings}
         handleSave={createTrackable}
