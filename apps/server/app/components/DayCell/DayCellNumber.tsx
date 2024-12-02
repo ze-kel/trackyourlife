@@ -1,11 +1,11 @@
 import type React from "react";
 import type { CSSProperties, ReactNode } from "react";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { cn } from "@shad/utils";
 import { format } from "date-fns";
 import { useIsomorphicLayoutEffect } from "usehooks-ts";
 
-import { debounce } from "@tyl/helpers";
+import { throttle } from "@tyl/helpers";
 import { makeColorString } from "@tyl/helpers/colorTools";
 
 import {
@@ -46,22 +46,29 @@ export const DayCellNumber = ({
   const { valueToColor, valueToProgressPercentage } = useDayCellContextNumber();
 
   const [internalNumber, setInternalNumber] = useState(getNumberSafe(value));
+  const internalNumberRef = useRef(internalNumber);
   const [rawInput, setRawInput] = useState<string>(String(internalNumber));
 
   const [isEditing, setIsEditing] = useState(false);
 
+  const updateInternalNumber = (val: number) => {
+    setInternalNumber(val);
+    internalNumberRef.current = val;
+  };
+
   useIsomorphicLayoutEffect(() => {
-    if (internalNumber !== getNumberSafe(value)) {
-      setInternalNumber(getNumberSafe(value));
+    const numberSafe = getNumberSafe(value);
+    if (internalNumber !== numberSafe) {
+      updateInternalNumber(numberSafe);
       if (!isEditing) {
-        setRawInput(String(internalNumber));
+        setRawInput(String(numberSafe));
       }
     }
   }, [value]);
 
   const internalUpdate = (val: number) => {
-    setInternalNumber(val);
-    void debouncedUpdateValue(val);
+    updateInternalNumber(val);
+    void debouncedUpdateValue();
   };
 
   const isBigNumber = internalNumber >= 10000;
@@ -70,11 +77,19 @@ export const DayCellNumber = ({
     ? NumberFormatter.format(internalNumber)
     : internalNumber;
 
-  const updateValue = async (value: number) => {
-    if (onChange) {
-      await onChange(String(value));
-    }
-  };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const debouncedUpdateValue = useCallback(
+    throttle(
+      () => {
+        if (onChange) {
+          void onChange(String(internalNumberRef.current));
+        }
+      },
+      1000,
+      { leading: false },
+    ),
+    [onChange, internalNumberRef],
+  );
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
@@ -102,6 +117,7 @@ export const DayCellNumber = ({
     }
     setDrawerOpen(false);
     setIsEditing(false);
+    debouncedUpdateValue.flush();
   };
 
   const progress = valueToProgressPercentage(internalNumber);
@@ -110,11 +126,6 @@ export const DayCellNumber = ({
     return valueToColor(internalNumber);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [internalNumber]);
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const debouncedUpdateValue = useCallback(debounce(updateValue, 400), [
-    updateValue,
-  ]);
 
   const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -145,6 +156,11 @@ export const DayCellNumber = ({
       }
     >
       {children}
+
+      <div className="z-100 absolute left-0 top-0 hidden -translate-y-full">
+        {internalNumber} {rawInput}
+      </div>
+
       {progress !== null && (
         <div
           className={

@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { cn } from "@shad/utils";
 
 import type { ITrackable } from "@tyl/validators/trackable";
@@ -115,7 +115,7 @@ const DayCellWrapper = ({
   const { id } = useTrackableIdSafe();
   const { data: trackable } = useTrackableMeta({ id });
   const { data: settings } = useTrackableSettings({ id });
-  const updateMutation = useTrackableUpdateMutation({ id });
+  const { mutateAsync } = useTrackableUpdateMutation({ id });
 
   if (!trackable) throw new Error("Trackable not found in context");
 
@@ -139,9 +139,12 @@ const DayCellWrapper = ({
     [day, month, year, settings?.startDate, uSettings.timezone],
   );
 
-  const updateHandler = async (value: string) => {
-    await updateMutation.mutateAsync({ value, day, month, year });
-  };
+  const updateHandler = useCallback(
+    async (value: string) => {
+      await mutateAsync({ value, day, month, year });
+    },
+    [mutateAsync, day, month, year],
+  );
 
   return (
     <div className="flex flex-col">

@@ -55,7 +55,6 @@ export const DayCellBoolean = ({
 
     const newVal = isActive ? "false" : "true";
 
-    // setIsActive(newVal === "true");
     if (onChange) {
       await onChange(newVal);
     }
