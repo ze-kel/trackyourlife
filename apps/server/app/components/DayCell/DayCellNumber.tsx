@@ -221,7 +221,8 @@ export const DayCellNumber = ({
           open={drawerOpen}
           onOpenChange={setDrawerOpen}
           shouldScaleBackground={false}
-          disablePreventScroll
+          disablePreventScroll={true}
+          repositionInputs={false}
         >
           <DrawerTrigger
             className={cn(

@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import { cn } from "@shad/utils";
+import { MoonIcon, SunIcon } from "lucide-react";
 
 import type { IColorValue } from "@tyl/validators/trackable";
 import { presetsArray } from "@tyl/helpers/colorPresets";
@@ -25,10 +26,18 @@ export const ColorDisplay = ({
       )}
       style={style}
     >
+      <SunIcon
+        size={16}
+        className="absolute left-2 top-1/2 z-20 -translate-y-1/2 stroke-neutral-950"
+      />
+      <MoonIcon
+        size={16}
+        className="absolute right-2 top-1/2 z-20 -translate-y-1/2 stroke-neutral-50"
+      />
       <div
         className="absolute left-1/2 top-0 z-10 h-full w-full"
         style={{
-          background: currentLight,
+          background: currentDark,
           // Manual transform because order matters
           transform: "rotate(35deg) scale(10)",
           transformOrigin: "left",
@@ -36,7 +45,7 @@ export const ColorDisplay = ({
       ></div>
       <div
         className="absolute left-0 top-0 h-full w-full"
-        style={{ background: currentDark }}
+        style={{ background: currentLight }}
       ></div>
     </div>
   );

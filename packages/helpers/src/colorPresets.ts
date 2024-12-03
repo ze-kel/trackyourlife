@@ -11,6 +11,11 @@ const neutral = {
     s: 0,
     l: 20,
   },
+  userSelect: {
+    h: 0,
+    s: 0,
+    l: 80,
+  },
 };
 
 // #BD162C
@@ -21,6 +26,11 @@ const red = {
     l: 41,
   },
   darkMode: {
+    h: 352,
+    s: 79,
+    l: 41,
+  },
+  userSelect: {
     h: 352,
     s: 79,
     l: 41,
@@ -39,6 +49,11 @@ const orange = {
     s: 99,
     l: 53,
   },
+  userSelect: {
+    h: 30,
+    s: 99,
+    l: 53,
+  },
 };
 
 // #58C9D4
@@ -49,6 +64,11 @@ const blue = {
     l: 59,
   },
   darkMode: {
+    h: 185,
+    s: 59,
+    l: 59,
+  },
+  userSelect: {
     h: 185,
     s: 59,
     l: 59,
@@ -67,6 +87,11 @@ const green = {
     s: 100,
     l: 37,
   },
+  userSelect: {
+    h: 73,
+    s: 100,
+    l: 37,
+  },
 };
 
 // #784384
@@ -81,6 +106,11 @@ const purple = {
     s: 33,
     l: 39,
   },
+  userSelect: {
+    h: 289,
+    s: 33,
+    l: 39,
+  },
 };
 
 // #E290B2
@@ -91,6 +121,11 @@ const pink = {
     l: 73,
   },
   darkMode: {
+    h: 335,
+    s: 59,
+    l: 73,
+  },
+  userSelect: {
     h: 335,
     s: 59,
     l: 73,

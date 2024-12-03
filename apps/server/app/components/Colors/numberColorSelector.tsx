@@ -1,5 +1,5 @@
 import type { TouchEvent } from "react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { cn } from "@shad/utils";
 import { PlusCircleIcon, XIcon } from "lucide-react";
 import { useTheme } from "next-themes";
@@ -9,14 +9,18 @@ import type { IColorCodingValue, IColorValue } from "@tyl/validators/trackable";
 import { clamp } from "@tyl/helpers";
 import { range } from "@tyl/helpers/animation";
 import { presetsMap } from "@tyl/helpers/colorPresets";
-import { getColorAtPosition, makeCssGradient } from "@tyl/helpers/colorTools";
+import {
+  getColorAtPosition,
+  makeColorString,
+  makeCssGradient,
+} from "@tyl/helpers/colorTools";
 
 import { Button } from "~/@shad/components/button";
 import { Input } from "~/@shad/components/input";
-import { RadioTabItem, RadioTabs } from "~/@shad/components/radio-tabs";
 import ColorPicker, { BetterNumberInput } from "~/components/Colors";
 import { ColorDisplay } from "~/components/Colors/colorDisplay";
 import { useRefSize } from "~/components/Colors/contoller";
+import { useIsMobile } from "~/utils/useIsDesktop";
 
 const getActualMin = (
   firstVal: number | undefined,
@@ -39,6 +43,8 @@ const getActualMax = (
   return Math.max(a, b);
 };
 
+// This can probably be refactored and be somewhat unified with a similar controller in color selector
+// However I don't see good enough justification to do so.
 const ControllerGradient = ({
   value,
   onChange,
@@ -47,6 +53,8 @@ const ControllerGradient = ({
   onChange: (v: IColorCodingValue[]) => void;
 }) => {
   const ref = useRef<HTMLDivElement>(null);
+
+  const isMobile = useIsMobile();
 
   const firstItem = value[0];
   const lastItem = value[value.length - 1];
@@ -143,13 +151,16 @@ const ControllerGradient = ({
 
     addEventListener("mousemove", moveHandler);
     addEventListener("mouseup", upHandler);
+    addEventListener("mouseleave", upHandler);
   };
 
-  const startTouch = (id: string) => {
+  const startTouch = (e: TouchEvent, id: string) => {
+    e.preventDefault();
     setSelectedColor(id);
   };
 
   const touchMove = (e: TouchEvent, id: string) => {
+    console.log("touchMove", e);
     const t = e.touches[0];
     if (t) {
       move(id, t.clientX, t.clientY);
@@ -201,17 +212,11 @@ const ControllerGradient = ({
   };
 
   const { resolvedTheme: theme } = useTheme();
-  const [gradientPreviewTheme, setGradientPreviewTheme] = useState("dark");
-
-  useEffect(() => {
-    setGradientPreviewTheme(theme ?? "");
-  }, [theme]);
 
   return (
     <>
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-[min-content_1fr_min-content_min-content]">
-        {/* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition */}
-        {isDragging && false && (
+      <div className="flex items-stretch gap-2 max-sm:grid max-sm:grid-cols-2">
+        {isDragging && (
           <div
             className={cn(
               "absolute z-50 h-[200%] w-full -translate-y-1/2",
@@ -239,16 +244,12 @@ const ControllerGradient = ({
         />
         <div
           className={cn(
-            "relative box-border flex h-9 w-full rounded-lg border-2 border-neutral-200 bg-transparent text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-950 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-800 max-sm:col-span-full max-sm:row-start-2 max-sm:row-end-2",
+            "max-sm:col-span-full max-sm:row-start-1 max-sm:row-end-1",
+            "relative box-border flex min-h-9 w-full touch-pan-x rounded-lg border-2 border-neutral-200 bg-transparent text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-950 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-800",
             !isDragging && "cursor-copy",
           )}
           style={{
-            background: makeCssGradient(
-              value,
-              minValue,
-              maxValue,
-              gradientPreviewTheme,
-            ),
+            background: makeCssGradient(value, minValue, maxValue, theme),
           }}
           onClick={(e) => {
             if (!isDragging) {
@@ -261,9 +262,10 @@ const ControllerGradient = ({
               return (
                 <div
                   key={v.id}
-                  onTouchStart={() => startTouch(v.id)}
+                  onTouchStart={(e) => startTouch(e, v.id)}
                   onTouchMove={(e) => touchMove(e, v.id)}
                   onTouchEnd={(e) => touchEnd(e, v.id)}
+                  onTouchCancel={(e) => touchEnd(e, v.id)}
                   onMouseDown={(e) => startMouseDrag(e, v.id)}
                   onClick={(e) => {
                     e.stopPropagation();
@@ -301,12 +303,18 @@ const ControllerGradient = ({
                         "border-orange-500 dark:border-orange-600",
                     )}
                   >
-                    <ColorDisplay
-                      color={v.color}
-                      className={cn(
-                        "box-border h-full w-2 overflow-hidden rounded-md border max-sm:w-4",
-                      )}
-                    />
+                    <div
+                      className="h-full w-1.5"
+                      // We don't know whether user has darkmode on ssr
+                      suppressHydrationWarning
+                      style={{
+                        background: makeColorString(
+                          theme === "dark"
+                            ? v.color.darkMode
+                            : v.color.lightMode,
+                        ),
+                      }}
+                    ></div>
                   </div>
                 </div>
               );
@@ -329,31 +337,10 @@ const ControllerGradient = ({
             className="w-16"
           />
         </div>
-        <RadioTabs
-          suppressHydrationWarning={true}
-          value={gradientPreviewTheme}
-          onValueChange={setGradientPreviewTheme}
-          className="max-sm:col-span-full max-sm:row-start-1 max-sm:row-end-1"
-        >
-          <RadioTabItem
-            suppressHydrationWarning={true}
-            value="light"
-            className="w-full"
-          >
-            Light
-          </RadioTabItem>
-          <RadioTabItem
-            suppressHydrationWarning={true}
-            value="dark"
-            className="w-full"
-          >
-            Dark
-          </RadioTabItem>
-        </RadioTabs>
       </div>
-      <div className="flex flex-col-reverse gap-4 sm:flex-row">
-        <div className="w-full">
-          {selectedColorObject && (
+      <div className="mt-2 flex flex-col-reverse gap-4 sm:flex-row">
+        <div className="w-full max-md:hidden">
+          {!isMobile && selectedColorObject && (
             <ColorPicker
               value={selectedColorObject}
               onChange={updateSelectedColor}

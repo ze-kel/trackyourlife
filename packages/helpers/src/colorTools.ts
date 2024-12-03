@@ -10,6 +10,8 @@ import type {
 import { range } from "./animation";
 import { presetsMap } from "./colorPresets";
 
+export { chroma };
+
 // It is probably possible to write this without using a library, especially because we only need a few transforms.
 
 export const InterpolateColors = (
@@ -20,16 +22,18 @@ export const InterpolateColors = (
   if (ratio >= 1) return second;
   if (ratio <= 0) return first;
 
-  const c = chroma
-    .mix(
-      chroma.hsl(first.h, first.s / 100, first.l / 100),
-      chroma.hsl(second.h, second.s / 100, second.l / 100),
-      ratio,
-      "rgb",
-    )
-    .hsl();
+  const c = chroma.mix(makeChroma(first), makeChroma(second), ratio, "rgb");
 
-  return { h: Number.isNaN(c[0]) ? 0 : c[0], s: c[1] * 100, l: c[2] * 100 };
+  return makeColorFromChroma(c);
+};
+
+export const makeChroma = ({ h, s, l }: IColorHSL) => {
+  return chroma.hsl(h, s / 100, l / 100);
+};
+
+export const makeColorFromChroma = (c: chroma.Color) => {
+  const [h, s, l] = c.hsl();
+  return { h: Number.isNaN(h) ? 0 : h, s: s * 100, l: l * 100 };
 };
 
 export const makeColorString = (color: IColorHSL) =>
@@ -49,12 +53,12 @@ export const getContrastierColorForDay = ({ h, s, l }: IColorHSL) => {
 };
 
 export const RGBToHSL = ({ r, g, b }: IColorRGB): IColorHSL => {
-  const [h, s, l] = chroma.rgb(r, g, b).hsl();
-  return { h, s: s * 100, l: l * 100 };
+  const c = chroma.rgb(r, g, b);
+  return makeColorFromChroma(c);
 };
 
-export const HSLToRGB = ({ h, s, l }: IColorHSL): IColorRGB => {
-  const [r, g, b] = chroma.hsl(h, s / 100, l / 100).rgb(true);
+export const HSLToRGB = (c: IColorHSL): IColorRGB => {
+  const [r, g, b] = makeChroma(c).rgb(true);
   return { r, g, b };
 };
 
@@ -117,16 +121,21 @@ export const getColorAtPosition = ({
 
   const proportion = range(leftSide.point, rightSide.point, 0, 1, point);
 
+  const l = InterpolateColors(
+    leftSide.color.lightMode,
+    rightSide.color.lightMode,
+
+    proportion,
+  );
+  const d = InterpolateColors(
+    leftSide.color.darkMode,
+    rightSide.color.darkMode,
+    proportion,
+  );
+
   return {
-    lightMode: InterpolateColors(
-      leftSide.color.lightMode,
-      rightSide.color.lightMode,
-      proportion,
-    ),
-    darkMode: InterpolateColors(
-      leftSide.color.darkMode,
-      rightSide.color.darkMode,
-      proportion,
-    ),
+    userSelect: l,
+    lightMode: l,
+    darkMode: d,
   };
 };

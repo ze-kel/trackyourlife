@@ -1,4 +1,5 @@
 import { useContext, useState } from "react";
+import { PopoverContent } from "@radix-ui/react-popover";
 
 import type { IColorValue } from "@tyl/validators/trackable";
 import { presetsMap } from "@tyl/helpers/colorPresets";
@@ -11,13 +12,9 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "~/@shad/components/drawer";
+import { Popover, PopoverTrigger } from "~/@shad/components/popover";
 import ColorPicker from "~/components/Colors";
 import { ColorDisplay } from "~/components/Colors/colorDisplay";
-import {
-  Dropdown,
-  DropdownContent,
-  DropdownTrigger,
-} from "~/components/Dropdown";
 import { useIsDesktop } from "~/utils/useIsDesktop";
 
 const ColorInput = ({
@@ -36,22 +33,25 @@ const ColorInput = ({
   if (isDesktop) {
     return (
       <div className="flex gap-4">
-        <Dropdown placement="right">
-          <DropdownTrigger className="h-fit cursor-pointer">
+        <Popover>
+          <PopoverTrigger className="h-fit cursor-pointer">
             <ColorDisplay color={color} className="w-36" />
-          </DropdownTrigger>
+          </PopoverTrigger>
 
-          <DropdownContent className="p-4">
+          <PopoverContent
+            side="right"
+            className="box-border overflow-hidden rounded-md border border-neutral-200 bg-white p-3 text-neutral-950 shadow dark:border-neutral-800 dark:bg-neutral-950 dark:text-neutral-50"
+          >
             <ColorPicker
               value={color}
               onChange={(v) => {
                 setColor(v);
                 onChange(v);
               }}
-              className="sm:max-w-md"
+              className="max-w-[300px] sm:max-w-md"
             />
-          </DropdownContent>
-        </Dropdown>
+          </PopoverContent>
+        </Popover>
       </div>
     );
   }

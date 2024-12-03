@@ -98,5 +98,11 @@ export const TrackableNameText = () => {
   const { id } = useTrackableIdSafe();
   const { data: trackable } = useTrackableMeta({ id });
 
-  return <> {trackable?.name ?? `Unnamed ${trackable?.type ?? ""}`}</>;
+  return (
+    <>
+      {trackable?.name.length
+        ? trackable.name
+        : `Unnamed ${trackable?.type ?? ""}`}
+    </>
+  );
 };

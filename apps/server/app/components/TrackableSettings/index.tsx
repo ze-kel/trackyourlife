@@ -250,10 +250,12 @@ const TrackableMock = ({
   type,
   form,
   mockLabel,
+  className,
 }: {
   type: ITrackable["type"];
   form: ReactFormExtendedApi<ITrackable["settings"]>;
   mockLabel: string;
+  className?: string;
 }) => {
   const [value, onChange] = useState("");
 
@@ -268,7 +270,7 @@ const TrackableMock = ({
   const settings = useStore(form.store, (state) => state.values);
 
   return (
-    <div className="relative w-full">
+    <div className={cn("relative w-full", className)}>
       <DayCellProvider type={type} settings={settings}>
         {type === "boolean" && (
           <DayCellBoolean className={classes} value={value} onChange={onChange}>
@@ -316,12 +318,14 @@ const TrackableSettings = ({
   return (
     <div>
       <SettingsTitle>Preview</SettingsTitle>
-      <div className="grid h-20 grid-cols-3 gap-1 md:grid-cols-6">
+      <div className="grid grid-cols-3 gap-1 md:grid-cols-6">
         {Array(6)
           .fill("")
           .map((_, i) => {
             return (
               <TrackableMock
+                className="h-20"
+                key={i}
                 mockLabel={String(i + 1)}
                 type={trackableType}
                 form={form}

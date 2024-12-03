@@ -26,6 +26,8 @@ export type IColorHSL = z.infer<typeof colorHSL>;
 export const ZColorValue = z.object({
   lightMode: colorHSL,
   darkMode: colorHSL,
+  userSelect: colorHSL,
+  manualMode: z.boolean().optional(),
 });
 
 export type IColorValue = z.infer<typeof ZColorValue>;

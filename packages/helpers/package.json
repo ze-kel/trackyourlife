@@ -21,7 +21,7 @@
   "dependencies": {
     "@date-fns/tz": "catalog:",
     "@tyl/validators": "workspace:*",
-    "chroma-js": "^3.0.0",
+    "chroma-js": "^3.1.2",
     "date-fns": "catalog:",
     "lodash-es": "^4.17.21"
   },
