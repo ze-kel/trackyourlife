@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { m } from "framer-motion";
-import { HeartIcon, HeartOffIcon } from "lucide-react";
+import { HeartIcon } from "lucide-react";
 
 import type { ButtonProps } from "~/@shad/components/button";
 import { Button } from "~/@shad/components/button";
@@ -41,7 +41,7 @@ export const FavoriteButton = ({
       <m.button layout transition={{ ease: "circOut" }}>
         {inFavs ? (
           <>
-            <HeartOffIcon size={16} />
+            <HeartIcon className="iconFill" fill="currentColor" size={16} />
             {!onlyIcon && <span className="max-md:hidden">Unfavorite</span>}
           </>
         ) : (

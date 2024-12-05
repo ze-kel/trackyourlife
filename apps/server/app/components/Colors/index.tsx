@@ -9,9 +9,9 @@ import type {
 } from "@tyl/validators/trackable";
 import { clamp } from "@tyl/helpers/animation";
 import {
-  chroma,
+  findClosestDarkmode,
+  findClosestLightmode,
   HSLToRGB,
-  makeChroma,
   makeColorString,
   RGBToHSL,
 } from "@tyl/helpers/colorTools";
@@ -24,13 +24,16 @@ import { Controller, Controller2D } from "./contoller";
 
 export const BetterNumberInput = ({
   value,
-
   onChange,
   limits = { min: 0, max: 255 },
+  className,
+  hardLimits = false,
 }: {
   value: number;
   limits?: { min: number; max: number };
   onChange: (v: number) => void;
+  className?: string;
+  hardLimits?: boolean;
 }) => {
   const [internalValue, setInternalVal] = useState<number | string>(value);
 
@@ -42,7 +45,7 @@ export const BetterNumberInput = ({
 
   return (
     <Input
-      className="w-full text-center max-sm:p-0 max-sm:text-xs"
+      className={cn("w-full text-center max-sm:p-0", className)}
       type="number"
       error={isError}
       value={internalValue}
@@ -52,15 +55,26 @@ export const BetterNumberInput = ({
           setInternalVal("");
           return;
         }
-        setInternalVal(e.target.valueAsNumber);
+
         const clamped = clamp(e.target.valueAsNumber, limits.min, limits.max);
 
-        if (clamped !== e.target.valueAsNumber) {
-          setIsError(true);
-          return;
+        if (hardLimits) {
+          console.log("hardLimits", clamped);
+          setInternalVal(clamped);
+          onChange(clamped);
+          setIsError(false);
+        } else {
+          console.log("softLimits", e.target.valueAsNumber);
+          setInternalVal(e.target.valueAsNumber);
+
+          if (clamped !== e.target.valueAsNumber) {
+            setIsError(true);
+            return;
+          }
+
+          onChange(clamped);
+          setIsError(false);
         }
-        setIsError(false);
-        onChange(clamped);
       }}
       onBlur={() => {
         setIsError(false);
@@ -250,45 +264,68 @@ export const PickerRGB = ({
 
   const [controlKey, setControlKey] = useState<IKey>("hue");
 
+  const inHSL =
+    controlKey === "hue" ||
+    controlKey === "saturation" ||
+    controlKey === "lightness";
+
+  const bniClasses = "h-7 rounded-b-none border border-b-0 transition-opacity";
+
+  const inactiveClasses = "opacity-70";
+
   return (
-    <div className="grid gap-x-4 gap-y-2">
-      <DynamicController
-        colors={[hsl, ...derived]}
-        setRGB={setRGB}
-        setHSL={setHSL}
-        controlKey={controlKey}
-      />
-      <div className="grid grid-cols-6 gap-1">
+    <div className="grid gap-x-4">
+      <div className="flex flex-col gap-2">
+        <DynamicController
+          colors={[hsl, ...derived]}
+          setRGB={setRGB}
+          setHSL={setHSL}
+          controlKey={controlKey}
+        />
+      </div>
+      <div className="mt-2 grid grid-cols-6 gap-1">
         <BetterNumberInput
+          className={cn(bniClasses, inHSL && inactiveClasses)}
           value={rgb.r}
           onChange={(v) => setRGB({ r: clamp(v, 0, 255) })}
+          hardLimits
         />
         <BetterNumberInput
+          className={cn(bniClasses, inHSL && inactiveClasses)}
           value={rgb.g}
           onChange={(v) => setRGB({ g: clamp(v, 0, 255) })}
+          hardLimits
         />
         <BetterNumberInput
+          className={cn(bniClasses, inHSL && inactiveClasses)}
           value={rgb.b}
           onChange={(v) => setRGB({ b: clamp(v, 0, 255) })}
+          hardLimits
         />
         <BetterNumberInput
+          className={cn(bniClasses, !inHSL && inactiveClasses)}
           value={hsl.h}
           limits={{ min: 0, max: 360 }}
           onChange={(v) => setHSL({ h: v })}
+          hardLimits
         />
         <BetterNumberInput
+          className={cn(bniClasses, !inHSL && inactiveClasses)}
           value={hsl.s}
           limits={{ min: 0, max: 100 }}
           onChange={(v) => setHSL({ s: v })}
+          hardLimits
         />
         <BetterNumberInput
+          className={cn(bniClasses, !inHSL && inactiveClasses)}
           value={hsl.l}
           limits={{ min: 0, max: 100 }}
           onChange={(v) => setHSL({ l: v })}
+          hardLimits
         />
       </div>
       <RadioTabs
-        className="grid h-8 grid-cols-6 gap-1 py-1"
+        className="grid h-8 grid-cols-6 gap-1 rounded-t-none py-1"
         value={controlKey}
         onValueChange={(v) => setControlKey(v as IKey)}
       >
@@ -313,33 +350,6 @@ export const PickerRGB = ({
       </RadioTabs>
     </div>
   );
-};
-
-const black_c = chroma("#fafafa");
-const white_c = chroma("#0a0a0a");
-
-const findClosestDarkmode = (c: IColorHSL): IColorHSL => {
-  const color = { ...c };
-  let tries = 100;
-
-  while (chroma.contrast(black_c, makeChroma(color)) < 4.5 && tries > 0) {
-    color.l -= 1;
-    tries--;
-  }
-
-  return color;
-};
-
-const findClosestLightmode = (c: IColorHSL): IColorHSL => {
-  const color = { ...c };
-  let tries = 100;
-
-  while (chroma.contrast(white_c, makeChroma(color)) < 4.5 && tries > 0) {
-    color.l += 1;
-    tries--;
-  }
-
-  return color;
 };
 
 export const ColorPicker = ({
@@ -377,7 +387,7 @@ export const ColorPicker = ({
     <div className={className}>
       <m.div
         className={cn(
-          "mb-2 flex min-h-10 w-fit items-center gap-2 overflow-hidden rounded-lg bg-neutral-900 px-2 text-xs",
+          "mb-2 flex min-h-10 w-fit items-center gap-2 overflow-hidden rounded-lg bg-neutral-100 px-2 text-xs dark:bg-neutral-900",
         )}
       >
         <Switch

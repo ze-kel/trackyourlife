@@ -139,3 +139,30 @@ export const getColorAtPosition = ({
     darkMode: d,
   };
 };
+
+const black_c = chroma("#fafafa");
+const white_c = chroma("#0a0a0a");
+
+export const findClosestDarkmode = (c: IColorHSL): IColorHSL => {
+  const color = { ...c };
+  let tries = 100;
+
+  while (chroma.contrast(black_c, makeChroma(color)) < 4.5 && tries > 0) {
+    color.l -= 1;
+    tries--;
+  }
+
+  return color;
+};
+
+export const findClosestLightmode = (c: IColorHSL): IColorHSL => {
+  const color = { ...c };
+  let tries = 100;
+
+  while (chroma.contrast(white_c, makeChroma(color)) < 4.5 && tries > 0) {
+    color.l += 1;
+    tries--;
+  }
+
+  return color;
+};

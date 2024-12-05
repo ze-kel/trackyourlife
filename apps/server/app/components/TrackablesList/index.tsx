@@ -126,9 +126,6 @@ const TrackablesList = ({ daysToShow }: { daysToShow: number }) => {
       <div className="mt-3 grid gap-5">
         {sorted.map((tr) => (
           <m.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 1 }}
             transition={{ duration: 0.2, ease: "circInOut" }}
             layout
             layoutId={tr.id}

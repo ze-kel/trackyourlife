@@ -1,135 +1,89 @@
 import type { IColorValue } from "@tyl/validators/trackable";
 
+import { findClosestDarkmode, findClosestLightmode } from "./colorTools";
+
+const neutral_base = {
+  h: 0,
+  s: 0,
+  l: 80,
+};
+
 const neutral = {
-  lightMode: {
-    h: 0,
-    s: 0,
-    l: 80,
-  },
-  darkMode: {
-    h: 0,
-    s: 0,
-    l: 20,
-  },
-  userSelect: {
-    h: 0,
-    s: 0,
-    l: 80,
-  },
+  lightMode: findClosestLightmode(neutral_base),
+  darkMode: findClosestDarkmode(neutral_base),
+  userSelect: neutral_base,
 };
 
-// #BD162C
+const red_base = {
+  h: 352,
+  s: 79,
+  l: 41,
+};
+
 const red = {
-  lightMode: {
-    h: 352,
-    s: 79,
-    l: 41,
-  },
-  darkMode: {
-    h: 352,
-    s: 79,
-    l: 41,
-  },
-  userSelect: {
-    h: 352,
-    s: 79,
-    l: 41,
-  },
+  lightMode: findClosestLightmode(red_base),
+  darkMode: findClosestDarkmode(red_base),
+  userSelect: red_base,
 };
 
-// #FE840E
+const orange_base = {
+  h: 30,
+  s: 99,
+  l: 53,
+};
+
 const orange = {
-  lightMode: {
-    h: 30,
-    s: 99,
-    l: 53,
-  },
-  darkMode: {
-    h: 30,
-    s: 99,
-    l: 53,
-  },
-  userSelect: {
-    h: 30,
-    s: 99,
-    l: 53,
-  },
+  lightMode: findClosestLightmode(orange_base),
+  darkMode: findClosestDarkmode(orange_base),
+  userSelect: orange_base,
 };
 
-// #58C9D4
+const blue_base = {
+  h: 185,
+  s: 59,
+  l: 59,
+};
+
 const blue = {
-  lightMode: {
-    h: 185,
-    s: 59,
-    l: 59,
-  },
-  darkMode: {
-    h: 185,
-    s: 59,
-    l: 59,
-  },
-  userSelect: {
-    h: 185,
-    s: 59,
-    l: 59,
-  },
+  lightMode: findClosestLightmode(blue_base),
+  darkMode: findClosestDarkmode(blue_base),
+  userSelect: blue_base,
 };
 
-// #BADF30
+const green_base = {
+  h: 73,
+  s: 73,
+  l: 53,
+};
+
 const green = {
-  lightMode: {
-    h: 73,
-    s: 73,
-    l: 53,
-  },
-  darkMode: {
-    h: 73,
-    s: 100,
-    l: 37,
-  },
-  userSelect: {
-    h: 73,
-    s: 100,
-    l: 37,
-  },
+  lightMode: findClosestLightmode(green_base),
+  darkMode: findClosestDarkmode(green_base),
+  userSelect: green_base,
 };
 
-// #784384
+const purple_base = {
+  h: 289,
+  s: 33,
+  l: 39,
+};
+
 const purple = {
-  lightMode: {
-    h: 289,
-    s: 33,
-    l: 39,
-  },
-  darkMode: {
-    h: 289,
-    s: 33,
-    l: 39,
-  },
-  userSelect: {
-    h: 289,
-    s: 33,
-    l: 39,
-  },
+  lightMode: findClosestLightmode(purple_base),
+  darkMode: findClosestDarkmode(purple_base),
+  userSelect: purple_base,
 };
 
-// #E290B2
+const pink_base = {
+  h: 335,
+  s: 59,
+  l: 73,
+};
+
 const pink = {
-  lightMode: {
-    h: 335,
-    s: 59,
-    l: 73,
-  },
-  darkMode: {
-    h: 335,
-    s: 59,
-    l: 73,
-  },
-  userSelect: {
-    h: 335,
-    s: 59,
-    l: 73,
-  },
+  lightMode: findClosestLightmode(pink_base),
+  darkMode: findClosestDarkmode(pink_base),
+  userSelect: pink_base,
 };
 
 export const presetsMap = {

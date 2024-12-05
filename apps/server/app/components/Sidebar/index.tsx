@@ -26,6 +26,7 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -33,6 +34,7 @@ import {
 import { Spinner } from "~/@shad/components/spinner";
 import { logoutFn } from "~/auth/authOperations";
 import { CoreLinks } from "~/components/Header";
+import { ThemeSwitcher } from "~/components/Settings/themeSwitcher";
 import { useTrackablesList } from "~/query/trackablesList";
 import { useUserQuery } from "~/query/user";
 import { useUserSettings } from "~/query/userSettings";
@@ -77,7 +79,11 @@ const TrackablesMiniList = () => {
                     <div className="opacity-70">{iconsMap[tr.type]}</div>
                     <div>{tr.name || "Unnamed"}</div>
                   </div>
-                  <div>{favsSet.has(tr.id) && <HeartIcon size={16} />}</div>
+                  <div>
+                    {favsSet.has(tr.id) && (
+                      <HeartIcon fill="currentColor" size={16} />
+                    )}
+                  </div>
                 </div>
               </Link>
             </SidebarMenuButton>
@@ -96,23 +102,18 @@ export const AppSidebar = () => {
 
   return (
     <Sidebar variant="floating">
+      <SidebarHeader>
+        <SidebarMenu>
+          {CoreLinks.map((item) => (
+            <SidebarMenuItem key={item.to}>
+              <SidebarMenuButton asChild isActive={loc.pathname === item.to}>
+                <Link {...item}>{item.label}</Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          ))}
+        </SidebarMenu>
+      </SidebarHeader>
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {CoreLinks.map((item) => (
-                <SidebarMenuItem key={item.to}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={loc.pathname === item.to}
-                  >
-                    <Link {...item}>{item.label}</Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
         <SidebarGroup>
           <SidebarGroupLabel>Trackables</SidebarGroupLabel>
           <SidebarGroupContent>
@@ -134,6 +135,7 @@ export const AppSidebar = () => {
                 side="top"
                 className="w-[--radix-popper-anchor-width]"
               >
+                <ThemeSwitcher className="mb-2 w-full" />
                 <DropdownMenuItem
                   onClick={() => {
                     void logoutFn();

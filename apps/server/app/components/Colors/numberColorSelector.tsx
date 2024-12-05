@@ -1,4 +1,4 @@
-import type { TouchEvent } from "react";
+import type { CSSProperties, TouchEvent } from "react";
 import { useMemo, useRef, useState } from "react";
 import { cn } from "@shad/utils";
 import { PlusCircleIcon, XIcon } from "lucide-react";
@@ -21,6 +21,7 @@ import ColorPicker, { BetterNumberInput } from "~/components/Colors";
 import { ColorDisplay } from "~/components/Colors/colorDisplay";
 import { useRefSize } from "~/components/Colors/contoller";
 import { useIsMobile } from "~/utils/useIsDesktop";
+import style from "./numberColorSelector.module.css";
 
 const getActualMin = (
   firstVal: number | undefined,
@@ -43,8 +44,7 @@ const getActualMax = (
   return Math.max(a, b);
 };
 
-// This can probably be refactored and be somewhat unified with a similar controller in color selector
-// However I don't see good enough justification to do so.
+// This can and probably should be refactored and be somewhat unified with a similar controller in color selector
 const ControllerGradient = ({
   value,
   onChange,
@@ -156,11 +156,13 @@ const ControllerGradient = ({
 
   const startTouch = (e: TouchEvent, id: string) => {
     e.preventDefault();
+    e.stopPropagation();
     setSelectedColor(id);
   };
 
   const touchMove = (e: TouchEvent, id: string) => {
-    console.log("touchMove", e);
+    e.preventDefault();
+    e.stopPropagation();
     const t = e.touches[0];
     if (t) {
       move(id, t.clientX, t.clientY);
@@ -211,23 +213,20 @@ const ControllerGradient = ({
     onChange(newVal);
   };
 
-  const { resolvedTheme: theme } = useTheme();
+  const { resolvedTheme } = useTheme();
 
   return (
     <>
-      <div className="flex items-stretch gap-2 max-sm:grid max-sm:grid-cols-2">
-        {isDragging && (
-          <div
-            className={cn(
-              "absolute z-50 h-[200%] w-full -translate-y-1/2",
-              selectedColorRemove === 0
-                ? "cursor-grabbing"
-                : value.length > 1
-                  ? "cursor-default"
-                  : "cursor-not-allowed",
-            )}
-          ></div>
-        )}
+      <div
+        className="flex touch-pan-y items-stretch gap-2"
+        onTouchStart={(e) => e.preventDefault()}
+        style={
+          {
+            "--gradLight": makeCssGradient(value, minValue, maxValue, "light"),
+            "--gradDark": makeCssGradient(value, minValue, maxValue, "dark"),
+          } as CSSProperties
+        }
+      >
         <Input
           warning={firstItem ? minValue > firstItem.point : false}
           error={minInput !== String(minValue)}
@@ -240,17 +239,15 @@ const ControllerGradient = ({
             if (Number.isNaN(n)) return;
             setMinValue(Math.min(n, maxValue - 1));
           }}
-          className="w-16"
+          className="w-16 text-center max-sm:w-12 max-sm:p-0"
         />
         <div
           className={cn(
-            "max-sm:col-span-full max-sm:row-start-1 max-sm:row-end-1",
-            "relative box-border flex min-h-9 w-full touch-pan-x rounded-lg border-2 border-neutral-200 bg-transparent text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-950 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-800",
+            style.gradientFromDarkVar,
+            "",
+            "relative box-border flex min-h-9 w-full rounded-lg border-2 border-neutral-200 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-950 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-800",
             !isDragging && "cursor-copy",
           )}
-          style={{
-            background: makeCssGradient(value, minValue, maxValue, theme),
-          }}
           onClick={(e) => {
             if (!isDragging) {
               addColor(e);
@@ -262,22 +259,14 @@ const ControllerGradient = ({
               return (
                 <div
                   key={v.id}
-                  onTouchStart={(e) => startTouch(e, v.id)}
-                  onTouchMove={(e) => touchMove(e, v.id)}
-                  onTouchEnd={(e) => touchEnd(e, v.id)}
-                  onTouchCancel={(e) => touchEnd(e, v.id)}
-                  onMouseDown={(e) => startMouseDrag(e, v.id)}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                  }}
                   className={cn(
-                    "absolute top-1/2 h-[125%] cursor-grab touch-none overflow-hidden rounded-lg border-2 border-transparent",
+                    "absolute top-1/2 h-[125%] cursor-grab touch-none rounded-lg border-2 border-transparent transition-[height] transition-[opacity]",
                     v.id === selectedColor &&
                       "z-20 border-neutral-50 dark:border-neutral-950",
                     v.id === selectedColor &&
                       value.length > 1 &&
                       selectedColorRemove !== 0 &&
-                      "opacity-25",
+                      "h-[100%] opacity-25",
                   )}
                   style={{
                     // This is fallback for SSR where we cant get width and therefore cant do Translate()
@@ -294,8 +283,19 @@ const ControllerGradient = ({
                   }}
                 >
                   <div
+                    onTouchStart={(e) => startTouch(e, v.id)}
+                    onTouchMove={(e) => touchMove(e, v.id)}
+                    onTouchEnd={(e) => touchEnd(e, v.id)}
+                    onTouchCancel={(e) => touchEnd(e, v.id)}
+                    onMouseDown={(e) => startMouseDrag(e, v.id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                    className="absolute left-1/2 top-0 h-full w-full -translate-x-1/2 select-none bg-red-500 opacity-0 max-sm:w-[200%]"
+                  ></div>
+                  <div
                     className={cn(
-                      "h-full overflow-hidden rounded-md border-2 shadow-lg shadow-neutral-50",
+                      "h-full overflow-hidden rounded-md border-2",
                       v.id === selectedColor
                         ? "border-neutral-950 dark:border-neutral-50"
                         : "border-neutral-500 dark:border-neutral-500",
@@ -304,12 +304,18 @@ const ControllerGradient = ({
                     )}
                   >
                     <div
-                      className="h-full w-1.5"
+                      className={cn(
+                        "h-full w-1.5 transition-all",
+                        v.id === selectedColor &&
+                          value.length > 1 &&
+                          selectedColorRemove !== 0 &&
+                          "w-0.5",
+                      )}
                       // We don't know whether user has darkmode on ssr
                       suppressHydrationWarning
                       style={{
                         background: makeColorString(
-                          theme === "dark"
+                          resolvedTheme === "dark"
                             ? v.color.darkMode
                             : v.color.lightMode,
                         ),
@@ -334,7 +340,7 @@ const ControllerGradient = ({
               if (Number.isNaN(n)) return;
               setMaxValue(Math.max(n, minValue + 1));
             }}
-            className="w-16"
+            className="w-16 text-center max-sm:w-12 max-sm:p-0"
           />
         </div>
       </div>
