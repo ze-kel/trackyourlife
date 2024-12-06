@@ -1,6 +1,6 @@
 import type { IColorValue } from "@tyl/validators/trackable";
 
-import { findClosestDarkmode, findClosestLightmode } from "./colorTools";
+import { findModeColorsFromUserSelect } from "./colorTools";
 
 const neutral_base = {
   h: 0,
@@ -9,8 +9,7 @@ const neutral_base = {
 };
 
 const neutral = {
-  lightMode: findClosestLightmode(neutral_base),
-  darkMode: findClosestDarkmode(neutral_base),
+  ...findModeColorsFromUserSelect(neutral_base),
   userSelect: neutral_base,
 };
 
@@ -21,8 +20,7 @@ const red_base = {
 };
 
 const red = {
-  lightMode: findClosestLightmode(red_base),
-  darkMode: findClosestDarkmode(red_base),
+  ...findModeColorsFromUserSelect(red_base),
   userSelect: red_base,
 };
 
@@ -33,8 +31,7 @@ const orange_base = {
 };
 
 const orange = {
-  lightMode: findClosestLightmode(orange_base),
-  darkMode: findClosestDarkmode(orange_base),
+  ...findModeColorsFromUserSelect(orange_base),
   userSelect: orange_base,
 };
 
@@ -45,8 +42,7 @@ const blue_base = {
 };
 
 const blue = {
-  lightMode: findClosestLightmode(blue_base),
-  darkMode: findClosestDarkmode(blue_base),
+  ...findModeColorsFromUserSelect(blue_base),
   userSelect: blue_base,
 };
 
@@ -57,8 +53,7 @@ const green_base = {
 };
 
 const green = {
-  lightMode: findClosestLightmode(green_base),
-  darkMode: findClosestDarkmode(green_base),
+  ...findModeColorsFromUserSelect(green_base),
   userSelect: green_base,
 };
 
@@ -69,8 +64,7 @@ const purple_base = {
 };
 
 const purple = {
-  lightMode: findClosestLightmode(purple_base),
-  darkMode: findClosestDarkmode(purple_base),
+  ...findModeColorsFromUserSelect(purple_base),
   userSelect: purple_base,
 };
 
@@ -81,8 +75,7 @@ const pink_base = {
 };
 
 const pink = {
-  lightMode: findClosestLightmode(pink_base),
-  darkMode: findClosestDarkmode(pink_base),
+  ...findModeColorsFromUserSelect(pink_base),
   userSelect: pink_base,
 };
 

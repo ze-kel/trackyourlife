@@ -13,6 +13,7 @@ import { FavoriteButton } from "~/components/FavoriteButton";
 import TrackableProvider from "~/components/Providers/TrackableProvider";
 import { TrackableNameEditable } from "~/components/TrackableName";
 import { fillPrefetchedTrackable } from "~/query/fillPrefetched";
+import { ensureTrackablesList } from "~/query/trackablesList";
 import { trpc } from "~/trpc/react";
 
 const getDataForTrackable = async (
@@ -85,8 +86,12 @@ export const Route = createFileRoute("/app/trackables/$id")({
   validateSearch: paramsSchema,
   loaderDeps: ({ search: { month, year } }) => ({ month, year }),
   loader: async ({ context, deps: { month, year }, params }) => {
-    const d = await getDataForTrackable(params.id, year, month);
-    fillPrefetchedTrackable(context.queryClient, d.trackable);
+    const p = await Promise.all([
+      ensureTrackablesList(context.queryClient),
+      getDataForTrackable(params.id, year, month),
+    ]);
+
+    fillPrefetchedTrackable(context.queryClient, p[1].trackable);
 
     return { month, year };
   },

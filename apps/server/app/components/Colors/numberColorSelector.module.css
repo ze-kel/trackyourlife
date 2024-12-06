@@ -1,7 +1,0 @@
-.gradientFromDarkVar {
-  background: var(--gradLight);
-}
-
-.gradientFromDarkVar:is(:global(.dark *)) {
-  background: var(--gradDark);
-}

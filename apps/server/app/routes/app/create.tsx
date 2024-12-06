@@ -12,10 +12,14 @@ import { cloneDeep } from "@tyl/helpers";
 import { Input } from "~/@shad/components/input";
 import { RadioTabItem, RadioTabs } from "~/@shad/components/radio-tabs";
 import TrackableSettings from "~/components/TrackableSettings";
+import { ensureTrackablesList } from "~/query/trackablesList";
 import { trpc } from "~/trpc/react";
 
 export const Route = createFileRoute("/app/create")({
   component: RouteComponent,
+  loader: async ({ context }) => {
+    await ensureTrackablesList(context.queryClient);
+  },
 });
 
 function RouteComponent() {

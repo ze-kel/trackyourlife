@@ -43,12 +43,10 @@ export const BetterNumberInput = ({
         const clamped = clamp(e.target.valueAsNumber, limits.min, limits.max);
 
         if (hardLimits) {
-          console.log("hardLimits", clamped);
           setInternalVal(clamped);
           onChange(clamped);
           setIsError(false);
         } else {
-          console.log("softLimits", e.target.valueAsNumber);
           setInternalVal(e.target.valueAsNumber);
 
           if (clamped !== e.target.valueAsNumber) {

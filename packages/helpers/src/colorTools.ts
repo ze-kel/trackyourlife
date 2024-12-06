@@ -33,7 +33,11 @@ export const makeChroma = ({ h, s, l }: IColorHSL) => {
 
 export const makeColorFromChroma = (c: chroma.Color) => {
   const [h, s, l] = c.hsl();
-  return { h: Number.isNaN(h) ? 0 : h, s: s * 100, l: l * 100 };
+  return {
+    h: Math.round(Number.isNaN(h) ? 0 : h),
+    s: Math.round(s * 100),
+    l: Math.round(l * 100),
+  };
 };
 
 export const makeColorString = (color: IColorHSL) =>
@@ -165,4 +169,29 @@ export const findClosestLightmode = (c: IColorHSL): IColorHSL => {
   }
 
   return color;
+};
+
+export const findModeColorsFromUserSelect = (c: IColorHSL) => {
+  const cc = makeChroma(c);
+  const baseLight = chroma.contrast(white_c, cc) > chroma.contrast(black_c, cc);
+
+  if (baseLight) {
+    const lightMode = findClosestLightmode(c);
+    const darkRough = { ...lightMode, l: 100 - lightMode.l };
+    console.log(darkRough);
+    const darkMode = findClosestDarkmode(darkRough);
+    return {
+      lightMode,
+      darkMode,
+    };
+  }
+
+  const darkMode = findClosestDarkmode(c);
+  const lightRough = { ...darkMode, l: 100 - darkMode.l };
+  const lightMode = findClosestLightmode(lightRough);
+
+  return {
+    lightMode,
+    darkMode,
+  };
 };

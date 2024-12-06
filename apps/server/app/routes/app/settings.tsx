@@ -8,11 +8,16 @@ import {
   TimezoneSelector,
 } from "~/components/Settings/timezoneSelector";
 import { getTimezones } from "~/components/Settings/timzones";
+import { ensureTrackablesList } from "~/query/trackablesList";
 
 export const Route = createFileRoute("/app/settings")({
   component: RouteComponent,
-  loader: async () => {
-    return await getTimezones();
+  loader: async ({ context }) => {
+    const p = await Promise.all([
+      ensureTrackablesList(context.queryClient),
+      getTimezones(),
+    ]);
+    return p[1];
   },
 });
 

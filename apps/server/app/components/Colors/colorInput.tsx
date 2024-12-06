@@ -35,7 +35,7 @@ const ColorInput = ({
       <div className="flex gap-4">
         <Popover>
           <PopoverTrigger className="h-fit cursor-pointer">
-            <ColorDisplay color={color} className="w-36" />
+            <ColorDisplay color={color} className="h-9 w-36" />
           </PopoverTrigger>
 
           <PopoverContent
@@ -60,7 +60,7 @@ const ColorInput = ({
     <div className="flex gap-4">
       <Drawer>
         <DrawerTrigger className="h-fit cursor-pointer">
-          <ColorDisplay color={color} className="w-36" />
+          <ColorDisplay color={color} className="h-9 w-36" />
         </DrawerTrigger>
         <DrawerContent className="p-4">
           <DrawerHeader>

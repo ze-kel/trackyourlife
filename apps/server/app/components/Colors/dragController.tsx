@@ -3,9 +3,13 @@ import React, {
   createContext,
   useCallback,
   useContext,
+  useId,
   useRef,
   useState,
 } from "react";
+import { AnimatePresence, m } from "framer-motion";
+import { TrashIcon } from "lucide-react";
+import { useMediaQuery } from "usehooks-ts";
 
 import { clamp } from "@tyl/helpers";
 import { range } from "@tyl/helpers/animation";
@@ -14,6 +18,7 @@ import { cn } from "~/@shad/utils";
 import { useRefSize } from "~/utils/useRefSize";
 
 const ControllerContext = createContext<{
+  id: string;
   disableX: boolean;
   disableY: boolean;
   width: number;
@@ -33,7 +38,8 @@ const ControllerContext = createContext<{
   selectedPoint: string | null;
   setSelectedPoint: (id: string | null) => void;
   onDragAway?: (id: string) => void;
-  isDraggingGlobalRef: MutableRefObject<boolean>;
+  draggingId: string | null;
+  setDraggingId: (id: string | null) => void;
 } | null>(null);
 
 const useControllerContextSafe = () => {
@@ -55,6 +61,7 @@ type ControllerRootProps = React.ComponentPropsWithoutRef<"div"> & {
   disableY?: boolean;
   disableX?: boolean;
   onEmptySpaceClick?: ({ x, y }: { x: number; y: number }) => void;
+  onEmptySpaceDrag?: ({ x, y }: { x: number; y: number }) => void;
   onDragAway?: (id: string) => void;
   dragAwayDistance?: number;
   selectedPoint?: string | null;
@@ -90,15 +97,18 @@ export const ControllerRoot = ({
   disableY = false,
   disableX = false,
   onEmptySpaceClick,
+  onEmptySpaceDrag,
   onDragAway,
   dragAwayDistance = 150,
   selectedPoint,
   onSelectedPointChange,
   ...props
 }: ControllerRootProps) => {
+  const id = useId();
+
   const ref = useRef<HTMLDivElement>(null);
   const { width, height, dataRef, forceRefresh } = useRefSize(ref);
-  const isDraggingGlobalRef = useRef(false);
+  const [draggingId, setDraggingId] = useState<string | null>(null);
 
   /* These convert values to percentages for simple positioning */
   const valueToY = useCallback(
@@ -162,11 +172,13 @@ export const ControllerRoot = ({
         dataRef.current.top + height,
       );
 
-      const distance = Math.sqrt((x - nX) ** 2 + (y - nY) ** 2);
+      const distance =
+        Math.abs(nX - x) * (1 - Number(disableY)) +
+        Math.abs(nY - y) * (1 - Number(disableX));
 
       return range(dragAwayDistance / 4, dragAwayDistance, 0, 100, distance);
     },
-    [dataRef, width, height, dragAwayDistance, onDragAway],
+    [dataRef, width, height, dragAwayDistance, disableX, disableY, onDragAway],
   );
 
   const externallyControlled =
@@ -177,7 +189,7 @@ export const ControllerRoot = ({
   >(initialSelectedPointId ?? null);
 
   const clickHandler = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (e.button !== 0 || isDraggingGlobalRef.current) return;
+    if (e.button !== 0 || draggingId) return;
     e.stopPropagation();
 
     onEmptySpaceClick?.({
@@ -186,28 +198,64 @@ export const ControllerRoot = ({
     });
   };
 
+  const getNearestPoint = (x: number, y: number) => {
+    return getNearestSquarePoint(
+      x,
+      y,
+      dataRef.current.left,
+      dataRef.current.top,
+      dataRef.current.left + width,
+      dataRef.current.top + height,
+    );
+  };
+
   /*
   By default in boundary values(i.e 0,0) controller will be partially ouside Root container becuase it's center is value.
-  It's ofter looks better to make it apper as if it's inside the root container
-  To achieve this you can add padding to ControllerRoot, and the actual mapped area will be smaller by that padding
+  It looks better to make it apper as if it's inside the root container
+  To achieve this we add padding to ControllerRoot, and the actual mapped area will be smaller by that padding
   The only problem is that then onEmptySpaceClick wont work on padding. This solves it by setting it to boundary value when clicked.
   */
   const clickHandlerOutside = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.button !== 0) return;
     e.stopPropagation();
 
-    const { x: nX, y: nY } = getNearestSquarePoint(
-      e.clientX,
-      e.clientY,
-      dataRef.current.left,
-      dataRef.current.top,
-      dataRef.current.left + width,
-      dataRef.current.top + height,
-    );
-
+    const { x, y } = getNearestPoint(e.clientX, e.clientY);
     onEmptySpaceClick?.({
-      x: xToValue(nX),
-      y: yToValue(nY),
+      x: xToValue(x),
+      y: yToValue(y),
+    });
+  };
+
+  const pointerDownHandler = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.button !== 0 || draggingId) return;
+    e.stopPropagation();
+    forceRefresh();
+
+    setDraggingId(initialSelectedPointId ?? null);
+    document
+      .getElementById(`${id}-${initialSelectedPointId}`)
+      ?.setPointerCapture(e.pointerId);
+
+    onEmptySpaceDrag?.({
+      x: xToValue(e.clientX),
+      y: yToValue(e.clientY),
+    });
+  };
+
+  const ponterDownHandlerOutside = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.button !== 0) return;
+    e.stopPropagation();
+    forceRefresh();
+
+    setDraggingId(initialSelectedPointId ?? null);
+    document
+      .getElementById(`${id}-${initialSelectedPointId}`)
+      ?.setPointerCapture(e.pointerId);
+
+    const { x, y } = getNearestPoint(e.clientX, e.clientY);
+    onEmptySpaceDrag?.({
+      x: xToValue(x),
+      y: yToValue(y),
     });
   };
 
@@ -220,12 +268,19 @@ export const ControllerRoot = ({
         getPanClass(disableX, disableY),
         className,
       )}
-      onClick={clickHandlerOutside}
+      onPointerDown={onEmptySpaceDrag ? ponterDownHandlerOutside : undefined}
+      onClick={onEmptySpaceClick ? clickHandlerOutside : undefined}
       {...props}
     >
-      <div ref={ref} className="relative h-full w-full" onClick={clickHandler}>
+      <div
+        ref={ref}
+        className="relative h-full w-full"
+        onPointerDown={onEmptySpaceDrag ? pointerDownHandler : undefined}
+        onClick={onEmptySpaceClick ? clickHandler : undefined}
+      >
         <ControllerContext.Provider
           value={{
+            id,
             disableX,
             disableY,
             width,
@@ -244,7 +299,8 @@ export const ControllerRoot = ({
               : setSelectedPointInternal,
             onDragAway,
             pointToDragAwayPercent,
-            isDraggingGlobalRef,
+            draggingId,
+            setDraggingId,
           }}
         >
           {children}
@@ -272,6 +328,7 @@ export const ControllerPoint = ({
   ...props
 }: ControllerPointProps) => {
   const {
+    id: rootId,
     width,
     height,
     valueToX,
@@ -284,14 +341,15 @@ export const ControllerPoint = ({
     pointToDragAwayPercent,
     disableX,
     disableY,
-    isDraggingGlobalRef,
     forceRefresh,
+    draggingId,
+    setDraggingId,
   } = useControllerContextSafe();
   const isSelected = selectedPoint === id;
 
   const isActive = typeof onValueChange === "function";
 
-  const [isDragging, setIsDragging] = useState(false);
+  const isDragging = draggingId === id;
 
   const xPercent = valueToX(x ?? 0);
   const yPercent = valueToY(y ?? 0);
@@ -303,12 +361,12 @@ export const ControllerPoint = ({
   const startDrag = (e: React.PointerEvent<HTMLDivElement>) => {
     if (e.button !== 0) return;
     if (e.ctrlKey) return;
+    // It bugs when we are in modal than animates in or changes position
     forceRefresh();
     e.preventDefault();
     e.stopPropagation();
     setSelectedPoint(id);
-    setIsDragging(true);
-    isDraggingGlobalRef.current = true;
+    setDraggingId(id);
     (e.target as HTMLElement).setPointerCapture(e.pointerId);
 
     const target = e.target as HTMLElement;
@@ -339,13 +397,13 @@ export const ControllerPoint = ({
   };
 
   const endDrag = (e: React.PointerEvent<HTMLDivElement>) => {
-    setIsDragging(false);
+    setDraggingId(null);
     e.stopPropagation();
-    isDraggingGlobalRef.current = false;
     (e.target as HTMLElement).releasePointerCapture(e.pointerId);
     if (dragAwayPercent >= 100) {
       onDragAway?.(id);
     }
+    pickupPosition.current = { x: 0, y: 0 };
     setDragAwayPercent(0);
   };
 
@@ -354,8 +412,12 @@ export const ControllerPoint = ({
         onPointerDown: startDrag,
         onPointerUp: endDrag,
         onPointerMove: moveDrag,
+        onPointerCancel: endDrag,
+        onLostPointerCapture: endDrag,
       }
     : {};
+
+  const isTouch = useMediaQuery("(pointer:coarse)");
 
   return (
     <div
@@ -377,13 +439,10 @@ export const ControllerPoint = ({
           ? dragAwayPercent >= 100
             ? "cursor-default"
             : "cursor-grab"
-          : "cursor-not-allowed",
+          : "",
         isSelected ? "z-20" : "z-10",
         className,
       )}
-      {...handlers}
-      onTouchStart={(e) => e.preventDefault()}
-      onClick={(e) => e.stopPropagation()}
       style={
         {
           left: width ? 0 : xPercent + "%",
@@ -392,19 +451,60 @@ export const ControllerPoint = ({
             width ? (width * xPercent) / 100 : 0
           }px)) translateY(calc(-50% + ${
             height ? (height * yPercent) / 100 : 0
-          }px)) scale(${range(0, 100, 1, 0, dragAwayPercent)})`,
-          "--drag-away-fade": dragAwayPercent,
-          opacity:
-            dragAwayPercent > 0
-              ? range(0, 100, 0, 1, dragAwayPercent)
-              : undefined,
+          }px))  scale(${range(0, 100, 1, 0.9, dragAwayPercent)})`,
+
+          "--drag-away-fade": dragAwayPercent + "%",
+          "--drag-away-fade-size": range(0, 15, 0, 13, dragAwayPercent) + "px",
 
           ...style,
         } as CSSProperties
       }
       {...props}
     >
+      <AnimatePresence>
+        {isTouch && isDragging && (
+          <m.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className={cn(
+              "absolute -top-2 left-1/2 h-5 w-5 -translate-x-1/2 -translate-y-[100%] rounded-md",
+              "border border-neutral-800 ring-1 ring-neutral-200 dark:border-neutral-200 dark:ring-neutral-800",
+              className,
+            )}
+            style={{ ...style }}
+          />
+        )}
+      </AnimatePresence>
+
+      <m.div
+        animate={{
+          opacity: dragAwayPercent / 100,
+        }}
+        transition={{ duration: 0 }}
+        className="absolute bottom-0 left-0 h-full w-full rounded bg-neutral-100 dark:bg-neutral-800"
+      >
+        <TrashIcon
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-neutral-800 dark:text-neutral-100"
+          size={11}
+          style={{
+            opacity: range(50, 100, 0, 1, dragAwayPercent),
+          }}
+        />
+      </m.div>
+
       {children}
+      <div
+        id={`${rootId}-${id}`}
+        className={cn(
+          "absolute left-0 top-0 h-[calc(100%+2px)] w-[calc(100%+2px)]",
+          isTouch && "h-[calc(100%+10px)] w-[calc(100%+10px)]",
+        )}
+        {...handlers}
+        onTouchStart={(e) => e.preventDefault()}
+        onClick={(e) => e.stopPropagation()}
+      ></div>
     </div>
   );
 };

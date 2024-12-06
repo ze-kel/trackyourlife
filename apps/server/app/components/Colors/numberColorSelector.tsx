@@ -2,7 +2,6 @@ import type { CSSProperties } from "react";
 import { useMemo, useState } from "react";
 import { cn } from "@shad/utils";
 import { PlusCircleIcon, XIcon } from "lucide-react";
-import { useTheme } from "next-themes";
 import { v4 as uuidv4 } from "uuid";
 
 import type { IColorCodingValue, IColorValue } from "@tyl/validators/trackable";
@@ -31,7 +30,6 @@ import {
   ControllerRoot,
 } from "~/components/Colors/dragController";
 import { useIsMobile } from "~/utils/useIsDesktop";
-import style from "./numberColorSelector.module.css";
 
 const getActualMin = (
   firstVal: number | undefined,
@@ -130,8 +128,6 @@ const ControllerGradient = ({
     onChange(newVal);
   };
 
-  const { resolvedTheme } = useTheme();
-
   return (
     <>
       <div
@@ -165,9 +161,11 @@ const ControllerGradient = ({
           xMax={maxValue}
           selectedPoint={selectedColor}
           onSelectedPointChange={setSelectedColor}
-          className={cn(style.gradientFromDarkVar, "cursor w-full cursor-copy")}
+          className={cn(
+            "numberColorSelectorGradient cursor w-full cursor-copy",
+          )}
           onEmptySpaceClick={!isMobile ? (v) => addColor(v.x) : undefined}
-          onDragAway={(id) => removeColor(id)}
+          onDragAway={value.length > 1 ? (id) => removeColor(id) : undefined}
         >
           {value.map((v) => {
             return (
@@ -175,13 +173,13 @@ const ControllerGradient = ({
                 key={v.id}
                 id={v.id}
                 x={v.point}
-                style={{
-                  background: makeColorString(
-                    resolvedTheme === "dark"
-                      ? v.color.darkMode
-                      : v.color.lightMode,
-                  ),
-                }}
+                style={
+                  {
+                    "--light": makeColorString(v.color.lightMode),
+                    "--dark": makeColorString(v.color.darkMode),
+                  } as CSSProperties
+                }
+                className="bg-[var(--light)] dark:bg-[var(--dark)]"
                 onValueChange={(p) => setById(v.id, p.x)}
               />
             );
@@ -219,12 +217,14 @@ const ControllerGradient = ({
               <div
                 key={v.id}
                 className={cn(
-                  "flex gap-2 p-2 transition-all",
+                  "flex items-stretch gap-2 p-2 transition-all",
                   v.id === selectedColor
                     ? "rounded-md bg-neutral-50 shadow dark:bg-neutral-950 dark:shadow-none"
                     : "cursor-pointer",
                 )}
-                onClick={() => setSelectedColor(v.id)}
+                onClick={() => {
+                  setSelectedColor(v.id);
+                }}
               >
                 {isMobile ? (
                   <DrawerMobileTitleProvider title={"Edit color"}>
@@ -256,14 +256,13 @@ const ControllerGradient = ({
                   variant={"ghost"}
                   size={"icon"}
                   className="flex-shrink-0"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    removeColor(v.id);
+                  }}
                 >
-                  <XIcon
-                    size={16}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      removeColor(v.id);
-                    }}
-                  />
+                  <XIcon size={16} />
                 </Button>
               </div>
             ))}

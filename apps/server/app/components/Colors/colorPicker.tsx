@@ -8,8 +8,7 @@ import type {
 } from "@tyl/validators/trackable";
 import { clamp } from "@tyl/helpers/animation";
 import {
-  findClosestDarkmode,
-  findClosestLightmode,
+  findModeColorsFromUserSelect,
   HSLToRGB,
   makeColorString,
   RGBToHSL,
@@ -179,7 +178,7 @@ const TripleController = ({
         yMax={maxY}
         className="h-36 w-full"
         initialSelectedPointId={"primary"}
-        onEmptySpaceClick={(v) => valueSetter(setRGB, setHSL)(v.x, v.y)}
+        onEmptySpaceDrag={(v) => valueSetter(setRGB, setHSL)(v.x, v.y)}
         style={{ background: gradientGetter(control.rgb, control.hsl) }}
       >
         <ControllerPoint
@@ -202,7 +201,7 @@ const TripleController = ({
         xMax={maxVal}
         className="h-10 w-full"
         initialSelectedPointId={"primary"}
-        onEmptySpaceClick={(v) => lSetter(setRGB, setHSL)(v.x)}
+        onEmptySpaceDrag={(v) => lSetter(setRGB, setHSL)(v.x)}
         style={{ background: lGradientGetter(control.rgb, control.hsl) }}
       >
         <ControllerPoint
@@ -351,8 +350,7 @@ export const ColorPicker = ({
 
   const setBoth = (color: IColorHSL) => {
     onChange({
-      darkMode: findClosestDarkmode(color),
-      lightMode: findClosestLightmode(color),
+      ...findModeColorsFromUserSelect(color),
       userSelect: color,
       manualMode: false,
     });
@@ -364,7 +362,7 @@ export const ColorPicker = ({
     <div className={className}>
       <m.div
         className={cn(
-          "mb-2 flex min-h-10 w-fit items-center gap-2 overflow-hidden rounded-lg bg-neutral-100 px-2 text-xs dark:bg-neutral-900",
+          "mb-2 flex min-h-8 w-fit items-center gap-2 overflow-hidden rounded-lg bg-neutral-100 px-2 text-xs dark:bg-neutral-900",
         )}
       >
         <Switch
@@ -415,7 +413,11 @@ export const ColorPicker = ({
           onChange={setBoth}
         />
       ) : mode === "light" ? (
-        <PickerRGBHSL hsl={lightMode} onChange={setLight} derived={[darkMode]} />
+        <PickerRGBHSL
+          hsl={lightMode}
+          onChange={setLight}
+          derived={[darkMode]}
+        />
       ) : (
         <PickerRGBHSL hsl={darkMode} onChange={setDark} derived={[lightMode]} />
       )}
