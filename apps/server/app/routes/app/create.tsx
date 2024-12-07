@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useRef, useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 
 import type {
@@ -12,7 +12,10 @@ import { cloneDeep } from "@tyl/helpers";
 import { Input } from "~/@shad/components/input";
 import { RadioTabItem, RadioTabs } from "~/@shad/components/radio-tabs";
 import TrackableSettings from "~/components/TrackableSettings";
-import { ensureTrackablesList } from "~/query/trackablesList";
+import {
+  ensureTrackablesList,
+  invalidateTrackablesList,
+} from "~/query/trackablesList";
 import { trpc } from "~/trpc/react";
 
 export const Route = createFileRoute("/app/create")({
@@ -24,6 +27,8 @@ export const Route = createFileRoute("/app/create")({
 
 function RouteComponent() {
   const router = useRouter();
+
+  const qc = useQueryClient();
 
   const [newOne, setNewOne] = useState<ITrackableToCreate>({
     type: "boolean",
@@ -42,7 +47,8 @@ function RouteComponent() {
 
   const mutation = useMutation({
     mutationFn: trpc.trackablesRouter.createTrackable.mutate,
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
+      await invalidateTrackablesList(qc);
       void router.navigate({
         to: `/app/trackables/${data.id}`,
       });
