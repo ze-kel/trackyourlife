@@ -1,6 +1,7 @@
 import * as React from "react";
 import { createFileRoute } from "@tanstack/react-router";
 
+import { PreserveLocationOnSidebarNavSwitch } from "~/components/Settings";
 import { BackupAndRestore } from "~/components/Settings/backup";
 import { ThemeSwitcher } from "~/components/Settings/themeSwitcher";
 import {
@@ -33,6 +34,19 @@ function RouteComponent() {
         <div className="flex flex-col gap-2">
           <div>Theme</div>
           <ThemeSwitcher />
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <h2 className="text-xl">Preserve location on sidebar nav</h2>
+          <div className="flex items-center gap-2">
+            <PreserveLocationOnSidebarNavSwitch />
+          </div>
+
+          <p className="text-xs opacity-50">
+            If enabled, when navigating to a new trackable in sidebar, app will
+            keep current view and date. Otherwise, app will reset to month view
+            and current date.
+          </p>
         </div>
 
         <div>

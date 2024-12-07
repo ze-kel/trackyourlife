@@ -1,7 +1,5 @@
-import { cn } from "@shad/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
-import { TrashIcon } from "lucide-react";
 
 import {
   AlertDialog,
@@ -12,13 +10,18 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "~/@shad/components/alert-dialog";
-import { buttonVariants } from "~/@shad/components/button";
 import { invalidateTrackablesList } from "~/query/trackablesList";
 import { trpc } from "~/trpc/react";
 
-const DeleteButton = ({ id }: { id: string }) => {
+const DeleteButton = ({
+  id,
+  children,
+}: {
+  id: string;
+  className?: string;
+  children?: React.ReactNode;
+}) => {
   const router = useRouter();
 
   const qc = useQueryClient();
@@ -33,15 +36,7 @@ const DeleteButton = ({ id }: { id: string }) => {
 
   return (
     <AlertDialog>
-      <AlertDialogTrigger
-        name="delete"
-        className={cn(
-          buttonVariants({ variant: "outline", size: "icon" }),
-          "shrink-0",
-        )}
-      >
-        <TrashIcon size={16} />
-      </AlertDialogTrigger>
+      {children}
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>

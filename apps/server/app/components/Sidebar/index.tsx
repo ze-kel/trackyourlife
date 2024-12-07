@@ -48,6 +48,8 @@ const iconsMap: Record<ITrackable["type"], ReactNode> = {
 const TrackablesMiniList = () => {
   const { data, isPending } = useTrackablesList();
 
+  const uSettings = useUserSettings();
+
   const loc = useLocation();
   const settings = useUserSettings();
 
@@ -73,7 +75,17 @@ const TrackablesMiniList = () => {
         return (
           <SidebarMenuItem key={tr.id}>
             <SidebarMenuButton asChild isActive={loc.pathname.includes(tr.id)}>
-              <Link key={tr.id} to={`/app/trackables/${tr.id}/`}>
+              <Link
+                key={tr.id}
+                to={`/app/trackables/${tr.id}/`}
+                search={(prev) =>
+                  uSettings.preserveLocationOnSidebarNav
+                    ? {
+                        ...prev,
+                      }
+                    : {}
+                }
+              >
                 <div className="flex w-full items-center justify-between">
                   <div className="justify-baseline flex items-center gap-2 truncate">
                     <div className="opacity-70">{iconsMap[tr.type]}</div>

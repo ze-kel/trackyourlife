@@ -23,6 +23,7 @@ import { Route as AppTrackablesIdImport } from './routes/app/trackables/$id'
 import { Route as AppTrackablesIdIndexImport } from './routes/app/trackables/$id/index'
 import { Route as AppTrackablesIdViewImport } from './routes/app/trackables/$id/view'
 import { Route as AppTrackablesIdSettingsImport } from './routes/app/trackables/$id/settings'
+import { Route as AppTrackablesIdImportImport } from './routes/app/trackables/$id/import'
 
 // Create/Update Routes
 
@@ -98,6 +99,12 @@ const AppTrackablesIdSettingsRoute = AppTrackablesIdSettingsImport.update({
   getParentRoute: () => AppTrackablesIdRoute,
 } as any)
 
+const AppTrackablesIdImportRoute = AppTrackablesIdImportImport.update({
+  id: '/import',
+  path: '/import',
+  getParentRoute: () => AppTrackablesIdRoute,
+} as any)
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -165,6 +172,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppTrackablesIndexImport
       parentRoute: typeof AppImport
     }
+    '/app/trackables/$id/import': {
+      id: '/app/trackables/$id/import'
+      path: '/import'
+      fullPath: '/app/trackables/$id/import'
+      preLoaderRoute: typeof AppTrackablesIdImportImport
+      parentRoute: typeof AppTrackablesIdImport
+    }
     '/app/trackables/$id/settings': {
       id: '/app/trackables/$id/settings'
       path: '/settings'
@@ -192,12 +206,14 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 interface AppTrackablesIdRouteChildren {
+  AppTrackablesIdImportRoute: typeof AppTrackablesIdImportRoute
   AppTrackablesIdSettingsRoute: typeof AppTrackablesIdSettingsRoute
   AppTrackablesIdViewRoute: typeof AppTrackablesIdViewRoute
   AppTrackablesIdIndexRoute: typeof AppTrackablesIdIndexRoute
 }
 
 const AppTrackablesIdRouteChildren: AppTrackablesIdRouteChildren = {
+  AppTrackablesIdImportRoute: AppTrackablesIdImportRoute,
   AppTrackablesIdSettingsRoute: AppTrackablesIdSettingsRoute,
   AppTrackablesIdViewRoute: AppTrackablesIdViewRoute,
   AppTrackablesIdIndexRoute: AppTrackablesIdIndexRoute,
@@ -237,6 +253,7 @@ export interface FileRoutesByFullPath {
   '/app/': typeof AppIndexRoute
   '/app/trackables/$id': typeof AppTrackablesIdRouteWithChildren
   '/app/trackables': typeof AppTrackablesIndexRoute
+  '/app/trackables/$id/import': typeof AppTrackablesIdImportRoute
   '/app/trackables/$id/settings': typeof AppTrackablesIdSettingsRoute
   '/app/trackables/$id/view': typeof AppTrackablesIdViewRoute
   '/app/trackables/$id/': typeof AppTrackablesIdIndexRoute
@@ -250,6 +267,7 @@ export interface FileRoutesByTo {
   '/app/testing': typeof AppTestingRoute
   '/app': typeof AppIndexRoute
   '/app/trackables': typeof AppTrackablesIndexRoute
+  '/app/trackables/$id/import': typeof AppTrackablesIdImportRoute
   '/app/trackables/$id/settings': typeof AppTrackablesIdSettingsRoute
   '/app/trackables/$id/view': typeof AppTrackablesIdViewRoute
   '/app/trackables/$id': typeof AppTrackablesIdIndexRoute
@@ -266,6 +284,7 @@ export interface FileRoutesById {
   '/app/': typeof AppIndexRoute
   '/app/trackables/$id': typeof AppTrackablesIdRouteWithChildren
   '/app/trackables/': typeof AppTrackablesIndexRoute
+  '/app/trackables/$id/import': typeof AppTrackablesIdImportRoute
   '/app/trackables/$id/settings': typeof AppTrackablesIdSettingsRoute
   '/app/trackables/$id/view': typeof AppTrackablesIdViewRoute
   '/app/trackables/$id/': typeof AppTrackablesIdIndexRoute
@@ -283,6 +302,7 @@ export interface FileRouteTypes {
     | '/app/'
     | '/app/trackables/$id'
     | '/app/trackables'
+    | '/app/trackables/$id/import'
     | '/app/trackables/$id/settings'
     | '/app/trackables/$id/view'
     | '/app/trackables/$id/'
@@ -295,6 +315,7 @@ export interface FileRouteTypes {
     | '/app/testing'
     | '/app'
     | '/app/trackables'
+    | '/app/trackables/$id/import'
     | '/app/trackables/$id/settings'
     | '/app/trackables/$id/view'
     | '/app/trackables/$id'
@@ -309,6 +330,7 @@ export interface FileRouteTypes {
     | '/app/'
     | '/app/trackables/$id'
     | '/app/trackables/'
+    | '/app/trackables/$id/import'
     | '/app/trackables/$id/settings'
     | '/app/trackables/$id/view'
     | '/app/trackables/$id/'
@@ -379,6 +401,7 @@ export const routeTree = rootRoute
       "filePath": "app/trackables/$id.tsx",
       "parent": "/app",
       "children": [
+        "/app/trackables/$id/import",
         "/app/trackables/$id/settings",
         "/app/trackables/$id/view",
         "/app/trackables/$id/"
@@ -387,6 +410,10 @@ export const routeTree = rootRoute
     "/app/trackables/": {
       "filePath": "app/trackables/index.tsx",
       "parent": "/app"
+    },
+    "/app/trackables/$id/import": {
+      "filePath": "app/trackables/$id/import.tsx",
+      "parent": "/app/trackables/$id"
     },
     "/app/trackables/$id/settings": {
       "filePath": "app/trackables/$id/settings.tsx",

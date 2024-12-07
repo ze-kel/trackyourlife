@@ -178,7 +178,6 @@ export const findModeColorsFromUserSelect = (c: IColorHSL) => {
   if (baseLight) {
     const lightMode = findClosestLightmode(c);
     const darkRough = { ...lightMode, l: 100 - lightMode.l };
-    console.log(darkRough);
     const darkMode = findClosestDarkmode(darkRough);
     return {
       lightMode,

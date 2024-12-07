@@ -1,16 +1,18 @@
 import type { TRPCRouterRecord } from "@trpc/server";
+import { parse } from "date-fns";
 import { z } from "zod";
 
 import type { DbTrackableRecordInsert } from "@tyl/db/schema";
 import { and, between, eq, sql } from "@tyl/db";
 import { trackable, trackableRecord } from "@tyl/db/schema";
-import { ZGETLimits } from "@tyl/validators/api";
+import { zUpdateTrackableEntries } from "@tyl/validators/import";
 import {
   ZTrackableSettings,
   ZTrackableToCreate,
   ZTrackableUpdate,
 } from "@tyl/validators/trackable";
 
+import { ZGETLimits } from "../../../helpers/api";
 import {
   getDateBounds,
   GetUserSettings,
@@ -177,9 +179,9 @@ export const trackablesRouter = {
       return input;
     }),
   updateTrackableEntries: protectedProcedure
-    .input(z.array(ZTrackableUpdate))
+    .input(z.object({ data: z.array(ZTrackableUpdate) }))
     .mutation(async ({ ctx, input }) => {
-      const toInsert: DbTrackableRecordInsert[] = input.map((i) => ({
+      const toInsert: DbTrackableRecordInsert[] = input.data.map((i) => ({
         trackableId: i.id,
         value: i.value,
         date: new Date(Date.UTC(i.year, i.month, i.day, 0, 0, 0, 0)),
@@ -197,6 +199,62 @@ export const trackablesRouter = {
 
       return input;
     }),
+
+  importTrackableEntries: protectedProcedure
+    .input(zUpdateTrackableEntries)
+    .mutation(async ({ ctx, input }) => {
+      const tr = await ctx.db.query.trackable.findFirst({
+        where: and(
+          eq(trackable.id, input.id),
+          eq(trackable.userId, ctx.user.id),
+        ),
+      });
+
+      if (!tr) {
+        throw new Error(`No trackable with id ${input.id}`);
+      }
+
+      if (tr.type !== input.data.type) {
+        throw new Error(
+          `Trackable type mismatch: trackable is ${tr.type} but data is ${input.data.type}`,
+        );
+      }
+
+      const toInsert: DbTrackableRecordInsert[] = Object.entries(
+        input.data.data,
+      ).map(([date, value]) => ({
+        trackableId: input.id,
+        value: String(value),
+        date: parse(date, "yyyy-MM-dd", new Date()),
+        userId: ctx.user.id,
+        updated: new Date(),
+      }));
+
+      if (toInsert.length === 0) {
+        throw new Error("No entries to import");
+      }
+
+      switch (input.actionOnConflict) {
+        case "skip":
+          await ctx.db
+            .insert(trackableRecord)
+            .values(toInsert)
+            .onConflictDoNothing();
+          break;
+        case "overwrite":
+          await ctx.db
+            .insert(trackableRecord)
+            .values(toInsert)
+            .onConflictDoUpdate({
+              target: [trackableRecord.trackableId, trackableRecord.date],
+              set: { value: sql.raw(`excluded.${trackableRecord.value.name}`) },
+            });
+          break;
+      }
+
+      return input;
+    }),
+
   updateTrackableName: protectedProcedure
     .input(
       z.object({

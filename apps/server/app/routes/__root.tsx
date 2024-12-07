@@ -84,11 +84,23 @@ const TanStackRouterDevtools =
         })),
       );
 
+// Temporary HMR HACK https://github.com/TanStack/router/issues/1992
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
     <html suppressHydrationWarning={true}>
       <head>
         <Meta />
+        {import.meta.env.DEV && (
+          <script
+            type="module"
+            dangerouslySetInnerHTML={{
+              __html: `import RefreshRuntime from "/_build/@react-refresh";
+RefreshRuntime.injectIntoGlobalHook(window)
+window.$RefreshReg$ = () => {}
+window.$RefreshSig$ = () => (type) => type`,
+            }}
+          />
+        )}
       </head>
       <body className="bg-neutral-50 text-neutral-900 dark:bg-neutral-950 dark:text-neutral-50">
         <LazyMotionProvider>

@@ -26,6 +26,7 @@ export type ILogin = z.infer<typeof ZLogin>;
 export const ZUserSettings = z.object({
   favorites: z.array(z.string()).default([]),
   colorPresets: z.array(ZColorValue).optional(),
+  preserveLocationOnSidebarNav: z.boolean().default(true),
   timezone: z
     .object({
       name: z.string(),
@@ -40,4 +41,5 @@ export type IUserSettings = z.infer<typeof ZUserSettings>;
 
 export const UserSettingsFallback: NonNullable<IUserSettings> = {
   favorites: [],
+  preserveLocationOnSidebarNav: true,
 };

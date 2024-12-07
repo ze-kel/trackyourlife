@@ -56,7 +56,6 @@ export const BackupAndRestore = () => {
           id="backupJsonLoad"
           onChange={(e) => {
             const firstFile = e.target.files?.[0];
-            console.log("ff", firstFile);
             if (!firstFile) return;
 
             const name = firstFile.name;
@@ -186,7 +185,9 @@ const ParsedItem = ({
     });
 
     if (allEntries.length) {
-      await trpc.trackablesRouter.updateTrackableEntries.mutate(allEntries);
+      await trpc.trackablesRouter.updateTrackableEntries.mutate({
+        data: allEntries,
+      });
     }
 
     setIsLoading(false);

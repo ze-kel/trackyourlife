@@ -29,7 +29,7 @@ import NumberColorSelector from "../Colors/numberColorSelector";
 import NumberLimitsSelector from "./numberLimitsSelector";
 import RangeLabelSelector from "./rangeLabelSelector";
 
-const SettingsTitle = ({ children }: { children: React.ReactNode }) => {
+export const SettingsTitle = ({ children }: { children: React.ReactNode }) => {
   return <h3 className="mb-1 mt-3 text-xl">{children}</h3>;
 };
 

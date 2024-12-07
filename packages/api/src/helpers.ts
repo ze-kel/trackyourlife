@@ -5,7 +5,6 @@ import type {
   DbTrackableRecordSelect,
   DbTrackableSelect,
 } from "@tyl/db/schema";
-import type { TGETLimits } from "@tyl/validators/api";
 import type {
   ITrackable,
   ITrackableData,
@@ -16,6 +15,8 @@ import { auth_user } from "@tyl/db/schema";
 import { getGMTWithTimezoneOffset } from "@tyl/helpers/timezone";
 import { ZTrackableSettings } from "@tyl/validators/trackable";
 import { UserSettingsFallback, ZUserSettings } from "@tyl/validators/user";
+
+import type { TGETLimits } from "../../helpers/api";
 
 export const GetUserSettings = async ({ userId }: { userId: string }) => {
   const user = await db.query.auth_user.findFirst({
