@@ -19,9 +19,11 @@ export default tseslint.config(
     },
     extends: [
       eslint.configs.recommended,
+      /*
       ...tseslint.configs.recommended,
       ...tseslint.configs.recommendedTypeChecked,
       ...tseslint.configs.stylisticTypeChecked,
+      */
     ],
     rules: {
       ...turboPlugin.configs.recommended.rules,

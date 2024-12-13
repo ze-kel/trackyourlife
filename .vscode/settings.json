@@ -4,5 +4,8 @@
     "tw`([^`]*)",
     ["tw.style\\(([^)]*)\\)", "'([^']*)'"]
   ],
-  "typescript.preferences.includePackageJsonAutoImports": "on"
+  "typescript.preferences.includePackageJsonAutoImports": "on",
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "markdown.updateLinksOnFileMove.enabled": "always"
 }
