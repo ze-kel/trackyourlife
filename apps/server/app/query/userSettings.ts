@@ -48,7 +48,7 @@ export const useUserSettingsMutation = () => {
   });
 
   const updateSettingsPartial = async (update: Partial<IUserSettings>) => {
-    const previous = queryClient.getQueryData([QUERY_KEY]) ?? {};
+    const previous = queryClient.getQueryData(QUERY_KEY) ?? {};
 
     await settingsMutation.mutateAsync({
       ...UserSettingsFallback,
