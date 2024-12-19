@@ -11,8 +11,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "~/@shad/components/alert-dialog";
-import { invalidateTrackablesList } from "~/query/trackablesList";
-import { trpc } from "~/trpc/react";
+import { useZ } from "~/utils/useZ";
 
 const DeleteButton = ({
   id,
@@ -24,12 +23,13 @@ const DeleteButton = ({
 }) => {
   const router = useRouter();
 
+  const z = useZ();
+
   const qc = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: trpc.trackablesRouter.deleteTrackable.mutate,
+    mutationFn: (id: string) => z.mutate.TYL_trackable.delete({ id }),
     onSuccess: async () => {
-      await invalidateTrackablesList(qc);
       await router.navigate({ to: "/app/trackables" });
     },
   });
@@ -49,7 +49,7 @@ const DeleteButton = ({
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
             name="confirm delete"
-            onClick={() => void mutation.mutateAsync({ id })}
+            onClick={() => void mutation.mutateAsync(id)}
           >
             Delete
           </AlertDialogAction>

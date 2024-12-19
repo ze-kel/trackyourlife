@@ -5,8 +5,9 @@ import { ErrorBoundary } from "react-error-boundary";
 
 import DayCellWrapper from "~/components/DayCell";
 import { FavoriteButton } from "~/components/FavoriteButton";
+import { useTrackableMeta } from "~/components/Providers/TrackableProvider";
 import { TrackableNameText } from "~/components/TrackableName";
-import { useTrackableIdSafe, useTrackableMeta } from "~/query/trackable";
+import { useZeroTrackableData } from "~/utils/useZ";
 
 const MiniTrackable = ({
   className,
@@ -15,14 +16,27 @@ const MiniTrackable = ({
   className?: string;
   daysToRender: { year: number; month: number; day: number }[];
 }) => {
-  const { id } = useTrackableIdSafe();
-  const { data: trackable } = useTrackableMeta({ id });
+  const { id, type } = useTrackableMeta();
+
+  const firstDay = daysToRender[0];
+  const lastDay = daysToRender[daysToRender.length - 1];
+
+  if (!firstDay || !lastDay) {
+    console.error("No days to render", daysToRender);
+    throw new Error("No days to render");
+  }
+
+  const [data, info] = useZeroTrackableData({
+    id,
+    firstDay: new Date(firstDay.year, firstDay.month, firstDay.day),
+    lastDay: new Date(lastDay.year, lastDay.month, lastDay.day),
+  });
 
   return (
     <div className={className}>
       <div className="flex items-center justify-between">
         <Link
-          to={`/app/trackables/${trackable?.id}/`}
+          to={`/app/trackables/${id}/`}
           className={cn(
             "mb-1 block w-full text-xl font-light text-neutral-950 dark:text-neutral-50",
           )}
@@ -43,7 +57,8 @@ const MiniTrackable = ({
         <div className={"sm grid grid-cols-3 gap-x-1 gap-y-1 md:grid-cols-6"}>
           <>
             {daysToRender.map((day, index) => {
-              const date = new Date(day.year, day.month, day.day);
+              const date = new Date(Date.UTC(day.year, day.month, day.day));
+              const value = data.find((d) => d.date === date.getTime())?.value;
               return (
                 <div
                   key={index}
@@ -62,7 +77,11 @@ const MiniTrackable = ({
                     </span>
                   </div>
                   <DayCellWrapper
-                    {...day}
+                    id={id}
+                    value={value}
+                    isLoading={info.type !== "complete"}
+                    date={date}
+                    type={type}
                     labelType="none"
                     key={index}
                     className="h-16"

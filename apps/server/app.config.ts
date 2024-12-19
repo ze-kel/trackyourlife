@@ -7,6 +7,11 @@ const confg = defineConfig({
     watchOptions: {
       ignored: ["**/node_modules/@tyl*/**"],
     },
+    esbuild: {
+      options: {
+        target: "es2022",
+      },
+    },
   },
 
   vite: {
@@ -14,11 +19,20 @@ const confg = defineConfig({
       exclude: ["oslo", "@node-rs/argon2", "@node-rs/bcrypt"],
       esbuildOptions: {
         target: "es2022",
+        supported: {
+          "top-level-await": true,
+        },
       },
     },
 
     build: {
       target: "es2022",
+    },
+    esbuild: {
+      target: "es2022",
+      supported: {
+        "top-level-await": true,
+      },
     },
     plugins: [tsConfigPaths({ projects: ["./tsconfig.json"] })],
   },

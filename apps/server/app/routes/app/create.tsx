@@ -2,6 +2,7 @@ import * as React from "react";
 import { useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { v4 as uuidv4 } from "uuid";
 
 import type {
   ITrackableSettings,
@@ -11,24 +12,19 @@ import { cloneDeep } from "@tyl/helpers";
 
 import { Input } from "~/@shad/components/input";
 import { RadioTabItem, RadioTabs } from "~/@shad/components/radio-tabs";
+import { useUserSafe } from "~/components/Providers/UserContext";
 import TrackableSettings from "~/components/TrackableSettings";
-import {
-  ensureTrackablesList,
-  invalidateTrackablesList,
-} from "~/query/trackablesList";
-import { trpc } from "~/trpc/react";
+import { useZ } from "~/utils/useZ";
 
 export const Route = createFileRoute("/app/create")({
   component: RouteComponent,
-  loader: async ({ context }) => {
-    await ensureTrackablesList(context.queryClient);
-  },
 });
 
 function RouteComponent() {
   const router = useRouter();
 
-  const qc = useQueryClient();
+  const z = useZ();
+  const user = useUserSafe();
 
   const [newOne, setNewOne] = useState<ITrackableToCreate>({
     type: "boolean",
@@ -45,21 +41,20 @@ function RouteComponent() {
     setNewOne(update);
   };
 
-  const mutation = useMutation({
-    mutationFn: trpc.trackablesRouter.createTrackable.mutate,
-    onSuccess: async (data) => {
-      await invalidateTrackablesList(qc);
-      void router.navigate({
-        to: `/app/trackables/${data.id}`,
-      });
-    },
-  });
-
   const createTrackable = async (settings: ITrackableSettings) => {
-    await mutation.mutateAsync({
+    const id = uuidv4();
+    await z.mutate.TYL_trackable.insert({
+      id,
       ...newOne,
       name: nameRef.current || "",
       settings,
+      user_id: user.id,
+      is_deleted: false,
+      attached_note: "",
+    });
+
+    void router.navigate({
+      to: `/app/trackables/${id}`,
     });
   };
 

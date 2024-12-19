@@ -60,24 +60,8 @@ export const Route = createRootRouteWithContext<{
     ],
   }),
 
-  beforeLoad: async () => {
-    if (import.meta.env.SSR) {
-      const { migrateIfNeeded } = await import("@tyl/db");
-      await migrateIfNeeded();
-    }
-
-    const user = await getUserFn();
-    return { user };
-  },
-
   component: RootComponent,
 });
-
-if (import.meta.env.SSR) {
-  const { WebSocket } = await import("ws");
-
-  Object.assign(global, { WebSocket: WebSocket });
-}
 
 function RootComponent() {
   return (

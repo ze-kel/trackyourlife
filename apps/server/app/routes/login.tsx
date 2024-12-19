@@ -5,11 +5,6 @@ import LoginForm from "~/components/LoginForm";
 
 export const Route = createFileRoute("/login")({
   component: LoginComp,
-  beforeLoad: ({ context }) => {
-    if (context.user) {
-      throw redirect({ to: "/app" });
-    }
-  },
 });
 
 function LoginComp() {

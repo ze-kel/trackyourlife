@@ -24,7 +24,7 @@ import { DayCellBoolean } from "~/components/DayCell/DayCellBoolean";
 import { DayCellNumber } from "~/components/DayCell/DayCellNumber";
 import { DayCellRange } from "~/components/DayCell/DayCellRange";
 import { DayCellProvider } from "~/components/Providers/DayCellProvider";
-import { useUserSettings } from "~/query/userSettings";
+import { useUserSafe } from "~/components/Providers/UserContext";
 import NumberColorSelector from "../Colors/numberColorSelector";
 import NumberLimitsSelector from "./numberLimitsSelector";
 import RangeLabelSelector from "./rangeLabelSelector";
@@ -38,7 +38,7 @@ export const SettingsCommon = ({
 }: {
   form: ReactFormExtendedApi<ITrackable["settings"]>;
 }) => {
-  const uSettings = useUserSettings();
+  const { settings } = useUserSafe();
 
   return (
     <div>
@@ -55,7 +55,7 @@ export const SettingsCommon = ({
                 onChange={(v) => field.handleChange(String(v))}
                 limits={{
                   start: new Date(1990, 0, 1),
-                  end: getGMTWithTimezoneOffset(uSettings.timezone),
+                  end: getGMTWithTimezoneOffset(settings.timezone),
                 }}
               />
             </DrawerMobileTitleProvider>

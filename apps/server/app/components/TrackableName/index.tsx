@@ -14,17 +14,22 @@ import {
   DrawerTrigger,
 } from "~/@shad/components/drawer";
 import { Input } from "~/@shad/components/input";
-import {
-  useTrackableIdSafe,
-  useTrackableMeta,
-  useTrackableNameMutation,
-} from "~/query/trackable";
+import { useTrackableMeta } from "~/components/Providers/TrackableProvider";
 import { useIsDesktop } from "~/utils/useIsDesktop";
+import { useZ, useZeroTrackable } from "~/utils/useZ";
 
 export const TrackableNameEditable = () => {
-  const { id } = useTrackableIdSafe();
-  const { data: trackable } = useTrackableMeta({ id });
-  const { mutateAsync: updateName } = useTrackableNameMutation(id);
+  const { id } = useTrackableMeta();
+
+  const z = useZ();
+
+  const [trackable, trackableInfo] = useZeroTrackable({ id });
+  const updateName = (name: string) => {
+    void z.mutate.TYL_trackable.update({
+      id,
+      name,
+    });
+  };
 
   const [isEditing, setIsEditing] = useState(false);
 
@@ -95,8 +100,9 @@ export const TrackableNameEditable = () => {
 };
 
 export const TrackableNameText = () => {
-  const { id } = useTrackableIdSafe();
-  const { data: trackable } = useTrackableMeta({ id });
+  const { id } = useTrackableMeta();
+
+  const [trackable] = useZeroTrackable({ id });
 
   return (
     <>

@@ -18,13 +18,14 @@ import {
   DropdownContent,
   DropdownTrigger,
 } from "~/components/Dropdown";
-import { useUserSettings, useUserSettingsMutation } from "~/query/userSettings";
+import { useUserSafe } from "~/components/Providers/UserContext";
 import { useIsDesktop } from "~/utils/useIsDesktop";
+import { useZ } from "~/utils/useZ";
 
 export const CurrentTime = () => {
   const [value, setValue] = useState("");
 
-  const settings = useUserSettings();
+  const { settings } = useUserSafe();
 
   useEffect(() => {
     setValue(format(getTimezonedDate(settings.timezone), "HH:mm:ss"));
@@ -114,13 +115,19 @@ const SearchableList = ({
 export const TimezoneSelector = ({ list }: { list: TimeZone[] }) => {
   const [open, setOpen] = useState(false);
 
-  const settings = useUserSettings();
-  const { updateSettingsPartial } = useUserSettingsMutation();
+  const { settings, id } = useUserSafe();
+  const z = useZ();
 
   const value = settings.timezone;
 
   const update = (zone: TimeZone) => {
-    void updateSettingsPartial({ timezone: zone });
+    void z.mutate.TYL_auth_user.update({
+      id,
+      settings: {
+        ...settings,
+        timezone: zone,
+      },
+    });
   };
 
   const isDesktop = useIsDesktop();

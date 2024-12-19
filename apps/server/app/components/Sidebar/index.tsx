@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import React, { useMemo } from "react";
 import { DropdownMenu } from "@radix-ui/react-dropdown-menu";
+import { useZero } from "@rocicorp/zero/react";
 import { Link, useLocation, useRouter } from "@tanstack/react-router";
 import {
   ChartColumnIncreasing,
@@ -34,10 +35,9 @@ import {
 import { Spinner } from "~/@shad/components/spinner";
 import { logoutFn } from "~/auth/authOperations";
 import { CoreLinks } from "~/components/Header";
+import { useUserSafe } from "~/components/Providers/UserContext";
 import { ThemeSwitcher } from "~/components/Settings/themeSwitcher";
-import { useTrackablesList } from "~/query/trackablesList";
-import { useUserQuery } from "~/query/user";
-import { useUserSettings } from "~/query/userSettings";
+import { useZeroTrackablesList, useZeroUser } from "~/utils/useZ";
 
 const iconsMap: Record<ITrackable["type"], ReactNode> = {
   boolean: <ToggleRight size={16} />,
@@ -46,31 +46,23 @@ const iconsMap: Record<ITrackable["type"], ReactNode> = {
 };
 
 const TrackablesMiniList = () => {
-  const { data, isPending } = useTrackablesList();
+  const [data, info] = useZeroTrackablesList();
 
-  const uSettings = useUserSettings();
+  const user = useUserSafe();
 
   const loc = useLocation();
-  const settings = useUserSettings();
 
   const favsSet = useMemo(() => {
-    return new Set(settings.favorites);
-  }, [settings]);
-
-  if (isPending) {
-    return (
-      <div className="flex h-64 w-full items-center justify-center">
-        <Spinner />
-      </div>
-    );
-  }
+    return new Set(user?.settings?.favorites || []);
+  }, [user]);
 
   if (!data || data.length === 0) return <div></div>;
 
-  const sorted = sortTrackableList(data, settings.favorites);
+  const sorted = sortTrackableList([...data], user?.settings?.favorites || []);
 
   return (
     <SidebarMenu>
+      {JSON.stringify(info)}
       {sorted.map((tr) => {
         return (
           <SidebarMenuItem key={tr.id}>
@@ -79,23 +71,24 @@ const TrackablesMiniList = () => {
                 key={tr.id}
                 to={`/app/trackables/${tr.id}/`}
                 search={(prev) =>
-                  uSettings.preserveLocationOnSidebarNav
+                  user?.settings.preserveLocationOnSidebarNav
                     ? {
                         ...prev,
                       }
                     : {}
                 }
               >
-                <div className="flex w-full items-center justify-between">
+                <div className="flex w-full items-center justify-between gap-2">
                   <div className="justify-baseline flex items-center gap-2 truncate">
                     <div className="opacity-70">{iconsMap[tr.type]}</div>
                     <div>{tr.name || "Unnamed"}</div>
                   </div>
-                  <div>
-                    {favsSet.has(tr.id) && (
+
+                  {favsSet.has(tr.id) && (
+                    <div>
                       <HeartIcon fill="currentColor" size={16} />
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
               </Link>
             </SidebarMenuButton>
@@ -110,7 +103,7 @@ export const AppSidebar = () => {
   const loc = useLocation();
   const router = useRouter();
 
-  const user = useUserQuery();
+  const user = useUserSafe();
 
   return (
     <Sidebar variant="floating">
@@ -139,7 +132,7 @@ export const AppSidebar = () => {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton>
-                  <User2 /> {user.data?.username}
+                  <User2 /> {user.username}
                   <ChevronUp className="ml-auto" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>

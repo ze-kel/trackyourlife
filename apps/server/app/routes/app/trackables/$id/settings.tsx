@@ -2,44 +2,34 @@ import { createFileRoute, useRouter } from "@tanstack/react-router";
 
 import type { ITrackableSettings } from "@tyl/validators/trackable";
 
-import { Spinner } from "~/@shad/components/spinner";
+import { useTrackableMeta } from "~/components/Providers/TrackableProvider";
 import TrackableSettings from "~/components/TrackableSettings";
-import {
-  useTrackableIdSafe,
-  useTrackableMeta,
-  useTrackableSettings,
-  useTrackableSettingsMutation,
-} from "~/query/trackable";
+import { useZ } from "~/utils/useZ";
 
 export const Route = createFileRoute("/app/trackables/$id/settings")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  const { id } = useTrackableIdSafe();
-  const { data: trackable } = useTrackableMeta({
-    id,
-  });
-  const { data: settings } = useTrackableSettings({ id });
-  const { settingsMutation } = useTrackableSettingsMutation({ id });
+  const { id, type, settings } = useTrackableMeta();
+
+  const z = useZ();
 
   const router = useRouter();
 
-  if (!trackable || !settings) {
-    return <Spinner />;
-  }
   return (
     <>
       <TrackableSettings
-        trackableType={trackable.type}
+        trackableType={type}
         initialSettings={settings}
         handleSave={async (v: ITrackableSettings) => {
-          await settingsMutation.mutateAsync(v, {
-            onSuccess: () => {
-              void router.navigate({
-                to: `/app/trackables/${trackable.id}`,
-              });
-            },
+          await z.mutate.TYL_trackable.update({
+            id,
+            settings: v,
+          });
+
+          void router.navigate({
+            to: `/app/trackables/${id}`,
           });
         }}
       />

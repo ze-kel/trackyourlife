@@ -4,8 +4,9 @@ import { HeartIcon } from "lucide-react";
 
 import type { ButtonProps } from "~/@shad/components/button";
 import { Button } from "~/@shad/components/button";
-import { useTrackableIdSafe } from "~/query/trackable";
-import { useUserSettings, useUserSettingsMutation } from "~/query/userSettings";
+import { useTrackableMeta } from "~/components/Providers/TrackableProvider";
+import { useUserSafe } from "~/components/Providers/UserContext";
+import { useZ } from "~/utils/useZ";
 
 export const FavoriteButton = ({
   variant = "ghost",
@@ -14,9 +15,10 @@ export const FavoriteButton = ({
   variant?: ButtonProps["variant"];
   onlyIcon?: boolean;
 }) => {
-  const { id } = useTrackableIdSafe();
-  const settings = useUserSettings();
-  const { updateSettingsPartial } = useUserSettingsMutation();
+  const { id } = useTrackableMeta();
+  const { settings, id: userId } = useUserSafe();
+
+  const z = useZ();
 
   const settingsSet = useMemo(() => {
     return new Set(settings.favorites);
@@ -31,8 +33,12 @@ export const FavoriteButton = ({
     } else {
       settingsSet.add(id);
     }
-    await updateSettingsPartial({
-      favorites: Array.from(settingsSet),
+    await z.mutate.TYL_auth_user.update({
+      id: userId,
+      settings: {
+        ...settings,
+        favorites: Array.from(settingsSet),
+      },
     });
   };
 

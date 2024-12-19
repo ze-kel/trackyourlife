@@ -1,20 +1,15 @@
 import type { ReactNode } from "react";
 import { useCallback, useMemo } from "react";
 import { cn } from "@shad/utils";
+import { format, isSameDay } from "date-fns";
 
 import type { ITrackable, ITrackableSettings } from "@tyl/validators/trackable";
 import { getGMTWithTimezoneOffset } from "@tyl/helpers/timezone";
 import { computeDayCellHelpers } from "@tyl/helpers/trackables";
 
 import { Skeleton } from "~/@shad/components/skeleton";
-import {
-  useTrackableIdSafe,
-  useTrackableMeta,
-  useTrackableQueryByMonth,
-  useTrackableSettings,
-  useTrackableUpdateMutation,
-} from "~/query/trackable";
-import { useUserSettings } from "~/query/userSettings";
+import { useUserSafe } from "~/components/Providers/UserContext";
+import { useZ } from "~/utils/useZ";
 import { DayCellBoolean } from "./DayCellBoolean";
 import { DayCellNumber } from "./DayCellNumber";
 import { DayCellRange } from "./DayCellRange";
@@ -98,133 +93,43 @@ const DayCellInner = ({
   throw new Error("Unsupported trackable type");
 };
 
-const DayCellWrapper = ({
-  day,
-  month,
-  year,
+export const DayCellWrapper = ({
+  id,
+  date,
+  disabled,
+
   className,
   labelType = "auto",
-}: {
-  day: number;
-  month: number;
-  year: number;
-  className?: string;
-  noLabel?: boolean;
-  labelType?: "auto" | "outside" | "none";
-}) => {
-  const { id } = useTrackableIdSafe();
-  const { data: trackable } = useTrackableMeta({ id });
-  const { data: settings } = useTrackableSettings({ id });
-  const { mutateAsync } = useTrackableUpdateMutation({ id });
-
-  if (!trackable) throw new Error("Trackable not found in context");
-
-  const { data, isLoading } = useTrackableQueryByMonth({
-    month,
-    year,
-    id: id,
-  });
-
-  const uSettings = useUserSettings();
-
-  const dateNow = getGMTWithTimezoneOffset(uSettings.timezone);
-
-  const { inTrackRange, isToday, dateDay } = useMemo(
-    () =>
-      computeDayCellHelpers({
-        day,
-        month,
-        year,
-        startDate: settings?.startDate,
-        dateNow: dateNow,
-      }),
-    [day, month, year, settings?.startDate, uSettings.timezone],
-  );
-
-  const updateHandler = useCallback(
-    async (value: string) => {
-      await mutateAsync({ value, day, month, year });
-    },
-    [mutateAsync, day, month, year],
-  );
-
-  return (
-    <div className="flex flex-col">
-      {labelType !== "none" && (
-        <div
-          className={cn(
-            "mr-1 text-right text-xs text-neutral-800",
-            labelType === "outside" ? "" : "md:hidden",
-            isToday ? "font-normal underline" : "font-light",
-          )}
-        >
-          {day}
-        </div>
-      )}
-
-      <DayCellInner
-        className={cn(DayCellBaseClasses, className)}
-        type={trackable.type}
-        isLoading={isLoading}
-        outOfRange={!inTrackRange}
-        dateDay={dateDay}
-        value={data?.[day]}
-        onChange={updateHandler}
-      >
-        {labelType !== "none" && (
-          <div
-            className={cn(
-              "absolute left-1 top-0 select-none text-base text-neutral-800",
-              labelType === "outside" ? "hidden" : "max-md:hidden",
-              isToday ? "font-normal underline" : "font-light",
-            )}
-          >
-            {day}
-          </div>
-        )}
-      </DayCellInner>
-    </div>
-  );
-};
-
-export const DayCellWrapperZero = ({
-  day,
-  month,
-  year,
-  className,
-  labelType = "auto",
-
-  settings,
+  isLoading = false,
   value,
   type,
-  onChange,
 }: {
-  day: number;
-  month: number;
-  year: number;
+  id: string;
+  date: Date;
+  isLoading?: boolean;
   className?: string;
-  noLabel?: boolean;
-  settings: ITrackable["settings"];
   type: ITrackable["type"];
   value?: string;
-  onChange: (v: string) => void | Promise<void>;
-
+  disabled?: boolean;
   labelType?: "auto" | "outside" | "none";
 }) => {
-  const uSettings = useUserSettings();
+  const { id: userId } = useUserSafe();
+  const { settings: uSettings } = useUserSafe();
 
-  const dateNow = getGMTWithTimezoneOffset(uSettings.timezone);
+  const isToday = isSameDay(date, getGMTWithTimezoneOffset(uSettings.timezone));
 
-  const { inTrackRange, isToday, dateDay } = useMemo(
-    () =>
-      computeDayCellHelpers({
-        day,
-        month,
-        year,
-        startDate: settings?.startDate,
-        dateNow: dateNow,
-      }),
-    [day, month, year, settings?.startDate, uSettings.timezone],
+  const z = useZ();
+
+  const onChange = useCallback(
+    (val: string) => {
+      z.mutate.TYL_trackableRecord.upsert({
+        date: date.getTime(),
+        trackableId: id,
+        value: val,
+        user_id: userId,
+      });
+    },
+    [date, id, z],
   );
 
   return (
@@ -237,16 +142,16 @@ export const DayCellWrapperZero = ({
             isToday ? "font-normal underline" : "font-light",
           )}
         >
-          {day}
+          {format(date, "d")}
         </div>
       )}
 
       <DayCellInner
         className={cn(DayCellBaseClasses, className)}
         type={type}
-        isLoading={false}
-        outOfRange={!inTrackRange}
-        dateDay={dateDay}
+        isLoading={isLoading}
+        outOfRange={disabled}
+        dateDay={date}
         value={value}
         onChange={onChange}
       >
@@ -258,7 +163,7 @@ export const DayCellWrapperZero = ({
               isToday ? "font-normal underline" : "font-light",
             )}
           >
-            {day}
+            {format(date, "d")}
           </div>
         )}
       </DayCellInner>

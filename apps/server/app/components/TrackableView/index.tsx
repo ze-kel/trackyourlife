@@ -1,17 +1,28 @@
 import { cn } from "@shad/utils";
 import { Link } from "@tanstack/react-router";
-import { format, getDaysInMonth, getISODay, getMonth, getYear } from "date-fns";
+import {
+  addMonths,
+  endOfYear,
+  format,
+  getDaysInMonth,
+  getISODay,
+  getMonth,
+  getYear,
+  lastDayOfMonth,
+  startOfYear,
+} from "date-fns";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { ErrorBoundary } from "react-error-boundary";
 
 import { getGMTWithTimezoneOffset } from "@tyl/helpers/timezone";
 
 import { Button } from "~/@shad/components/button";
+import { useTrackableMeta } from "~/components/Providers/TrackableProvider";
+import { useUserSafe } from "~/components/Providers/UserContext";
 import { TrackableNoteEditable } from "~/components/TrackableNote";
 import { YearSelector } from "~/components/TrackableView/yearSelector";
-import { useTrackableIdSafe } from "~/query/trackable";
-import { useUserSettings } from "~/query/userSettings";
 import { Route } from "~/routes/app/trackables/$id/view";
+import { useZ, useZeroTrackableData } from "~/utils/useZ";
 import DayCellWrapper from "../DayCell";
 
 const Month = ({
@@ -23,7 +34,7 @@ const Month = ({
   year: number;
   mini?: boolean;
 }) => {
-  const { id } = useTrackableIdSafe();
+  const { id, type } = useTrackableMeta();
   const toRender = getDaysInMonth(new Date(year, month));
   const dates = Array(toRender)
     .fill(0)
@@ -35,25 +46,42 @@ const Month = ({
 
   const myId = `${year}-${month}`;
 
+  const [data, dataInfo] = useZeroTrackableData({
+    id,
+    firstDay: firstDayDate,
+    lastDay: lastDayOfMonth(firstDayDate),
+  });
+
   return (
-    <div
-      id={myId}
-      className={cn("grid gap-1", mini ? "grid-cols-7" : "grid-cols-7")}
-    >
-      {prepend.map((_, i) => (
-        <div key={i}> </div>
-      ))}
-      {dates.map((el) => (
-        <DayCellWrapper
-          key={`${id}-${month}-${el}`}
-          year={year}
-          month={month}
-          day={el}
-          labelType={mini ? "outside" : "auto"}
-          className={mini ? "h-12" : "h-12 sm:h-14 md:h-16"}
-        />
-      ))}
-    </div>
+    <>
+      {JSON.stringify(dataInfo)} {data.length} {firstDayDate.getTime()}{" "}
+      {lastDayOfMonth(firstDayDate).getTime()}
+      <div
+        id={myId}
+        className={cn("grid gap-1", mini ? "grid-cols-7" : "grid-cols-7")}
+      >
+        {prepend.map((_, i) => (
+          <div key={i}> </div>
+        ))}
+        {dates.map((el) => {
+          const date = new Date(Date.UTC(year, month, el));
+
+          const value = data?.find((r) => r.date === date.getTime())?.value;
+
+          return (
+            <DayCellWrapper
+              id={id}
+              key={`${id}-${month}-${el}`}
+              value={value}
+              type={type}
+              date={date}
+              labelType={mini ? "outside" : "auto"}
+              className={mini ? "h-12" : "h-12 sm:h-14 md:h-16"}
+            />
+          );
+        })}
+      </div>
+    </>
   );
 };
 
@@ -74,7 +102,8 @@ const Year = ({
   year: number;
   openMonth: (n: number) => void;
 }) => {
-  const settings = useUserSettings();
+  const { settings } = useUserSafe();
+  const { id } = useTrackableMeta();
 
   const active = activeMonths(
     year,
@@ -142,7 +171,7 @@ const ViewController = ({
   year: TVDateValue;
   month: TVDateValue;
 }) => {
-  const settings = useUserSettings();
+  const { settings } = useUserSafe();
   const now = getGMTWithTimezoneOffset(settings.timezone);
   const navigate = Route.useNavigate();
 
@@ -233,12 +262,23 @@ const TrackableView = ({
   month: TVDateValue;
   setDates: (year: TVDateValue, month: TVDateValue) => void;
 }) => {
+  const { id } = useTrackableMeta();
   const view =
     typeof month !== "number" && typeof year === "number" ? "months" : "days";
 
   const openMonth = (m: number) => {
     setDates(year, m);
   };
+
+  const z = useZ();
+
+  z.query.TYL_trackableRecord.where(({ cmp, and }) =>
+    and(
+      cmp("trackableId", id),
+      cmp("date", ">=", addMonths(startOfYear(new Date()), -2).getTime()),
+      cmp("date", "<=", addMonths(endOfYear(new Date()), 2).getTime()),
+    ),
+  ).preload();
 
   return (
     <>

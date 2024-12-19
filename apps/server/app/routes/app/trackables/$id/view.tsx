@@ -12,14 +12,16 @@ function RouteComponent() {
   const { month, year } = Route.useSearch();
 
   return (
-    <TrackableView
-      month={month}
-      year={year}
-      setDates={(y, m) => {
-        void navigate({
-          search: (prev) => ({ ...prev, year: y, month: m }),
-        });
-      }}
-    />
+    <>
+      <TrackableView
+        month={month}
+        year={year}
+        setDates={(y, m) => {
+          void navigate({
+            search: (prev) => ({ ...prev, year: y, month: m }),
+          });
+        }}
+      />
+    </>
   );
 }

@@ -16,20 +16,16 @@ import {
   DrawerTrigger,
 } from "~/@shad/components/drawer";
 import { Textarea } from "~/@shad/components/textarea";
-import {
-  useTrackableIdSafe,
-  useTrackableMeta,
-  useTrackableNoteMutation,
-} from "~/query/trackable";
+import { useTrackableMeta } from "~/components/Providers/TrackableProvider";
 import { useIsDesktop } from "~/utils/useIsDesktop";
+import { useZ, useZeroTrackable } from "~/utils/useZ";
 
 export const TrackableNoteEditable = () => {
-  const { id } = useTrackableIdSafe();
-  const { data: trackable } = useTrackableMeta({ id });
+  const { id } = useTrackableMeta();
+  const [trackable] = useZeroTrackable({ id });
+  const z = useZ();
 
-  const hasNote = Boolean(trackable?.note);
-
-  const noteMutation = useTrackableNoteMutation(trackable?.id ?? "");
+  const hasNote = Boolean(trackable?.attached_note);
 
   const [isEditing, setIsEditing] = useState(false);
 
@@ -38,13 +34,16 @@ export const TrackableNoteEditable = () => {
   const isDesktop = useIsDesktop();
 
   const saveHandler = () => {
-    void noteMutation.mutate(internalValue);
+    void z.mutate.TYL_trackable.update({
+      id,
+      attached_note: internalValue,
+    });
     setIsEditing(false);
   };
 
   const display = hasNote ? (
     <p className="cursor-pointer whitespace-pre-wrap rounded-md bg-inherit px-2 py-1 text-left text-sm dark:text-neutral-300 md:text-base">
-      {trackable?.note}
+      {trackable?.attached_note}
     </p>
   ) : (
     <Button variant="outline" className="w-fit gap-2">
@@ -55,7 +54,7 @@ export const TrackableNoteEditable = () => {
 
   const openChangeHandler = (v: boolean) => {
     if (v === true) {
-      setInternalValue(trackable?.note ?? "");
+      setInternalValue(trackable?.attached_note ?? "");
     }
     setIsEditing(v);
   };

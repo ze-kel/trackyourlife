@@ -22,8 +22,6 @@ export const auth_user = pgTable("auth_user", {
 
   hashedPassword: varchar("hashed_password").notNull(),
 
-  updated: timestamp("updated").defaultNow().notNull(),
-
   settings: json("settings").default({}).$type<Record<string, unknown>>(),
   // Currently only used to identify users created by e2e testing
   role: varchar("role"),
@@ -45,9 +43,8 @@ export const user_session = pgTable("user_session", {
 export const trackableTypeEnum = pgEnum("type", ["boolean", "number", "range"]);
 
 export const trackable = pgTable("trackable", {
-  updated: timestamp("updated").defaultNow().notNull(),
-  isDeleted: boolean("is_deleted").notNull().default(false),
-  userId: varchar("user_id")
+  is_deleted: boolean("is_deleted").notNull().default(false),
+  user_id: varchar("user_id")
     .notNull()
     .references(() => auth_user.id, { onDelete: "cascade" }),
 
@@ -55,16 +52,15 @@ export const trackable = pgTable("trackable", {
 
   name: varchar("name").notNull(),
   type: trackableTypeEnum("type").notNull(),
-  note: varchar("attached_note"),
+  attached_note: varchar("attached_note"),
   settings: json("settings").default({}),
 });
 
 export const ZTrackableDbSelect = createSelectSchema(trackable);
 export const ZTrackableDbInsert = createInsertSchema(trackable).omit({
-  updated: true,
-  isDeleted: true,
+  is_deleted: true,
   id: true,
-  userId: true,
+  user_id: true,
 });
 
 export const trackableRelations = relations(trackable, ({ many }) => ({
@@ -74,14 +70,12 @@ export const trackableRelations = relations(trackable, ({ many }) => ({
 export const trackableRecord = pgTable(
   "trackableRecord",
   {
-    updated: timestamp("updated").defaultNow().notNull(),
-
     trackableId: uuid("trackableId")
       .notNull()
       .references(() => trackable.id, { onDelete: "cascade" }),
     date: timestamp("date").notNull(),
     value: varchar("value").notNull(),
-    userId: varchar("user_id")
+    user_id: varchar("user_id")
       .notNull()
       .references(() => auth_user.id, { onDelete: "cascade" }),
   },
@@ -97,7 +91,7 @@ export const recordRelations = relations(trackableRecord, ({ one }) => ({
     references: [trackable.id],
   }),
   userId: one(auth_user, {
-    fields: [trackableRecord.userId],
+    fields: [trackableRecord.user_id],
     references: [auth_user.id],
   }),
 }));

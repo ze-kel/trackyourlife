@@ -21,60 +21,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "~/@shad/components/dropdown-menu";
+import { Spinner } from "~/@shad/components/spinner";
 import DeleteButton from "~/components/DeleteButton";
 import { FavoriteButton } from "~/components/FavoriteButton";
 import TrackableProvider from "~/components/Providers/TrackableProvider";
 import { TrackableNameEditable } from "~/components/TrackableName";
-import { fillPrefetchedTrackable } from "~/query/fillPrefetched";
-import { ensureTrackablesList } from "~/query/trackablesList";
-import { trpc } from "~/trpc/react";
-
-const getDataForTrackable = async (
-  id: string,
-  year: TParamsSchema["year"],
-  month: TParamsSchema["month"],
-) => {
-  const yearValid = year !== "list";
-  const monthValid = month !== "list";
-
-  // Year view, prefetch full year
-  if (yearValid && !monthValid) {
-    const trackable = await trpc.trackablesRouter.getTrackableById.query({
-      id,
-      limits: {
-        type: "year",
-        year: year,
-      },
-    });
-
-    return { trackable };
-  }
-
-  // Either both are valid, or we use special link that always gets us to current month
-  if (monthValid && yearValid) {
-    const trackable = await trpc.trackablesRouter.getTrackableById.query({
-      id,
-      limits: {
-        type: "month",
-        year: year,
-        month: month,
-      },
-    });
-    return { trackable };
-  }
-
-  // Nothing is valid. Show year view. We still prefetch current month, just to get trackable settings and info.
-  const trackable = await trpc.trackablesRouter.getTrackableById.query({
-    id,
-    limits: {
-      // This is equivalent fetching current month
-      type: "last",
-      days: 1,
-    },
-  });
-
-  return { trackable };
-};
+import { useZeroTrackable } from "~/utils/useZ";
 
 const paramsSchema = z.object({
   month: z
@@ -92,22 +44,10 @@ const paramsSchema = z.object({
     .default(new Date().getFullYear()),
 });
 
-type TParamsSchema = z.infer<typeof paramsSchema>;
-
 export const Route = createFileRoute("/app/trackables/$id")({
   component: RouteComponent,
   validateSearch: paramsSchema,
   loaderDeps: ({ search: { month, year } }) => ({ month, year }),
-  loader: async ({ context, deps: { month, year }, params }) => {
-    const p = await Promise.all([
-      ensureTrackablesList(context.queryClient),
-      getDataForTrackable(params.id, year, month),
-    ]);
-
-    fillPrefetchedTrackable(context.queryClient, p[1].trackable);
-
-    return { month, year };
-  },
 });
 
 function RouteComponent() {
@@ -116,8 +56,18 @@ function RouteComponent() {
 
   const isView = loc.pathname === `/app/trackables/${params.id}/view`;
 
+  const [trackable, trackableInfo] = useZeroTrackable({ id: params.id });
+
+  if (!trackable) {
+    return (
+      <div className="flex h-full w-full items-center justify-center">
+        <Spinner />
+      </div>
+    );
+  }
+
   return (
-    <TrackableProvider id={params.id}>
+    <TrackableProvider trackable={trackable}>
       <div className="content-container flex h-full max-h-full w-full flex-col pb-6">
         <div className="grid grid-cols-2 gap-2 max-sm:grid-cols-1">
           <TrackableNameEditable />

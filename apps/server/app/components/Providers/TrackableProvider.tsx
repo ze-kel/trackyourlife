@@ -1,38 +1,49 @@
 import type { ReactNode } from "react";
-import { createContext } from "react";
+import { createContext, useContext } from "react";
 
-import type { ITrackable } from "@tyl/validators/trackable";
+import type {
+  ITrackable,
+  ITrackableWithoutData,
+} from "@tyl/validators/trackable";
 
 import { MemoDayCellProvider } from "~/components/Providers/DayCellProvider";
-import { useTrackableMeta, useTrackableSettings } from "~/query/trackable";
 
 interface ITrackableContext {
   id: ITrackable["id"];
+  type: ITrackable["type"];
+  settings: ITrackable["settings"];
 }
 
 export const TrackableContext = createContext<ITrackableContext | null>(null);
 
 const TrackableProvider = ({
-  id,
+  trackable,
   children,
 }: {
-  id: ITrackable["id"];
+  trackable: ITrackableWithoutData;
   children: ReactNode;
 }) => {
-  const { data: trackable } = useTrackableMeta({ id });
-  const { data: settings } = useTrackableSettings({ id });
-
   return (
     <TrackableContext.Provider
       value={{
-        id: id,
+        id: trackable.id,
+        type: trackable.type,
+        settings: trackable.settings,
       }}
     >
-      <MemoDayCellProvider type={trackable?.type} settings={settings}>
+      <MemoDayCellProvider type={trackable.type} settings={trackable.settings}>
         {children}
       </MemoDayCellProvider>
     </TrackableContext.Provider>
   );
+};
+
+export const useTrackableMeta = () => {
+  const context = useContext(TrackableContext);
+  if (!context) {
+    throw new Error("useTrackableId must be used within a TrackableProvider");
+  }
+  return context;
 };
 
 export default TrackableProvider;

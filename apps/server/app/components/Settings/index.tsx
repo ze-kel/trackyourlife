@@ -1,13 +1,18 @@
 import { Switch } from "~/@shad/components/switch";
-import { useUserSettings, useUserSettingsMutation } from "~/query/userSettings";
+import { useUserSafe } from "~/components/Providers/UserContext";
+import { useZ } from "~/utils/useZ";
 
 export const PreserveLocationOnSidebarNavSwitch = () => {
-  const settings = useUserSettings();
-  const { updateSettingsPartial } = useUserSettingsMutation();
+  const { settings, id } = useUserSafe();
+  const z = useZ();
 
   const update = (value: boolean) => {
-    void updateSettingsPartial({
-      preserveLocationOnSidebarNav: value,
+    void z.mutate.TYL_auth_user.update({
+      id,
+      settings: {
+        ...settings,
+        preserveLocationOnSidebarNav: value,
+      },
     });
   };
 

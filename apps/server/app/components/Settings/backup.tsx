@@ -7,9 +7,8 @@ import { ZTrackableWithData } from "@tyl/validators/trackable";
 
 import { Button } from "~/@shad/components/button";
 import { Input } from "~/@shad/components/input";
-import { invalidateTrackablesList } from "~/query/trackablesList";
-import { trpc } from "~/trpc/react";
 
+/*
 const getBackup = async () => {
   const res = await trpc.trackablesRouter.getAllTrackables.query({
     limits: {
@@ -33,8 +32,10 @@ const getBackup = async () => {
   a.setAttribute("download", `TYL_BACKUP_${new Date().getTime()}`);
   a.click();
 };
+*/
 
 export const BackupAndRestore = () => {
+  return <div>TODO</div>;
   const [fileData, setFileData] = useState(["", ""]);
 
   return (

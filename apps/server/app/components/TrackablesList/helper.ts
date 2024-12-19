@@ -10,7 +10,7 @@ export const generateDates = (days: number, nowDate: Date) => {
   const dates: { year: number; month: number; day: number }[] = [];
 
   for (; days >= 1; days--) {
-    dates[days] = { year, month, day };
+    dates[days - 1] = { year, month, day };
 
     if (day === 1) {
       if (month === 0) {

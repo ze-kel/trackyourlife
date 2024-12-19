@@ -32,7 +32,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "~/@shad/components/drawer";
-import { useUserSettings } from "~/query/userSettings";
+import { useUserSafe } from "~/components/Providers/UserContext";
 import { useIsDesktop } from "~/utils/useIsDesktop";
 import { Dropdown, DropdownContent, DropdownTrigger } from "../Dropdown";
 
@@ -53,7 +53,7 @@ const DatePicker = ({
   };
   className?: string;
 }) => {
-  const settings = useUserSettings();
+  const { settings } = useUserSafe();
   const dateNow = getGMTWithTimezoneOffset(settings.timezone);
 
   const [innerDate, setInnerDate] = useState(date);

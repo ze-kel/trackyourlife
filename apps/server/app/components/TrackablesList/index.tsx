@@ -11,13 +11,12 @@ import { sortTrackableList } from "@tyl/helpers/trackables";
 import { Badge } from "~/@shad/components/badge";
 import { Button } from "~/@shad/components/button";
 import { Input } from "~/@shad/components/input";
-import { Spinner } from "~/@shad/components/spinner";
 import DayCellWrapper from "~/components/DayCell";
 import TrackableProvider from "~/components/Providers/TrackableProvider";
+import { useUserSafe } from "~/components/Providers/UserContext";
 import { TrackableNameText } from "~/components/TrackableName";
 import { generateDates } from "~/components/TrackablesList/helper";
-import { useTrackablesList } from "~/query/trackablesList";
-import { useUserSettings } from "~/query/userSettings";
+import { useZeroTrackablesList, useZeroUser } from "~/utils/useZ";
 import MiniTrackable from "./miniTrackable";
 
 const EmptyList = () => {
@@ -56,9 +55,9 @@ const filterTrackables = (
 };
 
 const TrackablesList = ({ daysToShow }: { daysToShow: number }) => {
-  const settings = useUserSettings();
+  const [data, info] = useZeroTrackablesList();
 
-  const { data, isPending } = useTrackablesList();
+  const [user, uInfo] = useZeroUser();
 
   const [searchQ, setSearch] = useState("");
   const [filterTypes, setFilterTypes] = useState<TrackableTypeFilterState>({
@@ -68,28 +67,23 @@ const TrackablesList = ({ daysToShow }: { daysToShow: number }) => {
   });
 
   const filtered = useMemo(
-    () => filterTrackables(searchQ, filterTypes, data ?? []),
+    () => filterTrackables(searchQ, filterTypes, data ? [...data] : []),
     [data, filterTypes, searchQ],
   );
 
   const sorted = useMemo(
-    () => sortTrackableList(filtered, settings.favorites),
-    [filtered, settings],
+    () => sortTrackableList(filtered, user?.settings.favorites || []),
+    [filtered, user],
   );
 
   const daysToRender = useMemo(
     () =>
-      generateDates(daysToShow, getGMTWithTimezoneOffset(settings.timezone)),
-    [daysToShow, settings.timezone],
+      generateDates(
+        daysToShow,
+        getGMTWithTimezoneOffset(user?.settings.timezone),
+      ),
+    [daysToShow, user],
   );
-
-  if (isPending) {
-    return (
-      <div className="flex h-64 w-full items-center justify-center">
-        <Spinner />
-      </div>
-    );
-  }
 
   if (!data || data.length === 0) return <EmptyList />;
 
@@ -132,7 +126,7 @@ const TrackablesList = ({ daysToShow }: { daysToShow: number }) => {
             key={tr.id}
             className="border-b border-neutral-200 pb-4 last:border-0 dark:border-neutral-800"
           >
-            <TrackableProvider id={tr.id}>
+            <TrackableProvider trackable={tr}>
               <MiniTrackable daysToRender={daysToRender} />
             </TrackableProvider>
           </m.div>
@@ -143,30 +137,22 @@ const TrackablesList = ({ daysToShow }: { daysToShow: number }) => {
 };
 
 export const DailyList = ({ daysToShow }: { daysToShow: number }) => {
-  const { data, isPending } = useTrackablesList();
+  const [data, info] = useZeroTrackablesList();
 
-  const settings = useUserSettings();
+  const user = useUserSafe();
 
   const daysToRender = useMemo(
     () =>
       generateDates(
         daysToShow,
-        getGMTWithTimezoneOffset(settings.timezone),
+        getGMTWithTimezoneOffset(user.settings.timezone),
       ).reverse(),
-    [daysToShow, settings.timezone],
+    [daysToShow, user],
   );
-
-  if (isPending) {
-    return (
-      <div className="flex h-64 w-full items-center justify-center">
-        <Spinner />
-      </div>
-    );
-  }
 
   if (!data || data.length === 0) return <EmptyList />;
 
-  const sorted = sortTrackableList(data, settings.favorites);
+  const sorted = sortTrackableList([...data], user.settings.favorites);
 
   return (
     <div className="flex flex-col gap-6">
@@ -193,7 +179,7 @@ export const DailyList = ({ daysToShow }: { daysToShow: number }) => {
             <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
               {sorted.map((tr, index) => (
                 <div key={index}>
-                  <TrackableProvider id={tr.id}>
+                  <TrackableProvider trackable={tr}>
                     <Link
                       to={`/app/trackables/${tr.id}/`}
                       className={cn(
