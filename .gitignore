@@ -48,3 +48,6 @@ apps/expo/.gitignore
 apps/expo/ios
 apps/expo/android
 apps/expo/.cache
+
+# zero
+zeroTemp

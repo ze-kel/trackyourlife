@@ -9,8 +9,6 @@ import {
 import { Meta, Scripts } from "@tanstack/start";
 import { ThemeProvider } from "next-themes";
 
-import { migrateIfNeeded } from "@tyl/db";
-
 import { getUserFn } from "~/auth/authOperations";
 import { LazyMotionProvider } from "~/components/Providers/lazyFramerMotionProvider";
 import appCss from "~/styles/app.css?url";
@@ -71,8 +69,15 @@ export const Route = createRootRouteWithContext<{
     const user = await getUserFn();
     return { user };
   },
+
   component: RootComponent,
 });
+
+if (import.meta.env.SSR) {
+  const { WebSocket } = await import("ws");
+
+  Object.assign(global, { WebSocket: WebSocket });
+}
 
 function RootComponent() {
   return (

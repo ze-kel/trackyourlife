@@ -1,93 +1,86 @@
-import { useState } from "react";
+import { useQuery, useZero } from "@rocicorp/zero/react";
 import { createFileRoute } from "@tanstack/react-router";
 
-import { cn } from "~/@shad/utils";
-import {
-  ControllerPoint,
-  ControllerRoot,
-} from "~/components/Colors/dragController";
+import { DayCellWrapperZero } from "~/components/DayCell";
+import { DayCellProvider } from "~/components/Providers/DayCellProvider";
+import { Schema } from "~/schema";
 
 export const Route = createFileRoute("/app/testing")({
   component: RouteComponent,
 });
 
-const classesHor = cn(
-  "h-full w-2.5 rounded-lg border-2 border-neutral-800 opacity-50 ring-2 ring-neutral-200",
-  "dark:border-neutral-200 dark:ring-neutral-800",
-  "data-[selected=true]:opacity-100",
-  "data-[active=false]:w-1.5 data-[active=false]:border",
-);
+const MockTrackableComponent = ({ id }: { id: string }) => {
+  const zero = useZero<Schema>();
 
-const classesVer = cn(
-  "h-10 w-10 rounded-lg border-2 border-neutral-800 opacity-50 ring-2 ring-neutral-200",
-  "dark:border-neutral-200 dark:ring-neutral-800",
-  "data-[selected=true]:opacity-100",
-  "data-[active=false]:w-1.5 data-[active=false]:border",
-);
+  const q = zero.query.TYL_trackable.one().where("id", id);
 
-function RouteComponent() {
-  const [value, setValue] = useState(10);
-  const [value2, setValue2] = useState(50);
+  const qs = zero.query.TYL_trackableRecord.where("trackableId", id).limit(100);
 
-  const value2L = value2 / 2;
+  const [trackableData, trackableDataDetail] = useQuery(q);
 
-  const [value3, setValue3] = useState({ x: 10, y: 10 });
-  const [value4, setValue4] = useState({ x: 50, y: 50 });
-  const value4L = { x: value4.x / 2, y: value4.y / 2 };
+  const [recordsData, recordsDetail] = useQuery(qs);
+
+  if (!trackableData) {
+    return <div></div>;
+  }
 
   return (
     <div>
-      <ControllerRoot
-        xMax={100}
-        disableY
-        initialSelectedPointId="1"
-        className="h-[50px] w-[500px] bg-red-500"
-      >
-        <ControllerPoint
-          id="1"
-          x={value}
-          onValueChange={(v) => setValue(v.x)}
-          className={classesHor}
-        ></ControllerPoint>
-        <ControllerPoint
-          id="2"
-          x={value2}
-          onValueChange={(v) => setValue2(v.x)}
-          className={classesHor}
-        ></ControllerPoint>
-        <ControllerPoint
-          id="3"
-          x={value2L}
-          className={classesHor}
-        ></ControllerPoint>
-      </ControllerRoot>
+      <div>{trackableData?.id}</div>
 
-      <ControllerRoot
-        xMax={100}
-        yMax={100}
-        initialSelectedPointId="1"
-        className="mt-2 h-[500px] w-[500px] bg-red-500"
-      >
-        <ControllerPoint
-          id="1"
-          x={value3.x}
-          y={value3.y}
-          onValueChange={(v) => setValue3(v)}
-          className={classesVer}
-        ></ControllerPoint>
-        <ControllerPoint
-          id="2"
-          x={value4.x}
-          y={value4.y}
-          onValueChange={(v) => setValue4(v)}
-          className={classesVer}
-        ></ControllerPoint>
-        <ControllerPoint
-          id="3"
-          {...value4L}
-          className={classesVer}
-        ></ControllerPoint>
-      </ControllerRoot>
+      <div className="grid grid-cols-7">
+        {recordsData.map((v) => {
+          const date = new Date(v.date);
+          return (
+            <div>
+              <DayCellProvider
+                type={trackableData.type}
+                settings={trackableData.settings}
+              >
+                <DayCellWrapperZero
+                  className="h-10"
+                  value={v.value}
+                  type={trackableData.type}
+                  day={date.getDate()}
+                  month={date.getMonth()}
+                  year={date.getFullYear()}
+                  settings={trackableData.settings}
+                  onChange={(val) =>
+                    zero.mutate.TYL_trackableRecord.upsert({
+                      trackableId: v.trackableId,
+                      value: val,
+                      date: v.date,
+                      user_id: v.user_id,
+                    })
+                  }
+                />
+              </DayCellProvider>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+function RouteComponent() {
+  if (import.meta.env.SSR) {
+    return <div></div>;
+  }
+
+  const zero = useZero<Schema>();
+
+  const q = zero.query.TYL_trackable;
+
+  const [trackableData, trackableDataDetail] = useQuery(q);
+
+  return (
+    <div>
+      {trackableData.map((v) => (
+        <div>
+          <MockTrackableComponent id={v.id} />
+        </div>
+      ))}
     </div>
   );
 }

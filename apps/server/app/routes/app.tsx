@@ -1,3 +1,5 @@
+import { Zero } from "@rocicorp/zero";
+import { ZeroProvider } from "@rocicorp/zero/react";
 import { cn } from "@shad/utils";
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 
@@ -6,6 +8,7 @@ import Header from "~/components/Header";
 import { AppSidebar } from "~/components/Sidebar";
 import { ensureUser } from "~/query/user";
 import { ensureUserSettings } from "~/query/userSettings";
+import { schema } from "~/schema";
 
 const getSidebarState = async () => {
   // eslint-disable-next-line turbo/no-undeclared-env-vars
@@ -42,15 +45,24 @@ export const Route = createFileRoute("/app")({
 function AppComponent() {
   const loaderData = Route.useLoaderData();
 
+  const z = new Zero({
+    userID: "tyl-zero",
+    server: "http://localhost:4848/",
+    schema,
+    kvStore: "mem",
+  });
+
   return (
-    <SidebarProvider defaultOpen={loaderData.sidebarState}>
-      <AppSidebar />
-      <div className={cn("h-full max-h-full min-h-screen w-full", "")}>
-        <Header />
-        <div className="mx-auto box-border w-full pt-4 max-xl:col-span-2">
-          <Outlet />
+    <ZeroProvider zero={z}>
+      <SidebarProvider defaultOpen={loaderData.sidebarState}>
+        <AppSidebar />
+        <div className={cn("h-full max-h-full min-h-screen w-full", "")}>
+          <Header />
+          <div className="mx-auto box-border w-full pt-4 max-xl:col-span-2">
+            <Outlet />
+          </div>
         </div>
-      </div>
-    </SidebarProvider>
+      </SidebarProvider>
+    </ZeroProvider>
   );
 }

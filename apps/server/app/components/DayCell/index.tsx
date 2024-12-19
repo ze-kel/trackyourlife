@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { useCallback, useMemo } from "react";
 import { cn } from "@shad/utils";
 
-import type { ITrackable } from "@tyl/validators/trackable";
+import type { ITrackable, ITrackableSettings } from "@tyl/validators/trackable";
 import { getGMTWithTimezoneOffset } from "@tyl/helpers/timezone";
 import { computeDayCellHelpers } from "@tyl/helpers/trackables";
 
@@ -127,6 +127,8 @@ const DayCellWrapper = ({
 
   const uSettings = useUserSettings();
 
+  const dateNow = getGMTWithTimezoneOffset(uSettings.timezone);
+
   const { inTrackRange, isToday, dateDay } = useMemo(
     () =>
       computeDayCellHelpers({
@@ -134,7 +136,7 @@ const DayCellWrapper = ({
         month,
         year,
         startDate: settings?.startDate,
-        dateNow: getGMTWithTimezoneOffset(uSettings.timezone),
+        dateNow: dateNow,
       }),
     [day, month, year, settings?.startDate, uSettings.timezone],
   );
@@ -168,6 +170,85 @@ const DayCellWrapper = ({
         dateDay={dateDay}
         value={data?.[day]}
         onChange={updateHandler}
+      >
+        {labelType !== "none" && (
+          <div
+            className={cn(
+              "absolute left-1 top-0 select-none text-base text-neutral-800",
+              labelType === "outside" ? "hidden" : "max-md:hidden",
+              isToday ? "font-normal underline" : "font-light",
+            )}
+          >
+            {day}
+          </div>
+        )}
+      </DayCellInner>
+    </div>
+  );
+};
+
+export const DayCellWrapperZero = ({
+  day,
+  month,
+  year,
+  className,
+  labelType = "auto",
+
+  settings,
+  value,
+  type,
+  onChange,
+}: {
+  day: number;
+  month: number;
+  year: number;
+  className?: string;
+  noLabel?: boolean;
+  settings: ITrackable["settings"];
+  type: ITrackable["type"];
+  value?: string;
+  onChange: (v: string) => void | Promise<void>;
+
+  labelType?: "auto" | "outside" | "none";
+}) => {
+  const uSettings = useUserSettings();
+
+  const dateNow = getGMTWithTimezoneOffset(uSettings.timezone);
+
+  const { inTrackRange, isToday, dateDay } = useMemo(
+    () =>
+      computeDayCellHelpers({
+        day,
+        month,
+        year,
+        startDate: settings?.startDate,
+        dateNow: dateNow,
+      }),
+    [day, month, year, settings?.startDate, uSettings.timezone],
+  );
+
+  return (
+    <div className="flex flex-col">
+      {labelType !== "none" && (
+        <div
+          className={cn(
+            "mr-1 text-right text-xs text-neutral-800",
+            labelType === "outside" ? "" : "md:hidden",
+            isToday ? "font-normal underline" : "font-light",
+          )}
+        >
+          {day}
+        </div>
+      )}
+
+      <DayCellInner
+        className={cn(DayCellBaseClasses, className)}
+        type={type}
+        isLoading={false}
+        outOfRange={!inTrackRange}
+        dateDay={dateDay}
+        value={value}
+        onChange={onChange}
       >
         {labelType !== "none" && (
           <div
