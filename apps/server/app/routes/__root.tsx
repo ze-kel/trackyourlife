@@ -9,6 +9,8 @@ import {
 import { Meta, Scripts } from "@tanstack/start";
 import { ThemeProvider } from "next-themes";
 
+import { migrateIfNeeded } from "@tyl/db";
+
 import { getUserFn } from "~/auth/authOperations";
 import { LazyMotionProvider } from "~/components/Providers/lazyFramerMotionProvider";
 import appCss from "~/styles/app.css?url";
@@ -61,6 +63,11 @@ export const Route = createRootRouteWithContext<{
   }),
 
   beforeLoad: async () => {
+    if (import.meta.env.SSR) {
+      const { migrateIfNeeded } = await import("@tyl/db");
+      await migrateIfNeeded();
+    }
+
     const user = await getUserFn();
     return { user };
   },

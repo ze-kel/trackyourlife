@@ -16,18 +16,21 @@ const pool = new PG.Pool({
 
 const db: NodePgDatabase<typeof schema> = drizzle(pool, { schema });
 
-if (process.env.MIGRATE === "true") {
-  try {
-    console.log("RUNNING MIGRATION");
-    void migrate(db, {
-      migrationsFolder:
-        process.env.NODE_ENV === "development"
-          ? "../../packages/db/drizzle" // Local development when root folder is apps/next
-          : "./drizzle", // Docker build when drizzle folder is copied to build dir
-    });
-  } catch (e) {
-    console.log("Migration error", e);
-  }
-}
+let migrationsDone = false;
 
-export { db, pool };
+const migrateIfNeeded = async () => {
+  if (process.env.MIGRATE !== "true") return;
+
+  if (migrationsDone) return;
+
+  await migrate(db, {
+    migrationsFolder:
+      process.env.NODE_ENV === "development"
+        ? "../../packages/db/drizzle" // Local development when root folder is apps/next
+        : "./drizzle", // Docker build when drizzle folder is copied to build dir
+  });
+
+  migrationsDone = true;
+};
+
+export { db, pool, migrateIfNeeded };

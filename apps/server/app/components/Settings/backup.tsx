@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
 
 import type { ITrackable, ITrackableUpdate } from "@tyl/validators/trackable";
@@ -6,6 +7,7 @@ import { ZTrackableWithData } from "@tyl/validators/trackable";
 
 import { Button } from "~/@shad/components/button";
 import { Input } from "~/@shad/components/input";
+import { invalidateTrackablesList } from "~/query/trackablesList";
 import { trpc } from "~/trpc/react";
 
 const getBackup = async () => {
@@ -22,14 +24,14 @@ const getBackup = async () => {
       },
     },
   });
-  const a = document.createElement("a"); // Create "a" element
+  const a = document.createElement("a");
   const blob = new Blob([JSON.stringify(res, null, 4)], {
     type: "application/json",
-  }); // Create a blob (file-like object)
-  const url = URL.createObjectURL(blob); // Create an object URL from blob
-  a.setAttribute("href", url); // Set "a" element link
-  a.setAttribute("download", `TYL_BACKUP_${new Date().getTime()}`); // Set download filename
-  a.click(); // Start downloading
+  });
+  const url = URL.createObjectURL(blob);
+  a.setAttribute("href", url);
+  a.setAttribute("download", `TYL_BACKUP_${new Date().getTime()}`);
+  a.click();
 };
 
 export const BackupAndRestore = () => {
@@ -106,7 +108,16 @@ const FileParser = ({ content }: { content?: string }) => {
     return <div className="font-mono text-sm">{objectFromJson.error}</div>;
   }
 
-  const parsed = backupZ.safeParse(objectFromJson.result);
+  let rr = objectFromJson.result;
+
+  if (Array.isArray(objectFromJson.result)) {
+    rr = objectFromJson.result.map((v) => {
+      v.updated = new Date(v.updated);
+      return v;
+    });
+  }
+
+  const parsed = backupZ.safeParse(rr);
 
   if (!parsed.success) {
     console.log(parsed.error);
@@ -158,6 +169,8 @@ const ParsedItem = ({
 
   const [savedId, setSavedId] = useState("");
 
+  const qc = useQueryClient();
+
   const save = async () => {
     setIsLoading(true);
     const newOne = await trpc.trackablesRouter.createTrackable.mutate({
@@ -192,6 +205,7 @@ const ParsedItem = ({
 
     setIsLoading(false);
     setSavedId(newOne.id);
+    invalidateTrackablesList(qc);
   };
 
   return (

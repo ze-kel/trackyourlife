@@ -1,7 +1,7 @@
 import { defineConfig } from "@tanstack/start/config";
 import tsConfigPaths from "vite-tsconfig-paths";
 
-export default defineConfig({
+const confg = defineConfig({
   server: {
     preset: "node-server",
     watchOptions: {
@@ -16,3 +16,5 @@ export default defineConfig({
     plugins: [tsConfigPaths({ projects: ["./tsconfig.json"] })],
   },
 });
+
+export default confg;
