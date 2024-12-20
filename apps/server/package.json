@@ -41,7 +41,6 @@
     "@trpc/server": "catalog:",
     "@tyl/db": "workspace:*",
     "@tyl/helpers": "workspace:*",
-    "@tyl/validators": "workspace:*",
     "@visx/visx": "^3.12.0",
     "@yornaath/batshit": "^0.10.1",
     "arctic": "^2.3.0",

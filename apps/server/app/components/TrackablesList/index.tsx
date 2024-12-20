@@ -4,7 +4,7 @@ import { Link } from "@tanstack/react-router";
 import { format, isLastDayOfMonth } from "date-fns";
 import { m } from "framer-motion";
 
-import type { ITrackable } from "@tyl/validators/trackable";
+import { DbTrackableSelect } from "@tyl/db/schema";
 import { getGMTWithTimezoneOffset } from "@tyl/helpers/timezone";
 import { sortTrackableList } from "@tyl/helpers/trackables";
 
@@ -33,12 +33,12 @@ const EmptyList = () => {
   );
 };
 
-type TrackableTypeFilterState = Record<ITrackable["type"], boolean>;
+type TrackableTypeFilterState = Record<DbTrackableSelect["type"], boolean>;
 
 const filterTrackables = (
   query: string,
   types: TrackableTypeFilterState,
-  list: Pick<ITrackable, "id" | "name" | "type">[],
+  list: Pick<DbTrackableSelect, "id" | "name" | "type">[],
 ) => {
   const filterByType = Object.values(types).some((v) => v);
 
@@ -190,7 +190,7 @@ export const DailyList = ({ daysToShow }: { daysToShow: number }) => {
                     </Link>
 
                     <DayCellWrapper
-                      {...date}
+                      date={new Date(date.year, date.month, date.day)}
                       labelType="none"
                       className="h-20"
                     />

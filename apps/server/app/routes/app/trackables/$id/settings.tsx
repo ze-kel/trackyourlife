@@ -1,6 +1,6 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 
-import type { ITrackableSettings } from "@tyl/validators/trackable";
+import type { ITrackableSettings } from "@tyl/db/jsonValidators";
 
 import { useTrackableMeta } from "~/components/Providers/TrackableProvider";
 import TrackableSettings from "~/components/TrackableSettings";

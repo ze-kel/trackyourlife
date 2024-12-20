@@ -8,6 +8,7 @@ import Header from "~/components/Header";
 import { UserProvider } from "~/components/Providers/UserContext";
 import { AppSidebar } from "~/components/Sidebar";
 import { schema } from "~/schema";
+import { preloadCore } from "~/utils/useZ";
 
 export const Route = createFileRoute("/app")({
   component: AppComponent,
@@ -23,17 +24,25 @@ function AppComponent() {
 
   return (
     <ZeroProvider zero={z}>
-      <UserProvider>
-        <SidebarProvider>
-          <AppSidebar />
-          <div className={cn("h-full max-h-full min-h-screen w-full", "")}>
-            <Header />
-            <div className="mx-auto box-border w-full pt-4 max-xl:col-span-2">
-              <Outlet />
+      <MainPreloader>
+        <UserProvider>
+          <SidebarProvider>
+            <AppSidebar />
+            <div className={cn("h-full max-h-full min-h-screen w-full", "")}>
+              <Header />
+              <div className="mx-auto box-border w-full pt-4 max-xl:col-span-2">
+                <Outlet />
+              </div>
             </div>
-          </div>
-        </SidebarProvider>
-      </UserProvider>
+          </SidebarProvider>
+        </UserProvider>
+      </MainPreloader>
     </ZeroProvider>
   );
 }
+
+const MainPreloader = ({ children }: { children: React.ReactNode }) => {
+  preloadCore();
+
+  return children;
+};

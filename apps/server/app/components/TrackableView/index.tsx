@@ -2,18 +2,20 @@ import { cn } from "@shad/utils";
 import { Link } from "@tanstack/react-router";
 import {
   addMonths,
+  eachDayOfInterval,
+  endOfMonth,
   endOfYear,
   format,
-  getDaysInMonth,
   getISODay,
   getMonth,
   getYear,
-  lastDayOfMonth,
+  isSameDay,
   startOfYear,
 } from "date-fns";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { ErrorBoundary } from "react-error-boundary";
 
+import { DbTrackableRecordSelect } from "@tyl/db/schema";
 import { getGMTWithTimezoneOffset } from "@tyl/helpers/timezone";
 
 import { Button } from "~/@shad/components/button";
@@ -25,7 +27,68 @@ import { Route } from "~/routes/app/trackables/$id/view";
 import { useZ, useZeroTrackableData } from "~/utils/useZ";
 import DayCellWrapper from "../DayCell";
 
-const Month = ({
+type DataRecord = { readonly date: number; readonly value: string };
+
+type PureDataRecord = { readonly date: Date; readonly value?: string };
+
+const mapDataToRange = (
+  start: Date,
+  end: Date,
+  data: readonly DataRecord[],
+): PureDataRecord[] => {
+  const days = eachDayOfInterval({
+    start,
+    end,
+  });
+
+  const result: PureDataRecord[] = [];
+
+  let dataPointer = 0;
+
+  for (const day of days) {
+    const dataRecord = data[dataPointer];
+    if (dataRecord && isSameDay(day, dataRecord.date)) {
+      result.push({ date: day, value: dataRecord.value });
+      dataPointer++;
+    } else {
+      result.push({ date: day });
+    }
+  }
+
+  return result;
+};
+
+const MonthVisualCalendar = ({
+  data,
+  prefaceDays,
+  mini,
+}: {
+  data: PureDataRecord[];
+  prefaceDays: number;
+  mini?: boolean;
+}) => {
+  return (
+    <>
+      <div className={cn("grid gap-1", mini ? "grid-cols-7" : "grid-cols-7")}>
+        <div style={{ gridColumn: `span ${prefaceDays}` }}></div>
+
+        {data.map((el, i) => {
+          return (
+            <DayCellWrapper
+              key={`${i}`}
+              value={el.value}
+              date={el.date}
+              labelType={mini ? "outside" : "auto"}
+              className={mini ? "h-12" : "h-12 sm:h-14 md:h-16"}
+            />
+          );
+        })}
+      </div>
+    </>
+  );
+};
+
+const MonthFetcher = ({
   month,
   year,
   mini,
@@ -35,53 +98,25 @@ const Month = ({
   mini?: boolean;
 }) => {
   const { id, type } = useTrackableMeta();
-  const toRender = getDaysInMonth(new Date(year, month));
-  const dates = Array(toRender)
-    .fill(0)
-    .map((_, i) => i + 1);
 
-  const firstDayDate = new Date(year, month, 1);
+  const firstDayDate = new Date(Date.UTC(year, month, 1));
+  const lastDayDate = endOfMonth(firstDayDate);
   const prefaceWith = getISODay(firstDayDate) - 1;
-  const prepend = Array(prefaceWith).fill(0);
-
-  const myId = `${year}-${month}`;
 
   const [data, dataInfo] = useZeroTrackableData({
     id,
     firstDay: firstDayDate,
-    lastDay: lastDayOfMonth(firstDayDate),
+    lastDay: lastDayDate,
   });
 
+  const mappedData = mapDataToRange(firstDayDate, lastDayDate, data);
+
   return (
-    <>
-      {JSON.stringify(dataInfo)} {data.length} {firstDayDate.getTime()}{" "}
-      {lastDayOfMonth(firstDayDate).getTime()}
-      <div
-        id={myId}
-        className={cn("grid gap-1", mini ? "grid-cols-7" : "grid-cols-7")}
-      >
-        {prepend.map((_, i) => (
-          <div key={i}> </div>
-        ))}
-        {dates.map((el) => {
-          const date = new Date(Date.UTC(year, month, el));
-
-          const value = data?.find((r) => r.date === date.getTime())?.value;
-
-          return (
-            <DayCellWrapper
-              id={id}
-              key={`${id}-${month}-${el}`}
-              value={value}
-              type={type}
-              date={date}
-              labelType={mini ? "outside" : "auto"}
-              className={mini ? "h-12" : "h-12 sm:h-14 md:h-16"}
-            />
-          );
-        })}
-      </div>
-    </>
+    <MonthVisualCalendar
+      data={mappedData}
+      prefaceDays={prefaceWith}
+      mini={mini}
+    />
   );
 };
 
@@ -95,7 +130,7 @@ const activeMonths = (year: number, now: Date) => {
   return getMonth(now);
 };
 
-const Year = ({
+const YearFetcher = ({
   year,
   openMonth,
 }: {
@@ -105,33 +140,28 @@ const Year = ({
   const { settings } = useUserSafe();
   const { id } = useTrackableMeta();
 
-  const active = activeMonths(
-    year,
-    getGMTWithTimezoneOffset(settings.timezone),
-  );
-  const toRender = 12;
+  const firstDayDate = new Date(Date.UTC(year, 0, 1));
+  const lastDayDate = endOfYear(firstDayDate);
+  const prefaceWith = getISODay(firstDayDate) - 1;
 
-  const months = Array(toRender)
-    .fill(0)
-    .map((_, i) => i);
+  const [data, dataInfo] = useZeroTrackableData({
+    id,
+    firstDay: firstDayDate,
+    lastDay: lastDayDate,
+  });
+
+  const mappedData = mapDataToRange(firstDayDate, lastDayDate, data);
 
   return (
-    <div className="my-4 grid gap-x-3 gap-y-2 md:grid-cols-2">
-      {months.map((m) => (
-        <div
-          data-upcoming={m > active}
-          key={`${year}-${m}`}
-          className="cursor-pointer rounded-md border border-transparent px-2 py-1 transition-colors disabled:pointer-events-none disabled:cursor-default data-[upcoming=true]:opacity-50"
-        >
-          <h5
-            onClick={() => openMonth(m)}
-            className={cn("mb-1 text-left font-semibold transition-colors")}
-          >
-            <span>{format(new Date(year, m, 1), "MMMM")}</span>
-          </h5>
-          <Month year={year} month={m} mini={true} />
-        </div>
-      ))}
+    <div className="my-4 flex flex-wrap gap-0.5">
+      {mappedData.map((el, i) => {
+        return (
+          <div
+            key={`${i}`}
+            className={cn("h-3 w-3", el.value ? "bg-red-500" : "bg-blue-500")}
+          />
+        );
+      })}
     </div>
   );
 };
@@ -290,10 +320,10 @@ const TrackableView = ({
         }}
       >
         {view === "days" && (
-          <Month year={year as number} month={month as number} />
+          <MonthFetcher year={year as number} month={month as number} />
         )}
         {view === "months" && (
-          <Year year={year as number} openMonth={openMonth} />
+          <YearFetcher year={year as number} openMonth={openMonth} />
         )}
       </ErrorBoundary>
 

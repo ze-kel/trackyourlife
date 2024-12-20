@@ -8,9 +8,9 @@
       "types": "./dist/index.d.ts",
       "default": "./src/index.ts"
     },
-    "./client": {
-      "types": "./dist/client.d.ts",
-      "default": "./src/client.ts"
+    "./jsonValidators": {
+      "types": "./dist/jsonValidators.d.ts",
+      "default": "./src/jsonValidators.ts"
     },
     "./schema": {
       "types": "./dist/schema.d.ts",

@@ -4,8 +4,8 @@ import { AnimatePresence, Reorder, useDragControls } from "framer-motion";
 import { GripHorizontalIcon, PlusIcon, XIcon } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 
-import type { ArrayElement } from "@tyl/validators/helpers";
-import type { IColorValue, IRangeSettings } from "@tyl/validators/trackable";
+import type { IColorValue, IRangeSettings } from "@tyl/db/jsonValidators";
+import type { ArrayElement } from "@tyl/helpers/types";
 import { cloneDeep } from "@tyl/helpers";
 
 import { Button } from "~/@shad/components/button";

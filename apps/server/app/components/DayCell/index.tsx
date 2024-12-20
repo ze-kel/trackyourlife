@@ -1,13 +1,13 @@
 import type { ReactNode } from "react";
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 import { cn } from "@shad/utils";
 import { format, isSameDay } from "date-fns";
 
-import type { ITrackable, ITrackableSettings } from "@tyl/validators/trackable";
+import { DbTrackableSelect } from "@tyl/db/schema";
 import { getGMTWithTimezoneOffset } from "@tyl/helpers/timezone";
-import { computeDayCellHelpers } from "@tyl/helpers/trackables";
 
 import { Skeleton } from "~/@shad/components/skeleton";
+import { useTrackableMeta } from "~/components/Providers/TrackableProvider";
 import { useUserSafe } from "~/components/Providers/UserContext";
 import { useZ } from "~/utils/useZ";
 import { DayCellBoolean } from "./DayCellBoolean";
@@ -28,7 +28,7 @@ const DayCellInner = ({
   onChange,
 }: {
   children: ReactNode;
-  type: ITrackable["type"];
+  type: DbTrackableSelect["type"];
   value?: string;
   isLoading?: boolean;
   outOfRange?: boolean;
@@ -94,7 +94,6 @@ const DayCellInner = ({
 };
 
 export const DayCellWrapper = ({
-  id,
   date,
   disabled,
 
@@ -102,19 +101,18 @@ export const DayCellWrapper = ({
   labelType = "auto",
   isLoading = false,
   value,
-  type,
 }: {
-  id: string;
   date: Date;
   isLoading?: boolean;
   className?: string;
-  type: ITrackable["type"];
   value?: string;
   disabled?: boolean;
   labelType?: "auto" | "outside" | "none";
 }) => {
   const { id: userId } = useUserSafe();
   const { settings: uSettings } = useUserSafe();
+
+  const { id, type } = useTrackableMeta();
 
   const isToday = isSameDay(date, getGMTWithTimezoneOffset(uSettings.timezone));
 

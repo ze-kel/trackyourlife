@@ -2,7 +2,7 @@ import { createContext, useContext } from "react";
 import { ReactNode, redirect } from "@tanstack/react-router";
 
 import type { DbUserSelect } from "@tyl/db/schema";
-import { IUserSettings } from "@tyl/validators/user";
+import { IUserSettings } from "@tyl/db/jsonValidators";
 
 import { Spinner } from "~/@shad/components/spinner";
 import { useZeroUser } from "~/utils/useZ";

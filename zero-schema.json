@@ -70,6 +70,15 @@
           }
         },
         "relationships": {
+          "trackableRecord": {
+            "sourceField": [
+              "id"
+            ],
+            "destField": [
+              "trackableId"
+            ],
+            "destSchema": "TYL_trackableRecord"
+          },
           "user": {
             "sourceField": [
               "user_id"
@@ -106,15 +115,6 @@
           }
         },
         "relationships": {
-          "trackable": {
-            "sourceField": [
-              "trackableId"
-            ],
-            "destField": [
-              "id"
-            ],
-            "destSchema": "TYL_trackable"
-          },
           "user": {
             "sourceField": [
               "user_id"

@@ -6,8 +6,7 @@ import {
   definePermissions,
 } from "@rocicorp/zero";
 
-import type { ITrackable } from "@tyl/validators/trackable";
-import type { IUserSettings } from "@tyl/validators/user";
+import { ITrackableSettings, IUserSettings } from "@tyl/db/jsonValidators";
 
 const { json } = column;
 
@@ -20,27 +19,6 @@ const TYL_auth_user = createTableSchema({
     settings: json<IUserSettings>(),
   },
   primaryKey: "id",
-});
-
-const TYL_trackable = createTableSchema({
-  tableName: "TYL_trackable",
-  columns: {
-    is_deleted: { type: "boolean" },
-    user_id: { type: "string" },
-    id: { type: "string" },
-    name: { type: "string" },
-    type: column.enumeration<"boolean" | "range" | "number">(false),
-    attached_note: { type: "string" },
-    settings: json<ITrackable["settings"]>(),
-  },
-  primaryKey: "id",
-  relationships: {
-    user: {
-      sourceField: "user_id",
-      destSchema: TYL_auth_user,
-      destField: "id",
-    },
-  },
 });
 
 const TYL_trackableRecord = createTableSchema({
@@ -58,10 +36,31 @@ const TYL_trackableRecord = createTableSchema({
       destSchema: TYL_auth_user,
       destField: "id",
     },
-    trackable: {
-      sourceField: "trackableId",
-      destSchema: TYL_trackable,
+  },
+});
+
+const TYL_trackable = createTableSchema({
+  tableName: "TYL_trackable",
+  columns: {
+    is_deleted: { type: "boolean" },
+    user_id: { type: "string" },
+    id: { type: "string" },
+    name: { type: "string" },
+    type: column.enumeration<"boolean" | "range" | "number">(false),
+    attached_note: { type: "string" },
+    settings: json<ITrackableSettings>(),
+  },
+  primaryKey: "id",
+  relationships: {
+    user: {
+      sourceField: "user_id",
+      destSchema: TYL_auth_user,
       destField: "id",
+    },
+    trackableRecord: {
+      sourceField: "id",
+      destSchema: TYL_trackableRecord,
+      destField: "trackableId",
     },
   },
 });

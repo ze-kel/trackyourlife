@@ -1,4 +1,4 @@
-import type { IColorValue } from "@tyl/validators/trackable";
+import type { IColorValue } from "@tyl/db/jsonValidators";
 
 import { findModeColorsFromUserSelect } from "./colorTools";
 

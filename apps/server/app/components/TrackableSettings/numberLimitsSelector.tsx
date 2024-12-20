@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { cn } from "@shad/utils";
 
-import type { INumberSettings } from "@tyl/validators/trackable";
+import type { INumberSettings } from "@tyl/db/jsonValidators";
 
 import { Input } from "~/@shad/components/input";
 

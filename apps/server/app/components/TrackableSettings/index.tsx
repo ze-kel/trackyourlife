@@ -4,12 +4,12 @@ import { cn } from "@shad/utils";
 import { useForm } from "@tanstack/react-form";
 import { useStore } from "@tanstack/react-store";
 
-import type {
+import {
   IBooleanSettings,
   INumberSettings,
   IRangeSettings,
-  ITrackable,
-} from "@tyl/validators/trackable";
+} from "@tyl/db/jsonValidators";
+import { DbTrackableSelect } from "@tyl/db/schema";
 import { presetsMap } from "@tyl/helpers/colorPresets";
 import { getGMTWithTimezoneOffset } from "@tyl/helpers/timezone";
 
@@ -36,7 +36,7 @@ export const SettingsTitle = ({ children }: { children: React.ReactNode }) => {
 export const SettingsCommon = ({
   form,
 }: {
-  form: ReactFormExtendedApi<ITrackable["settings"]>;
+  form: ReactFormExtendedApi<DbTrackableSelect["settings"]>;
 }) => {
   const { settings } = useUserSafe();
 
@@ -252,8 +252,8 @@ const TrackableMock = ({
   mockLabel,
   className,
 }: {
-  type: ITrackable["type"];
-  form: ReactFormExtendedApi<ITrackable["settings"]>;
+  type: DbTrackableSelect["type"];
+  form: ReactFormExtendedApi<DbTrackableSelect["settings"]>;
   mockLabel: string;
   className?: string;
 }) => {
@@ -303,12 +303,12 @@ const TrackableSettings = ({
   handleSave,
   customSaveButtonText,
 }: {
-  trackableType: ITrackable["type"];
-  initialSettings: ITrackable["settings"];
-  handleSave: (v: ITrackable["settings"]) => void | Promise<void>;
+  trackableType: DbTrackableSelect["type"];
+  initialSettings: DbTrackableSelect["settings"];
+  handleSave: (v: DbTrackableSelect["settings"]) => void | Promise<void>;
   customSaveButtonText?: string;
 }) => {
-  const form = useForm<ITrackable["settings"]>({
+  const form = useForm<DbTrackableSelect["settings"]>({
     defaultValues: initialSettings,
     onSubmit: async (v) => {
       await handleSave(v.value);

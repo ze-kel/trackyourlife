@@ -4,10 +4,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { v4 as uuidv4 } from "uuid";
 
-import type {
-  ITrackableSettings,
-  ITrackableToCreate,
-} from "@tyl/validators/trackable";
+import type { ITrackableSettings } from "@tyl/db/jsonValidators";
+import { DbTrackableInsert } from "@tyl/db/schema";
 import { cloneDeep } from "@tyl/helpers";
 
 import { Input } from "~/@shad/components/input";
@@ -26,10 +24,11 @@ function RouteComponent() {
   const z = useZ();
   const user = useUserSafe();
 
-  const [newOne, setNewOne] = useState<ITrackableToCreate>({
+  const [newOne, setNewOne] = useState<DbTrackableInsert>({
     type: "boolean",
     name: "",
     settings: {},
+    user_id: user.id,
   });
 
   const nameRef = useRef("");
@@ -48,7 +47,6 @@ function RouteComponent() {
       ...newOne,
       name: nameRef.current || "",
       settings,
-      user_id: user.id,
       is_deleted: false,
       attached_note: "",
     });

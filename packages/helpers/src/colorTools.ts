@@ -5,7 +5,7 @@ import type {
   IColorHSL,
   IColorRGB,
   IColorValue,
-} from "@tyl/validators/trackable";
+} from "@tyl/db/jsonValidators";
 
 import { range } from "./animation";
 import { presetsMap } from "./colorPresets";

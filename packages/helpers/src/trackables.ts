@@ -1,12 +1,12 @@
 import { isAfter, isBefore, isSameDay } from "date-fns";
 
-import type {
+import {
   IBooleanSettings,
   INumberSettings,
   IRangeSettings,
-  ITrackable,
   ITrackableSettings,
-} from "@tyl/validators/trackable";
+} from "@tyl/db/jsonValidators";
+import { DbTrackableSelect } from "@tyl/db/schema";
 
 import { range } from "./animation";
 import { presetsMap } from "./colorPresets";
@@ -106,7 +106,9 @@ export const getDayCellBooleanColors = (settings: IBooleanSettings) => {
   };
 };
 
-export const sortTrackableList = <T extends Pick<ITrackable, "id" | "name">>(
+export const sortTrackableList = <
+  T extends Pick<DbTrackableSelect, "id" | "name">,
+>(
   list: T[],
   favorites: string[],
 ) => {

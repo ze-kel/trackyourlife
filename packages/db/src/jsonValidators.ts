@@ -1,11 +1,6 @@
-import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
 
-import { ZTrackableDbInsert, ZTrackableDbSelect } from "@tyl/db/schema";
-
-//
-// Settings
-//
+/* Colors */
 
 export const colorRGB = z.object({
   r: z.number().min(0).max(255).default(0),
@@ -13,15 +8,11 @@ export const colorRGB = z.object({
   b: z.number().min(0).max(255).default(0),
 });
 
-export type IColorRGB = z.infer<typeof colorRGB>;
-
 export const colorHSL = z.object({
   h: z.number().min(0).max(360).default(0),
   s: z.number().min(0).max(100).default(0),
   l: z.number().min(0).max(100).default(0),
 });
-
-export type IColorHSL = z.infer<typeof colorHSL>;
 
 export const ZColorValue = z.object({
   lightMode: colorHSL,
@@ -30,7 +21,11 @@ export const ZColorValue = z.object({
   manualMode: z.boolean().optional(),
 });
 
+export type IColorRGB = z.infer<typeof colorRGB>;
+export type IColorHSL = z.infer<typeof colorHSL>;
 export type IColorValue = z.infer<typeof ZColorValue>;
+
+/* Trackable settings */
 
 const basics = {
   startDate: z.string().datetime().optional(),
@@ -48,7 +43,7 @@ export const ZColorCodingValue = z.object({
   point: z.number(),
   color: ZColorValue,
   // used to key inputs when editing, can be changed voluntarily
-  id: z.string().uuid().default(uuidv4),
+  id: z.string().uuid().default("empty_id"),
 });
 
 export type IColorCodingValue = z.infer<typeof ZColorCodingValue>;
@@ -76,7 +71,7 @@ export const ZTrackableSettingsRange = z.object({
         emoji: z.string().optional(),
         color: ZColorValue.optional(),
         // used to key inputs when editing, can be changed voluntarily
-        id: z.string().uuid().default(uuidv4),
+        id: z.string().uuid().default("empty_id"),
       }),
     )
     .optional(),
@@ -103,41 +98,20 @@ export type ITrackableSettings =
   | INumberSettings
   | IRangeSettings;
 
-//
-// Trackable
-//
+/* User settings */
 
-export const zTrackableDataMonth = z.record(z.coerce.number(), z.string());
-export const zTrackableDataYear = z.record(
-  z.coerce.number(),
-  zTrackableDataMonth,
-);
-export const zTrackableData = z.record(z.coerce.number(), zTrackableDataYear);
-
-export type ITrackableDataMonth = z.infer<typeof zTrackableDataMonth>;
-export type ITrackableDataYear = z.infer<typeof zTrackableDataYear>;
-export type ITrackableData = z.infer<typeof zTrackableData>;
-
-export const ZTrackableFromDb = ZTrackableDbSelect.and(typeSettingsUnion);
-export const ZTrackableWithData = ZTrackableFromDb.and(
-  z.object({
-    data: zTrackableData,
-  }),
-);
-export const ZTrackableToCreate = ZTrackableDbInsert.and(typeSettingsUnion);
-
-export type ITrackableWithoutData = z.infer<typeof ZTrackableFromDb>;
-export type ITrackable = z.infer<typeof ZTrackableWithData>;
-export type ITrackableToCreate = z.infer<typeof ZTrackableToCreate>;
-//
-// Update
-//
-export const ZTrackableUpdate = z.object({
-  id: z.string(),
-  year: z.number(),
-  month: z.number(),
-  day: z.number(),
-  value: z.string(),
+export const ZUserSettings = z.object({
+  favorites: z.array(z.string()).default([]),
+  colorPresets: z.array(ZColorValue).optional(),
+  preserveLocationOnSidebarNav: z.boolean().default(true),
+  timezone: z
+    .object({
+      name: z.string(),
+      label: z.string(),
+      tzCode: z.string(),
+      utc: z.string(),
+    })
+    .optional(),
 });
 
-export type ITrackableUpdate = z.infer<typeof ZTrackableUpdate>;
+export type IUserSettings = z.infer<typeof ZUserSettings>;

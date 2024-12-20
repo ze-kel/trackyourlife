@@ -77,11 +77,9 @@ const MiniTrackable = ({
                     </span>
                   </div>
                   <DayCellWrapper
-                    id={id}
                     value={value}
                     isLoading={info.type !== "complete"}
                     date={date}
-                    type={type}
                     labelType="none"
                     key={index}
                     className="h-16"

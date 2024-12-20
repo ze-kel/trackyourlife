@@ -12,7 +12,7 @@ import {
   User2,
 } from "lucide-react";
 
-import type { ITrackable } from "@tyl/validators/trackable";
+import { DbTrackableSelect } from "@tyl/db/schema";
 import { sortTrackableList } from "@tyl/helpers/trackables";
 
 import {
@@ -32,14 +32,13 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "~/@shad/components/sidebar";
-import { Spinner } from "~/@shad/components/spinner";
 import { logoutFn } from "~/auth/authOperations";
 import { CoreLinks } from "~/components/Header";
 import { useUserSafe } from "~/components/Providers/UserContext";
 import { ThemeSwitcher } from "~/components/Settings/themeSwitcher";
 import { useZeroTrackablesList, useZeroUser } from "~/utils/useZ";
 
-const iconsMap: Record<ITrackable["type"], ReactNode> = {
+const iconsMap: Record<DbTrackableSelect["type"], ReactNode> = {
   boolean: <ToggleRight size={16} />,
   range: <SmileIcon size={16} />,
   number: <ChartColumnIncreasing size={16} />,
@@ -62,7 +61,6 @@ const TrackablesMiniList = () => {
 
   return (
     <SidebarMenu>
-      {JSON.stringify(info)}
       {sorted.map((tr) => {
         return (
           <SidebarMenuItem key={tr.id}>

@@ -6,8 +6,8 @@ import type {
   IColorValue,
   INumberSettings,
   IRangeSettings,
-  ITrackable,
-} from "@tyl/validators/trackable";
+} from "@tyl/db/jsonValidators";
+import { DbTrackableSelect } from "@tyl/db/schema";
 import {
   getDayCellBooleanColors,
   getRangeLabelMapping,
@@ -151,8 +151,8 @@ export const DayCellProvider = ({
   settings,
   children,
 }: {
-  type: ITrackable["type"] | undefined;
-  settings: ITrackable["settings"] | undefined;
+  type: DbTrackableSelect["type"] | undefined;
+  settings: DbTrackableSelect["settings"] | undefined;
   children: ReactNode;
 }) => {
   if (!type || !settings) {

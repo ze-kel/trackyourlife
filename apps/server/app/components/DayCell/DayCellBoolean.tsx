@@ -1,5 +1,5 @@
 import type { MouseEvent, ReactNode } from "react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@shad/utils";
 import { AnimatePresence, m } from "framer-motion";
 
@@ -60,6 +60,11 @@ export const DayCellBoolean = ({
     }
   };
 
+  const [animate, setAnimate] = useState(false);
+  useEffect(() => {
+    setAnimate(true);
+  }, []);
+
   return (
     <button
       data-value={isActive}
@@ -85,37 +90,40 @@ export const DayCellBoolean = ({
         )}
       ></div>
       {/* This is animating layer with with active color */}
-      <AnimatePresence initial={false}>
-        <m.div
-          key={String(isActive)}
-          initial={{
-            scaleX: 0,
-            scaleY: 0,
-          }}
-          animate={{
-            scaleX: 1.2,
-            scaleY: 1.2,
-          }}
-          transition={{
-            duration: ANIMATION_TIME,
+
+      <m.div
+        key={String(isActive)}
+        initial={
+          animate
+            ? {
+                scaleX: 0,
+                scaleY: 0,
+              }
+            : {}
+        }
+        animate={{
+          scaleX: 1.2,
+          scaleY: 1.2,
+        }}
+        transition={{
+          duration: ANIMATION_TIME,
+          ease: EASE,
+          scaleY: {
+            duration: ANIMATION_TIME * whRatio,
             ease: EASE,
-            scaleY: {
-              duration: ANIMATION_TIME * whRatio,
-              ease: EASE,
-            },
-          }}
-          className={cn(
-            "absolute left-0 top-0 h-full w-full",
-            isActive
-              ? "bg-[var(--themeActiveLight)] dark:bg-[var(--themeActiveDark)]"
-              : "bg-[var(--themeInactiveLight)] dark:bg-[var(--themeInactiveDark)]",
-          )}
-          style={{
-            transformOrigin: `
+          },
+        }}
+        className={cn(
+          "absolute left-0 top-0 h-full w-full",
+          isActive
+            ? "bg-[var(--themeActiveLight)] dark:bg-[var(--themeActiveDark)]"
+            : "bg-[var(--themeInactiveLight)] dark:bg-[var(--themeInactiveDark)]",
+        )}
+        style={{
+          transformOrigin: `
               ${clickPoint[0] ?? 50}% ${clickPoint[1] ?? 50}%`,
-          }}
-        />
-      </AnimatePresence>
+        }}
+      />
       {children}
     </button>
   );

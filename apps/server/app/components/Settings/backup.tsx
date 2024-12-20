@@ -2,8 +2,7 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
 
-import type { ITrackable, ITrackableUpdate } from "@tyl/validators/trackable";
-import { ZTrackableWithData } from "@tyl/validators/trackable";
+import { DbTrackableSelect } from "@tyl/db/schema";
 
 import { Button } from "~/@shad/components/button";
 import { Input } from "~/@shad/components/input";
@@ -164,8 +163,10 @@ const ParsedItem = ({
   namePrefix,
 }: {
   namePrefix: string;
-  trackable: ITrackable;
+  trackable: DbTrackableSelect;
 }) => {
+  return <div></div>;
+
   const [isLoading, setIsLoading] = useState(false);
 
   const [savedId, setSavedId] = useState("");

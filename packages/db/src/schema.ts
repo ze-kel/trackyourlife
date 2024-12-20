@@ -12,6 +12,8 @@ import {
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
+import { ITrackableSettings, IUserSettings } from "./jsonValidators";
+
 const pgTable = pgTableCreator((name) => `TYL_${name}`);
 
 export const auth_user = pgTable("auth_user", {
@@ -22,7 +24,7 @@ export const auth_user = pgTable("auth_user", {
 
   hashedPassword: varchar("hashed_password").notNull(),
 
-  settings: json("settings").default({}).$type<Record<string, unknown>>(),
+  settings: json("settings").default({}).$type<IUserSettings>(),
   // Currently only used to identify users created by e2e testing
   role: varchar("role"),
 });
@@ -53,7 +55,7 @@ export const trackable = pgTable("trackable", {
   name: varchar("name").notNull(),
   type: trackableTypeEnum("type").notNull(),
   attached_note: varchar("attached_note"),
-  settings: json("settings").default({}),
+  settings: json("settings").default({}).$type<ITrackableSettings>(),
 });
 
 export const ZTrackableDbSelect = createSelectSchema(trackable);

@@ -1,4 +1,5 @@
 import { useQuery, useZero } from "@rocicorp/zero/react";
+import { addMonths, addYears } from "date-fns";
 
 import { Schema } from "~/schema";
 
@@ -49,7 +50,7 @@ export const useZeroTrackableData = ({
   return useQuery(q);
 };
 
-export const preloadTrackableYear = async ({
+export const preloadTrackableMonthView = async ({
   id,
   year,
 }: {
@@ -58,8 +59,39 @@ export const preloadTrackableYear = async ({
 }) => {
   const zero = useZ();
 
+  const now = new Date(year, 0, 1);
+
   zero.query.TYL_trackableRecord.where("trackableId", id)
-    .where("date", ">=", new Date(year - 1, 11, 1).getTime())
-    .where("date", "<=", new Date(year + 1, 0, 31).getTime())
+    .where("date", ">=", addMonths(now, -3).getTime())
+    .where("date", "<=", addMonths(now, 15).getTime())
     .preload();
+};
+
+export const preloadTrackableYearView = async ({
+  id,
+  year,
+}: {
+  id: string;
+  year: number;
+}) => {
+  const zero = useZ();
+
+  const now = new Date(year, 0, 1);
+
+  zero.query.TYL_trackableRecord.where("trackableId", id)
+    .where("date", ">=", addYears(now, -2).getTime())
+    .where("date", "<=", addYears(now, 2).getTime())
+    .preload();
+};
+
+export const preloadCore = async () => {
+  const zero = useZ();
+
+  const now = new Date();
+
+  zero.query.TYL_trackable.related("trackableRecord", (q) =>
+    q
+      .where("date", ">=", addMonths(now, -1).getTime())
+      .where("date", "<=", addMonths(now, 1).getTime()),
+  ).preload();
 };

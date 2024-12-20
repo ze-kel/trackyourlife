@@ -1,17 +1,14 @@
 import type { ReactNode } from "react";
 import { createContext, useContext } from "react";
 
-import type {
-  ITrackable,
-  ITrackableWithoutData,
-} from "@tyl/validators/trackable";
+import { DbTrackableSelect } from "@tyl/db/schema";
 
 import { MemoDayCellProvider } from "~/components/Providers/DayCellProvider";
 
 interface ITrackableContext {
-  id: ITrackable["id"];
-  type: ITrackable["type"];
-  settings: ITrackable["settings"];
+  id: DbTrackableSelect["id"];
+  type: DbTrackableSelect["type"];
+  settings: DbTrackableSelect["settings"];
 }
 
 export const TrackableContext = createContext<ITrackableContext | null>(null);
@@ -20,7 +17,7 @@ const TrackableProvider = ({
   trackable,
   children,
 }: {
-  trackable: ITrackableWithoutData;
+  trackable: DbTrackableSelect;
   children: ReactNode;
 }) => {
   return (
